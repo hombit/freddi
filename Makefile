@@ -6,5 +6,9 @@ LDLIBS = -lgsl -lgslcblas -lboost_program_options
 
 OBJ = nonlinear_diffusion.o spectrum.o
 
+
 all: fred
 fred: $(OBJ) fred.o
+
+clean:
+	rm -f *.o
