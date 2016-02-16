@@ -58,7 +58,7 @@ int main(int ac, char *av[]){
     double power_order = 6.;
 	string output_dir("data");
 	bool output_fulldata = false;
-    string initial_cond_shape = "sinusgauss";
+    string initial_cond_shape = "power";
 
 	{
 		po::options_description desc("Allowed options");
@@ -209,6 +209,7 @@ int main(int ac, char *av[]){
 			ostringstream filename;
 			filename << output_dir << "/" << static_cast<int>(t/tau) << ".dat";
 			ofstream output( filename.str() );
+            output << "#h   F   Sigma   W   R   Tph_vis Height" << endl;
 			for ( int i = 1; i < Nx; ++i ){
 				output		<< h.at(i)
 					<< "\t" << F.at(i)
