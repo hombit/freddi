@@ -6,54 +6,112 @@ import fredlib
 from fredlib import FRED, Tmax_SS, Tin_color_diskbb
 
 
-obs_filename = 'obs/park1543.dat'
-obscolumns = ['ObsN', 'Date', 'MJD', 'ObsTime', 'Tin', 'Tin_poserr', 'Tin_negerr', 'PhotonIndex', 'PhotonIndex_poserr', 'PhotonIndex_negerr', 'PowerLawNorm', 'PowerLawNorm_poserr', 'PowerLawNorm_negerr', 'FeEdge', 'FeEdge_poserr', 'FeEdge_negerr', 'tauFe', 'tauFe_poserr', 'tauFe_negerr', 'Lx', 'Lx_poserr', 'Lx_negerr', 'chi2nu']
-obs = np.genfromtxt(obs_filename, names=obscolumns)
-obs = fredlib.rec_append_fields( obs, 'DaP', obs['MJD'] - 52445.5 )
-obs = fredlib.rec_append_fields( obs, 'err', 0.5 * (obs['Tin_poserr'] + obs['Tin_negerr']) )
+def parkTin():
+    obs_filename = 'obs/park1543.dat'
+    obscolumns = ['ObsN', 'Date', 'MJD', 'ObsTime', 'Tin', 'Tin_poserr', 'Tin_negerr', 'PhotonIndex', 'PhotonIndex_poserr', 'PhotonIndex_negerr', 'PowerLawNorm', 'PowerLawNorm_poserr', 'PowerLawNorm_negerr', 'FeEdge', 'FeEdge_poserr', 'FeEdge_negerr', 'tauFe', 'tauFe_poserr', 'tauFe_negerr', 'Lx', 'Lx_poserr', 'Lx_negerr', 'chi2nu']
+    obs = np.genfromtxt(obs_filename, names=obscolumns)
+    obs = fredlib.rec_append_fields( obs, 'DaP', obs['MJD'] - 52445.5 )
+    obs = fredlib.rec_append_fields( obs, 'err', 0.5 * (obs['Tin_poserr'] + obs['Tin_negerr']) )
+
+    sp = fredlib.SystemParameters(
+        Mx=9.4,
+        Mopt=2.5,
+        Period=1.1164,
+        r_out=None,
+        fcol=1.7,
+    )
+
+    op = fredlib.OptimizeParameters(
+        Time=35,
+        tau=0.2,
+        t0_range=3,
+        alpha_min= 0.1,
+        alpha_max= 1.0,
+        alpha_step=0.025,
+        mulF0_min=1.0,
+        mulF0_max=15.0,
+    )
+
+    fred = FRED(
+        obs=obs,
+        sp=sp,
+        op=op,
+        absolute=True,
+        flux_obs='Tin',
+        flux_model='Mdot',
+        flux_model_func=lambda Mdot: Tin_color_diskbb( Tmax_SS(sp.Mx, Mdot, 6.*sp.Rg, units='keV'), fcol=sp.fcol ),
+        flux_fit_model='t0',
+        cloptions=(
+            '--initialcond=power',
+            '--powerorder=6',
+            '--Thot=1e4',
+            '--kirr=0.00',
+    #        '--fulldata'
+        ),
+    )
+    #fred.print_params( 1.9764e+38, 0.71178 )
+
+    #fred.fit_alpha()
+
+    #alpha = 0.71178
+    #fred.print_params( fred.fit_F0(alpha), alpha )
+
+    fred.print_params( *fred.fit_F0alpha() )
 
 
-sp = fredlib.SystemParameters(
-    Mx=8,
-    Mopt=2.5,
-    Period=1.1164,
-    r_out=None,
-    fcol=1.7,
-)
 
-op = fredlib.OptimizeParameters(
-    Time=35,
-    tau=0.2,
-    t0_range=3,
-    alpha_min= 0.1,
-    alpha_max= 1.0,
-    alpha_step=0.025,
-    mulF0_min=1.0,
-    mulF0_max=15.0,
-)
 
-fred = FRED(
-    obs=obs,
-    sp=sp,
-    op=op,
-    absolute=True,
-    flux_obs='Tin',
-    flux_model='Mdot',
-    flux_model_func=lambda Mdot: Tin_color_diskbb( Tmax_SS(sp.Mx, Mdot, 6.*sp.Rg, units='keV'), fcol=sp.fcol ),
-    flux_fit_model='t0',
-    cloptions=(
-        '--initialcond=power',
-        '--powerorder=6',
-        '--Thot=1e4',
-        '--kirr=0.00',
-#        '--fulldata'
-    ),
-)
-#fred.print_params( 1.9764e+38, 0.71178 )
+def kerrMdot():
+    obs_filename = 'X-ray_novae_modeling/data_and_plots/Mdot-t/Min_pl_kerrbb_laor_smedge_ak_0.dat'
+    obscolumns = ['Day', 'Mdot', 'Mdot_negerr', 'Mdot_poserr']
+    obs = np.genfromtxt(obs_filename, names=obscolumns)
+    obs = fredlib.rec_append_fields( obs, 'DaP', obs['Day'] - 445 )
+    obs = fredlib.rec_append_fields( obs, 'err', 0.5 * (obs['Mdot_poserr'] + obs['Mdot_negerr']) )
 
-#fred.fit_alpha()
+    sp = fredlib.SystemParameters(
+        Mx=9.4,
+        Mopt=2.5,
+        Period=1.1164,
+        r_out=None,
+        fcol=1.7,
+    )
 
-#alpha = 0.71178
-#fred.print_params( fred.fit_F0(alpha), alpha )
+    op = fredlib.OptimizeParameters(
+        Time=35,
+        tau=0.2,
+        t0_range=3,
+        alpha_min= 0.1,
+        alpha_max= 1.0,
+        alpha_step=0.025,
+        mulF0_min=1.0,
+        mulF0_max=15.0,
+    )
 
-fred.print_params( *fred.fit_F0alpha() )
+    fred = FRED(
+        obs=obs,
+        sp=sp,
+        op=op,
+        absolute=True,
+        flux_obs='Tin',
+        flux_model='Mdot',
+        flux_model_func=lambda Mdot: Mdot / 1e18,
+        flux_fit_model='t0',
+        cloptions=(
+            '--initialcond=power',
+            '--powerorder=6',
+            '--Thot=1e4',
+            '--kirr=0.00',
+    #        '--fulldata'
+        ),
+    )
+
+    fred.print_params( *fred.fit_F0alpha() )
+
+
+#############
+
+
+
+if __name__ == '__main__':
+    # parkTin()
+    kerrMdot()
