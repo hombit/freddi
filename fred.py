@@ -62,11 +62,11 @@ def parkTin():
 
 
 def kerrMdot():
-    obs_filename = 'X-ray_novae_modeling/data_and_plots/Mdot-t/Min_pl_kerrbb_laor_smedge_ak_0.dat'
+    obs_filename = 'X-ray_novae_modeling/data_and_plots/Mdot-t/Min_simpl_kerrbb_gauss_smedge_ak0.6.dat'
     obscolumns = ['Day', 'Mdot', 'Mdot_negerr', 'Mdot_poserr']
     obs = np.genfromtxt(obs_filename, names=obscolumns)
     obs = fredlib.rec_append_fields( obs, 'DaP', obs['Day'] - 445 )
-    obs = fredlib.rec_append_fields( obs, 'err', 0.5 * (obs['Mdot_poserr'] + obs['Mdot_negerr']) )
+    obs = fredlib.rec_append_fields( obs, 'err', 0.5 * (np.abs(obs['Mdot_poserr']) + np.abs(obs['Mdot_negerr'])) )
 
     sp = fredlib.SystemParameters(
         Mx=9.4,
@@ -92,7 +92,7 @@ def kerrMdot():
         sp=sp,
         op=op,
         absolute=True,
-        flux_obs='Tin',
+        flux_obs='Mdot',
         flux_model='Mdot',
         flux_model_func=lambda Mdot: Mdot / 1e18,
         flux_fit_model='t0',
@@ -101,11 +101,13 @@ def kerrMdot():
             '--powerorder=6',
             '--Thot=1e4',
             '--kirr=0.00',
+            '--kerr=0.6'
     #        '--fulldata'
         ),
     )
 
     fred.print_params( *fred.fit_F0alpha() )
+    # fred.print_params( 3.9571469e38, 0.91435947 )
 
 
 #############
