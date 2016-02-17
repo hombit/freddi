@@ -48,7 +48,7 @@ def Tin_color_diskbb( TmaxSS, fcol=1.7 ):
 
 
 def chi2(f, x, y, sigma=None):
-    if sigma == None  or  (sigma == 0).any():
+    if sigma is None  or  (sigma == 0).any():
         sigma = np.ones_like(y)
     return (( (f(x) - y) / sigma )**2).sum() / (y.shape[0]-2)
 
