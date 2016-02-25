@@ -1,5 +1,5 @@
 
-# Created by https://www.gitignore.io/api/python,linux,osx,vim,c++
+# Created by https://www.gitignore.io/api/python,linux,osx,vim,c++,ipythonnotebook
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
@@ -138,6 +138,10 @@ Session.vim
 *.exe
 *.out
 *.app
+
+### IPythonNotebook ###
+# Temporary data
+.ipynb_checkpoints/
 
 
 ### My ###
