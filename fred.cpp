@@ -34,6 +34,14 @@ int main(int ac, char *av[]){
 	const double Angstrem = 1e-8;
 	const double keV = 1000. * GSL_CONST_CGSM_ELECTRON_VOLT / GSL_CONST_CGSM_PLANCKS_CONSTANT_H;
 	const double solar_radius = 6.955e10;
+	const double kpc = 1000. * GSL_CONST_CGSM_PARSEC;
+
+	const double lambdaU = 3650. * Angstrem;
+	const double lambdaB = 4400. * Angstrem;
+	const double lambdaV = 5500. * Angstrem;
+	const double irr0U = 4.27e-9 / Angstrem;
+	const double irr0B = 6.61e-9 / Angstrem;
+	const double irr0V = 3.63e-9 / Angstrem;
 
 	double alpha = 0.55;
 	double fc = 1.7;
@@ -42,6 +50,8 @@ int main(int ac, char *av[]){
 	double Mx = 7.5 * GSL_CONST_CGSM_SOLAR_MASS;
 	double Mopt = 0.8 * GSL_CONST_CGSM_SOLAR_MASS;
 	double P = 0.433 * DAY;
+	double cosi = cos(20.7 / 180 * M_PI);
+	double Distance = 10. * kpc;
     double r_in = r_in_func( Mx, kerr );
 	double r_out = r_out_func( Mx, Mopt, P );
     double T_min_hot_disk = 8000;
@@ -118,7 +128,7 @@ int main(int ac, char *av[]){
 	const double GM = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx;
 	const double h_in = sqrt( GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx  * r_in );
 	const double h_out = sqrt( GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx  * r_out );
-	const double F0_sinus = 1e-6 * F0_gauss;
+    const double cosiOverD2 = cosi / Distance / Distance;
 //	cout
 //        << "R_out = " << r_out / solar_radius << "\n"
 //	    << "h_out = " << h_out << "\n"
@@ -133,6 +143,7 @@ int main(int ac, char *av[]){
 
     vector<double> F(Nx);
     if ( initial_cond_shape == "sinusgauss" ){
+		const double F0_sinus = 1e-6 * F0_gauss;
 		const double h_cut_for_F_gauss = h_out / sqrt(r_gauss_cut_to_r_out);
 		const double F_gauss_cut = F0_gauss * exp( - (h_cut_for_F_gauss-h_out)*(h_cut_for_F_gauss-h_out) / (2. * h_out*h_out/(sigma_for_F_gauss*sigma_for_F_gauss)) );
 		for ( int i = 0; i < Nx; ++i ){
@@ -161,7 +172,7 @@ int main(int ac, char *av[]){
 	};
 
 	ofstream output_sum( output_dir + "/sum.dat" );
-	output_sum << "#t	Mdot	Lx	H2R Rhot2Rout    Tphout kxout" << endl;
+	output_sum << "#t	Mdot	Lx	H2R Rhot2Rout    Tphout kxout   mB  mV" << endl;
     output_sum << "# r_out = " << r_out << endl;
 
 	for( double t = 0.; t <= Time; t += tau ){
@@ -188,7 +199,7 @@ int main(int ac, char *av[]){
         
 		const double Lx = Luminosity( R, Tph_X, nu_min, nu_max, 100 ) / pow(fc, 4.);
 
-        double Tph = Tph_vis.at(Nx-1);
+        auto Tph = vector<double>(Tph_vis);
         double k_x = 0.;
         if ( T_min_hot_disk > 0. ){
             int i = Nx;
@@ -196,14 +207,17 @@ int main(int ac, char *av[]){
                 i--;
                 k_x = k_irr * pow(Height.at(i) / R.at(i), 2.);
                 const double Qx = k_x * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * eta / (4.*M_PI * R.at(i)*R.at(i));
-                Tph = pow( pow(Tph_vis.at(i), 4.) + Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
-            } while( Tph < T_min_hot_disk );
+                Tph.at(i) = pow( pow(Tph_vis.at(i), 4.) + Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
+            } while( Tph.at(i) < T_min_hot_disk );
             if ( i < Nx-1 ){
                 Nx = i;
                 F.at(Nx-1) = F.at(Nx-2);
                 h.resize(Nx);
             }
         }
+
+		const double mB = -2.5 * log10( I_lambda(R, Tph, lambdaB) * cosiOverD2 / irr0B );
+		const double mV = -2.5 * log10( I_lambda(R, Tph, lambdaV) * cosiOverD2 / irr0V );
 
         if (output_fulldata){
 			ostringstream filename;
@@ -227,8 +241,10 @@ int main(int ac, char *av[]){
 				<< "\t" << Lx
 				<< "\t" << Height.at(Nx-1) / R.at(Nx-1)
                 << "\t" << R.at(Nx-1) / r_out
-                << "\t" << Tph
+                << "\t" << Tph.at(Nx-1)
                 << "\t" << k_x
+                << "\t" << mB
+                << "\t" << mV
 				<< endl;
 	}
 

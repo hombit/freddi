@@ -62,7 +62,7 @@ def parkTin():
 
 
 def kerrMdot():
-    obs_filename = 'X-ray_novae_modeling/data_and_plots/Mdot-t/Min_simpl_kerrbb_gauss_smedge_ak0.6.dat'
+    obs_filename = '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_pl_kerrbb_laor_smedge_ak_0.dat'
     obscolumns = ['Day', 'Mdot', 'Mdot_negerr', 'Mdot_poserr']
     obs = np.genfromtxt(obs_filename, names=obscolumns)
     obs = fredlib.rec_append_fields( obs, 'DaP', obs['Day'] - 445 )
@@ -101,13 +101,13 @@ def kerrMdot():
             '--powerorder=6',
             '--Thot=1e4',
             '--kirr=0.00',
-            '--kerr=0.6'
+            '--kerr=0.0'
     #        '--fulldata'
         ),
     )
 
-    fred.print_params( *fred.fit_F0alpha() )
-    # fred.print_params( 3.9571469e38, 0.91435947 )
+    # fred.print_params( *fred.fit_F0alpha() )
+    fred.print_params( 3.9571e+38, 0.91436 )
 
 
 #############
