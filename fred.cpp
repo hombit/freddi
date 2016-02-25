@@ -82,6 +82,7 @@ int main(int ac, char *av[]){
 			( "Mx,M", po::value<double>()->default_value(Mx/GSL_CONST_CGSM_SOLAR_MASS), "Mass of central object, solar masses" )
 			( "period,P", po::value<double>()->default_value(P/DAY), "Orbital period of binary system, days" )
 			( "rout,R", po::value<double>()->default_value(r_out/solar_radius), "Outer radius of the disk, solar radii. If it isn't setted than it will be calculated using Mx, Mopt and period" )
+            ( "distance,r", po::value<double>()->default_value(Distance/kpc), "Distance to the system, kpc" )
 			( "numin,u", po::value<double>()->default_value(nu_min/keV), "Lower bound of X-ray band, keV" )
 			( "numax,U", po::value<double>()->default_value(nu_max/keV), "Upper bound of X-ray band, keV" )
 			( "Nx,N",	po::value<int>(&Nx)->default_value(Nx), "Size of calculation grid" )
@@ -112,6 +113,7 @@ int main(int ac, char *av[]){
 		Mopt = vm["Mopt"].as<double>() * GSL_CONST_CGSM_SOLAR_MASS;
 		Mx = vm["Mx"].as<double>() * GSL_CONST_CGSM_SOLAR_MASS;
 		P = vm["period"].as<double>() * DAY;
+        Distance = vm["distance"].as<double>() * kpc;
 		nu_min = vm["numin"].as<double>() * keV;
 		nu_max = vm["numax"].as<double>() * keV;
 		tau = vm["tau"].as<double>() * DAY;
