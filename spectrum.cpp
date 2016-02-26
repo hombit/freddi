@@ -35,7 +35,7 @@ double I_lambda( const std::vector<double> &R, const std::vector<double> &T, dou
 		if ( i_R == 0              ) stepR = R.at(i_R+1) - R.at(i_R  );
 		if ( i_R == NR-1           ) stepR = R.at(i_R  ) - R.at(i_R-1);
 		if ( i_R > 1 and i_R < NR-1 ) stepR = R.at(i_R+1) - R.at(i_R-1);
-		const double B_lambda =  2. * GSL_CONST_CGSM_PLANCKS_CONSTANT_H * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / pow(lambda,5.) / ( exp( GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_PLANCKS_CONSTANT_H / lambda / GSL_CONST_CGSM_BOLTZMANN / T.at(i_R) ) );
+		const double B_lambda =  2. * GSL_CONST_CGSM_PLANCKS_CONSTANT_H * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / pow(lambda,5.) / ( exp( GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_PLANCKS_CONSTANT_H / lambda / GSL_CONST_CGSM_BOLTZMANN / T.at(i_R) ) - 1. );
 		I += .5 * B_lambda * 2. * M_PI * R.at(i_R) * stepR;
 	}
 	return I;
