@@ -171,6 +171,8 @@ class FRED(object):
         )
         
         model = np.genfromtxt( os.path.join(dirname, 'sum.dat'), names=True )
+        if len( model.shape ) == 0:
+            raise RuntimeError('Model file is empty')
         if model.shape[0] <= 3:
             raise RuntimeError('Need more dots in model file')
         Mdot0 = model['Mdot'].max()
