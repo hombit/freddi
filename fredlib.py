@@ -171,8 +171,8 @@ class FRED(object):
         )
         
         model = np.genfromtxt( os.path.join(dirname, 'sum.dat'), names=True )
-        if model.shape[0] == 0:
-            raise RuntimeError('Empty model file')
+        if model.shape[0] <= 3:
+            raise RuntimeError('Need more dots in model file')
         Mdot0 = model['Mdot'].max()
         if self.flux_model_func:
             model[self.flux_model] = self.flux_model_func( model[self.flux_model] )
