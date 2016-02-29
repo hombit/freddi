@@ -36,12 +36,11 @@ int main(int ac, char *av[]){
 	const double solar_radius = 6.955e10;
 	const double kpc = 1000. * GSL_CONST_CGSM_PARSEC;
 
-	const double lambdaU = 3650. * Angstrem;
 	const double lambdaB = 4400. * Angstrem;
-	const double lambdaV = 5500. * Angstrem;
-	const double irr0U = 4.27e-9 / Angstrem;
 	const double irr0B = 6.61e-9 / Angstrem;
-	const double irr0V = 3.63e-9 / Angstrem;
+    // Calculated for BUXTON & BAILYN 2004
+	const double lambdaV = 5450. * Angstrem;
+	const double irr0V = 2.90e-9 / Angstrem;
 
 	double alpha = 0.55;
 	double fc = 1.7;
