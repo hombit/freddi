@@ -317,6 +317,7 @@ class FRED(object):
         r_hot_max = {r_hot_max}
         k_x_max = {k_x_max}
         H2r = {H2r}
+        dir = {path}
         '''.format(
             F0=F0,
             alpha=alpha,
@@ -327,6 +328,7 @@ class FRED(object):
             r_hot_0 = r_hot_0,
             r_hot_max = splines['Rhot2Rout'](t0) * r_cold,
             k_x_max = splines['kxout'](t0),
-            H2r = splines['H2R'](t0)
+            H2r = splines['H2R'](t0),
+            path = self.datadir(F0, alpha),
         ))
 
