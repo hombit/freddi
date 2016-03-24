@@ -14,15 +14,15 @@ def parkTin():
     obs = fredlib.rec_append_fields( obs, 'err', 0.5 * (obs['Tin_poserr'] + obs['Tin_negerr']) )
 
     sp = fredlib.SystemParameters(
-        Mx=9.4,
+        Mx=6,
         Mopt=2.5,
         Period=1.1164,
-        r_out=None,
+        r_out=1,
         fcol=1.7,
     )
 
     op = fredlib.OptimizeParameters(
-        Time=35,
+        Time=20,
         tau=0.2,
         t0_range=3,
         alpha_min= 0.1,
@@ -44,7 +44,7 @@ def parkTin():
         cloptions=(
             '--initialcond=power',
             '--powerorder=6',
-            '--Thot=8000',
+            '--Thot=-1',
             '--kirr=0.00',
     #        '--fulldata'
         ),
@@ -56,7 +56,8 @@ def parkTin():
     #alpha = 0.71178
     #fred.print_params( fred.fit_F0(alpha), alpha )
 
-    fred.print_params( *fred.fit_F0alpha() )
+    fred.print_params( 1.4893e+37, 0.40401 )
+    print( fred.find_errors( 1.4893e+37, 0.40401, sigma_level=3 ) )
 
 
 
@@ -98,7 +99,7 @@ def kerrMdot():
         flux_fit_model='t0',
         cloptions=(
             '--initialcond=power',
-            '--powerorder=7.5',
+            '--powerorder=6',
             '--Thot=1e4',
             '--kirr=0.0',
             '--kerr=0.9',
@@ -110,8 +111,8 @@ def kerrMdot():
     #alpha = 0.64902
     #fred.print_params( fred.fit_F0(alpha), alpha )
 
-    fred.print_params( *fred.fit_F0alpha() )
-    # fred.print_params( 1.9829e+38, 0.64902 )
+    # fred.print_params( *fred.fit_F0alpha() )
+    fred.print_params( 1.9829e+38, 0.64902 )
 
 
 #############
@@ -119,5 +120,5 @@ def kerrMdot():
 
 
 if __name__ == '__main__':
-    # parkTin()
-    kerrMdot()
+    parkTin()
+    # kerrMdot()

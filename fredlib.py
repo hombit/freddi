@@ -9,7 +9,8 @@ import os, os.path
 from astropy import constants
 from numpy.lib.recfunctions import rec_append_fields
 from scipy.interpolate import interp1d
-from scipy.optimize import curve_fit, differential_evolution
+from scipy.optimize import brentq, curve_fit, differential_evolution
+from scipy import special, stats
 
 
 eV = astropy.units.eV.in_units(astropy.units.erg)
@@ -52,6 +53,40 @@ def chi2(f, x, y, sigma=None):
         sigma = np.ones_like(y)
     return (( (f(x) - y) / sigma )**2).sum() / (y.shape[0]-2)
 
+def chi2_errors( chi2_func, x0, bounds, dof, sigma_level=1 ):
+    chi2_quantile = stats.distributions.chi2.ppf( special.erf(sigma_level/np.sqrt(2)), df=dof ) / dof
+    chi2_min = chi2_func(x0)
+    if chi2_quantile > chi2_min:
+        chi2_quantile = chi2_min
+    print( chi2_min, chi2_quantile, sigma_level**2*chi2_min/chi2_quantile/dof)
+
+    errors = np.empty( ( len(x0), 2 ) )
+    for i in range( len(x0) ):
+        bounds_trunc = list(bounds)
+        del bounds_trunc[i]
+
+        def chi2_func_trunc(x, x_i):
+            x_list = list(x)
+            x_list.insert(i, x_i)
+            return chi2_func(x_list)
+
+        search_func = lambda x_i: differential_evolution(
+            lambda x: chi2_func_trunc(x, x_i) - chi2_min - sigma_level**2*chi2_min/chi2_quantile/dof,
+            bounds_trunc,
+            tol=2e-2,
+            popsize=7,
+        ).fun
+
+        for j in range(2):
+            errors[i,j] = abs(
+                brentq(
+                        search_func,
+                        bounds[i][j], x0[i],
+                        rtol=2e-2,
+                    )
+                - x0[i]
+            )
+    return errors
 
 def disksize(Mx, Mopt, Period):
     Mass = (Mx+Mopt) * Msun
@@ -150,6 +185,20 @@ class FRED(object):
         dirname = 'data/F_{F}/alpha_{alpha}'.format(F=F0, alpha=alpha)
         os.makedirs(dirname, exist_ok=True)
         return dirname
+    
+    def get_model( self, F0, alpha ):
+        dirname = self.datadir(F0, alpha)
+        model = np.genfromtxt( os.path.join(dirname, 'sum.dat'), names=True )
+        if len( model.shape ) == 0:
+            raise RuntimeError('Model file is empty')
+        if model.shape[0] <= 3:
+            raise RuntimeError('Need more dots in model file')
+        if self.flux_model_func:
+            model[self.flux_model] = self.flux_model_func( model[self.flux_model] )
+        if not self.absolute:
+            model[self.flux_model] /= model[self.flux_model].max()
+
+        return model
 
     def fit_t0( self, F0, alpha, draw=False ):
         dirname = self.datadir(F0, alpha)
@@ -170,16 +219,8 @@ class FRED(object):
             ] + list(self.cloptions)
         )
         
-        model = np.genfromtxt( os.path.join(dirname, 'sum.dat'), names=True )
-        if len( model.shape ) == 0:
-            raise RuntimeError('Model file is empty')
-        if model.shape[0] <= 3:
-            raise RuntimeError('Need more dots in model file')
+        model = self.get_model(F0, alpha)
         Mdot0 = model['Mdot'].max()
-        if self.flux_model_func:
-            model[self.flux_model] = self.flux_model_func( model[self.flux_model] )
-        if not self.absolute:
-            model[self.flux_model] /= model[self.flux_model].max()
         model_spline = interp1d( model['t'], model[self.flux_model], kind='cubic' )
         t0 = model['t'][ model[self.flux_model].argmax() ]
         i_min = self.obs['DaP'].searchsorted( -t0, side='left' )
@@ -228,7 +269,7 @@ class FRED(object):
         return ( lambda t: Amplitude * model_spline(t+t0), model, obs_trunc, t0, Mdot0 )
 
     def chi2_fit_t0( self, F0, alpha ):
-        print(F0, alpha)
+        print(F0/self.F0_0, alpha)
         try:
             model_spline, model, obs_trunc, t0, Mdot0 = self.fit_t0( F0, alpha )
         except RuntimeError:
@@ -273,6 +314,7 @@ class FRED(object):
             F0 *= self.sp.Mdot_max / Mdot0
 
     def fit_F0(self, alpha):
+        print(self.F0_0)
         minimize_result = differential_evolution(
             lambda x: self.chi2_fit_t0( x[0] * self.F0_0, alpha ),
             ( (self.op.mulF0_min, self.op.mulF0_max), ),
@@ -282,7 +324,7 @@ class FRED(object):
         print(minimize_result)
         F0 = self.F0_0 * minimize_result.x[0]
         return F0
-
+    
     def fit_F0alpha(self):
         print(self.F0_0)
         minimize_result = differential_evolution(
@@ -298,7 +340,24 @@ class FRED(object):
         F0 = self.F0_0 * minimize_result.x[0]
         alpha = minimize_result.x[1]
         return( F0, alpha )
-        
+    
+    def find_errors(self, F0, alpha, sigma_level=1):
+        chi2_func = lambda x: self.chi2_fit_t0( x[0] * self.F0_0, x[1] )
+        x0 = (F0/self.F0_0, alpha)
+        bounds = (
+            (self.op.mulF0_min, self.op.mulF0_max),
+            (self.op.alpha_min, self.op.alpha_max)
+        )
+        dof = self.get_model(F0, alpha).shape[0]-2
+        errors = chi2_errors( 
+            chi2_func,
+            x0, bounds,
+            dof,
+            sigma_level=sigma_level
+        )
+        # errors[0] *= self.F0_0
+        return errors
+
     def print_params(self, F0, alpha):
         model_spline, model, obs_trunc, t0, Mdot0 = self.fit_t0(F0, alpha, draw=True)
         r_cold = self.sp.r_out
@@ -333,4 +392,3 @@ class FRED(object):
             H2r = splines['H2R'](t0),
             path = self.datadir(F0, alpha),
         ))
-
