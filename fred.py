@@ -165,4 +165,7 @@ def process_kerrMdot(multiproc=True):
 
 if __name__ == '__main__':
     # parkTin()
-    print( process_kerrMdot(multiproc=True) )
+    lines = process_kerrMdot(multiproc=True)
+    with open('results.dat', 'w') as f:
+        for line in lines:
+            f.write(line)
