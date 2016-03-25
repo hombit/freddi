@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import multiprocessing, subprocess
 import os, os.path
+import sys
 from astropy import constants
 from numpy.lib.recfunctions import rec_append_fields
 from scipy.interpolate import interp1d
@@ -156,7 +157,7 @@ class FRED(object):
         flux_model='Lx',
         flux_model_func=None,
         flux_fit_model='t0_Amplitude',
-        cloptions=[]
+        cloptions={}
     ):
         self.obs = obs
         self.sp = sp
@@ -216,7 +217,9 @@ class FRED(object):
                 '--dir={}'.format(dirname),
                 '--F0={}'.format(F0),
                 '--dilution={}'.format(self.sp.fcol),
-            ] + list(self.cloptions)
+            ] + [
+                '--{}={}'.format(k,v) for k,v in self.cloptions.items()
+            ]
         )
         
         model = self.get_model(F0, alpha)
@@ -358,7 +361,7 @@ class FRED(object):
         # errors[0] *= self.F0_0
         return errors
 
-    def print_params(self, F0, alpha):
+    def print_params(self, F0, alpha, stream=sys.stdout, oneline=False, additional_fields={}):
         model_spline, model, obs_trunc, t0, Mdot0 = self.fit_t0(F0, alpha, draw=True)
         r_cold = self.sp.r_out
         r_hot_0 = r_cold * model[0]['Rhot2Rout']
@@ -367,28 +370,58 @@ class FRED(object):
         for column in model.dtype.names[1:]:
             splines[column] = interp1d( model['t'], model[column], kind='cubic' )
         
-        print('''
-        F0 = {F0}
-        alpha = {alpha}
-        chi2 = {chi2}
-        t0 = {t0}
-        Mdot_max = {Mdot_max}
-        r_cold = {r_cold}
-        r_hot_0 = {r_hot_0}
-        r_hot_max = {r_hot_max}
-        k_x_max = {k_x_max}
-        H2r = {H2r}
-        dir = {path}
-        '''.format(
-            F0=F0,
-            alpha=alpha,
-            chi2=chi2( model_spline, obs_trunc['DaP'], obs_trunc[self.flux_obs], sigma=obs_trunc['err'] ),
-            t0=t0,
-            Mdot_max=Mdot0,
-            r_cold=r_cold,
-            r_hot_0 = r_hot_0,
-            r_hot_max = splines['Rhot2Rout'](t0) * r_cold,
-            k_x_max = splines['kxout'](t0),
-            H2r = splines['H2R'](t0),
-            path = self.datadir(F0, alpha),
-        ))
+        if oneline:
+            stream.write(
+                '{Mx:<6.1g} {Kerr:<5.3g} {Mopt:<4.1g} {Period:<7.4g} {r_out:<7.5g} {fullTime:<8g} {spectrum_fit:<19s} {t0range:<7g} {F0:<10.4e} {alpha:<7.5g} {initialcond:<11s} {ic_param:<8.1g} {Thot:<6g} {run_radius:<10d} {k_irr:<5.2g} {irr_enable:<10d} {fitdots:<7s} {fcol:<5.1g} {Chi2:<5.3g} {r_hot_0:<7.5g} {r_hot_max:<9.5g} {k_x_max:<9.4g} {H2r:<6.4g} {Mdot_max:<10.4e}\n'.format(
+                    Mx = self.sp.Mx,
+                    Kerr = self.cloptions.get('kerr') or 0.,
+                    Mopt = self.sp.Mopt,
+                    Period = self.sp.Period,
+                    r_out = self.sp.r_out,
+                    fullTime = self.op.Time,
+                    spectrum_fit = additional_fields.get('spectrum_fit'),
+                    t0range = self.op.tau,
+                    F0 = F0,
+                    alpha = alpha,
+                    initialcond = self.cloptions.get('initialcond') or 'unknown',
+                    ic_param = self.cloptions.get('powerorder'),
+                    Thot = self.cloptions['Thot'],
+                    run_radius = int( self.cloptions['Thot'] > 0. ),
+                    k_irr = self.cloptions.get('kirr'),
+                    irr_enable = int( self.cloptions['kirr'] > 0. ),
+                    fitdots = self.flux_obs,
+                    fcol = self.sp.fcol,
+                    Chi2 = chi2( model_spline, obs_trunc['DaP'], obs_trunc[self.flux_obs], sigma=obs_trunc['err'] ),
+                    r_hot_0 = r_hot_0,
+                    r_hot_max = float( splines['kxout'](t0) ),
+                    k_x_max = float( splines['kxout'](t0) ),
+                    H2r = float( splines['H2R'](t0) ),
+                    Mdot_max = Mdot0,
+                )
+            )
+        else:
+            stream.write('''
+            F0 = {F0}
+            alpha = {alpha}
+            chi2 = {chi2}
+            t0 = {t0}
+            Mdot_max = {Mdot_max}
+            r_cold = {r_cold}
+            r_hot_0 = {r_hot_0}
+            r_hot_max = {r_hot_max}
+            k_x_max = {k_x_max}
+            H2r = {H2r}
+            dir = {path}
+            '''.format(
+                F0=F0,
+                alpha=alpha,
+                chi2=chi2( model_spline, obs_trunc['DaP'], obs_trunc[self.flux_obs], sigma=obs_trunc['err'] ),
+                t0=t0,
+                Mdot_max=Mdot0,
+                r_cold=r_cold,
+                r_hot_0 = r_hot_0,
+                r_hot_max = splines['Rhot2Rout'](t0) * r_cold,
+                k_x_max = splines['kxout'](t0),
+                H2r = splines['H2R'](t0),
+                path = self.datadir(F0, alpha),
+            ))

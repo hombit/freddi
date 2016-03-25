@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 
 
+import re
+import os.path
+from glob import glob
+from io import StringIO
+from multiprocessing import Pool
 import numpy as np
+
 import fredlib
 from fredlib import FRED, Tmax_SS, Tin_color_diskbb
 
@@ -62,15 +68,28 @@ def parkTin():
 
 
 
-def kerrMdot():
-    obs_filename = '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_gauss_smedge_ak0.9.v2.dat'
-    obscolumns = ['Day', 'Mdot', 'Mdot_negerr', 'Mdot_poserr']
+def kerrMdot(obs_filename=None):
+    if obs_filename is None:
+        obs_filename = '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_gauss_smedge_ak0.9.v2.dat'
+        Mx = 9.4
+        kerr = 0.9
+        spectrum_fit = 'kerrbb_gauss_smedge'
+    else:
+        basename = os.path.basename(obs_filename)
+        match_result = re.match( r'.+_(?P<spectrum_fit>\w+_\w+_\w+)_ak_(?P<kerr>0.\d+)_m(?P<Mx>\d+).dat', basename )
+        match_dict = match_result.groupdict()
+        Mx = float( match_dict['Mx'] )
+        kerr = float( match_dict['kerr'] )
+        spectrum_fit = match_dict['spectrum_fit']
+    
+    obscolumns = ['Day', 'Mdot', 'Mdot_negerr', 'Mdot_poserr', 'tstart', 'tstop', 'chi2']
     obs = np.genfromtxt(obs_filename, names=obscolumns)
+    obs = obs[ obs['chi2'] < 2 ]
     obs = fredlib.rec_append_fields( obs, 'DaP', obs['Day'] - 445 )
     obs = fredlib.rec_append_fields( obs, 'err', 0.5 * (np.abs(obs['Mdot_poserr']) + np.abs(obs['Mdot_negerr'])) )
 
     sp = fredlib.SystemParameters(
-        Mx=9.4,
+        Mx=Mx,
         Mopt=2.5,
         Period=1.1164,
         r_out=None,
@@ -97,22 +116,47 @@ def kerrMdot():
         flux_model='Mdot',
         flux_model_func=lambda Mdot: Mdot / 1e18,
         flux_fit_model='t0',
-        cloptions=(
-            '--initialcond=power',
-            '--powerorder=6',
-            '--Thot=1e4',
-            '--kirr=0.0',
-            '--kerr=0.9',
-            '--distance=4.937'
-    #        '--fulldata'
-        ),
+        cloptions={
+            'initialcond' : 'power',
+            'powerorder' : 6,
+            'Thot' : 1e4,
+            'kirr' : 0.0,
+            'kerr' : kerr,
+            'distance' : 4.937,
+        },
     )
 
     #alpha = 0.64902
     #fred.print_params( fred.fit_F0(alpha), alpha )
 
     # fred.print_params( *fred.fit_F0alpha() )
-    fred.print_params( 1.9829e+38, 0.64902 )
+
+    
+    with StringIO() as stream:
+        fred.print_params(
+            *fred.fit_F0alpha(),
+#            1.9829e+38, 0.64902,
+            stream=stream,
+            oneline=True,
+            additional_fields={
+                'spectrum_fit' : spectrum_fit,
+            },
+        )
+        line = stream.getvalue()
+
+    return line
+
+
+def process_kerrMdot(multiproc=True):
+    filenames = glob('/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0.0*.dat')
+    
+    if multiproc:
+        with Pool() as p:
+            lines = p.map( kerrMdot, filenames )
+    else:
+        lines = [ line for line in map(kerrMdot, filenames) ]
+    
+    return lines
 
 
 #############
@@ -120,5 +164,5 @@ def kerrMdot():
 
 
 if __name__ == '__main__':
-    parkTin()
-    # kerrMdot()
+    # parkTin()
+    print( process_kerrMdot(multiproc=True) )
