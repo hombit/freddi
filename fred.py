@@ -131,7 +131,6 @@ def kerrMdot(obs_filename=None):
 
     # fred.print_params( *fred.fit_F0alpha() )
 
-    
     with StringIO() as stream:
         fred.print_params(
             *fred.fit_F0alpha(),
@@ -140,7 +139,7 @@ def kerrMdot(obs_filename=None):
             oneline=True,
             additional_fields={
                 'spectrum_fit' : spectrum_fit,
-            },
+            }
         )
         line = stream.getvalue()
 
