@@ -132,16 +132,19 @@ def kerrMdot(obs_filename=None):
     # fred.print_params( *fred.fit_F0alpha() )
 
     with StringIO() as stream:
-        fred.print_params(
-            *fred.fit_F0alpha(),
-#            1.9829e+38, 0.64902,
-            stream=stream,
-            oneline=True,
-            additional_fields={
-                'spectrum_fit' : spectrum_fit,
-            }
-        )
-        line = stream.getvalue()
+        try:
+            fred.print_params(
+                *fred.fit_F0alpha(),
+    #            1.9829e+38, 0.64902,
+                stream=stream,
+                oneline=True,
+                additional_fields={
+                    'spectrum_fit' : spectrum_fit,
+                }
+            )
+            line = stream.getvalue()
+        except:
+            line = '# ERROR: Mx = {}\tkerr = {}\n'.format(Mx, kerr)
 
     return line
 
