@@ -76,7 +76,7 @@ def chi2_errors( chi2_func, x0, bounds, dof, sigma_level=1 ):
             bounds_trunc,
             tol=2e-2,
             popsize=7,
-            init='random',
+            seed=np.random.mtrand.RandomState(),
         ).fun
 
         for j in range(2):
@@ -328,7 +328,7 @@ class FRED(object):
             ( (self.op.mulF0_min, self.op.mulF0_max), ),
             tol=2e-2,
             popsize=7,
-            init='random'
+            seed=np.random.mtrand.RandomState(),
         )
         print(minimize_result)
         F0 = self.F0_0 * minimize_result.x[0]
@@ -344,7 +344,7 @@ class FRED(object):
             ),
             tol=2e-2,
             popsize=7,
-            init='random',
+            seed=np.random.mtrand.RandomState(),
         )
         print( minimize_result )
         F0 = self.F0_0 * minimize_result.x[0]
