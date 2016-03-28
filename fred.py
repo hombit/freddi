@@ -101,7 +101,7 @@ def kerrMdot(obs_filename=None):
         tau=0.2,
         t0_range=3,
         alpha_min= 0.1,
-        alpha_max= 1.0,
+        alpha_max= 2.0,
         alpha_step=0.025,
         mulF0_min=3.0,
         mulF0_max=15.0,
@@ -143,14 +143,15 @@ def kerrMdot(obs_filename=None):
                 }
             )
             line = stream.getvalue()
-        except:
-            line = '# ERROR: Mx = {}\tkerr = {}\n'.format(Mx, kerr)
+        except Exception as e:
+            line = '# ERROR: Mx = {}\tkerr = {}. {}\n'.format(Mx, kerr, e)
+            print("Cannot compute something: "+line)
 
     return line
 
 
-def process_kerrMdot(multiproc=True):
-    filenames = glob('/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0.0*.dat')
+def process_kerrMdot(Mdot_t_dir, multiproc=True):
+    filenames = glob(Mdot_t_dir + '/Min_simpl_kerrbb_laor_smedge_ak_0.*.dat')
     
     if multiproc:
         with Pool() as p:
@@ -166,8 +167,16 @@ def process_kerrMdot(multiproc=True):
 
 
 if __name__ == '__main__':
+    # print(kerrMdot( '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0.9_m10.dat' ))
+    
     # parkTin()
-    lines = process_kerrMdot(multiproc=True)
+    
+    from sys import argv
+    if len(argv) < 2:
+        Mdot_t_dir = '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/'
+    else:
+        Mdot_t_dir = argv[1]
+    lines = process_kerrMdot(Mdot_t_dir, multiproc=False)
     with open('results.dat', 'w') as f:
         for line in lines:
             f.write(line)
