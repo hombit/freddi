@@ -150,8 +150,8 @@ def kerrMdot(obs_filename=None):
     return line
 
 
-def process_kerrMdot(Mdot_t_dir, multiproc=True):
-    filenames = glob(Mdot_t_dir + '/Min_simpl_kerrbb_laor_smedge_ak_0.*.dat')
+def process_kerrMdot(Mdot-t-prefix, multiproc=True):
+    filenames = glob(Mdot_t_dir + '*.dat')
     
     if multiproc:
         with Pool() as p:
@@ -167,16 +167,18 @@ def process_kerrMdot(Mdot_t_dir, multiproc=True):
 
 
 if __name__ == '__main__':
-    # print(kerrMdot( '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0.9_m10.dat' ))
+    #print(kerrMdot( '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0.0_m6.dat' ))
     
     # parkTin()
     
     from sys import argv
     if len(argv) < 2:
-        Mdot_t_dir = '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/'
+        Mdot_t_dir = '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0'
     else:
         Mdot_t_dir = argv[1]
-    lines = process_kerrMdot(Mdot_t_dir, multiproc=False)
+    
+    lines = process_kerrMdot(Mdot_t_dir, multiproc=True)
+    
     with open('results.dat', 'w') as f:
         for line in lines:
             f.write(line)
