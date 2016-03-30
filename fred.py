@@ -2,7 +2,7 @@
 
 
 import re
-import os.path
+import os, os.path
 from glob import glob
 from io import StringIO
 from multiprocessing import Pool
@@ -173,12 +173,14 @@ if __name__ == '__main__':
     
     from sys import argv
     if len(argv) < 2:
-        Mdot_t_prefix = '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0'
+        Mdot_t = '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0'
     else:
-        Mdot_t_prefix = argv[1]
-    
-    lines = process_kerrMdot(Mdot_t_prefix, multiproc=True)
-    
-    with open('results.dat', 'w') as f:
-        for line in lines:
-            f.write(line)
+        Mdot_t = argv[1]
+
+    if os.access(Mdot_t, os.F_OK):
+        print( kerrMdot(Mdot_t) )
+    else:
+        lines = process_kerrMdot(Mdot_t_prefix, multiproc=True)
+        with open('results.dat', 'w') as f:
+            for line in lines:
+                f.write(line)
