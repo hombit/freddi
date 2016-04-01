@@ -180,7 +180,7 @@ if __name__ == '__main__':
     if os.access(Mdot_t, os.F_OK):
         print( kerrMdot(Mdot_t) )
     else:
-        lines = process_kerrMdot(Mdot_t_prefix, multiproc=True)
+        lines = process_kerrMdot(Mdot_t, multiproc=True)
         with open('results.dat', 'w') as f:
             for line in lines:
                 f.write(line)
