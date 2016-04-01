@@ -76,7 +76,7 @@ def kerrMdot(obs_filename=None):
         spectrum_fit = 'kerrbb_gauss_smedge'
     else:
         basename = os.path.basename(obs_filename)
-        match_result = re.match( r'.+_(?P<spectrum_fit>\w+_\w+_\w+)_ak_(?P<kerr>0.\d+)_m(?P<Mx>\d+).dat', basename )
+        match_result = re.match( r'Min_(?P<spectrum_fit>.+)_ak_(?P<kerr>0.\d+)_m(?P<Mx>\d+).dat', basename )
         match_dict = match_result.groupdict()
         Mx = float( match_dict['Mx'] )
         kerr = float( match_dict['kerr'] )
