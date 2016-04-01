@@ -379,7 +379,7 @@ class FRED(object):
         
         if oneline:
             stream.write(
-                '{Mx:<6.1g} {Kerr:<5.3g} {Mopt:<4.1f} {Period:<7.4g} {r_out:<7.5f} {fullTime:<8g} {spectrum_fit:<19s} {t0range:<7g} {F0:<10.4e} {alpha:<7.5f} {initialcond:<11s} {ic_param:<8.1g} {Thot:<6g} {run_radius:<10d} {k_irr:<5.2g} {irr_enable:<10d} {fitdots:<7s} {fcol:<5.1f} {Chi2:<5.3g} {r_hot_0:<7.5f} {r_hot_max:<9.5g} {k_x_max:<9.4g} {H2r:<7.5g} {Mdot_max:<10.4e}\n'.format(
+                '{Mx:<6.1g} {Kerr:<5.3g} {Mopt:<4.1f} {Period:<7.4g} {r_out:<7.5f} {fullTime:<8g} {spectrum_fit:25<s} {t0range:<7g} {F0:<10.4e} {alpha:<7.5f} {initialcond:<11s} {ic_param:<8.1g} {Thot:<6g} {run_radius:<10d} {k_irr:<5.2g} {irr_enable:<10d} {fitdots:<7s} {fcol:<5.1f} {Chi2:<5.3g} {r_hot_0:<7.5f} {r_hot_max:<9.5g} {k_x_max:<9.4g} {H2r:<7.5f} {Mdot_max:<10.4e}\n'.format(
                     Mx = self.sp.Mx,
                     Kerr = self.cloptions.get('kerr') or 0.,
                     Mopt = self.sp.Mopt,
