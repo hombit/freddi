@@ -150,9 +150,7 @@ def kerrMdot(obs_filename=None):
     return line
 
 
-def process_kerrMdot(Mdot_t_prefix, multiproc=True):
-    filenames = glob(Mdot_t_prefix + '*.dat')
-    
+def process_kerrMdot(filenames, multiproc=True):
     if multiproc:
         with Pool() as p:
             lines = p.map( kerrMdot, filenames )
@@ -173,14 +171,14 @@ if __name__ == '__main__':
     
     from sys import argv
     if len(argv) < 2:
-        Mdot_t = '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0'
+        filenames = ['/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0']
     else:
-        Mdot_t = argv[1]
+        filenames = argv[1:]
 
-    if os.access(Mdot_t, os.F_OK):
-        print( kerrMdot(Mdot_t) )
+    if len(filenames) == 1:
+        print( kerrMdot(filenames[0]) )
     else:
-        lines = process_kerrMdot(Mdot_t, multiproc=True)
+        lines = process_kerrMdot(filenames, multiproc=True)
         with open('results.dat', 'w') as f:
             for line in lines:
                 f.write(line)
