@@ -34,7 +34,7 @@ def parkTin():
         alpha_min= 0.1,
         alpha_max= 1.0,
         alpha_step=0.025,
-        mulF0_min=1.0,
+        mulF0_min=0.1,
         mulF0_max=15.0,
     )
 
