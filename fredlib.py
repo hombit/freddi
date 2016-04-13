@@ -110,15 +110,15 @@ class SystemParameters(object):
         fcol=1.7,
     ):
         self.Mx = Mx  
+        self.Mopt = Mopt
+        self.Period = Period
         self.Mdot_max = Mdot_max or Mdot_edd * Mx
         self.Rg = Rgsun * Mx
         self.fcol = fcol
         
-        if Mopt and Period and (not r_out):
-            self.Mopt = Mopt
-            self.Period = Period
+        if not(Mopt is None) and not(Period is None) and (r_out is None):
             self.r_out = disksize( Mx, Mopt, Period )
-        elif r_out:
+        elif not(r_out is None):
             self.r_out = r_out
         else:
             raise RuntimeError( "You should use set at least a pair of Mopt and Period or r_out" )
