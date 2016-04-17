@@ -54,6 +54,7 @@ int main(int ac, char *av[]){
     double r_in = r_in_func( Mx, kerr );
 	double r_out = r_out_func( Mx, Mopt, P );
     double T_min_hot_disk = 8000;
+    double Sigma_min4hot_disk_Menou1999 = false;
     double k_irr = 0.05; //0.05; // (dlog H / dlog r - 1)
 	double nu_min = 1.2 * keV;
 	double nu_max = 37.2 * keV;
@@ -88,6 +89,7 @@ int main(int ac, char *av[]){
 			( "tau,t",	po::value<double>()->default_value(tau/DAY), "Time step, days" )
 			( "time,T", po::value<double>()->default_value(Time/DAY), "Computation time, days" )
             ( "Thot,H", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere temperature of the outer edge of the hot disk, degrees Kelvin" )
+            ( "boundSigma,S", "Use 4*Sigma_min from Menou et al. 1999 as a boundary for a 'hot' disk" )
             ( "kirr,k", po::value<double>(&k_irr)->default_value(k_irr), "[d log(z_0) / d log(r) - 1] factor for irradiation" )
 			( "dir,d", po::value<string>(&output_dir)->default_value(output_dir), "Directory to write output files. It should exists" )
 			( "F0,F", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque per radian on outer border of the disk, cgs" )
@@ -109,6 +111,7 @@ int main(int ac, char *av[]){
 			return 0;
 		}
 		output_fulldata = vm.count("fulldata");
+        Sigma_min4hot_disk_Menou1999 = vm.count("boundSigma");
 		Mopt = vm["Mopt"].as<double>() * GSL_CONST_CGSM_SOLAR_MASS;
 		Mx = vm["Mx"].as<double>() * GSL_CONST_CGSM_SOLAR_MASS;
 		P = vm["period"].as<double>() * DAY;
@@ -202,20 +205,29 @@ int main(int ac, char *av[]){
 
         auto Tph = vector<double>(Tph_vis);
         double k_x = 0.;
-        if ( T_min_hot_disk > 0. ){
-            int i = Nx;
+        int ii = Nx;
+        if (Sigma_min4hot_disk_Menou1999){
+            double Sigma_hot_disk;
             do{
-                i--;
-                k_x = k_irr * pow(Height.at(i) / R.at(i), 2.);
-                const double Qx = k_x * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * eta / (4.*M_PI * R.at(i)*R.at(i));
-                Tph.at(i) = pow( pow(Tph_vis.at(i), 4.) + Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
-            } while( Tph.at(i) < T_min_hot_disk );
-            if ( i < Nx-1 ){
-                Nx = i;
-                F.at(Nx-1) = F.at(Nx-2);
-                h.resize(Nx);
-            }
+                ii--;
+                // Equation from Menou et al. 1999. Factor 4 is from their fig and connected to point where Mdot = 0. Our Sigma is 0.5 from their Sigma.
+                Sigma_hot_disk = 0.5 * 4. * 39.9 * pow(alpha/0.1, -0.80) * pow(R.at(ii)/1e10, 1.11) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -0.37);
+            } while( Sigma.at(ii) < Sigma_hot_disk );
         }
+        if ( T_min_hot_disk > 0. ){
+            do{
+                ii--;
+                k_x = k_irr * pow(Height.at(ii) / R.at(ii), 2.);
+                const double Qx = k_x * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * eta / (4.*M_PI * R.at(ii)*R.at(ii));
+                Tph.at(ii) = pow( pow(Tph_vis.at(ii), 4.) + Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
+            } while( Tph.at(ii) < T_min_hot_disk );
+        }
+        if ( ii < Nx-1 ){
+            Nx = ii;
+            F.at(Nx-1) = F.at(Nx-2);
+            h.resize(Nx);
+        }
+
 
 		const double mB = -2.5 * log10( I_lambda(R, Tph, lambdaB) * cosiOverD2 / irr0B );
 		const double mV = -2.5 * log10( I_lambda(R, Tph, lambdaV) * cosiOverD2 / irr0V );
