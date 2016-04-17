@@ -92,7 +92,7 @@ def kerrMdot(obs_filename=None):
         Mx=Mx,
         Mopt=2.5,
         Period=1.1164,
-        r_out=None,
+        r_out=1.7166,
         fcol=1.7,
     )
 
@@ -100,10 +100,10 @@ def kerrMdot(obs_filename=None):
         Time=35,
         tau=0.2,
         t0_range=3,
-        alpha_min= 1.0,
-        alpha_max= 6.0,
+        alpha_min= 0.1,
+        alpha_max= 2.0,
         alpha_step=0.025,
-        mulF0_min=3.0,
+        mulF0_min=1.0,
         mulF0_max=15.0,
     )
 
@@ -119,7 +119,8 @@ def kerrMdot(obs_filename=None):
         cloptions={
             'initialcond' : 'power',
             'powerorder' : 6,
-            'Thot' : 6000,
+            'Thot' : -1,
+            'boundSigma' : None,
             'kirr' : 0.0,
             'kerr' : kerr,
             'distance' : 4.937,

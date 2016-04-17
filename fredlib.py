@@ -220,7 +220,9 @@ class FRED(object):
                 '--F0={}'.format(F0),
                 '--dilution={}'.format(self.sp.fcol),
             ] + [
-                '--{}={}'.format(k,v) for k,v in self.cloptions.items()
+                '--{}={}'.format(k,v) for k,v in self.cloptions.items() if not(v is None)
+            ] + [
+                '--{}'.format(k,v) for k, v in self.cloptions.items() if (v is None)
             ]
         )
         
