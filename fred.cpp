@@ -210,7 +210,7 @@ int main(int ac, char *av[]){
             double Sigma_hot_disk;
             do{
                 ii--;
-                // Equation from Menou et al. 1999. Factor 4 is from their fig and connected to point where Mdot = 0. Our Sigma is 0.5 from their Sigma.
+                // Equation from Menou et al. 1999. Factor 4 is from their fig 8 and connected to point where Mdot = 0. Our Sigma is 0.5 from their Sigma.
                 Sigma_hot_disk = 0.5 * 4. * 39.9 * pow(alpha/0.1, -0.80) * pow(R.at(ii)/1e10, 1.11) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -0.37);
             } while( Sigma.at(ii) < Sigma_hot_disk );
         }
