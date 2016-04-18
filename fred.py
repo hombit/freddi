@@ -92,7 +92,7 @@ def kerrMdot(obs_filename=None):
         Mx=Mx,
         Mopt=2.5,
         Period=1.1164,
-        r_out=1.7166,
+        r_out=None,
         fcol=1.7,
     )
 
