@@ -175,6 +175,8 @@ int main(int ac, char *av[]){
 		return W;
 	};
 
+    double Mdot_in;
+
 	ofstream output_sum( output_dir + "/sum.dat" );
 	output_sum << "#t	Mdot	Lx	H2R Rhot2Rout    Tphout kxout   mB  mV" << endl;
     output_sum << "# r_out = " << r_out << endl;
@@ -192,7 +194,7 @@ int main(int ac, char *av[]){
 			break;
 		}
 
-		const double Mdot_in = 2.*M_PI * ( F.at(1) - F.at(0) ) / ( h.at(1) - h.at(0) );
+		Mdot_in = 2.*M_PI * ( F.at(1) - F.at(0) ) / ( h.at(1) - h.at(0) );
 
 		for ( int i = 1; i < Nx; ++i ){
 			Sigma.at(i) = W.at(i) * GM*GM / (4. * pow(h.at(i), 3.));
