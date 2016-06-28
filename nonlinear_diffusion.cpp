@@ -40,13 +40,16 @@ void nonlenear_diffusion_nonuniform_1_2 (const double tau,
 	const auto W = wunc(x, y, 1, N-1);
 	vecd K_0(N), K_1(N), CC(N), frac(N), a(N), b(N), f(N);
 	for ( int i = 1; i < N-1; ++i ){
-		frac.at(i) = ( x.at(i+1) - x.at(i) ) * ( x.at(i) - x.at(i-1) ) / tau;
 		a.at(i) = 2. * ( x.at(i+1) - x.at(i) ) / ( x.at(i+1) - x.at(i-1) );
 		b.at(i) = 2. * ( x.at(i) - x.at(i-1) ) / ( x.at(i+1) - x.at(i-1) );
-		f.at(i) = frac.at(i) * W.at(i);
-		K_1.at(i) = frac.at(i) * W.at(i) / y.at(i);
-		CC.at(i) = K_0.at(i) = K_1.at(i) * 2. + 10.*eps;
+		frac.at(i) = ( x.at(i+1) - x.at(i) ) * ( x.at(i) - x.at(i-1) ) / tau;
 	}
+    frac.at(N-1) = ( x.at(N-1) - x.at(N-2) ) * ( x.at(N-1) - x.at(N-2) ) * 0.5 / tau;
+    for ( int i = 1; i < N; ++i ){
+        f.at(i) = frac.at(i) * W.at(i);
+		K_1.at(i) = frac.at(i) * W.at(i) / y.at(i);
+		CC.at(i) = K_0.at(i) = K_1.at(i) * (1. + 2.*eps);
+    }
 	auto iteration = [&](vecd &K) -> void{ // [&] <-> [&wunc, &x, &y, &frac, &a, &b, &f, N, left_bounder_cond, right_bounder_cond]
 		vecd alpha(N), beta(N);
 		alpha.at(1) = 0.;
@@ -56,7 +59,8 @@ void nonlenear_diffusion_nonuniform_1_2 (const double tau,
 			alpha.at(i+1) = b.at(i) / ( c - alpha.at(i) * a.at(i) );
 			beta.at(i+1) = ( beta.at(i) * a.at(i) + f.at(i) ) / ( c - alpha.at(i) * a.at(i) );
 		}
-		y.at(N-1) = ( (x.at(N-1) - x.at(N-2) ) * right_bounder_cond + beta.at(N-1) ) / ( 1. - alpha.at(N-1) );
+		// y.at(N-1) = ( (x.at(N-1) - x.at(N-2) ) * right_bounder_cond + beta.at(N-1) ) / ( 1. - alpha.at(N-1) );
+		y.at(N-1) = ( (x.at(N-1) - x.at(N-2) ) * right_bounder_cond + f.at(N-1) + beta.at(N-1) ) / ( 1. + K.at(N-1) - alpha.at(N-1) );
 		for ( int i = N-2; i > 0; --i )
 			y.at(i) = alpha.at(i+1) * y.at(i+1) + beta.at(i+1);
 		y.at(0) = left_bounder_cond;
