@@ -54,7 +54,6 @@ int main(int ac, char *av[]){
     double r_in = r_in_func( Mx, kerr );
 	double r_out = r_out_func( Mx, Mopt, P );
     double T_min_hot_disk = 8000;
-    double Sigma_min4hot_disk_Menou1999 = false;
     double k_irr = 0.05; //0.05; // (dlog H / dlog r - 1)
 	double nu_min = 1.2 * keV;
 	double nu_max = 37.2 * keV;
@@ -62,13 +61,18 @@ int main(int ac, char *av[]){
 	double Time = 100.*DAY;
 	double tau = 0.1 * DAY;
 	double eps = 1e-6;
+    string bound_cond_type = "Teff";
 	double F0_gauss = 1e37;
 	double sigma_for_F_gauss = 5.;
 	double r_gauss_cut_to_r_out = 0.01;
     double power_order = 6.;
-	string output_dir("data");
+    double kMdot_out = 2.5;
+	string output_dir = "data";
 	bool output_fulldata = false;
     string initial_cond_shape = "power";
+
+    double Mdot_in;
+    double Mdot_out = 0.;
 
 	{
 		po::options_description desc("Allowed options");
@@ -88,8 +92,10 @@ int main(int ac, char *av[]){
 			( "Nx,N",	po::value<int>(&Nx)->default_value(Nx), "Size of calculation grid" )
 			( "tau,t",	po::value<double>()->default_value(tau/DAY), "Time step, days" )
 			( "time,T", po::value<double>()->default_value(Time/DAY), "Computation time, days" )
-            ( "Thot,H", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere temperature of the outer edge of the hot disk, degrees Kelvin" )
-            ( "boundSigma,S", "Use 4*Sigma_min from Menou et al. 1999 as a boundary for a 'hot' disk" )
+            // ( "boundSigma,S", "Use 4*Sigma_min from Menou et al. 1999 as a boundary for a 'hot' disk" )
+            // ( "boundMdot,b", "Use -2 * Mdot_in from  Menou et al. 1999 as a boundary for a 'hot' disk" )
+            ( "boundcond,B", po::value<string>(&bound_cond_type)->default_value(bound_cond_type), "Boundary movement condition, should be one of: Teff, fourSigmaCrit, MdotOut" )
+            ( "Thot,H", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere temperature of the outer edge of the hot disk, degrees Kelvin. This option works only with --boundcond=Teff" )
             ( "kirr,k", po::value<double>(&k_irr)->default_value(k_irr), "[d log(z_0) / d log(r) - 1] factor for irradiation" )
 			( "dir,d", po::value<string>(&output_dir)->default_value(output_dir), "Directory to write output files. It should exists" )
 			( "F0,F", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque per radian on outer border of the disk, cgs" )
@@ -111,7 +117,6 @@ int main(int ac, char *av[]){
 			return 0;
 		}
 		output_fulldata = vm.count("fulldata");
-        Sigma_min4hot_disk_Menou1999 = vm.count("boundSigma");
 		Mopt = vm["Mopt"].as<double>() * GSL_CONST_CGSM_SOLAR_MASS;
 		Mx = vm["Mx"].as<double>() * GSL_CONST_CGSM_SOLAR_MASS;
 		P = vm["period"].as<double>() * DAY;
@@ -138,6 +143,23 @@ int main(int ac, char *av[]){
 //	    << "h_out = " << h_out << "\n"
 //    	<< std::flush;
 
+	auto wunc = [alpha, Mx, GM](
+		const vector<double> &h, const vector<double> &F,
+		int first, int last	
+	) ->vector<double>{
+		vector<double> W( first > 0 ? first : 0,  0. );
+		for ( int i = first; i <= last; ++i ){
+			W.push_back( 2.73e-9 * pow(F.at(i), 0.7) * pow(h.at(i), 0.8) * pow(alpha, -0.8) / GM ); //4. * Sigma * h*h*h / GMx / GMx, Sigma for free-free 1.2e25*rho/t^3.5, tau=100
+//			W.push_back( 0.17 * pow(F.at(i), 2./3.) * h.at(i) * pow(alpha, -7./9.) * pow(Mx, -10/9) ); //4. * Sigma * h*h*h / GMx / GMx, Sigma for free-free 6.45e22*rho/t^2.5, tau=100
+		}
+		return W;
+	};
+
+    // Equation from Menou et al. 1999. Sigma_cr is from their fig 8 and connected to point where Mdot is minimal. Our Sigma is 0.5 from their Sigma.
+    auto Sigma_hot_disk = [alpha, Mx](double r) ->double{
+        return 0.5 * 39.9 * pow(alpha/0.1, -0.80) * pow(r/1e10, 1.11) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -0.37);
+    };
+
 	vector<double> h(Nx), R(Nx);
     for ( int i = 0; i < Nx; ++i ){
         h.at(i) = h_in * pow( h_out/h_in, i/(Nx-1.) );
@@ -162,20 +184,25 @@ int main(int ac, char *av[]){
             F.at(i) = F0_gauss * pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
         }
     }
-	
-	auto wunc = [alpha, Mx, GM](
-		const vector<double> &h, const vector<double> &F,
-		int first, int last	
-	) ->vector<double>{
-		vector<double> W( first > 0 ? first : 0,  0. );
-		for ( int i = first; i <= last; ++i ){
-			W.push_back( 2.73e-9 * pow(F.at(i), 0.7) * pow(h.at(i), 0.8) * pow(alpha, -0.8) / GM ); //4. * Sigma * h*h*h / GMx / GMx, Sigma for free-free 1.2e25*rho/t^3.5, tau=100
-//			W.push_back( 0.17 * pow(F.at(i), 2./3.) * h.at(i) * pow(alpha, -7./9.) * pow(Mx, -10/9) ); //4. * Sigma * h*h*h / GMx / GMx, Sigma for free-free 6.45e22*rho/t^2.5, tau=100
-		}
-		return W;
-	};
+    /*
+    if ( Mdot_out4hot_disk_Menou1999 ){
+        const double h_F0 = h_out * 0.9;
+        const double delta_h = h_out - h_F0;
 
-    double Mdot_in;
+        F0_gauss = 1.24e13 * pow(Sigma_hot_disk(R.at(Nx-1)), 10./7.) * pow(h.at(Nx-1), 22./7.) * pow(GM, -10./7.) * pow(alpha, 8./7.);
+
+        Mdot_out = -kMdot_out * F0_gauss / (h_F0 - h_in) * M_PI*M_PI;
+
+        for ( int i = 0; i < Nx; ++i ){
+            if ( h.at(i) < h_F0 ){
+                F.at(i) = F0_gauss * sin( (h.at(i) - h_in) / (h_F0 - h_in) * M_PI / 2. );
+            } else{
+                F.at(i) = F0_gauss * ( 1. - kMdot_out / (h_F0-h_in) / delta_h * M_PI / 4. * (h.at(i) - h_F0)*(h.at(i) - h_F0) );
+            }
+        }
+    }
+    */
+	
 
 	ofstream output_sum( output_dir + "/sum.dat" );
 	output_sum << "#t	Mdot	Lx	H2R Rhot2Rout    Tphout kxout   mB  mV" << endl;
@@ -187,7 +214,7 @@ int main(int ac, char *av[]){
 		vector<double> W(Nx, 0.), Tph_vis(Nx, 0.), Tph_X(Nx, 0.), Sigma(Nx, 0.), Height(Nx, 0.);
 		
 		try{
-			nonlenear_diffusion_nonuniform_1_2 (tau, eps, 0., 0., wunc, h, F);
+			nonlenear_diffusion_nonuniform_1_2 (tau, eps, 0., Mdot_out/(2.*M_PI), wunc, h, F);
 			W = wunc(h, F, 1, Nx-1);
 		} catch (runtime_error er){
 			cout << er.what() << endl;
@@ -208,15 +235,21 @@ int main(int ac, char *av[]){
         auto Tph = vector<double>(Tph_vis);
         double k_x = 0.;
         int ii = Nx;
-        if (Sigma_min4hot_disk_Menou1999){
-            double Sigma_hot_disk;
+        if (bound_cond_type == "MdotOut"){
+            Mdot_out = - kMdot_out * Mdot_in;
+ 
+            do{
+                ii--;
+            } while( Sigma.at(ii) < Sigma_hot_disk(R[ii]) );
+
+        }
+        if (bound_cond_type == "fourSigmaCrit"){
             do{
                 ii--;
                 // Equation from Menou et al. 1999. Factor 4 is from their fig 8 and connected to point where Mdot = 0. Our Sigma is 0.5 from their Sigma.
-                Sigma_hot_disk = 0.5 * 4. * 39.9 * pow(alpha/0.1, -0.80) * pow(R.at(ii)/1e10, 1.11) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -0.37);
-            } while( Sigma.at(ii) < Sigma_hot_disk );
+            } while( Sigma.at(ii) <  4 * Sigma_hot_disk(R[ii]) );
         }
-        if ( T_min_hot_disk > 0. ){
+        if ( T_min_hot_disk > 0. && bound_cond_type == "Teff" ){
             do{
                 ii--;
                 k_x = k_irr * pow(Height.at(ii) / R.at(ii), 2.);
@@ -224,11 +257,7 @@ int main(int ac, char *av[]){
                 Tph.at(ii) = pow( pow(Tph_vis.at(ii), 4.) + Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
             } while( Tph.at(ii) < T_min_hot_disk );
         }
-        if ( ii < Nx-1 ){
-            Nx = ii;
-            F.at(Nx-1) = F.at(Nx-2);
-            h.resize(Nx);
-        }
+
 
 
 		const double mB = -2.5 * log10( I_lambda(R, Tph, lambdaB) * cosiOverD2 / irr0B );
@@ -261,6 +290,12 @@ int main(int ac, char *av[]){
                 << "\t" << mB
                 << "\t" << mV
 				<< endl;
+
+        if ( ii < Nx ){
+            Nx = ii;
+            // F.at(Nx-2) = F.at(Nx-1) - Mdot_out / (2.*M_PI) * (h.at(Nx-1) - h.at(Nx-2));
+            h.resize(Nx);
+        }
 	}
 
 	return 0;
