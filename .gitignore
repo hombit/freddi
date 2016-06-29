@@ -161,3 +161,6 @@ fred
 
 # Mathematica notebooks
 *.nb
+
+# Jupyter notebooks
+Untitled*.ipynb
