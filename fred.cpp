@@ -58,15 +58,16 @@ int main(int ac, char *av[]){
 	double nu_min = 1.2 * keV;
 	double nu_max = 37.2 * keV;
 	int Nx = 1000;
-	double Time = 100.*DAY;
-	double tau = 0.1 * DAY;
+    string grid_scale = "log";
+	double Time = 100. * DAY;
+	double tau = 0.25 * DAY;
 	double eps = 1e-6;
     string bound_cond_type = "Teff";
 	double F0_gauss = 1e37;
 	double sigma_for_F_gauss = 5.;
 	double r_gauss_cut_to_r_out = 0.01;
     double power_order = 6.;
-    double kMdot_out = 2.5;
+    double kMdot_out = 2.;
 	string output_dir = "data";
 	bool output_fulldata = false;
     string initial_cond_shape = "power";
@@ -90,6 +91,7 @@ int main(int ac, char *av[]){
 			( "numin,u", po::value<double>()->default_value(nu_min/keV), "Lower bound of X-ray band, keV" )
 			( "numax,U", po::value<double>()->default_value(nu_max/keV), "Upper bound of X-ray band, keV" )
 			( "Nx,N",	po::value<int>(&Nx)->default_value(Nx), "Size of calculation grid" )
+            ( "gridscale,g", po::value<string>(&grid_scale)->default_value(grid_scale), "Type of grid: log or linear" )
 			( "tau,t",	po::value<double>()->default_value(tau/DAY), "Time step, days" )
 			( "time,T", po::value<double>()->default_value(Time/DAY), "Computation time, days" )
             // ( "boundSigma,S", "Use 4*Sigma_min from Menou et al. 1999 as a boundary for a 'hot' disk" )
@@ -99,7 +101,7 @@ int main(int ac, char *av[]){
             ( "kirr,k", po::value<double>(&k_irr)->default_value(k_irr), "[d log(z_0) / d log(r) - 1] factor for irradiation" )
 			( "dir,d", po::value<string>(&output_dir)->default_value(output_dir), "Directory to write output files. It should exists" )
 			( "F0,F", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque per radian on outer border of the disk, cgs" )
-			( "initialcond,I", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "One of the available shapes of initial conditions for viscous torque F: sinusgauss, power" )
+			( "initialcond,I", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "One of the available shapes of initial conditions for viscous torque F: sinusgauss, power, sinus" )
             ( "powerorder,p", po::value<double>(&power_order)->default_value(power_order), "Parameter of initial condition distribution: F ~ h^poweroder. This option works only with --initialcond=power" )
 		;
 		po::variables_map vm;
@@ -162,8 +164,13 @@ int main(int ac, char *av[]){
 
 	vector<double> h(Nx), R(Nx);
     for ( int i = 0; i < Nx; ++i ){
-        h.at(i) = h_in * pow( h_out/h_in, i/(Nx-1.) );
-		//h.at(i) = h_in + (h_out - h_in) * i/(Nx-1.);
+        if ( grid_scale == "log" ){ 
+            h.at(i) = h_in * pow( h_out/h_in, i/(Nx-1.) );
+        } else if ( grid_scale == "linear" ){
+		    h.at(i) = h_in + (h_out - h_in) * i/(Nx-1.);
+        } else{
+            throw po::invalid_option_value(grid_scale);
+        }
 		R.at(i) = h.at(i) * h.at(i) / GM;
     }
 
@@ -178,14 +185,15 @@ int main(int ac, char *av[]){
 			const double F_sinus =  F0_sinus * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI / 2. );
 			F.at(i) = F_gauss + F_sinus;
 		}
-	}
-    if ( initial_cond_shape == "power" ){
+	} else if ( initial_cond_shape == "power" ){
         for ( int i = 0; i < Nx; ++i ){
             F.at(i) = F0_gauss * pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
         }
-    }
-    /*
-    if ( Mdot_out4hot_disk_Menou1999 ){
+    } else if ( initial_cond_shape == "sinus" ){
+        for ( int i = 0; i < Nx; ++i ){
+            F.at(i) = F0_gauss * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI / 2. );
+        }
+    } else if ( initial_cond_shape == "sinusparabola" ){
         const double h_F0 = h_out * 0.9;
         const double delta_h = h_out - h_F0;
 
@@ -200,9 +208,9 @@ int main(int ac, char *av[]){
                 F.at(i) = F0_gauss * ( 1. - kMdot_out / (h_F0-h_in) / delta_h * M_PI / 4. * (h.at(i) - h_F0)*(h.at(i) - h_F0) );
             }
         }
-    }
-    */
-	
+    } else{
+        throw po::invalid_option_value(initial_cond_shape);
+    }	
 
 	ofstream output_sum( output_dir + "/sum.dat" );
 	output_sum << "#t	Mdot	Lx	H2R Rhot2Rout    Tphout kxout   mB  mV" << endl;
@@ -242,23 +250,23 @@ int main(int ac, char *av[]){
                 ii--;
             } while( Sigma.at(ii) < Sigma_hot_disk(R[ii]) );
 
-        }
-        if (bound_cond_type == "fourSigmaCrit"){
+        } else if (bound_cond_type == "fourSigmaCrit"){
             do{
                 ii--;
                 // Equation from Menou et al. 1999. Factor 4 is from their fig 8 and connected to point where Mdot = 0. Our Sigma is 0.5 from their Sigma.
             } while( Sigma.at(ii) <  4 * Sigma_hot_disk(R[ii]) );
+        } else if ( bound_cond_type == "Teff" ){
+            if ( T_min_hot_disk > 0. ){
+                do{
+                    ii--;
+                    k_x = k_irr * pow(Height.at(ii) / R.at(ii), 2.);
+                    const double Qx = k_x * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * eta / (4.*M_PI * R.at(ii)*R.at(ii));
+                    Tph.at(ii) = pow( pow(Tph_vis.at(ii), 4.) + Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
+                } while( Tph.at(ii) < T_min_hot_disk );
+            }
+        } else{
+            throw po::invalid_option_value(bound_cond_type);
         }
-        if ( T_min_hot_disk > 0. && bound_cond_type == "Teff" ){
-            do{
-                ii--;
-                k_x = k_irr * pow(Height.at(ii) / R.at(ii), 2.);
-                const double Qx = k_x * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * eta / (4.*M_PI * R.at(ii)*R.at(ii));
-                Tph.at(ii) = pow( pow(Tph_vis.at(ii), 4.) + Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
-            } while( Tph.at(ii) < T_min_hot_disk );
-        }
-
-
 
 		const double mB = -2.5 * log10( I_lambda(R, Tph, lambdaB) * cosiOverD2 / irr0B );
 		const double mV = -2.5 * log10( I_lambda(R, Tph, lambdaV) * cosiOverD2 / irr0V );
