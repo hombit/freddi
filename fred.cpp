@@ -213,8 +213,13 @@ int main(int ac, char *av[]){
     }	
 
 	ofstream output_sum( output_dir + "/sum.dat" );
-	output_sum << "#t	Mdot	Lx	H2R Rhot2Rout    Tphout kxout   mB  mV" << endl;
-    output_sum << "# r_out = " << r_out << endl;
+	output_sum << "#t	Mdot	Lx	H2R Rhot2Rout    Tphout kxout   mB  mV" << "\n";
+    output_sum << "# r_out = " << r_out << "\n";
+    output_sum << "#";
+    for ( int i = 0; i < ac; ++i ){
+        output_sum << " " << av[i];
+    }
+    output_sum << endl;
 
 	for( double t = 0.; t <= Time; t += tau ){
 		// cout << t/DAY << endl;
