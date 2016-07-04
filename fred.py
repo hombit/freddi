@@ -98,7 +98,7 @@ def kerrMdot(obs_filename=None):
 
     op = fredlib.OptimizeParameters(
         Time=35,
-        tau=0.2,
+        tau=0.25,
         t0_range=3,
         alpha_min= 0.1,
         alpha_max= 2.0,
@@ -119,11 +119,13 @@ def kerrMdot(obs_filename=None):
         cloptions={
             'initialcond' : 'power',
             'powerorder' : 6,
-            'Thot' : -1,
-            'boundSigma' : None,
-            'kirr' : 0.0,
+            'Thot' : 1e4,
+#            'boundSigma' : None,
+            'kirr' : 0.,
             'kerr' : kerr,
             'distance' : 4.937,
+            'Nx' : 1000,
+            'gridscale' : 'linear',
         },
     )
 
@@ -136,7 +138,7 @@ def kerrMdot(obs_filename=None):
         try:
             fred.print_params(
                 *fred.fit_F0alpha(),
-    #            1.9829e+38, 0.64902,
+                #2.0522e38, 0.76485,
                 stream=stream,
                 oneline=True,
                 additional_fields={
@@ -172,7 +174,7 @@ if __name__ == '__main__':
     
     from sys import argv
     if len(argv) < 2:
-        filenames = ['/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0']
+        filenames = ['/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0.0_m6.dat']
     else:
         filenames = argv[1:]
 
