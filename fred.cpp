@@ -55,11 +55,12 @@ int main(int ac, char *av[]){
 	double r_out = r_out_func( Mx, Mopt, P );
     double T_min_hot_disk = 8000;
     double k_irr = 0.05; //0.05; // (dlog H / dlog r - 1)
+    double mu = 0.5;
 	double nu_min = 1.2 * keV;
 	double nu_max = 37.2 * keV;
 	int Nx = 1000;
     string grid_scale = "log";
-	double Time = 100. * DAY;
+	double Time = 30. * DAY;
 	double tau = 0.25 * DAY;
 	double eps = 1e-6;
     string bound_cond_type = "Teff";
@@ -71,6 +72,7 @@ int main(int ac, char *av[]){
 	string output_dir = "data";
 	bool output_fulldata = false;
     string initial_cond_shape = "power";
+    string opacity_type = "Kramers";
 
     double Mdot_in;
     double Mdot_out = 0.;
@@ -88,14 +90,13 @@ int main(int ac, char *av[]){
 			( "period,P", po::value<double>()->default_value(P/DAY), "Orbital period of binary system, days" )
 			( "rout,R", po::value<double>()->default_value(r_out/solar_radius), "Outer radius of the disk, solar radii. If it isn't setted than it will be calculated using Mx, Mopt and period" )
             ( "distance,r", po::value<double>()->default_value(Distance/kpc), "Distance to the system, kpc" )
+            ( "opacity,O", po::value<string>(&opacity_type)->default_value(opacity_type), "Opacity law: Kramers or OPAL" )
 			( "numin,u", po::value<double>()->default_value(nu_min/keV), "Lower bound of X-ray band, keV" )
 			( "numax,U", po::value<double>()->default_value(nu_max/keV), "Upper bound of X-ray band, keV" )
 			( "Nx,N",	po::value<int>(&Nx)->default_value(Nx), "Size of calculation grid" )
             ( "gridscale,g", po::value<string>(&grid_scale)->default_value(grid_scale), "Type of grid: log or linear" )
 			( "tau,t",	po::value<double>()->default_value(tau/DAY), "Time step, days" )
 			( "time,T", po::value<double>()->default_value(Time/DAY), "Computation time, days" )
-            // ( "boundSigma,S", "Use 4*Sigma_min from Menou et al. 1999 as a boundary for a 'hot' disk" )
-            // ( "boundMdot,b", "Use -2 * Mdot_in from  Menou et al. 1999 as a boundary for a 'hot' disk" )
             ( "boundcond,B", po::value<string>(&bound_cond_type)->default_value(bound_cond_type), "Boundary movement condition, should be one of: Teff, fourSigmaCrit, MdotOut" )
             ( "Thot,H", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere temperature of the outer edge of the hot disk, degrees Kelvin. This option works only with --boundcond=Teff" )
             ( "kirr,k", po::value<double>(&k_irr)->default_value(k_irr), "[d log(z_0) / d log(r) - 1] factor for irradiation" )
@@ -140,19 +141,65 @@ int main(int ac, char *av[]){
 	const double h_in = sqrt( GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx  * r_in );
 	const double h_out = sqrt( GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx  * r_out );
     const double cosiOverD2 = cosi / Distance / Distance;
+
+    double m_op, n_op, varkappa0, Pi_Sigma, Pi_Height, D_op, Height_exp_F, Height_exp_R, Height_coef;
+    if ( opacity_type == "Kramers" ){
+        m_op = 0.3;
+        n_op = 0.8;
+        varkappa0 = 5e24;
+
+        // tau_0 = 1e3
+		const double Pi1 = 6.31217;
+		const double Pi2 = 0.51523;
+		const double Pi3 = 1.13050;
+		const double Pi4 = 0.39842;
+
+        Pi_Sigma = pow(Pi1, 0.05) * pow(Pi2, 0.1) * pow(Pi3, 0.8) * pow(Pi4, 0.1);
+        Pi_Height = pow(Pi1, 19./40.) * pow(Pi2, -0.05) * pow(Pi3, 0.1) * pow(Pi4, -0.05);
+
+        D_op = 2.41e34 * pow(alpha, 0.8) * (Mx/GSL_CONST_CGSM_SOLAR_MASS) * pow(mu/0.5, -0.75) / Pi_Sigma * pow(varkappa0/1e22, 0.1);
+
+        Height_exp_F = 3./20.;
+        Height_exp_R = 1./8.;
+        Height_coef = 0.020 * pow(1e17, -Height_exp_F) * pow(GM, -Height_exp_F/2.) * pow(1e10, -Height_exp_F/2.) * pow(alpha, -0.1) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -3./8.) * pow(mu/0.6, -3./8.) * Pi_Height * pow(varkappa0/5e24, 0.05);
+    } else if ( opacity_type == "OPAL" ){
+        m_op = 1./3.;
+        n_op = 1.;
+        varkappa0 = 1.5e20;
+
+        // tau_0 = 1e3
+		const double Pi1 = 5.53450;
+		const double Pi2 = 0.55220;
+		const double Pi3 = 1.14712;
+		const double Pi4 = 0.44777;
+
+        Pi_Sigma = pow(Pi1, 1./18.) * pow(Pi2, 1./9.) * pow(Pi3, 7./9.) * pow(Pi4, 1./9.);
+        Pi_Height = pow(Pi1, 17./36.) * pow(Pi2, -1./18.) * pow(Pi3, 1./9.) * pow(Pi4, -1./18.);
+
+        D_op = 2.12e37 * pow(alpha, 7./9.) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, 10./9.) * pow(mu/0.5, -13./18.) / Pi_Sigma * pow(varkappa0/1e22, 1./9.);
+        
+        Height_exp_F = 1./6.;
+        Height_exp_R = 1./12.;
+        Height_coef = 0.021 * pow(1e17, -Height_exp_F) * pow(GM, -Height_exp_F/2.) * pow(1e10, -Height_exp_F/2.) * pow(alpha, -1./9.) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -13./36.) * pow(mu/0.6, -13./36.) * Pi_Height * pow(varkappa0/1.5e20, 1./18.);
+    } else{
+        throw po::invalid_option_value(opacity_type);
+    }
+
+
 //	cout
 //        << "R_out = " << r_out / solar_radius << "\n"
 //	    << "h_out = " << h_out << "\n"
 //    	<< std::flush;
 
-	auto wunc = [alpha, Mx, GM](
+	auto wunc = [m_op, n_op, D_op](
 		const vector<double> &h, const vector<double> &F,
 		int first, int last	
 	) ->vector<double>{
 		vector<double> W( first > 0 ? first : 0,  0. );
 		for ( int i = first; i <= last; ++i ){
-			W.push_back( 2.73e-9 * pow(F.at(i), 0.7) * pow(h.at(i), 0.8) * pow(alpha, -0.8) / GM ); //4. * Sigma * h*h*h / GMx / GMx, Sigma for free-free 1.2e25*rho/t^3.5, tau=100
-//			W.push_back( 0.17 * pow(F.at(i), 2./3.) * h.at(i) * pow(alpha, -7./9.) * pow(Mx, -10/9) ); //4. * Sigma * h*h*h / GMx / GMx, Sigma for free-free 6.45e22*rho/t^2.5, tau=100
+            W.push_back(
+                pow(F.at(i)*(2. * M_PI), 1. - m_op) * pow(h.at(i), n_op) / (1. - m_op) / D_op / (2.*M_PI)
+            );
 		}
 		return W;
 	};
@@ -237,9 +284,9 @@ int main(int ac, char *av[]){
 		Mdot_in = 2.*M_PI * ( F.at(1) - F.at(0) ) / ( h.at(1) - h.at(0) );
 
 		for ( int i = 1; i < Nx; ++i ){
-			Sigma.at(i) = W.at(i) * GM*GM / (4. * pow(h.at(i), 3.));
-			Height.at(i) = 6.4e4 * pow(F.at(i), 0.15) * pow(h.at(i), 2.1) * pow(alpha, -0.1) * pow(GM, -1.5); // for free-free 1.2e25*rho/t^3.5, tau=100
-			Tph_vis.at(i) = GM * pow(h.at(i), -1.75) * pow( 0.75 * F.at(i) / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
+			Sigma.at(i) = 0.5 * W.at(i) * GM*GM / (2. * pow(h.at(i), 3.));
+            Height.at(i) = R.at(i) * Height_coef * pow(F.at(i)*(2. * M_PI), Height_exp_F) * pow(R.at(i)/1e10, Height_exp_R - Height_exp_F/2.);
+            Tph_vis.at(i) = GM * pow(h.at(i), -1.75) * pow( 0.75 * F.at(i) / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
 			Tph_X.at(i) = fc * T_GR( R.at(i), 0., Mx, Mdot_in, R.front() );
 		}
         
@@ -280,7 +327,8 @@ int main(int ac, char *av[]){
 			ostringstream filename;
 			filename << output_dir << "/" << static_cast<int>(t/tau) << ".dat";
 			ofstream output( filename.str() );
-            output << "#h   F   Sigma   W   R   Tph_vis Height" << endl;
+            output << "#h   F   Sigma   W   R   Tph_vis Height" << "\n";
+            output << "# Time = " << t / DAY << " Mdot_in = " << Mdot_in << endl;
 			for ( int i = 1; i < Nx; ++i ){
 				output		<< h.at(i)
 					<< "\t" << F.at(i)
