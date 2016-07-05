@@ -82,10 +82,12 @@ def kerrMdot(obs_filename=None):
         kerr = float( match_dict['kerr'] )
         spectrum_fit = match_dict['spectrum_fit']
     
+    Time_shift = 445
+
     obscolumns = ['Day', 'Mdot', 'Mdot_negerr', 'Mdot_poserr', 'tstart', 'tstop', 'chi2']
     obs = np.genfromtxt(obs_filename, names=obscolumns)
     obs = obs[ obs['chi2'] < 2 ]
-    obs = fredlib.rec_append_fields( obs, 'DaP', obs['Day'] - 445 )
+    obs = fredlib.rec_append_fields( obs, 'DaP', obs['Day'] - Time_shift )
     obs = fredlib.rec_append_fields( obs, 'err', 0.5 * (np.abs(obs['Mdot_poserr']) + np.abs(obs['Mdot_negerr'])) )
 
     sp = fredlib.SystemParameters(
@@ -98,6 +100,7 @@ def kerrMdot(obs_filename=None):
 
     op = fredlib.OptimizeParameters(
         Time=35,
+        Time_shift=Time_shift,
         tau=0.25,
         t0_range=3,
         alpha_min= 0.1,

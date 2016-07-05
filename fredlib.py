@@ -129,6 +129,7 @@ class OptimizeParameters(object):
     def __init__(
         self,
         Time=50,
+        Time_shift = 0.,
         tau=1,
         t0_range = None, # Time/10 if None
         alpha_min = 0.1,
@@ -138,13 +139,14 @@ class OptimizeParameters(object):
         mulF0_max=10.0
     ):
         self.Time = Time
+        self.Time_shift = Time_shift
         self.tau = tau
         self.t0_range = t0_range or Time / 10.
         self.alpha_min = alpha_min
         self.alpha_max = alpha_max
         self.alpha_step = alpha_step
-        self.mulF0_min=mulF0_min
-        self.mulF0_max=mulF0_max
+        self.mulF0_min = mulF0_min
+        self.mulF0_max = mulF0_max
 
 
 class FRED(object):
@@ -381,7 +383,7 @@ class FRED(object):
         
         if oneline:
             stream.write(
-                '{Mx:<6.1g} {Kerr:<5.3g} {Mopt:<4.1f} {Period:<7.4g} {r_out:<7.5f} {fullTime:<8g} {spectrum_fit:<25s} {t0range:<7g} {F0:<10.4e} {alpha:<7.5f} {initialcond:<11s} {ic_param:<8.1g} {Thot:<6g} {run_radius:<10d} {k_irr:<5.2g} {irr_enable:<10d} {fitdots:<7s} {fcol:<5.1f} {Chi2:<5.3g} {r_hot_0:<7.5f} {r_hot_max:<9.5g} {k_x_max:<9.4g} {H2r:<7.5f} {Mdot_max:<10.4e}\n'.format(
+                '{Mx:<6.1g} {Kerr:<5.3g} {Mopt:<4.1f} {Period:<7.4g} {r_out:<7.5f} {fullTime:<8g} {spectrum_fit:<25s} {t0range:<7g} {F0:<10.4e} {alpha:<7.5f} {initialcond:<11s} {ic_param:<8.1g} {Thot:<6g} {run_radius:<10d} {k_irr:<5.2g} {irr_enable:<10d} {fitdots:<7s} {fcol:<5.1f} {Chi2:<5.3g} {r_hot_0:<7.5f} {r_hot_max:<9.5g} {k_x_max:<9.4g} {H2r:<7.5f} {Mdot_max:<10.4e} {T0:<10.1f}\n'.format(
                     Mx = self.sp.Mx,
                     Kerr = self.cloptions.get('kerr') or 0.,
                     Mopt = self.sp.Mopt,
@@ -396,8 +398,8 @@ class FRED(object):
                     ic_param = self.cloptions.get('powerorder'),
                     Thot = self.cloptions['Thot'],
                     run_radius = int( self.cloptions['Thot'] > 0. ),
-                    k_irr = self.cloptions.get('kirr'),
-                    irr_enable = int( self.cloptions['kirr'] > 0. ),
+                    k_irr = self.cloptions.get('Cirr'),
+                    irr_enable = int( self.cloptions['Cirr'] > 0. ),
                     fitdots = self.flux_obs,
                     fcol = self.sp.fcol,
                     Chi2 = chi2( model_spline, obs_trunc['DaP'], obs_trunc[self.flux_obs], sigma=obs_trunc['err'] ),
@@ -406,6 +408,7 @@ class FRED(object):
                     k_x_max = float( splines['kxout'](t0) ),
                     H2r = float( splines['H2R'](t0) ),
                     Mdot_max = Mdot0,
+                    T0 = self.op.Time_shift - t0,
                 )
             )
         else:
