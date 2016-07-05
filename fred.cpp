@@ -33,7 +33,7 @@ int main(int ac, char *av[]){
 	double alpha = 0.55;
 	double fc = 1.7;
 	double kerr = 0.;
-	double eta = 1./12.;
+	double eta = efficiency_of_accretion(kerr);
 	double Mx = 7.5 * GSL_CONST_CGSM_SOLAR_MASS;
 	double Mopt = 0.8 * GSL_CONST_CGSM_SOLAR_MASS;
 	double P = 0.433 * DAY;
@@ -122,6 +122,9 @@ int main(int ac, char *av[]){
 		else{
 			r_out = r_out_func( Mx, Mopt, P );
 		}
+		if ( not vm["kerr"].defaulted() ){
+			eta = efficiency_of_accretion(kerr);
+		}
 		r_in = r_in_func( Mx, kerr );
 	}
 
@@ -132,7 +135,7 @@ int main(int ac, char *av[]){
 
 	double m_op, n_op, varkappa0, Pi_Sigma, Pi_Height, D_op, Height_exp_F, Height_exp_R, Height_coef;
 	if ( opacity_type == "Kramers" ){
-        // varkappa = vakappa0 * rho^1 / T^3.5
+		// varkappa = vakappa0 * rho^1 / T^3.5
 		m_op = 0.3;
 		n_op = 0.8;
 		varkappa0 = 5e24;
@@ -152,7 +155,7 @@ int main(int ac, char *av[]){
 		Height_exp_R = 1./8.;
 		Height_coef = 0.020 * pow(1e17, -Height_exp_F) * pow(GM, -Height_exp_F/2.) * pow(1e10, -Height_exp_F/2.) * pow(alpha, -0.1) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -3./8.) * pow(mu/0.6, -3./8.) * Pi_Height * pow(varkappa0/5e24, 0.05);
 	} else if ( opacity_type == "OPAL" ){
-        // varkappa = vakappa0 * rho^1 / T^2.5
+		// varkappa = vakappa0 * rho^1 / T^2.5
 		m_op = 1./3.;
 		n_op = 1.;
 		varkappa0 = 1.5e20;

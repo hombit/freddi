@@ -9,9 +9,9 @@ double r_out_func(const double Mx, const double Mopt, const double P){
 }
 
 double r_ISCO(const double kerr){ // From «Black Hole Accretion Disks», A.44 (p. 530)
-    double Z1 = 1. + cbrt( (1.-kerr*kerr) ) * ( cbrt( (1.+kerr) ) + cbrt( (1.-kerr) ) );
+	double Z1 = 1. + cbrt( (1.-kerr*kerr) ) * ( cbrt( (1.+kerr) ) + cbrt( (1.-kerr) ) );
 	double Z2 = sqrt( 3.*kerr*kerr + Z1*Z1 );
-    return 3. + Z2 - sqrt( (3.-Z1) * (3.+Z1+2.*Z2) );
+	return 3. + Z2 - sqrt( (3.-Z1) * (3.+Z1+2.*Z2) );
 }
 
 double r_in_func(const double Mx, const double kerr){
@@ -19,5 +19,5 @@ double r_in_func(const double Mx, const double kerr){
 };
 
 double efficiency_of_accretion(const double kerr){
-    return 1. - sqrt(1. - 2./3. / r_ISCO(kerr));
+	return 1. - sqrt(1. - 2./3. / r_ISCO(kerr));
 }
