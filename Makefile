@@ -4,7 +4,7 @@ CPPFLAGS = -std=c++11
 
 LDLIBS = -lboost_program_options
 
-OBJ = nonlinear_diffusion.o spectrum.o
+OBJ = nonlinear_diffusion.o orbit.o spectrum.o
 
 
 all: fred
