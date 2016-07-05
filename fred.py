@@ -121,11 +121,12 @@ def kerrMdot(obs_filename=None):
             'powerorder' : 6,
             'Thot' : 1e4,
 #            'boundSigma' : None,
-            'Cirr' : 0.,
+            'Cirr' : 1e-4,
             'kerr' : kerr,
             'distance' : 4.937,
             'Nx' : 1000,
             'gridscale' : 'linear',
+            'opacity' : 'OPAL',
         },
     )
 
