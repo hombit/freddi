@@ -3,6 +3,7 @@
 #include <fstream>
 #include <gsl/gsl_const_cgsm.h>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <string>
 
@@ -63,7 +64,8 @@ int main(int ac, char *av[]){
 	string initial_cond_shape = "power";
 	string opacity_type = "Kramers";
 
-	double Mdot_in;
+	double Mdot_in = 0.;
+	double Mdot_in_prev;
 	double Mdot_out = 0.;
 
 	{
@@ -86,7 +88,7 @@ int main(int ac, char *av[]){
 			( "gridscale,g", po::value<string>(&grid_scale)->default_value(grid_scale), "Type of grid: log or linear" )
 			( "tau,t",	po::value<double>()->default_value(tau/DAY), "Time step, days" )
 			( "time,T", po::value<double>()->default_value(Time/DAY), "Computation time, days" )
-			( "boundcond,B", po::value<string>(&bound_cond_type)->default_value(bound_cond_type), "Boundary movement condition, should be one of: Teff, fourSigmaCrit, MdotOut" )
+			( "boundcond,B", po::value<string>(&bound_cond_type)->default_value(bound_cond_type), "Boundary movement condition, should be one of: Teff, Tirr, fourSigmaCrit, MdotOut" )
 			( "Thot,H", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere temperature of the outer edge of the hot disk, degrees Kelvin. This option works only with --boundcond=Teff" )
 			( "Cirr,C", po::value<double>(&C_irr)->default_value(C_irr), "Irradiation factor" )
 			( "dir,d", po::value<string>(&output_dir)->default_value(output_dir), "Directory to write output files. It should exists" )
@@ -265,7 +267,7 @@ int main(int ac, char *av[]){
 	for( double t = 0.; t <= Time; t += tau ){
 		// cout << t/DAY << endl;
 
-		vector<double> W(Nx, 0.), Tph_vis(Nx, 0.), Tph_X(Nx, 0.), Sigma(Nx, 0.), Height(Nx, 0.);
+		vector<double> W(Nx, 0.), Tph(Nx), Tph_vis(Nx, 0.), Tph_X(Nx, 0.), Sigma(Nx, 0.), Height(Nx, 0.);
 		
 		try{
 			nonlenear_diffusion_nonuniform_1_2 (tau, eps, 0., Mdot_out/(2.*M_PI), wunc, h, F);
@@ -275,6 +277,7 @@ int main(int ac, char *av[]){
 			break;
 		}
 
+		Mdot_in_prev = Mdot_in;
 		Mdot_in = 2.*M_PI * ( F.at(1) - F.at(0) ) / ( h.at(1) - h.at(0) );
 
 		for ( int i = 1; i < Nx; ++i ){
@@ -282,11 +285,15 @@ int main(int ac, char *av[]){
 			Height.at(i) = R.at(i) * Height_coef * pow(2.*M_PI*F.at(i), Height_exp_F) * pow(R.at(i)/1e10, Height_exp_R - Height_exp_F/2.);
 			Tph_vis.at(i) = GM * pow(h.at(i), -1.75) * pow( 0.75 * F.at(i) / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
 			Tph_X.at(i) = fc * T_GR( R.at(i), 0., Mx, Mdot_in, R.front() );
+
+			// k_x = k_irr * pow(Height.at(ii) / R.at(ii), 2.);
+			const double Qx = C_irr * eta * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / (4.*M_PI * R.at(i)*R.at(i));
+			Tph.at(i) = pow( pow(Tph_vis.at(i), 4.) + Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
+
 		}
 		
 		const double Lx = Luminosity( R, Tph_X, nu_min, nu_max, 100 ) / pow(fc, 4.);
 
-		auto Tph = vector<double>(Tph_vis);
 		double k_x = 0.;
 		int ii = Nx;
 		if (bound_cond_type == "MdotOut"){
@@ -301,18 +308,29 @@ int main(int ac, char *av[]){
 				// Equation from Menou et al. 1999. Factor 4 is from their fig 8 and connected to point where Mdot = 0. Our Sigma is 0.5 from their Sigma.
 			} while( Sigma.at(ii) <  4 * Sigma_hot_disk(R[ii]) );
 		} else if ( bound_cond_type == "Teff" ){
-			if ( T_min_hot_disk > 0. ){
+			do{
+				ii--;
+			} while( Tph.at(ii) < T_min_hot_disk );
+		} else if (  bound_cond_type == "Tirr" ){
+			cout << Mdot_in - Mdot_in_prev;
+			if ( Mdot_in >= Mdot_in_prev ){
 				do{
 					ii--;
-					// k_x = k_irr * pow(Height.at(ii) / R.at(ii), 2.);
-					const double Qx = C_irr * eta * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / (4.*M_PI * R.at(ii)*R.at(ii));
-					Tph.at(ii) = pow( pow(Tph_vis.at(ii), 4.) + Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
 				} while( Tph.at(ii) < T_min_hot_disk );
+				cout << "\t" << Tph.at(ii);
+			} else{
+				double Tirr;
+				do{
+					ii--;
+					Tirr = pow( pow(Tph.at(ii), 4.) - pow(Tph_vis.at(ii), 4.), 0.25 );
+				} while( Tirr < T_min_hot_disk );
+				cout << "\t" << Tirr;
 			}
+			cout << endl;
 		} else{
 			throw po::invalid_option_value(bound_cond_type);
 		}
-
+		
 		const double mB = -2.5 * log10( I_lambda(R, Tph, lambdaB) * cosiOverD2 / irr0B );
 		const double mV = -2.5 * log10( I_lambda(R, Tph, lambdaV) * cosiOverD2 / irr0V );
 
@@ -320,7 +338,7 @@ int main(int ac, char *av[]){
 			ostringstream filename;
 			filename << output_dir << "/" << static_cast<int>(t/tau) << ".dat";
 			ofstream output( filename.str() );
-			output << "#h   F   Sigma   W   R   Tph_vis Height" << "\n";
+			output << "#h   F   Sigma   W   R   Tph_vis Height	Tph" << "\n";
 			output << "# Time = " << t / DAY << " Mdot_in = " << Mdot_in << endl;
 			for ( int i = 1; i < Nx; ++i ){
 				output		<< h.at(i)
@@ -330,6 +348,7 @@ int main(int ac, char *av[]){
 					<< "\t" << R.at(i)
 					<< "\t" << Tph_vis.at(i)
 					<< "\t" << Height.at(i)
+					<< "\t" << Tph.at(i)
 					<< endl;
 			}
 		}
@@ -345,8 +364,8 @@ int main(int ac, char *av[]){
 				<< "\t" << mV
 				<< endl;
 
-		if ( ii < Nx ){
-			Nx = ii;
+		if ( ii < Nx-1 ){
+			Nx = ii+1;
 			// F.at(Nx-2) = F.at(Nx-1) - Mdot_out / (2.*M_PI) * (h.at(Nx-1) - h.at(Nx-2));
 			h.resize(Nx);
 		}
