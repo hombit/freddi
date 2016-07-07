@@ -312,21 +312,17 @@ int main(int ac, char *av[]){
 				ii--;
 			} while( Tph.at(ii) < T_min_hot_disk );
 		} else if (  bound_cond_type == "Tirr" ){
-			cout << Mdot_in - Mdot_in_prev;
 			if ( Mdot_in >= Mdot_in_prev ){
 				do{
 					ii--;
 				} while( Tph.at(ii) < T_min_hot_disk );
-				cout << "\t" << Tph.at(ii);
 			} else{
 				double Tirr;
 				do{
 					ii--;
 					Tirr = pow( pow(Tph.at(ii), 4.) - pow(Tph_vis.at(ii), 4.), 0.25 );
 				} while( Tirr < T_min_hot_disk );
-				cout << "\t" << Tirr;
 			}
-			cout << endl;
 		} else{
 			throw po::invalid_option_value(bound_cond_type);
 		}
