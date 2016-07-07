@@ -256,7 +256,7 @@ int main(int ac, char *av[]){
 	}	
 
 	ofstream output_sum( output_dir + "/sum.dat" );
-	output_sum << "#t	Mdot	Lx	H2R Rhot2Rout	Tphout kxout   mB  mV" << "\n";
+	output_sum << "#t	Mdot	Lx	H2R	Rhot2Rout	Tphout	kxout Qiir2Qvisout	Qirr2Qvisout_analyt	mB	mV" << "\n";
 	output_sum << "# r_out = " << r_out << "\n";
 	output_sum << "#";
 	for ( int i = 0; i < ac; ++i ){
@@ -267,7 +267,7 @@ int main(int ac, char *av[]){
 	for( double t = 0.; t <= Time; t += tau ){
 		// cout << t/DAY << endl;
 
-		vector<double> W(Nx, 0.), Tph(Nx), Tph_vis(Nx, 0.), Tph_X(Nx, 0.), Sigma(Nx, 0.), Height(Nx, 0.);
+		vector<double> W(Nx, 0.), Tph(Nx, 0.), Tph_vis(Nx, 0.), Tph_X(Nx, 0.), Tirr(Nx,0.), Sigma(Nx, 0.), Height(Nx, 0.);
 		
 		try{
 			nonlenear_diffusion_nonuniform_1_2 (tau, eps, 0., Mdot_out/(2.*M_PI), wunc, h, F);
@@ -288,8 +288,8 @@ int main(int ac, char *av[]){
 
 			// k_x = k_irr * pow(Height.at(ii) / R.at(ii), 2.);
 			const double Qx = C_irr * eta * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / (4.*M_PI * R.at(i)*R.at(i));
+			Tirr.at(i) = pow( Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
 			Tph.at(i) = pow( pow(Tph_vis.at(i), 4.) + Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
-
 		}
 		
 		const double Lx = Luminosity( R, Tph_X, nu_min, nu_max, 100 ) / pow(fc, 4.);
@@ -317,11 +317,9 @@ int main(int ac, char *av[]){
 					ii--;
 				} while( Tph.at(ii) < T_min_hot_disk );
 			} else{
-				double Tirr;
 				do{
 					ii--;
-					Tirr = pow( pow(Tph.at(ii), 4.) - pow(Tph_vis.at(ii), 4.), 0.25 );
-				} while( Tirr < T_min_hot_disk );
+				} while( Tirr.at(ii) < T_min_hot_disk );
 			}
 		} else{
 			throw po::invalid_option_value(bound_cond_type);
@@ -356,6 +354,8 @@ int main(int ac, char *av[]){
 				<< "\t" << R.at(Nx-1) / r_out
 				<< "\t" << Tph.at(Nx-1)
 				<< "\t" << C_irr
+				<< "\t" << pow( Tirr.at(Nx-1) / Tph_vis.at(Nx-1), 4. )
+				<< "\t" << 4./3. * eta * C_irr * R.at(Nx-1) / (2. * GM / GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_SPEED_OF_LIGHT)
 				<< "\t" << mB
 				<< "\t" << mV
 				<< endl;
