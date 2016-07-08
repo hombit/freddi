@@ -17,7 +17,12 @@ private:
 	void init_OPAL();
 
 public:
-	OpacityRelated(const std::string &opacity_type, double Mx, double alpha, double mu);
+	OpacityRelated(
+		const std::string &opacity_type,
+		double Mx,
+		double alpha,
+		double mu
+	) throw(std::invalid_argument);
 	~OpacityRelated(){};
 
 	const std::array<std::string, 2> supported_types {{ "Kramers", "OPAL" }};
@@ -28,7 +33,7 @@ public:
 	double m, n, varkappa0, Pi1, Pi2, Pi3, Pi4, Pi_Sigma, Pi_Height, D, Height_exp_F, Height_exp_R, Height_coef;
 	double a0, a1, a2, k, l;
 
-	double Height(double F, double R);
+	double Height(double R, double F);
 	double f_F(double xi);
 };
 

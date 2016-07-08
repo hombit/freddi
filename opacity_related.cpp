@@ -1,7 +1,12 @@
 #include "opacity_related.hpp"
 
 
-OpacityRelated::OpacityRelated(const std::string &opacity_type, double Mx, double alpha, double mu):
+OpacityRelated::OpacityRelated(
+	const std::string &opacity_type,
+	double Mx,
+	double alpha,
+	double mu
+) throw(std::invalid_argument):
 	type(opacity_type),
 	Mx(Mx),
 	alpha(alpha),
@@ -77,7 +82,7 @@ void OpacityRelated::init_OPAL(){
 }
 
 
-double OpacityRelated::Height(double F, double R){
+double OpacityRelated::Height(double R, double F){
 	return R * Height_coef * pow(2.*M_PI*F, Height_exp_F) * pow(R/1e10, Height_exp_R - Height_exp_F/2.);
 }
 

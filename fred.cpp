@@ -9,6 +9,7 @@
 
 #include "nonlinear_diffusion.hpp"
 #include "spectrum.hpp"
+#include "opacity_related.hpp"
 #include "orbit.hpp"
 
 
@@ -136,65 +137,21 @@ int main(int ac, char *av[]){
 	const double h_out = sqrt( GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx  * r_out );
 	const double cosiOverD2 = cosi / Distance / Distance;
 
-	double m_op, n_op, varkappa0, Pi_Sigma, Pi_Height, D_op, Height_exp_F, Height_exp_R, Height_coef;
-	if ( opacity_type == "Kramers" ){
-		// varkappa = vakappa0 * rho^1 / T^3.5
-		m_op = 0.3;
-		n_op = 0.8;
-		varkappa0 = 5e24;
-
-		// tau_0 = 1e3
-		const double Pi1 = 6.31217;
-		const double Pi2 = 0.51523;
-		const double Pi3 = 1.13050;
-		const double Pi4 = 0.39842;
-
-		Pi_Sigma = pow(Pi1, 0.05) * pow(Pi2, 0.1) * pow(Pi3, 0.8) * pow(Pi4, 0.1);
-		Pi_Height = pow(Pi1, 19./40.) * pow(Pi2, -0.05) * pow(Pi3, 0.1) * pow(Pi4, -0.05);
-
-		D_op = 2.41e34 * pow(alpha, 0.8) * (Mx/GSL_CONST_CGSM_SOLAR_MASS) * pow(mu/0.5, -0.75) / Pi_Sigma * pow(varkappa0/1e22, 0.1);
-
-		Height_exp_F = 3./20.;
-		Height_exp_R = 1./8.;
-		Height_coef = 0.020 * pow(1e17, -Height_exp_F) * pow(GM, -Height_exp_F/2.) * pow(1e10, -Height_exp_F/2.) * pow(alpha, -0.1) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -3./8.) * pow(mu/0.6, -3./8.) * Pi_Height * pow(varkappa0/5e24, 0.05);
-	} else if ( opacity_type == "OPAL" ){
-		// varkappa = vakappa0 * rho^1 / T^2.5
-		m_op = 1./3.;
-		n_op = 1.;
-		varkappa0 = 1.5e20;
-
-		// tau_0 = 1e3
-		const double Pi1 = 5.53450;
-		const double Pi2 = 0.55220;
-		const double Pi3 = 1.14712;
-		const double Pi4 = 0.44777;
-
-		Pi_Sigma = pow(Pi1, 1./18.) * pow(Pi2, 1./9.) * pow(Pi3, 7./9.) * pow(Pi4, 1./9.);
-		Pi_Height = pow(Pi1, 17./36.) * pow(Pi2, -1./18.) * pow(Pi3, 1./9.) * pow(Pi4, -1./18.);
-
-		D_op = 2.12e37 * pow(alpha, 7./9.) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, 10./9.) * pow(mu/0.5, -13./18.) / Pi_Sigma * pow(varkappa0/1e22, 1./9.);
-		
-		Height_exp_F = 1./6.;
-		Height_exp_R = 1./12.;
-		Height_coef = 0.021 * pow(1e17, -Height_exp_F) * pow(GM, -Height_exp_F/2.) * pow(1e10, -Height_exp_F/2.) * pow(alpha, -1./9.) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -13./36.) * pow(mu/0.6, -13./36.) * Pi_Height * pow(varkappa0/1.5e20, 1./18.);
-	} else{
+	OpacityRelated *oprel;
+	try{
+		oprel = new OpacityRelated(opacity_type, Mx, alpha, mu);
+	} catch (invalid_argument){
 		throw po::invalid_option_value(opacity_type);
 	}
 
-
-//	cout
-//		<< "R_out = " << r_out / solar_radius << "\n"
-//		<< "h_out = " << h_out << "\n"
-//		<< std::flush;
-
-	auto wunc = [m_op, n_op, D_op](
+	auto wunc = [oprel](
 		const vector<double> &h, const vector<double> &F,
 		int first, int last	
 	) ->vector<double>{
 		vector<double> W( first > 0 ? first : 0,  0. );
 		for ( int i = first; i <= last; ++i ){
 			W.push_back(
-				pow(2.*M_PI*F.at(i), 1. - m_op) * pow(h.at(i), n_op) / (1. - m_op) / D_op / (2.*M_PI)
+				pow(2.*M_PI*F.at(i), 1. - oprel->m) * pow(h.at(i), oprel->n) / (1. - oprel->m) / oprel->D / (2.*M_PI)
 			);
 		}
 		return W;
@@ -252,28 +209,9 @@ int main(int ac, char *av[]){
 			}
 		}
 	} else if( initial_cond_shape == "quasistat" ){
-		if ( opacity_type == "Kramers" ){
-			const double a0_LS2000 = 1.430;
-			const double a1_LS2000 = -0.46;
-			const double a2_LS2000 = 0.03;
-			const double k_LS2000 = 3.5;
-			const double l_LS2000 = 6.0;
-			for ( int i = 0; i < Nx; ++i ){
-				const double xi_LS2000 = h.at(i) / h_out;
-				F.at(i) = F0_gauss * ( a0_LS2000 * xi_LS2000 + a1_LS2000 * pow(xi_LS2000, k_LS2000) + a2_LS2000 * pow(xi_LS2000, l_LS2000) ) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
-			}
-		} else if ( opacity_type == "OPAL" ){
-			const double a0_LS2000 = 1.3998;
-			const double a1_LS2000 = -0.425;
-			const double a2_LS2000 = 0.0249;
-			const double k_LS2000 = 11./3.;
-			const double l_LS2000 = 19./3.;
-			for ( int i = 0; i < Nx; ++i ){
-				const double xi_LS2000 = h.at(i) / h_out;
-				F.at(i) = F0_gauss * ( a0_LS2000 * xi_LS2000 + a1_LS2000 * pow(xi_LS2000, k_LS2000) + a2_LS2000 * pow(xi_LS2000, l_LS2000) ) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
-			}
-		} else {
-			throw po::invalid_option_value(opacity_type);
+		for ( int i = 0; i < Nx; ++i ){
+			const double xi_LS2000 = h.at(i) / h_out;
+			F.at(i) = F0_gauss * oprel->f_F(xi_LS2000) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
 		}
 	} else{
 		throw po::invalid_option_value(initial_cond_shape);
@@ -306,7 +244,7 @@ int main(int ac, char *av[]){
 
 		for ( int i = 1; i < Nx; ++i ){
 			Sigma.at(i) = 0.5 * W.at(i) * GM*GM / (2. * pow(h.at(i), 3.));
-			Height.at(i) = R.at(i) * Height_coef * pow(2.*M_PI*F.at(i), Height_exp_F) * pow(R.at(i)/1e10, Height_exp_R - Height_exp_F/2.);
+			Height.at(i) = oprel->Height(R.at(i), F.at(i));
 			Tph_vis.at(i) = GM * pow(h.at(i), -1.75) * pow( 0.75 * F.at(i) / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
 			Tph_X.at(i) = fc * T_GR( R.at(i), 0., Mx, Mdot_in, R.front() );
 
@@ -390,6 +328,8 @@ int main(int ac, char *av[]){
 			h.resize(Nx);
 		}
 	}
+
+	delete oprel;
 
 	return 0;
 }
