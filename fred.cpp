@@ -336,7 +336,7 @@ int main(int ac, char *av[]){
 				ii--;
 			} while( Tph.at(ii) < T_min_hot_disk );
 		} else if (  bound_cond_type == "Tirr" ){
-			if ( Mdot_in >= Mdot_in_prev ){
+			if ( Mdot_in >= Mdot_in_prev  and ( initial_cond_shape == "power" or initial_cond_shape == "sinusgauss" ) ){
 				do{
 					ii--;
 				} while( Tph.at(ii) < T_min_hot_disk );
