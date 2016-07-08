@@ -93,7 +93,7 @@ int main(int ac, char *av[]){
 			( "Cirr,C", po::value<double>(&C_irr)->default_value(C_irr), "Irradiation factor" )
 			( "dir,d", po::value<string>(&output_dir)->default_value(output_dir), "Directory to write output files. It should exists" )
 			( "F0,F", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque per radian on outer border of the disk, cgs" )
-			( "initialcond,I", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "One of the available shapes of initial conditions for viscous torque F: sinusgauss, power, sinus" )
+			( "initialcond,I", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "One of the available shapes of initial conditions for viscous torque F: sinusgauss, power, sinus, sinusparabola, quasistat" )
 			( "powerorder,p", po::value<double>(&power_order)->default_value(power_order), "Parameter of initial condition distribution: F ~ h^poweroder. This option works only with --initialcond=power" )
 		;
 		po::variables_map vm;
@@ -251,9 +251,34 @@ int main(int ac, char *av[]){
 				F.at(i) = F0_gauss * ( 1. - kMdot_out / (h_F0-h_in) / delta_h * M_PI / 4. * (h.at(i) - h_F0)*(h.at(i) - h_F0) );
 			}
 		}
+	} else if( initial_cond_shape == "quasistat" ){
+		if ( opacity_type == "Kramers" ){
+			const double a0_LS2000 = 1.430;
+			const double a1_LS2000 = -0.46;
+			const double a2_LS2000 = 0.03;
+			const double k_LS2000 = 3.5;
+			const double l_LS2000 = 6.0;
+			for ( int i = 0; i < Nx; ++i ){
+				const double xi_LS2000 = h.at(i) / h_out;
+				F.at(i) = F0_gauss * ( a0_LS2000 * xi_LS2000 + a1_LS2000 * pow(xi_LS2000, k_LS2000) + a2_LS2000 * pow(xi_LS2000, l_LS2000) ) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
+				cout << F.at(i) << endl;
+			}
+		} else if ( opacity_type == "OPAL" ){
+			const double a0_LS2000 = 1.3998;
+			const double a1_LS2000 = -0.425;
+			const double a2_LS2000 = 0.0249;
+			const double k_LS2000 = 11./3.;
+			const double l_LS2000 = 19./3.;
+			for ( int i = 0; i < Nx; ++i ){
+				const double xi_LS2000 = h.at(i) / h_out;
+				F.at(i) = F0_gauss * ( a0_LS2000 * xi_LS2000 + a1_LS2000 * pow(xi_LS2000, k_LS2000) + a2_LS2000 * pow(xi_LS2000, l_LS2000) ) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
+			}
+		} else {
+			throw po::invalid_option_value(opacity_type);
+		}
 	} else{
 		throw po::invalid_option_value(initial_cond_shape);
-	}	
+	}
 
 	ofstream output_sum( output_dir + "/sum.dat" );
 	output_sum << "#t	Mdot	Lx	H2R	Rhot2Rout	Tphout	kxout Qiir2Qvisout	Qirr2Qvisout_analyt	mB	mV" << "\n";
