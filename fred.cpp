@@ -261,7 +261,6 @@ int main(int ac, char *av[]){
 			for ( int i = 0; i < Nx; ++i ){
 				const double xi_LS2000 = h.at(i) / h_out;
 				F.at(i) = F0_gauss * ( a0_LS2000 * xi_LS2000 + a1_LS2000 * pow(xi_LS2000, k_LS2000) + a2_LS2000 * pow(xi_LS2000, l_LS2000) ) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
-				cout << F.at(i) << endl;
 			}
 		} else if ( opacity_type == "OPAL" ){
 			const double a0_LS2000 = 1.3998;
