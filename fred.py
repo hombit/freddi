@@ -68,7 +68,7 @@ def parkTin():
 
 
 
-def kerrMdot(obs_filename=None):
+def kerrMdot(obs_filename=None, cloptions={}):
     if obs_filename is None:
         obs_filename = '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_gauss_smedge_ak0.9.v2.dat'
         Mx = 9.4
@@ -81,7 +81,11 @@ def kerrMdot(obs_filename=None):
         Mx = float( match_dict['Mx'] )
         kerr = float( match_dict['kerr'] )
         spectrum_fit = match_dict['spectrum_fit']
-    
+
+    cloptions.update({
+        'kerr' : kerr,   
+    })
+
     Time_shift = 445
 
     obscolumns = ['Day', 'Mdot', 'Mdot_negerr', 'Mdot_poserr', 'tstart', 'tstop', 'chi2']
@@ -119,18 +123,7 @@ def kerrMdot(obs_filename=None):
         flux_model='Mdot',
         flux_model_func=lambda Mdot: Mdot / 1e18,
         flux_fit_model='t0',
-        cloptions={
-            'initialcond' : 'power',
-            'powerorder' : 6,
-            'Thot' : 1e4,
-#            'boundSigma' : None,
-            'Cirr' : 5e-3,
-            'kerr' : kerr,
-            'distance' : 4.937,
-            'Nx' : 1000,
-            'gridscale' : 'linear',
-            'opacity' : 'OPAL',
-        },
+        cloptions=cloptions,
     )
 
     #alpha = 0.64902
@@ -157,12 +150,14 @@ def kerrMdot(obs_filename=None):
     return line
 
 
-def process_kerrMdot(filenames, multiproc=True):
+def process_kerrMdot(filenames, cloptions={}, multiproc=True):
+    f = lambda filename: kerrMdot(filename, cloptions=cloptions)
+
     if multiproc:
         with Pool() as p:
-            lines = p.map( kerrMdot, filenames )
+            lines = p.map( f, filenames )
     else:
-        lines = [ line for line in map(kerrMdot, filenames) ]
+        lines = [ line for line in map(f, filenames) ]
     
     return lines
 
@@ -172,20 +167,25 @@ def process_kerrMdot(filenames, multiproc=True):
 
 
 if __name__ == '__main__':
-    #print(kerrMdot( '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0.0_m6.dat' ))
-    
-    # parkTin()
-    
     from sys import argv
-    if len(argv) < 2:
-        filenames = ['/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_laor_smedge_ak_0.0_m6.dat']
-    else:
-        filenames = argv[1:]
+    filenames = argv[1:]
+
+    cloptions = {
+        'initialcond' : 'power',
+        'powerorder' : 6,
+        'Thot' : 1e4,
+        'boundcond' : 'Tirr',
+        'Cirr' : 5e-3,
+        'distance' : 4.937,
+        'Nx' : 1000,
+        'gridscale' : 'linear',
+        'opacity' : 'OPAL',
+    }
 
     if len(filenames) == 1:
         print( kerrMdot(filenames[0]) )
     else:
-        lines = process_kerrMdot(filenames, multiproc=True)
+        lines = process_kerrMdot(filenames, cloptions, multiproc=True)
         with open('results.dat', 'w') as f:
             for line in lines:
                 f.write(line)
