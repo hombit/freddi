@@ -380,10 +380,12 @@ class FRED(object):
         splines = {}
         for column in model.dtype.names[1:]:
             splines[column] = interp1d( model['t'], model[column], kind='cubic' )
-        
+
+        t0_eff = t0 if t0>0 else 0
+
         if oneline:
             stream.write(
-                '{Mx:<6.1g} {Kerr:<5.3g} {Mopt:<4.1f} {Period:<7.4g} {r_out:<7.5f} {fullTime:<8g} {spectrum_fit:<25s} {t0range:<7g} {F0:<10.4e} {alpha:<7.5f} {initialcond:<11s} {ic_param:<8.1g} {Thot:<6g} {run_radius:<10d} {k_irr:<5.2g} {irr_enable:<10d} {fitdots:<7s} {fcol:<5.1f} {Chi2:<5.3g} {r_hot_0:<7.5f} {r_hot_max:<9.5g} {k_x_max:<9.4g} {H2r:<7.5f} {Mdot_max:<10.4e} {T0:<10.1f}\n'.format(
+                '{Mx:<6.1f} {Kerr:<5.3g} {Mopt:<4.1f} {Period:<7.4g} {r_out:<7.5f} {fullTime:<8g} {spectrum_fit:<25s} {t0range:<7g} {F0:<10.4e} {alpha:<7.5f} {initialcond:<11s} {ic_param:<8.1g} {Thot:<6g} {run_radius:<10d} {k_irr:<5.2g} {irr_enable:<10d} {fitdots:<7s} {fcol:<5.1f} {Chi2:<5.3g} {r_hot_0:<7.5f} {r_hot_max:<9.5g} {k_x_max:<9.4g} {H2r:<7.5f} {Mdot_max:<10.4e} {T0:<10.1f}\n'.format(
                     Mx = self.sp.Mx,
                     Kerr = self.cloptions.get('kerr') or 0.,
                     Mopt = self.sp.Mopt,
@@ -395,7 +397,7 @@ class FRED(object):
                     F0 = F0,
                     alpha = alpha,
                     initialcond = self.cloptions.get('initialcond') or 'unknown',
-                    ic_param = self.cloptions.get('powerorder'),
+                    ic_param = self.cloptions.get('powerorder') or float('inf'),
                     Thot = self.cloptions['Thot'],
                     run_radius = int( self.cloptions['Thot'] > 0. ),
                     k_irr = self.cloptions.get('Cirr'),
@@ -404,9 +406,9 @@ class FRED(object):
                     fcol = self.sp.fcol,
                     Chi2 = chi2( model_spline, obs_trunc['DaP'], obs_trunc[self.flux_obs], sigma=obs_trunc['err'] ),
                     r_hot_0 = r_hot_0,
-                    r_hot_max = splines['Rhot2Rout'](t0) * r_cold,
-                    k_x_max = float( splines['kxout'](t0) ),
-                    H2r = float( splines['H2R'](t0) ),
+                    r_hot_max = float( splines['Rhot2Rout'](t0_eff) * r_cold ),
+                    k_x_max = float( splines['kxout'](t0_eff) ),
+                    H2r = float( splines['H2R'](t0_eff) ),
                     Mdot_max = Mdot0,
                     T0 = self.op.Time_shift - t0,
                 )
