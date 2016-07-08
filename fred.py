@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 
+import argparse
 import re
 import os, os.path
-from glob import glob
+import numpy as np
 from io import StringIO
 from multiprocessing import Pool
-import numpy as np
+from functools import partial
 
 import fredlib
 from fredlib import FRED, Tmax_SS, Tin_color_diskbb
@@ -151,13 +152,11 @@ def kerrMdot(obs_filename=None, cloptions={}):
 
 
 def process_kerrMdot(filenames, cloptions={}, multiproc=True):
-    f = lambda filename: kerrMdot(filename, cloptions=cloptions)
-
-    if multiproc:
-        with Pool() as p:
-            lines = p.map( f, filenames )
+    if multiproc and len(filenames) > 1:
+        with Pool(1) as p:
+            lines = p.map( partial(kerrMdot, cloptions=cloptions), filenames )
     else:
-        lines = [ line for line in map(f, filenames) ]
+        lines = map( partial(kerrMdot, cloptions=cloptions), filenames )
     
     return lines
 
@@ -167,25 +166,45 @@ def process_kerrMdot(filenames, cloptions={}, multiproc=True):
 
 
 if __name__ == '__main__':
-    from sys import argv
-    filenames = argv[1:]
+    parser = argparse.ArgumentParser(description='Find your value of alpha in 1543!')
+    parser.add_argument(
+        'filename',
+        action = 'store',
+        nargs = '+',
+        help = 'path to Mdot-t file'
+    )
+    parser.add_argument(
+        '-C', '--Cirr',
+        dest = 'Cirr',
+        action = 'store',
+        default = 1e-3,
+        type = float,
+        help = 'parameter of irradiation',
+    )
+    parser.add_argument(
+        '--results',
+        dest = 'results',
+        action = 'store',
+        default = 'results.dat',
+        help = 'where to output results of optimization',
+    )
+    args = parser.parse_args()
+    Cirr = args.Cirr
+    filenames = args.filename
 
     cloptions = {
         'initialcond' : 'power',
         'powerorder' : 6,
         'Thot' : 1e4,
         'boundcond' : 'Tirr',
-        'Cirr' : 5e-3,
+        'Cirr' : Cirr,
         'distance' : 4.937,
         'Nx' : 1000,
         'gridscale' : 'linear',
         'opacity' : 'OPAL',
     }
 
-    if len(filenames) == 1:
-        print( kerrMdot(filenames[0]) )
-    else:
-        lines = process_kerrMdot(filenames, cloptions, multiproc=True)
-        with open('results.dat', 'w') as f:
-            for line in lines:
-                f.write(line)
+    lines = process_kerrMdot(filenames, cloptions, multiproc=True)
+    with open(args.results, 'w') as f:
+        for line in lines:
+            f.write(line)
