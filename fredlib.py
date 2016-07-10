@@ -332,6 +332,7 @@ class FRED(object):
             ( (self.op.mulF0_min, self.op.mulF0_max), ),
             tol=2e-2,
             popsize=7,
+            maxiter=100,
             seed=np.random.mtrand.RandomState(),
         )
         print(minimize_result)
@@ -348,6 +349,7 @@ class FRED(object):
             ),
             tol=2e-2,
             popsize=7,
+            maxiter=1000,
             seed=np.random.mtrand.RandomState(),
         )
         print( minimize_result )
