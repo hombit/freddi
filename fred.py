@@ -113,7 +113,7 @@ def kerrMdot(obs_filename=None, cloptions={}, start_from_peak=False):
         tau=0.25,
         t0_range=3,
         alpha_min= 0.1,
-        alpha_max= 2.0,
+        alpha_max= 3.0,
         alpha_step=0.025,
         mulF0_min=0.1,
         mulF0_max=3.0,
