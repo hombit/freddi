@@ -69,7 +69,7 @@ def parkTin():
 
 
 
-def kerrMdot(obs_filename=None, cloptions={}):
+def kerrMdot(obs_filename=None, cloptions={}, start_from_peak=False):
     if obs_filename is None:
         obs_filename = '/Users/hombit/Dropbox/X-ray_novae_modeling (2) (1)/data_and_plots/Mdot-t/Min_simpl_kerrbb_gauss_smedge_ak0.9.v2.dat'
         Mx = 9.4
@@ -88,12 +88,16 @@ def kerrMdot(obs_filename=None, cloptions={}):
     })
 
     Time_shift = 445
+    Time_peak = 447
 
     obscolumns = ['Day', 'Mdot', 'Mdot_negerr', 'Mdot_poserr', 'tstart', 'tstop', 'chi2']
     obs = np.genfromtxt(obs_filename, names=obscolumns)
+    if start_from_peak:
+        obs = obs[ obs['Day'] > Time_peak ]
     obs = obs[ obs['chi2'] < 2 ]
     obs = fredlib.rec_append_fields( obs, 'DaP', obs['Day'] - Time_shift )
     obs = fredlib.rec_append_fields( obs, 'err', 0.5 * (np.abs(obs['Mdot_poserr']) + np.abs(obs['Mdot_negerr'])) )
+        
 
     sp = fredlib.SystemParameters(
         Mx=Mx,
@@ -111,8 +115,8 @@ def kerrMdot(obs_filename=None, cloptions={}):
         alpha_min= 0.1,
         alpha_max= 2.0,
         alpha_step=0.025,
-        mulF0_min=1.0,
-        mulF0_max=15.0,
+        mulF0_min=0.1,
+        mulF0_max=3.0,
     )
 
     fred = FRED(
@@ -151,13 +155,15 @@ def kerrMdot(obs_filename=None, cloptions={}):
     return line
 
 
-def process_kerrMdot(filenames, cloptions={}, multiproc=True):
+def process_kerrMdot(filenames, cloptions={}, start_from_peak=False, multiproc=True):
+    partfunc = partial(kerrMdot, cloptions=cloptions, start_from_peak=start_from_peak)
+
     if multiproc and len(filenames) > 1:
         with Pool(1) as p:
-            lines = p.map( partial(kerrMdot, cloptions=cloptions), filenames )
+            lines = p.map(partfunc, filenames)
     else:
-        lines = map( partial(kerrMdot, cloptions=cloptions), filenames )
-    
+        lines = map(partfunc, filenames)
+ 
     return lines
 
 
@@ -193,8 +199,8 @@ if __name__ == '__main__':
     filenames = args.filename
 
     cloptions = {
-        'initialcond' : 'power',
-        'powerorder' : 6,
+        'initialcond' : 'quasistat',
+#        'powerorder' : 6,
         'Thot' : 1e4,
         'boundcond' : 'Tirr',
         'Cirr' : Cirr,
@@ -204,7 +210,7 @@ if __name__ == '__main__':
         'opacity' : 'OPAL',
     }
 
-    lines = process_kerrMdot(filenames, cloptions, multiproc=True)
+    lines = process_kerrMdot(filenames, cloptions, start_from_peak=True, multiproc=True)
     with open(args.results, 'w') as f:
         for line in lines:
             f.write(line)
