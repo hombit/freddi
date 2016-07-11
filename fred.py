@@ -87,7 +87,7 @@ def kerrMdot(obs_filename=None, cloptions={}, start_from_peak=False):
         'kerr' : kerr,   
     })
 
-    Time_shift = 445
+    Time_shift = 446
     Time_peak = 447
 
     obscolumns = ['Day', 'Mdot', 'Mdot_negerr', 'Mdot_poserr', 'tstart', 'tstop', 'chi2']
@@ -115,7 +115,7 @@ def kerrMdot(obs_filename=None, cloptions={}, start_from_peak=False):
         alpha_min= 0.1,
         alpha_max= 3.0,
         alpha_step=0.025,
-        mulF0_min=0.1,
+        mulF0_min=0.03,
         mulF0_max=3.0,
     )
 
@@ -127,7 +127,7 @@ def kerrMdot(obs_filename=None, cloptions={}, start_from_peak=False):
         flux_obs='Mdot',
         flux_model='Mdot',
         flux_model_func=lambda Mdot: Mdot / 1e18,
-        flux_fit_model='t0',
+        flux_fit_model='None',
         cloptions=cloptions,
     )
 
@@ -137,7 +137,7 @@ def kerrMdot(obs_filename=None, cloptions={}, start_from_peak=False):
     # fred.print_params( *fred.fit_F0alpha() )
 
     with StringIO() as stream:
-        try:
+        #try:
             fred.print_params(
                 *fred.fit_F0alpha(),
                 #2.0522e38, 0.76485,
@@ -148,9 +148,9 @@ def kerrMdot(obs_filename=None, cloptions={}, start_from_peak=False):
                 }
             )
             line = stream.getvalue()
-        except Exception as e:
-            line = '# ERROR: Mx = {}\tkerr = {}. {}\n'.format(Mx, kerr, e)
-            print("Cannot compute something: "+line)
+        #except Exception as e:
+        #    line = '# ERROR: Mx = {}\tkerr = {}. {}\n'.format(Mx, kerr, e)
+        #    print("Cannot compute something: "+line)
 
     return line
 

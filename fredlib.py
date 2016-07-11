@@ -265,6 +265,11 @@ class FRED(object):
                 t0_err = params[1][0][0]
             except (ValueError, TypeError):
                 t0_err = float('inf')
+        elif self.flux_fit_model == 'None' or self.flux_fit_model is None:
+            if model['t'][-1] < self.op.Time:
+                t0_err = float('inf')
+            else:
+                t0_err = 0.
         else:
             raise RuntimeError('Wrong flux_fit_model')
 
