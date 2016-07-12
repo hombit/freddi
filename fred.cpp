@@ -43,7 +43,7 @@ int main(int ac, char *av[]){
 	double Distance = 10. * kpc;
 	double r_in = r_in_func( Mx, kerr );
 	double r_out = r_out_func( Mx, Mopt, P );
-	double T_min_hot_disk = 8000;
+	double T_min_hot_disk = 1e4;
 //	double k_irr = 0.05; //0.05; // (dlog H / dlog r - 1)
 	double C_irr = 0.; // 1e-4;
 	double mu = 0.5;
