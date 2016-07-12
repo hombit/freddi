@@ -113,10 +113,10 @@ def kerrMdot(obs_filename=None, cloptions={}, start_from_peak=False):
         tau=0.25,
         t0_range=3,
         alpha_min= 0.1,
-        alpha_max= 3.0,
+        alpha_max= 2.0,
         alpha_step=0.025,
-        mulF0_min=0.03,
-        mulF0_max=3.0,
+        mulF0_min=0.01,
+        mulF0_max=2.0,
     )
 
     fred = FRED(
@@ -140,7 +140,7 @@ def kerrMdot(obs_filename=None, cloptions={}, start_from_peak=False):
         #try:
             fred.print_params(
                 *fred.fit_F0alpha(),
-                #2.0522e38, 0.76485,
+                #1.7642e+36, 0.53963,
                 stream=stream,
                 oneline=True,
                 additional_fields={
