@@ -94,7 +94,8 @@ def kerrMdot(obs_filename=None, cloptions={}, start_from_peak=False):
     obs = np.genfromtxt(obs_filename, names=obscolumns)
     if start_from_peak:
         obs = obs[ obs['Day'] > Time_peak ]
-    obs = obs[ obs['chi2'] < 2 ]
+    obs = obs[ obs['chi2'] < 2 ] # Take dots with good statistics
+    obs = obs[ obs['Mdot'] > 5e-3 ] # Do not take dots with too small Mdot
     obs = fredlib.rec_append_fields( obs, 'DaP', obs['Day'] - Time_shift )
     obs = fredlib.rec_append_fields( obs, 'err', 0.5 * (np.abs(obs['Mdot_poserr']) + np.abs(obs['Mdot_negerr'])) )
         
