@@ -266,6 +266,7 @@ class FRED(object):
             except (ValueError, TypeError):
                 t0_err = float('inf')
         elif self.flux_fit_model == 'None' or self.flux_fit_model is None:
+            obs_trunc = self.obs[ self.obs['DaP'] <= self.op.Time ]
             if model['t'][-1] < self.op.Time:
                 t0_err = float('inf')
             else:
