@@ -23,14 +23,22 @@ int main(int ac, char *av[]){
 	const double DAY = 86400.;
 	const double Angstrem = 1e-8;
 	const double keV = 1000. * GSL_CONST_CGSM_ELECTRON_VOLT / GSL_CONST_CGSM_PLANCKS_CONSTANT_H;
+	const double Jy = 1e-23;
 	const double solar_radius = 6.955e10;
 	const double kpc = 1000. * GSL_CONST_CGSM_PARSEC;
 
+	// Allen's Astrophysical Quantities (4th ed.)
 	const double lambdaB = 4400. * Angstrem;
-	const double irr0B = 6.61e-9 / Angstrem;
-	// Calculated for BUXTON & BAILYN 2004
-	const double lambdaV = 5450. * Angstrem;
-	const double irr0V = 2.90e-9 / Angstrem;
+	const double irr0B = 6.4e-9 / Angstrem;
+	const double lambdaV = 5500. * Angstrem;
+	const double irr0V = 3.750e-9 / Angstrem;
+	const double lambdaR = 7100 * Angstrem;
+	const double irr0R = 1.75e-9 / Angstrem;
+	const double lambdaI = 9700 * Angstrem;
+	const double irr0I = 0.84e-9 / Angstrem;
+	// Campins et al., 1985, AJ, 90, 896
+	const double lambdaJ = 12600 * Angstrem;
+	const double irr0J = 1600 * Jy *  GSL_CONST_CGSM_SPEED_OF_LIGHT / (lambdaJ*lambdaJ); 
 
 	double alpha = 0.55;
 	double fc = 1.7;
@@ -218,7 +226,7 @@ int main(int ac, char *av[]){
 	}
 
 	ofstream output_sum( output_dir + "/sum.dat" );
-	output_sum << "#t	Mdot	Lx	H2R	Rhot2Rout	Tphout	kxout Qiir2Qvisout	Qirr2Qvisout_analyt	mB	mV" << "\n";
+	output_sum << "#t	Mdot	Lx	H2R	Rhot2Rout	Tphout	kxout Qiir2Qvisout	Qirr2Qvisout_analyt	mB	mV mR mI mJ" << "\n";
 	output_sum << "# r_out = " << r_out << "\n";
 	output_sum << "#";
 	for ( int i = 0; i < ac; ++i ){
@@ -289,6 +297,9 @@ int main(int ac, char *av[]){
 		
 		const double mB = -2.5 * log10( I_lambda(R, Tph, lambdaB) * cosiOverD2 / irr0B );
 		const double mV = -2.5 * log10( I_lambda(R, Tph, lambdaV) * cosiOverD2 / irr0V );
+		const double mR = -2.5 * log10( I_lambda(R, Tph, lambdaR) * cosiOverD2 / irr0R );
+		const double mI = -2.5 * log10( I_lambda(R, Tph, lambdaI) * cosiOverD2 / irr0I );
+		const double mJ = -2.5 * log10( I_lambda(R, Tph, lambdaJ) * cosiOverD2 / irr0J );
 
 		if (output_fulldata){
 			ostringstream filename;
@@ -320,6 +331,9 @@ int main(int ac, char *av[]){
 				<< "\t" << 4./3. * eta * C_irr * R.at(Nx-1) / (2. * GM / GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_SPEED_OF_LIGHT)
 				<< "\t" << mB
 				<< "\t" << mV
+				<< "\t" << mR
+				<< "\t" << mI
+				<< "\t" << mJ
 				<< endl;
 
 		if ( ii < Nx-1 ){
