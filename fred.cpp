@@ -47,7 +47,7 @@ int main(int ac, char *av[]){
 	double Mx = 7.5 * GSL_CONST_CGSM_SOLAR_MASS;
 	double Mopt = 0.8 * GSL_CONST_CGSM_SOLAR_MASS;
 	double P = 0.433 * DAY;
-	double cosi = cos(20.7 / 180 * M_PI);
+	double inclination = 20.7;  // degrees
 	double Distance = 10. * kpc;
 	double r_in = r_in_func( Mx, kerr );
 	double r_out = r_out_func( Mx, Mopt, P );
@@ -90,6 +90,7 @@ int main(int ac, char *av[]){
 			( "period,P", po::value<double>()->default_value(P/DAY), "Orbital period of binary system, days" )
 			( "rout,R", po::value<double>()->default_value(r_out/solar_radius), "Outer radius of the disk, solar radii. If it isn't setted than it will be calculated using Mx, Mopt and period" )
 			( "distance,r", po::value<double>()->default_value(Distance/kpc), "Distance to the system, kpc" )
+			( "inclination,i", po::value<double>(&inclination)->default_value(inclination), "Inclination of the system, degrees" )
 			( "opacity,O", po::value<string>(&opacity_type)->default_value(opacity_type), "Opacity law: Kramers or OPAL" )
 			( "numin,u", po::value<double>()->default_value(nu_min/keV), "Lower bound of X-ray band, keV" )
 			( "numax,U", po::value<double>()->default_value(nu_max/keV), "Upper bound of X-ray band, keV" )
@@ -143,6 +144,7 @@ int main(int ac, char *av[]){
 	const double GM = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx;
 	const double h_in = sqrt( GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx  * r_in );
 	const double h_out = sqrt( GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx  * r_out );
+	const double cosi = cos( inclination / 180 * M_PI );
 	const double cosiOverD2 = cosi / Distance / Distance;
 
 	OpacityRelated *oprel;
