@@ -53,7 +53,7 @@ int main(int ac, char *av[]){
 	double r_out = r_out_func( Mx, Mopt, P );
 	double T_min_hot_disk = 1e4;
 //	double k_irr = 0.05; //0.05; // (dlog H / dlog r - 1)
-	double C_irr = 0.; // 1e-4;
+	double C_irr_input = 0.; // 1e-4;
 	double mu = 0.5;
 	double nu_min = 1.2 * keV;
 	double nu_max = 37.2 * keV;
@@ -72,6 +72,7 @@ int main(int ac, char *av[]){
 	bool output_fulldata = false;
 	string initial_cond_shape = "power";
 	string opacity_type = "Kramers";
+	string irr_factor_type = "const";
 
 	double Mdot_in = 0.;
 	double Mdot_in_prev;
@@ -100,7 +101,8 @@ int main(int ac, char *av[]){
 			( "time,T", po::value<double>()->default_value(Time/DAY), "Computation time, days" )
 			( "boundcond,B", po::value<string>(&bound_cond_type)->default_value(bound_cond_type), "Boundary movement condition, should be one of: Teff, Tirr, fourSigmaCrit, MdotOut" )
 			( "Thot,H", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere temperature of the outer edge of the hot disk, degrees Kelvin. This option works only with --boundcond=Teff" )
-			( "Cirr,C", po::value<double>(&C_irr)->default_value(C_irr), "Irradiation factor" )
+			( "Cirr,C", po::value<double>(&C_irr_input)->default_value(C_irr_input), "Irradiation factor" )
+			( "irrfactortype,I", po::value<string>(&irr_factor_type)->default_value(irr_factor_type), "Type of irradiation factor Cirr: const (doesn't depend on disk shape, [rad. flux] = Cirr  L / [4 pi r^2]), square (disk has polynomial shape, [rad. flux] = Cirr L / [4 pi r^2] [z/r]^2 )" )
 			( "dir,d", po::value<string>(&output_dir)->default_value(output_dir), "Directory to write output files. It should exists" )
 			( "F0,F", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque per radian on outer border of the disk, cgs" )
 			( "initialcond,I", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "One of the available shapes of initial conditions for viscous torque F: sinusgauss, power, sinus, sinusparabola, quasistat" )
@@ -252,21 +254,29 @@ int main(int ac, char *av[]){
 		Mdot_in_prev = Mdot_in;
 		Mdot_in = 2.*M_PI * ( F.at(1) - F.at(0) ) / ( h.at(1) - h.at(0) );
 
+		double C_irr;
 		for ( int i = 1; i < Nx; ++i ){
 			Sigma.at(i) = 0.5 * W.at(i) * GM*GM / (2. * pow(h.at(i), 3.));
 			Height.at(i) = oprel->Height(R.at(i), F.at(i));
 			Tph_vis.at(i) = GM * pow(h.at(i), -1.75) * pow( 0.75 * F.at(i) / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
 			Tph_X.at(i) = fc * T_GR( R.at(i), 0., Mx, Mdot_in, R.front() );
 
-			// k_x = k_irr * pow(Height.at(ii) / R.at(ii), 2.);
-			const double Qx = C_irr * eta * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / (4.*M_PI * R.at(i)*R.at(i));
+			double Qx;
+			if ( irr_factor_type == "const" ){
+				C_irr = C_irr_input;
+				Qx = C_irr_input * eta * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / (4.*M_PI * R.at(i)*R.at(i));
+			} else if ( irr_factor_type == "square" ){
+				C_irr = C_irr_input * (Height.at(i) / R.at(i)) * (Height.at(i) / R.at(i));
+				Qx = C_irr * eta * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / (4.*M_PI * R.at(i)*R.at(i));
+			} else{
+				throw po::invalid_option_value(irr_factor_type);
+			}
 			Tirr.at(i) = pow( Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
 			Tph.at(i) = pow( pow(Tph_vis.at(i), 4.) + Qx / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
 		}
 		
 		const double Lx = Luminosity( R, Tph_X, nu_min, nu_max, 100 ) / pow(fc, 4.);
 
-		double k_x = 0.;
 		int ii = Nx;
 		if (bound_cond_type == "MdotOut"){
 			Mdot_out = - kMdot_out * Mdot_in;
