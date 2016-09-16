@@ -110,12 +110,14 @@ int main(int ac, char *av[]){
 				"  Tirr: outer radius of the disc moves inside to keep irradiation flux of the disc larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
 			( "Thot,H", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere of irradiation temperature of the outer edge of the hot disk, degrees Kelvin. For details see --boundcond description" )
 			( "F0,F", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque per radian on outer boundary of the disk, cgs" )
-			( "initialcond,I", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "One of the available shapes of initial conditions for viscous torque F\n\n"
+			( "initialcond,I", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "Initial condition viscous torque F or surface density Sigma\n\n"
 				"Values:\n"
-				"  power\n"
-				"  sinus\n"
-				"  quasistat" ) // sinusparabola, sinusgauss
-			( "powerorder,p", po::value<double>(&power_order)->default_value(power_order), "Parameter of initial condition distribution: F ~ h^poweroder. This option works only with --initialcond=power" )
+				"  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power option does the same
+				"  powerSigma: Sigma ~ xi^powerorder, powerorder is specified by --powerorder option\n"
+				"  sinusF: F ~ sin( xi * pi/2 )\n" // sinus option does the same
+				"  quasistat: F ~ f(xi), where f is quasistatic solution found in Lipunova, Shakura 2000. f(xi=0) = 0, df/dxi(xi=1) = 0\n\n"
+				"Here xi is (h - h_in) / (h_out - h_in)") // sinusparabola, sinusgauss
+			( "powerorder,p", po::value<double>(&power_order)->default_value(power_order), "Parameter of the powerlaw initial condition distributions. This option works only with --initialcond=powerF and =powerSigma" )
 		;
 		desc.add(internal);
 
@@ -233,11 +235,16 @@ int main(int ac, char *av[]){
 			const double F_sinus =  F0_sinus * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI / 2. );
 			F.at(i) = F_gauss + F_sinus;
 		}
-	} else if ( initial_cond_shape == "power" ){
+	} else if ( initial_cond_shape == "power" or initial_cond_shape == "powerF" ){
 		for ( int i = 0; i < Nx; ++i ){
 			F.at(i) = F0_gauss * pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
 		}
-	} else if ( initial_cond_shape == "sinus" ){
+	} else if ( initial_cond_shape == "powerSigma" ){
+		const double power_order_F = (power_order + 3. - oprel->n) / (1. - oprel->m);
+		for ( int i = 0; i < Nx; ++i ){
+			F.at(i) = F0_gauss * pow( (h.at(i) - h_in) / (h_out - h_in), power_order_F );
+		}
+	} else if ( initial_cond_shape == "sinus" or initial_cond_shape == "sinusF" ){
 		for ( int i = 0; i < Nx; ++i ){
 			F.at(i) = F0_gauss * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI / 2. );
 		}
