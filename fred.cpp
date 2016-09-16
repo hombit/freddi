@@ -79,35 +79,71 @@ int main(int ac, char *av[]){
 	double Mdot_out = 0.;
 
 	{
-		po::options_description desc("Allowed options");
-		desc.add_options()
+		po::options_description desc("Fred - numerical calculation of accretion disc evolution");
+
+		po::options_description general("General options");
+		general.add_options()
 			( "help,h", "Produce help message" )
+			( "dir,d", po::value<string>(&output_dir)->default_value(output_dir), "Directory to write output files. It should exist" )
 			( "fulldata,f", "Output files with radial structure for every computed time step. Default is output only sum.dat with integrated parameters for every time step" )
-			( "alpha,a", po::value<double>(&alpha)->default_value(alpha), "Alpha parameter" )
-			( "kerr,A", po::value<double>(&kerr)->default_value(kerr), "Kerr parameter of the black hole" )
-			( "dilution,D", po::value<double>(&fc)->default_value(fc), "Dilution parameter"  )
-			( "Mopt,m",	po::value<double>()->default_value(Mopt/GSL_CONST_CGSM_SOLAR_MASS), "Mass of optical star, solar masses" )
+		;
+		desc.add(general);
+		
+		po::options_description binary("Basic binary and disc parameters");
+		binary.add_options()
 			( "Mx,M", po::value<double>()->default_value(Mx/GSL_CONST_CGSM_SOLAR_MASS), "Mass of central object, solar masses" )
+			( "kerr,A", po::value<double>(&kerr)->default_value(kerr), "Kerr parameter of the black hole" )
+			( "alpha,a", po::value<double>(&alpha)->default_value(alpha), "Alpha parameter" )
+			( "Mopt,m",	po::value<double>()->default_value(Mopt/GSL_CONST_CGSM_SOLAR_MASS), "Mass of optical star, solar masses" )
 			( "period,P", po::value<double>()->default_value(P/DAY), "Orbital period of binary system, days" )
 			( "rout,R", po::value<double>()->default_value(r_out/solar_radius), "Outer radius of the disk, solar radii. If it isn't setted than it will be calculated using Mx, Mopt and period" )
-			( "distance,r", po::value<double>()->default_value(Distance/kpc), "Distance to the system, kpc" )
 			( "inclination,i", po::value<double>(&inclination)->default_value(inclination), "Inclination of the system, degrees" )
-			( "opacity,O", po::value<string>(&opacity_type)->default_value(opacity_type), "Opacity law: Kramers or OPAL" )
-			( "numin,u", po::value<double>()->default_value(nu_min/keV), "Lower bound of X-ray band, keV" )
-			( "numax,U", po::value<double>()->default_value(nu_max/keV), "Upper bound of X-ray band, keV" )
-			( "Nx,N",	po::value<int>(&Nx)->default_value(Nx), "Size of calculation grid" )
-			( "gridscale,g", po::value<string>(&grid_scale)->default_value(grid_scale), "Type of grid: log or linear" )
-			( "tau,t",	po::value<double>()->default_value(tau/DAY), "Time step, days" )
-			( "time,T", po::value<double>()->default_value(Time/DAY), "Computation time, days" )
-			( "boundcond,B", po::value<string>(&bound_cond_type)->default_value(bound_cond_type), "Boundary movement condition, should be one of: Teff, Tirr, fourSigmaCrit, MdotOut" )
-			( "Thot,H", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere temperature of the outer edge of the hot disk, degrees Kelvin. This option works only with --boundcond=Teff" )
-			( "Cirr,C", po::value<double>(&C_irr_input)->default_value(C_irr_input), "Irradiation factor" )
-			( "irrfactortype,I", po::value<string>(&irr_factor_type)->default_value(irr_factor_type), "Type of irradiation factor Cirr: const (doesn't depend on disk shape, [rad. flux] = Cirr  L / [4 pi r^2]), square (disk has polynomial shape, [rad. flux] = Cirr L / [4 pi r^2] [z/r]^2 )" )
-			( "dir,d", po::value<string>(&output_dir)->default_value(output_dir), "Directory to write output files. It should exists" )
-			( "F0,F", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque per radian on outer border of the disk, cgs" )
-			( "initialcond,I", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "One of the available shapes of initial conditions for viscous torque F: sinusgauss, power, sinus, sinusparabola, quasistat" )
+		;
+		desc.add(binary);
+
+		po::options_description internal("Parameters of the disc model");
+		internal.add_options()
+			( "opacity,O", po::value<string>(&opacity_type)->default_value(opacity_type), "Opacity law: Kramers (varkappa ~ rho / T^7/2) or OPAL (varkappa ~ rho / T^5/2)" )
+			( "boundcond,B", po::value<string>(&bound_cond_type)->default_value(bound_cond_type), "Outer boundary movement condition\n\n"
+				"Values:\n"
+				"  Teff: outer radius of the disc moves inside to keep photosphere temperature of the disc larger than some value. This value is specified by --Thot option\n"
+				"  Tirr: outer radius of the disc moves inside to keep irradiation flux of the disc larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
+			( "Thot,H", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere of irradiation temperature of the outer edge of the hot disk, degrees Kelvin. For details see --boundcond description" )
+			( "F0,F", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque per radian on outer boundary of the disk, cgs" )
+			( "initialcond,I", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "One of the available shapes of initial conditions for viscous torque F\n\n"
+				"Values:\n"
+				"  power\n"
+				"  sinus\n"
+				"  quasistat" ) // sinusparabola, sinusgauss
 			( "powerorder,p", po::value<double>(&power_order)->default_value(power_order), "Parameter of initial condition distribution: F ~ h^poweroder. This option works only with --initialcond=power" )
 		;
+		desc.add(internal);
+
+		po::options_description x_ray("Parameters of X-ray emission");
+		x_ray.add_options()
+			( "Cirr,C", po::value<double>(&C_irr_input)->default_value(C_irr_input), "Irradiation factor" )
+			( "irrfactortype,I", po::value<string>(&irr_factor_type)->default_value(irr_factor_type), "Type of irradiation factor Cirr: const (doesn't depend on disk shape, [rad. flux] = Cirr  L / [4 pi r^2]), square (disk has polynomial shape, [rad. flux] = Cirr L / [4 pi r^2] [z/r]^2 )" )
+			( "dilution,D", po::value<double>(&fc)->default_value(fc), "Dilution parameter"  )
+			( "numin,u", po::value<double>()->default_value(nu_min/keV), "Lower bound of X-ray band, keV" )
+			( "numax,U", po::value<double>()->default_value(nu_max/keV), "Upper bound of X-ray band, keV" )
+		;
+		desc.add(x_ray);
+
+		po::options_description optical("Parameters for optical magnitudes calculation");
+		optical.add_options()
+			( "distance,r", po::value<double>()->default_value(Distance/kpc), "Distance to the system, kpc" )
+		;
+		desc.add(optical);
+
+		po::options_description numeric("Parameters of disc evolution calculation");
+		numeric.add_options()
+			( "time,T", po::value<double>()->default_value(Time/DAY), "Computation time, days" )
+			( "tau,t",	po::value<double>()->default_value(tau/DAY), "Time step, days" )
+			( "Nx,N",	po::value<int>(&Nx)->default_value(Nx), "Size of calculation grid" )
+			( "gridscale,g", po::value<string>(&grid_scale)->default_value(grid_scale), "Type of grid: log or linear" )
+		;
+		desc.add(numeric);
+
 		po::variables_map vm;
 
 		try {
