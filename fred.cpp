@@ -242,7 +242,8 @@ int main(int ac, char *av[]){
 	} else if ( initial_cond_shape == "powerSigma" ){
 		const double power_order_F = (power_order + 3. - oprel->n) / (1. - oprel->m);
 		for ( int i = 0; i < Nx; ++i ){
-			F.at(i) = F0_gauss * pow( (h.at(i) - h_in) / (h_out - h_in), power_order_F );
+			const double Sigma_to_Sigmaout = pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
+			F.at(i) = F0_gauss * pow( h.at(i) / h_out, (3. - oprel->n) / (1. - oprel->m) ) * pow( Sigma_to_Sigmaout, 1. / (1. - oprel->m) );
 		}
 	} else if ( initial_cond_shape == "sinus" or initial_cond_shape == "sinusF" ){
 		for ( int i = 0; i < Nx; ++i ){
