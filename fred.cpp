@@ -109,7 +109,7 @@ int main(int ac, char *av[]){
 				"  Teff: outer radius of the disc moves inside to keep photosphere temperature of the disc larger than some value. This value is specified by --Thot option\n"
 				"  Tirr: outer radius of the disc moves inside to keep irradiation flux of the disc larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
 			( "Thot,H", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere of irradiation temperature of the outer edge of the hot disk, degrees Kelvin. For details see --boundcond description" )
-			( "F0,F", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque per radian on outer boundary of the disk, cgs" )
+			( "F0,F", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque on outer boundary of the disk, cgs" )
 			( "initialcond,I", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "Initial condition viscous torque F or surface density Sigma\n\n"
 				"Values:\n"
 				"  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power option does the same
@@ -201,15 +201,15 @@ int main(int ac, char *av[]){
 		vector<double> W( first > 0 ? first : 0,  0. );
 		for ( int i = first; i <= last; ++i ){
 			W.push_back(
-				pow(2.*M_PI*F.at(i), 1. - oprel->m) * pow(h.at(i), oprel->n) / (1. - oprel->m) / oprel->D / (2.*M_PI)
+				pow(F.at(i), 1. - oprel->m) * pow(h.at(i), oprel->n) / (1. - oprel->m) / oprel->D
 			);
 		}
 		return W;
 	};
 
-	// Equation from Menou et al. 1999. Sigma_cr is from their fig 8 and connected to point where Mdot is minimal. Our Sigma is 0.5 from their Sigma.
+	// Equation from Menou et al. 1999. Sigma_cr is from their fig 8 and connected to point where Mdot is minimal.
 	auto Sigma_hot_disk = [alpha, Mx](double r) ->double{
-		return 0.5 * 39.9 * pow(alpha/0.1, -0.80) * pow(r/1e10, 1.11) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -0.37);
+		return 39.9 * pow(alpha/0.1, -0.80) * pow(r/1e10, 1.11) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -0.37);
 	};
 
 	vector<double> h(Nx), R(Nx);
@@ -288,7 +288,7 @@ int main(int ac, char *av[]){
 		vector<double> W(Nx, 0.), Tph(Nx, 0.), Tph_vis(Nx, 0.), Tph_X(Nx, 0.), Tirr(Nx,0.), Sigma(Nx, 0.), Height(Nx, 0.);
 		
 		try{
-			nonlenear_diffusion_nonuniform_1_2 (tau, eps, 0., Mdot_out/(2.*M_PI), wunc, h, F);
+			nonlenear_diffusion_nonuniform_1_2 (tau, eps, 0., Mdot_out, wunc, h, F);
 			W = wunc(h, F, 1, Nx-1);
 		} catch (runtime_error er){
 			cout << er.what() << endl;
@@ -296,13 +296,13 @@ int main(int ac, char *av[]){
 		}
 
 		Mdot_in_prev = Mdot_in;
-		Mdot_in = 2.*M_PI * ( F.at(1) - F.at(0) ) / ( h.at(1) - h.at(0) );
+		Mdot_in = ( F.at(1) - F.at(0) ) / ( h.at(1) - h.at(0) );
 
 		double C_irr;
 		for ( int i = 1; i < Nx; ++i ){
-			Sigma.at(i) = 0.5 * W.at(i) * GM*GM / (2. * pow(h.at(i), 3.));
+			Sigma.at(i) = W.at(i) * GM*GM / ( 4.*M_PI *  pow(h.at(i), 3.) );
 			Height.at(i) = oprel->Height(R.at(i), F.at(i));
-			Tph_vis.at(i) = GM * pow(h.at(i), -1.75) * pow( 0.75 * F.at(i) / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
+			Tph_vis.at(i) = GM * pow(h.at(i), -1.75) * pow( 3. / (8.*M_PI) * F.at(i) / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
 			Tph_X.at(i) = fc * T_GR( R.at(i), 0., Mx, Mdot_in, R.front() );
 
 			double Qx;
@@ -331,7 +331,7 @@ int main(int ac, char *av[]){
 		} else if (bound_cond_type == "fourSigmaCrit"){
 			do{
 				ii--;
-				// Equation from Menou et al. 1999. Factor 4 is from their fig 8 and connected to point where Mdot = 0. Our Sigma is 0.5 from their Sigma.
+				// Equation from Menou et al. 1999. Factor 4 is from their fig 8 and connected to point where Mdot = 0.
 			} while( Sigma.at(ii) <  4 * Sigma_hot_disk(R[ii]) );
 		} else if ( bound_cond_type == "Teff" ){
 			do{
