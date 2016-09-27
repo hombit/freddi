@@ -54,7 +54,7 @@ int main(int ac, char *av[]){
 	double T_min_hot_disk = 1e4;
 //	double k_irr = 0.05; //0.05; // (dlog H / dlog r - 1)
 	double C_irr_input = 0.; // 1e-4;
-	double mu = 0.5;
+	double mu = 0.62;
 	double nu_min = 1.2 * keV;
 	double nu_max = 37.2 * keV;
 	int Nx = 1000;
