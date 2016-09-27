@@ -83,7 +83,7 @@ void OpacityRelated::init_OPAL(){
 
 
 double OpacityRelated::Height(double R, double F){
-	return R * Height_coef * pow(2.*M_PI*F, Height_exp_F) * pow(R/1e10, Height_exp_R - Height_exp_F/2.);
+	return R * Height_coef * pow(F, Height_exp_F) * pow(R/1e10, Height_exp_R - Height_exp_F/2.);
 }
 
 
