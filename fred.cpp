@@ -208,7 +208,7 @@ int main(int ac, char *av[]){
 		return W;
 	};
 
-	// Equation from Menou et al. 1999. Sigma_cr is from their fig 8 and connected to point where Mdot is minimal.
+	// Equation from Lasota, Dubus, Kruk A&A 2008, Menou et al. 1999. Sigma_cr is from their fig 8 and connected to point where Mdot is minimal.
 	auto Sigma_hot_disk = [alpha, Mx](double r) ->double{
 		return 39.9 * pow(alpha/0.1, -0.80) * pow(r/1e10, 1.11) * pow(Mx/GSL_CONST_CGSM_SOLAR_MASS, -0.37);
 	};
