@@ -245,7 +245,7 @@ int main(int ac, char *av[]){
 		}
 	} else if ( initial_cond_shape == "powerSigma" ){
 		if ( Mdot_in != 0. ){
-			throw po::invalid_option_value("It is obvious to use --Mdot with --initialcond=powerF");
+			throw po::invalid_option_value("It is obvious to use --Mdot with --initialcond=powerSigma");
 		}
 		for ( int i = 0; i < Nx; ++i ){
 			const double Sigma_to_Sigmaout = pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
