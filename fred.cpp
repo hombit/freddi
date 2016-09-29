@@ -78,6 +78,8 @@ int main(int ac, char *av[]){
 	double Mdot_in_prev;
 	double Mdot_out = 0.;
 
+	double Mdisk = 0.;
+
 	{
 		po::options_description desc("Fred - numerical calculation of accretion disc evolution");
 
@@ -286,7 +288,7 @@ int main(int ac, char *av[]){
 	}
 
 	ofstream output_sum( output_dir + "/sum.dat" );
-	output_sum << "#t	Mdot	Lx	H2R	Rhot2Rout	Tphout	kxout Qiir2Qvisout	Qirr2Qvisout_analyt	mB	mV mR mI mJ" << "\n";
+	output_sum << "#t	Mdot	Lx	H2R	Rhot2Rout	Tphout	Mdisk	kxout Qiir2Qvisout	mB	mV mR mI mJ" << "\n";
 	output_sum << "# r_out = " << r_out << "\n";
 	output_sum << "#";
 	for ( int i = 0; i < ac; ++i ){
@@ -362,12 +364,27 @@ int main(int ac, char *av[]){
 		} else{
 			throw po::invalid_option_value(bound_cond_type);
 		}
-		
+
+		if ( ii < Nx-1 ){
+			Nx = ii+1;
+			// F.at(Nx-2) = F.at(Nx-1) - Mdot_out / (2.*M_PI) * (h.at(Nx-1) - h.at(Nx-2));
+			h.resize(Nx);
+		}
+	
 		const double mB = -2.5 * log10( I_lambda(R, Tph, lambdaB) * cosiOverD2 / irr0B );
 		const double mV = -2.5 * log10( I_lambda(R, Tph, lambdaV) * cosiOverD2 / irr0V );
 		const double mR = -2.5 * log10( I_lambda(R, Tph, lambdaR) * cosiOverD2 / irr0R );
 		const double mI = -2.5 * log10( I_lambda(R, Tph, lambdaI) * cosiOverD2 / irr0I );
 		const double mJ = -2.5 * log10( I_lambda(R, Tph, lambdaJ) * cosiOverD2 / irr0J );
+
+		Mdisk = 0.;
+		for ( int i = 0; i < Nx; ++i ){
+			double stepR;
+			if ( i == 0              ) stepR = R.at(i+1) - R.at(i  );
+			if ( i == Nx-1           ) stepR = R.at(i  ) - R.at(i-1);
+			if ( i > 1 and i < Nx-1  ) stepR = R.at(i+1) - R.at(i-1);
+			Mdisk += 0.5 * 2.*Sigma.at(i) * 2.*M_PI * R.at(i) * stepR;
+		}
 
 		if (output_fulldata){
 			ostringstream filename;
@@ -394,9 +411,9 @@ int main(int ac, char *av[]){
 				<< "\t" << Height.at(Nx-1) / R.at(Nx-1)
 				<< "\t" << R.at(Nx-1) / r_out
 				<< "\t" << Tph.at(Nx-1)
+				<< "\t" << Mdisk
 				<< "\t" << C_irr
 				<< "\t" << pow( Tirr.at(Nx-1) / Tph_vis.at(Nx-1), 4. )
-				<< "\t" << 4./3. * eta * C_irr * R.at(Nx-1) / (2. * GM / GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_SPEED_OF_LIGHT)
 				<< "\t" << mB
 				<< "\t" << mV
 				<< "\t" << mR
@@ -404,11 +421,6 @@ int main(int ac, char *av[]){
 				<< "\t" << mJ
 				<< endl;
 
-		if ( ii < Nx-1 ){
-			Nx = ii+1;
-			// F.at(Nx-2) = F.at(Nx-1) - Mdot_out / (2.*M_PI) * (h.at(Nx-1) - h.at(Nx-2));
-			h.resize(Nx);
-		}
 	}
 
 	delete oprel;
