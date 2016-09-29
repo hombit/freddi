@@ -40,18 +40,18 @@ int main(int ac, char *av[]){
 	const double lambdaJ = 12600 * Angstrem;
 	const double irr0J = 1600 * Jy *  GSL_CONST_CGSM_SPEED_OF_LIGHT / (lambdaJ*lambdaJ); 
 
-	double alpha = 0.55;
+	double alpha = 0.2;
 	double fc = 1.7;
 	double kerr = 0.;
 	double eta = efficiency_of_accretion(kerr);
-	double Mx = 7.5 * GSL_CONST_CGSM_SOLAR_MASS;
-	double Mopt = 0.8 * GSL_CONST_CGSM_SOLAR_MASS;
-	double P = 0.433 * DAY;
-	double inclination = 20.7;  // degrees
+	double Mx = 10. * GSL_CONST_CGSM_SOLAR_MASS;
+	double Mopt = 1. * GSL_CONST_CGSM_SOLAR_MASS;
+	double P = 1. * DAY;
+	double inclination = 0.;  // degrees
 	double Distance = 10. * kpc;
 	double r_in = r_in_func( Mx, kerr );
 	double r_out = r_out_func( Mx, Mopt, P );
-	double T_min_hot_disk = 1e4;
+	double T_min_hot_disk = 0.;
 //	double k_irr = 0.05; //0.05; // (dlog H / dlog r - 1)
 	double C_irr_input = 0.; // 1e-4;
 	double mu = 0.62;
@@ -59,7 +59,7 @@ int main(int ac, char *av[]){
 	double nu_max = 37.2 * keV;
 	int Nx = 1000;
 	string grid_scale = "log";
-	double Time = 30. * DAY;
+	double Time = 25. * DAY;
 	double tau = 0.25 * DAY;
 	double eps = 1e-6;
 	string bound_cond_type = "Teff";
