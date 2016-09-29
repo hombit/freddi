@@ -1,6 +1,5 @@
 fredlib - compute FRED-like light curves of LMXB
 
 Requirements:
-1) GSL
-2) Boost.Program_options
-3) C++ compiler with C++11 support, e.g. gcc version 4.7 and higher
+1) Boost.Program_options
+2) C++ compiler with C++11 support, e.g. gcc version 4.7 and higher
