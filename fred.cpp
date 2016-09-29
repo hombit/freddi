@@ -43,13 +43,12 @@ int main(int ac, char *av[]){
 	double alpha = 0.2;
 	double fc = 1.7;
 	double kerr = 0.;
-	double eta = efficiency_of_accretion(kerr);
 	double Mx = 10. * GSL_CONST_CGSM_SOLAR_MASS;
 	double Mopt = 1. * GSL_CONST_CGSM_SOLAR_MASS;
 	double P = 1. * DAY;
 	double inclination = 0.;  // degrees
 	double Distance = 10. * kpc;
-	double r_in = r_in_func( Mx, kerr );
+	double r_in = 0.;
 	double r_out = r_out_func( Mx, Mopt, P );
 	double T_min_hot_disk = 0.;
 //	double k_irr = 0.05; //0.05; // (dlog H / dlog r - 1)
@@ -93,12 +92,13 @@ int main(int ac, char *av[]){
 		
 		po::options_description binary("Basic binary and disc parameters");
 		binary.add_options()
-			( "Mx,M", po::value<double>()->default_value(Mx/GSL_CONST_CGSM_SOLAR_MASS), "Mass of central object, solar masses" )
+			( "Mx,M", po::value<double>()->default_value(Mx/GSL_CONST_CGSM_SOLAR_MASS), "Mass of the central object, solar masses" )
 			( "kerr,A", po::value<double>(&kerr)->default_value(kerr), "Kerr parameter of the black hole" )
 			( "alpha,a", po::value<double>(&alpha)->default_value(alpha), "Alpha parameter" )
+			( "rin", po::value<double>(), "Internal radius of the disk, Schwarzschild radii of the central object. If it isn't setted then it will be calculated as radius of ISCO orbit using --Mx and --kerr values" )
 			( "Mopt,m",	po::value<double>()->default_value(Mopt/GSL_CONST_CGSM_SOLAR_MASS), "Mass of optical star, solar masses" )
 			( "period,P", po::value<double>()->default_value(P/DAY), "Orbital period of binary system, days" )
-			( "rout,R", po::value<double>()->default_value(r_out/solar_radius), "Outer radius of the disk, solar radii. If it isn't setted than it will be calculated using Mx, Mopt and period" )
+			( "rout,R", po::value<double>()->default_value(r_out/solar_radius), "Outer radius of the disk, solar radii. If it isn't setted then it will be calculated as tidal radius using --Mx, --Mopt and --period" )
 			( "inclination,i", po::value<double>(&inclination)->default_value(inclination), "Inclination of the system, degrees" )
 		;
 		desc.add(binary);
@@ -174,17 +174,19 @@ int main(int ac, char *av[]){
 		Time = vm["time"].as<double>() * DAY;
 		if ( not vm["rout"].defaulted() ){
 			r_out = vm["rout"].as<double>() * solar_radius;
-		}
-		else{
+		} else{
 			r_out = r_out_func( Mx, Mopt, P );
 		}
-		if ( not vm["kerr"].defaulted() ){
-			eta = efficiency_of_accretion(kerr);
+		if ( vm.count("rin") ){
+			r_in = vm["rin"].as<double>() * 3. * 2. * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+		} else{
+			r_in = r_in_func( Mx, kerr );
 		}
-		r_in = r_in_func( Mx, kerr );
+		cout << r_in / ( 2. * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT) ) << endl;
 	}
 
 	const double GM = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx;
+	const double eta = efficiency_of_accretion(kerr);
 	const double h_in = sqrt( GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx  * r_in );
 	const double h_out = sqrt( GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx  * r_out );
 	const double cosi = cos( inclination / 180 * M_PI );
