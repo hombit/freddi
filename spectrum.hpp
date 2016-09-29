@@ -4,8 +4,9 @@
 
 
 #include <cmath>
-#include <gsl/gsl_const_cgsm.h>
 #include <vector>
+
+#include "gsl/gsl_const_cgsm.h"
 
 
 double Luminosity(const std::vector<double> &R, const std::vector<double> &T, double min_nu, double max_nu, int Nnu);

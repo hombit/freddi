@@ -5,10 +5,10 @@
 #include <algorithm> // std::none_of
 #include <array>
 #include <cmath>
-#include <gsl/gsl_const_cgsm.h>
 #include <stdexcept> // std::invalid_argument
 #include <string>
 
+#include "gsl/gsl_const_cgsm.h"
 
 
 class OpacityRelated{
