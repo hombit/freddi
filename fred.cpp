@@ -10,7 +10,7 @@
 #include "spectrum.hpp"
 #include "opacity_related.hpp"
 #include "orbit.hpp"
-#include "gsl/gsl_const_cgsm.h"
+#include "gsl_const_cgsm.h"
 
 
 namespace po = boost::program_options;

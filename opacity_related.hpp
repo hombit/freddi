@@ -8,7 +8,7 @@
 #include <stdexcept> // std::invalid_argument
 #include <string>
 
-#include "gsl/gsl_const_cgsm.h"
+#include "gsl_const_cgsm.h"
 
 
 class OpacityRelated{
