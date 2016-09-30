@@ -25,17 +25,17 @@ Installation and Usage
 First go to the path where `Freddi` directory will be located. Then download and
 compile it:
 
-```bash
-$ git clone https://github.com/hombit/freddi.git
-$ cd freddi
-$ make
+```
+git clone https://github.com/hombit/freddi.git
+cd freddi
+make
 ```
 
 Now it should be executable file `./freddi` in the current directory. If you’d
 like to install it to `/usr/local/bin` then do
 
-```bash
-# make install
+```
+sudo make install
 ```
 
 
@@ -56,7 +56,7 @@ License
 
 Copyright (c) 2016, Konstantin L. Malanchev & Galina V. Lipunova.
 
-`Freddi` is distributed under the terms of the GPLv2 and GPLv3.
+`Freddi` is distributed under the terms of the GPLv3.
 
 Please, accompany any results obtained using this code with reference to
 Lipunova & Malanchev (2016) (in prep.)
