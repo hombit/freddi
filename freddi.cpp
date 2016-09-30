@@ -80,7 +80,7 @@ int main(int ac, char *av[]){
 	double Mdisk = 0.;
 
 	{
-		po::options_description desc("Fred - numerical calculation of accretion disc evolution");
+		po::options_description desc("Freddi - numerical calculation of accretion disc evolution");
 
 		po::options_description general("General options");
 		general.add_options()
