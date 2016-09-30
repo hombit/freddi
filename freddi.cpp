@@ -39,7 +39,6 @@ int main(int ac, char *av[]){
 	// Campins et al., 1985, AJ, 90, 896
 	const double lambdaJ = 12600 * Angstrem;
 	const double irr0J = 1600 * Jy *  GSL_CONST_CGSM_SPEED_OF_LIGHT / (lambdaJ*lambdaJ); 
-	cout << irr0J*Angstrem << endl;
 
 	double alpha = 0.2;
 	double fc = 1.7;

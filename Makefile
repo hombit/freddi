@@ -12,7 +12,7 @@ all: freddi
 freddi: $(OBJ) freddi.o
 
 install: all
-    install -m 0755 freddi $(prefix)/bin
+	install -m 0755 freddi $(prefix)/bin
 
 clean:
 	rm -f *.o
