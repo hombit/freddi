@@ -25,24 +25,23 @@ Installation and Usage
 First go to the path where `Freddi` directory will be located. Then download and
 compile it:
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 git clone https://github.com/hombit/freddi.git
 cd freddi
 make
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now it should be executable file `./freddi` in the current directory. If you’d
 like to install it to `/usr/local/bin` then do
 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sudo make install
-```
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Usage
 
-All you need to calculate your first FRED is to type `./freddi` or `freddi` if
-it is in your `$PATH`.
+All you need to calculate your first FRED is to type `./freddi`. The result will
+appear as `data/sum.dat` file in your current location.
 
 `Freddi` has a number of command line options, full list of them with
 descriptions can be read using `--help` option. `Freddi` always outputs
