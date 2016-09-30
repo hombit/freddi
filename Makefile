@@ -7,8 +7,8 @@ LDLIBS = -lboost_program_options
 OBJ = nonlinear_diffusion.o opacity_related.o orbit.o spectrum.o
 
 
-all: fred
-fred: $(OBJ) fred.o
+all: freddi
+fred: $(OBJ) freddi.o
 
 clean:
 	rm -f *.o
