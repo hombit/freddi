@@ -5,7 +5,9 @@ Overview
 --------
 
 The code solves 1-D evolution equation of Shakura-Sunyaev accretion disk. This
-code
+code was developed to simulate fast rise exponential decay (FRED) light curves
+of low mass X-ray binaries (LMXB) for the paper Lipunova & Malanchev (2016) (in
+prep.).
 
 Installation and Usage
 ----------------------
@@ -41,5 +43,19 @@ make install
 All you need to calculate your first FRED is to type `./freddi` or `freddi` if
 it is in your `$PATH`.
 
-`Freddi` has a number of command line options, full list with descriptions read
-using `--help` option.
+`Freddi` has a number of command line options, full list of them with
+descriptions can be read using `--help` option. `Freddi` always outputs
+`sum.dat` file with temporal dependence of disk values. If `--fulldata` is
+specified then `%d.dat` files for each time step are outputted to the same
+directory with variuos radial distributions (temperature, viscous torque,
+surface density, etc.).
+
+License
+-------
+
+Copyright (c) 2016, Konstantin L. Malanchev & Galina V. Lipunova.
+
+`Freddi` is distributed under the terms of the GPLv2 and GPLv3.
+
+Please, accompany any results obtained using this code with reference to
+Lipunova & Malanchev (2016) (in prep.)
