@@ -39,6 +39,7 @@ int main(int ac, char *av[]){
 	// Campins et al., 1985, AJ, 90, 896
 	const double lambdaJ = 12600 * Angstrem;
 	const double irr0J = 1600 * Jy *  GSL_CONST_CGSM_SPEED_OF_LIGHT / (lambdaJ*lambdaJ); 
+	cout << irr0J*Angstrem << endl;
 
 	double alpha = 0.2;
 	double fc = 1.7;
@@ -182,7 +183,6 @@ int main(int ac, char *av[]){
 		} else{
 			r_in = r_in_func( Mx, kerr );
 		}
-		cout << r_in / ( 2. * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT) ) << endl;
 	}
 
 	const double GM = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx;
