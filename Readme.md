@@ -26,16 +26,16 @@ First go to the path where `Freddi` directory will be located. Then download and
 compile it:
 
 ```shell
-git clone https://github.com/hombit/freddi.git
-cd freddi
-make
+$ git clone https://github.com/hombit/freddi.git
+$ cd freddi
+$ make
 ```
 
 Now it should be executable file `./freddi` in the current directory. If you’d
 like to install it to `/usr/local/bin` then do
 
 ```shell
-make install
+# make install
 ```
 
 
