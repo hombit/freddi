@@ -40,7 +40,7 @@ int main(int ac, char *av[]){
 	const double lambdaJ = 12600 * Angstrem;
 	const double irr0J = 1600 * Jy *  GSL_CONST_CGSM_SPEED_OF_LIGHT / (lambdaJ*lambdaJ); 
 
-	double alpha = 0.2;
+	double alpha = 0.25;
 	double fc = 1.7;
 	double kerr = 0.;
 	double Mx = 10. * GSL_CONST_CGSM_SOLAR_MASS;
@@ -54,15 +54,15 @@ int main(int ac, char *av[]){
 //	double k_irr = 0.05; //0.05; // (dlog H / dlog r - 1)
 	double C_irr_input = 0.; // 1e-4;
 	double mu = 0.62;
-	double nu_min = 1.2 * keV;
-	double nu_max = 37.2 * keV;
+	double nu_min = 1. * keV;
+	double nu_max = 12. * keV;
 	int Nx = 1000;
 	string grid_scale = "log";
 	double Time = 25. * DAY;
 	double tau = 0.25 * DAY;
 	double eps = 1e-6;
 	string bound_cond_type = "Teff";
-	double F0_gauss = 1e37;
+	double F0_gauss = 1e36;
 	double sigma_for_F_gauss = 5.;
 	double r_gauss_cut_to_r_out = 0.01;
 	double power_order = 6.;
