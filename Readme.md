@@ -50,13 +50,15 @@ sudo make install
 Usage
 -----
 
-`Freddi` has a number of command line options, run `./freddi --help` to see them
-all. `Freddi` always outputs `freddi.dat` file with temporal dependence of disk
-values. If `--fulldata` is specified then `freddi_%d.dat` files for each time
-step are outputted to the same directory with variuos radial distributions
-(temperature, viscous torque, surface density, etc.). You can use another prefix
-instead of `freddi` using `--prefix` option and change output directory with
+`Freddi` always outputs `freddi.dat` file with temporal distribution of various
+physical values. If `--fulldata` is specified then `freddi_%d.dat` files for
+each time step are outputted to the same directory with various radial
+distributions. These `*.dat` data-files contain whitespace-seporated data
+columns with header lines started with `#` symbol. You can use another prefix
+instead of `freddi` with `--prefix` option and change output directory with
 `--dir` option.
+
+Full list of command line options see with `--help` option.
 
 License
 -------
