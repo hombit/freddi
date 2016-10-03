@@ -29,7 +29,7 @@ docker run -v `pwd`:/data --rm -ti hombit/freddi
 
 `Freddi` was tested on Linux and macOS but it should work on Windows as well.
 
-### Installation
+### Get and compile source files
 
 First go to the path where `Freddi` directory will be located. Then download and
 compile it:
