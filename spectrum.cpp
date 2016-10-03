@@ -61,7 +61,9 @@ double T_GR( const double r1, const double ak, const double Mx, const double Mdo
    
     return( pow(
         (3.*Mdot * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT,6.) / (8.*M_PI*GM*GM)) *
-            (x-x0-1.5*ak*log(x/x0)-a-b-c) / ( pow(x,4.)*(x*x*x-3.*x+2.*ak) ),
+            (x-x0-1.5*ak*log(x/x0)-a-b-c) / ( pow(x,4.)*(x*x*x-3.*x+2.*ak) ) /
+			GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT,
         0.25)
+
     );
 }

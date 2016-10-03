@@ -323,7 +323,7 @@ int main(int ac, char *av[]){
 			Sigma.at(i) = W.at(i) * GM*GM / ( 4.*M_PI *  pow(h.at(i), 3.) );
 			Height.at(i) = oprel->Height(R.at(i), F.at(i));
 			Tph_vis.at(i) = GM * pow(h.at(i), -1.75) * pow( 3. / (8.*M_PI) * F.at(i) / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25 );
-			Tph_X.at(i) = fc * T_GR( R.at(i), 0., Mx, Mdot_in, R.front() );
+			Tph_X.at(i) = fc * T_GR( R.at(i), kerr, Mx, Mdot_in, R.front() );
 
 			double Qx;
 			if ( irr_factor_type == "const" ){
