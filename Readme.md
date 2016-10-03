@@ -9,8 +9,17 @@ code was developed to simulate fast rise exponential decay (FRED) light curves
 of low mass X-ray binaries (LMXB) for the paper Lipunova & Malanchev (2016) (in
 prep.).
 
-Installation and Usage
-----------------------
+Installation
+------------
+
+### Docker
+
+If you are Docker user then you can run `Freddi` as Docker executable, skip all
+installation instructions and go straight to the Usage section
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+docker run -v `pwd`:/data --rm -ti hombit/freddi
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Requirements
 
@@ -38,17 +47,16 @@ like to install it to `/usr/local/bin` then do
 sudo make install
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Usage
+Usage
+-----
 
-All you need to calculate your first FRED is to type `./freddi`. The result will
-appear as `data/sum.dat` file in your current location.
-
-`Freddi` has a number of command line options, full list of them with
-descriptions can be read using `--help` option. `Freddi` always outputs
-`sum.dat` file with temporal dependence of disk values. If `--fulldata` is
-specified then `%d.dat` files for each time step are outputted to the same
-directory with variuos radial distributions (temperature, viscous torque,
-surface density, etc.).
+`Freddi` has a number of command line options, run `./freddi --help` to see them
+all. `Freddi` always outputs `freddi.dat` file with temporal dependence of disk
+values. If `--fulldata` is specified then `freddi_%d.dat` files for each time
+step are outputted to the same directory with variuos radial distributions
+(temperature, viscous torque, surface density, etc.). You can use another prefix
+instead of `freddi` using `--prefix` option and change output directory with
+`--dir` option.
 
 License
 -------
