@@ -53,12 +53,12 @@ Usage
 `Freddi` always outputs `freddi.dat` file with temporal distribution of various
 physical values. If `--fulldata` is specified then `freddi_%d.dat` files for
 each time step are outputted to the same directory with various radial
-distributions. These `*.dat` data-files contain whitespace-seporated data
+distributions. These `*.dat` data-files contain whitespace-separated data
 columns with header lines started with `#` symbol. You can use another prefix
 instead of `freddi` with `--prefix` option and change output directory with
 `--dir` option.
 
-See full list of command line options with `--help` option.
+See full list of command line options with `--help` option:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ ./freddi --help
