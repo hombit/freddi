@@ -28,6 +28,8 @@ int main(int ac, char *av[]){
 	const double kpc = 1000. * GSL_CONST_CGSM_PARSEC;
 
 	// Allen's Astrophysical Quantities (4th ed.)
+	const double lambdaU = 3600. * Angstrem;
+	const double irr0U = 4.22e-9 / Angstrem;
 	const double lambdaB = 4400. * Angstrem;
 	const double irr0B = 6.4e-9 / Angstrem;
 	const double lambdaV = 5500. * Angstrem;
@@ -291,8 +293,8 @@ int main(int ac, char *av[]){
 	}
 
 	ofstream output_sum( output_dir + "/" + filename_prefix + ".dat" );
-	output_sum << "#t    Mdot Lx    H2R   Rhot Tphout Mdisk kxout Qiir2Qvisout mB  mV  mR  mI  mJ" << "\n";
-	output_sum << "#days g/s  erg/s float Rsun K      g     float float        mag mag mag mag mag" << "\n";
+	output_sum << "#t    Mdot Lx    H2R   Rhot Tphout Mdisk kxout Qiir2Qvisout mU  mB  mV  mR  mI  mJ" << "\n";
+	output_sum << "#days g/s  erg/s float Rsun K      g     float float        mag mag mag mag mag mag" << "\n";
 	output_sum << "# r_out = " << r_out << "\n";
 	output_sum << "#";
 	for ( int i = 0; i < ac; ++i ){
@@ -375,6 +377,7 @@ int main(int ac, char *av[]){
 			h.resize(Nx);
 		}
 	
+		const double mU = -2.5 * log10( I_lambda(R, Tph, lambdaU) * cosiOverD2 / irr0U );
 		const double mB = -2.5 * log10( I_lambda(R, Tph, lambdaB) * cosiOverD2 / irr0B );
 		const double mV = -2.5 * log10( I_lambda(R, Tph, lambdaV) * cosiOverD2 / irr0V );
 		const double mR = -2.5 * log10( I_lambda(R, Tph, lambdaR) * cosiOverD2 / irr0R );
@@ -418,6 +421,7 @@ int main(int ac, char *av[]){
 				<< "\t" << Mdisk
 				<< "\t" << C_irr
 				<< "\t" << pow( Tirr.at(Nx-1) / Tph_vis.at(Nx-1), 4. )
+				<< "\t" << mU
 				<< "\t" << mB
 				<< "\t" << mV
 				<< "\t" << mR
