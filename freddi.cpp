@@ -291,7 +291,8 @@ int main(int ac, char *av[]){
 	}
 
 	ofstream output_sum( output_dir + "/" + filename_prefix + ".dat" );
-	output_sum << "#t	Mdot	Lx	H2R	Rhot2Rout	Tphout	Mdisk	kxout Qiir2Qvisout	mB	mV mR mI mJ" << "\n";
+	output_sum << "#t    Mdot Lx    H2R   Rhot Tphout Mdisk kxout Qiir2Qvisout mB  mV  mR  mI  mJ" << "\n";
+	output_sum << "#days g/s  erg/s float Rsun K      g     float float        mag mag mag mag mag" << "\n";
 	output_sum << "# r_out = " << r_out << "\n";
 	output_sum << "#";
 	for ( int i = 0; i < ac; ++i ){
@@ -393,17 +394,17 @@ int main(int ac, char *av[]){
 			ostringstream filename;
 			filename << output_dir << "/" << filename_prefix << "_" << static_cast<int>(t/tau) << ".dat";
 			ofstream output( filename.str() );
-			output << "#h   F   Sigma   W   R   Tph_vis Height	Tph" << "\n";
+			output << "#h      R  F      Sigma  Tph_vis Tph Height" << "\n";
+			output << "#cm^2/s cm dyn*cm g/cm^2 K       K   cm" << "\n";
 			output << "# Time = " << t / DAY << " Mdot_in = " << Mdot_in << endl;
 			for ( int i = 1; i < Nx; ++i ){
 				output		<< h.at(i)
+					<< "\t" << R.at(i)
 					<< "\t" << F.at(i)
 					<< "\t" << Sigma.at(i)
-					<< "\t" << W.at(i)
-					<< "\t" << R.at(i)
+					<< "\t" << Tph.at(i)
 					<< "\t" << Tph_vis.at(i)
 					<< "\t" << Height.at(i)
-					<< "\t" << Tph.at(i)
 					<< endl;
 			}
 		}
@@ -412,7 +413,7 @@ int main(int ac, char *av[]){
 				<< "\t" << Mdot_in
 				<< "\t" << Lx
 				<< "\t" << Height.at(Nx-1) / R.at(Nx-1)
-				<< "\t" << R.at(Nx-1) / r_out
+				<< "\t" << R.at(Nx-1) / solar_radius
 				<< "\t" << Tph.at(Nx-1)
 				<< "\t" << Mdisk
 				<< "\t" << C_irr
