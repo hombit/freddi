@@ -18,7 +18,7 @@ If you are Docker user then you can run `Freddi` as Docker executable, skip all
 installation instructions and go straight to the Usage section
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-docker run -v `pwd`:/data --rm -ti hombit/freddi
+docker run -v "`pwd`":/data --rm -ti hombit/freddi
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Requirements
@@ -58,7 +58,7 @@ columns with header lines started with `#` symbol. You can use another prefix
 instead of `freddi` with `--prefix` option and change output directory with
 `--dir` option.
 
-Full list of command line options see with `--help` option.
+See full list of command line options with `--help` option.
 
 License
 -------
