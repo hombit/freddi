@@ -13,4 +13,4 @@ RUN rm -r /tmp/freddi
 
 VOLUME /data
 WORKDIR /
-ENTRYPOINT ["/usr/local/bin/freddi"]
+ENTRYPOINT ["/usr/local/bin/freddi", "--dir=/data"]
