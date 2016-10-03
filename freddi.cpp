@@ -67,7 +67,8 @@ int main(int ac, char *av[]){
 	double r_gauss_cut_to_r_out = 0.01;
 	double power_order = 6.;
 	double kMdot_out = 2.;
-	string output_dir = "data";
+	string filename_prefix = "freddi";
+	string output_dir = ".";
 	bool output_fulldata = false;
 	string initial_cond_shape = "power";
 	string opacity_type = "Kramers";
@@ -85,8 +86,9 @@ int main(int ac, char *av[]){
 		po::options_description general("General options");
 		general.add_options()
 			( "help,h", "Produce help message" )
+			( "prefix", po::value<string>(&filename_prefix)->default_value(filename_prefix), "Prefix for output filenames. File with temporal distributions of parameters is PREFIX.dat" )
 			( "dir,d", po::value<string>(&output_dir)->default_value(output_dir), "Directory to write output files. It should exist" )
-			( "fulldata,f", "Output files with radial structure for every computed time step. Default is output only sum.dat with integrated parameters for every time step" )
+			( "fulldata,f", "Output files PREFIX_%d.dat with radial structure for every computed time step. Default is to output only PREFIX.dat with global disk parameters for every time step" )
 		;
 		desc.add(general);
 		
@@ -288,7 +290,7 @@ int main(int ac, char *av[]){
 		throw po::invalid_option_value(initial_cond_shape);
 	}
 
-	ofstream output_sum( output_dir + "/sum.dat" );
+	ofstream output_sum( output_dir + "/" + filename_prefix + ".dat" );
 	output_sum << "#t	Mdot	Lx	H2R	Rhot2Rout	Tphout	Mdisk	kxout Qiir2Qvisout	mB	mV mR mI mJ" << "\n";
 	output_sum << "# r_out = " << r_out << "\n";
 	output_sum << "#";
@@ -389,7 +391,7 @@ int main(int ac, char *av[]){
 
 		if (output_fulldata){
 			ostringstream filename;
-			filename << output_dir << "/" << static_cast<int>(t/tau) << ".dat";
+			filename << output_dir << "/" << filename_prefix << "_" << static_cast<int>(t/tau) << ".dat";
 			ofstream output( filename.str() );
 			output << "#h   F   Sigma   W   R   Tph_vis Height	Tph" << "\n";
 			output << "# Time = " << t / DAY << " Mdot_in = " << Mdot_in << endl;
