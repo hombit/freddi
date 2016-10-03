@@ -12,9 +12,9 @@ all: freddi
 freddi: $(OBJ) freddi.o
 
 readme: all
-	./freddi --help > ./help_message
-	sed -e '/freddi --help/r help_message' Readme_template.md > Readme.md
-	rm -f ./help_message
+	./freddi --help > ./.freddi_help_message
+	sed -e '/freddi --help/r .freddi_help_message' Readme_template.md > Readme.md
+	rm -f ./.freddi_help_message
 
 install: all
 	install -m 0755 freddi $(prefix)/bin
