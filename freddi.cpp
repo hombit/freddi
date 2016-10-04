@@ -186,6 +186,9 @@ int main(int ac, char *av[]){
 		} else{
 			r_in = r_in_func( Mx, kerr );
 		}
+		if ( C_irr_input <= 0. and bound_cond_type == "Tirr" ){
+			throw po::error("It is obvious to use nonpositive --Cirr with --boundcond=Tirr");
+		}
 	}
 
 	const double GM = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx;
