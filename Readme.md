@@ -139,12 +139,13 @@ Parameters of the disc model:
                                         powerorder is specified by --powerorder
                                         option
                                           sinusF: F ~ sin( xi * pi/2 )
-                                          quasistat: F ~ f(xi), where f is 
-                                        quasistationary solution found in 
-                                        Lipunova, Shakura 2000. f(xi=0) = 0, 
-                                        df/dxi(xi=1) = 0
+                                          quasistat: F ~ f(h/h_out) * xi * 
+                                        h_out/h, where f is quasi-stationary 
+                                        solution found in Lipunova & Shakura 
+                                        2000. f(xi=0) = 0, df/dxi(xi=1) = 0
                                         
                                         Here xi is (h - h_in) / (h_out - h_in)
+                                        
   --powerorder arg (=6)                 Parameter of the powerlaw initial 
                                         condition distributions. This option 
                                         works only with --initialcond=powerF 
@@ -170,6 +171,7 @@ Parameters of disc evolution calculation:
   --Nx arg (=1000)                      Size of calculation grid
   --gridscale arg (=log)                Type of grid for angular momentum h: 
                                         log or linear
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 License
