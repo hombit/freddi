@@ -122,8 +122,8 @@ int main(int ac, char *av[]){
 				"  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power option does the same
 				"  powerSigma: Sigma ~ xi^powerorder, powerorder is specified by --powerorder option\n"
 				"  sinusF: F ~ sin( xi * pi/2 )\n" // sinus option does the same
-				"  quasistat: F ~ f(xi), where f is quasistationary solution found in Lipunova, Shakura 2000. f(xi=0) = 0, df/dxi(xi=1) = 0\n\n"
-				"Here xi is (h - h_in) / (h_out - h_in)") // sinusparabola, sinusgauss
+				"  quasistat: F ~ f(h/h_out) * xi * h_out/h, where f is quasi-stationary solution found in Lipunova & Shakura 2000. f(xi=0) = 0, df/dxi(xi=1) = 0\n\n"
+				"Here xi is (h - h_in) / (h_out - h_in)\n") // sinusparabola, sinusgauss
 			( "powerorder", po::value<double>(&power_order)->default_value(power_order), "Parameter of the powerlaw initial condition distributions. This option works only with --initialcond=powerF and =powerSigma" )
 		;
 		desc.add(internal);
