@@ -5,8 +5,8 @@ Overview
 --------
 
 The code solves 1-D evolution equation of Shakura-Sunyaev accretion disk. This
-code was developed to simulate fast rise exponential decay (FRED) light curves
-of low mass X-ray binaries (LMXB) for the paper Lipunova & Malanchev (2016) (in
+code is developed to simulate fast rise exponential decay (FRED) light curves of
+low mass X-ray binaries (LMXBs) for the paper Lipunova & Malanchev (2016) (in
 prep.).
 
 Installation
@@ -14,8 +14,9 @@ Installation
 
 ### Docker
 
-If you are Docker user then you can run `Freddi` as Docker executable, skip all
-installation instructions and go straight to the Usage section
+If you are familiar with [Docker](http://docker.com) then you can skip all
+further installation instructions and go straight to the Usage section, using
+following string instead of `./freddi`.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 docker run -v "`pwd`":/data --rm -ti hombit/freddi
@@ -56,7 +57,8 @@ each time step are outputted to the same directory with various radial
 distributions. These `*.dat` data-files contain whitespace-seporated data
 columns with header lines started with `#` symbol. You can use another prefix
 instead of `freddi` with `--prefix` option and change output directory with
-`--dir` option.
+`--dir` option. If you chose Docker way and would like to specify directory then
+avoid to use `--dir` option and just replace `` "`pwd`" `` with any local path.
 
 See full list of command line options with `--help` option.
 
@@ -166,7 +168,6 @@ Parameters of disc evolution calculation:
   --Nx arg (=1000)                      Size of calculation grid
   --gridscale arg (=log)                Type of grid for angular momentum h: 
                                         log or linear
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 License
