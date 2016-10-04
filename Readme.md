@@ -58,7 +58,9 @@ distributions. These `*.dat` data-files contain whitespace-seporated data
 columns with header lines started with `#` symbol. You can use another prefix
 instead of `freddi` with `--prefix` option and change output directory with
 `--dir` option. If you chose Docker way and would like to specify directory then
-avoid to use `--dir` option and just replace `` "`pwd`" `` with any local path.
+avoid to use `--dir` option and just replace `` "`pwd`" `` with some local path
+(for more details see [Docker
+documentation](https://docs.docker.com/engine/tutorials/dockervolumes)).
 
 See full list of command line options with `--help` option.
 
