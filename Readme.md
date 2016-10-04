@@ -62,7 +62,7 @@ avoid to use `--dir` option and just replace `` "`pwd`" `` with some local path
 (for more details see [Docker
 documentation](https://docs.docker.com/engine/tutorials/dockervolumes)).
 
-See full list of command line options with `--help` option.
+See full list of command line options with `--help` option:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ ./freddi --help
