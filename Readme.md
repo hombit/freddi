@@ -6,8 +6,9 @@ Overview
 
 The code solves 1-D evolution equation of Shakura-Sunyaev accretion disk. The
 code is developed to simulate fast rise exponential decay (FRED) light curves of
-low mass X-ray binaries (LMXBs) for the paper Lipunova & Malanchev (2016) (in
-prep.).
+low mass X-ray binaries (LMXBs) for the paper “Determination of the turbulent
+parameter in the accretion disks: effects of self-irradiation in 4U 1543-47
+during the 2002 outburst” by Lipunova & Malanchev (2016) (in prep.).
 
 Installation
 ------------
@@ -181,32 +182,61 @@ Parameters of disc evolution calculation:
   --Nx arg (=1000)                      Size of calculation grid
   --gridscale arg (=log)                Type of grid for angular momentum h: 
                                         log or linear
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Physical Background
 -------------------
-Freddi - Fast Rise Exponential Decay: accretion Disk model Implementation - is designed to solve the differential equation of the viscous evolution of the Shakura-Sunyaev accretion disk in a stellar binary system. Shakura-Sunyaev disk is the standard model of accretion of plasma  onto the cosmic bodies, like neutron stars or black holes. Viscous evolution of the accretion disks exibits itself, for example, in X-ray outbursts of binary stars. Usually, the outbursts last for several tens of days and many of them are observed by orbital observatories.
 
-The basic equation of the viscous evolution relates the surface density and viscous stresses and is of diffusion type. Evolution of the accretion rate can be found on solving the equation. The accretion rate defined the X-ray luminosity of the source.  
+`Freddi` — Fast Rise Exponential Decay: accretion Disk model Implementation — is
+designed to solve the differential equation of the viscous evolution of the
+Shakura-Sunyaev accretion disk in a stellar binary system. Shakura-Sunyaev disk
+is the standard model of accretion of plasma onto the cosmic bodies, like
+neutron stars or black holes. Viscous evolution of the accretion disks exibits
+itself, for example, in X-ray outbursts of binary stars. Usually, the outbursts
+last for several tens of days and many of them are observed by orbital
+observatories.
 
-Standard model for the accretion disk is implied, which is developed by Shakura & Sunyaev (1973).
-The metric is Newtonian which is accurate enough for the problem. The boundary conditions in the disk 
-are the zero stress at the inner boundary and the zero accretion rate at the outer boundary. The conditions are suitable for the outbursts in X-ray binary transients with black holes. The vertical structure of the disk is solved in the code and valid for the effective surface temperatures from 10 000 to 100 000 K, approximately. It is assumed that the gas pressure dominates in the disk, the gas is completely ionized, and the photon opacity is defined by free-free ad free-bound transitions (Kramers' type of OPAL-approximated opacity for chemical composition with solar abundances). 
+The basic equation of the viscous evolution relates the surface density and
+viscous stresses and is of diffusion type. Evolution of the accretion rate can
+be found on solving the equation. The accretion rate defined the X-ray
+luminosity of the source.
 
-The outer radius of the disk can be stationary or moving in the approximation that the evolution goes through the quasi-stationary states. Different options are implemented to control the position of the outer radius.
+Standard model for the accretion disk is implied, which is developed by [Shakura
+& Sunyaev (1973)](http://adsabs.harvard.edu/abs/1973A%26A....24..337S). The
+metric is Newtonian which is accurate enough for the problem. The boundary
+conditions in the disk are the zero stress at the inner boundary and the zero
+accretion rate at the outer boundary. The conditions are suitable for the
+outbursts in X-ray binary transients with black holes. The vertical structure of
+the disk is solved in the code and valid for the effective surface temperatures
+from 10 000 to 100 000 K, approximately. It is assumed that the gas pressure
+dominates in the disk, the gas is completely ionized, and the photon opacity is
+defined by free-free and free-bound transitions (Kramers' type of
+OPAL-approximated opacity for chemical composition with solar abundances).
 
-The initial distribution of the matter in the disk should be specified. Freddi can start from several types of initial distributions: power-law distribution of the surface density,  power-law  or sinus-law distribution of the viscous torque, quasi-stationary distribution. The choice of the initial distribution defines what type of evolution is to be calculated. Starting from the quasi-stationary distribution, the solution describes the decaying part of the outburst, otherwise, the rise to the peak is also computed.
+The outer radius of the disk can be stationary or moving in the approximation
+that the evolution goes through the quasi-stationary states. Different options
+are implemented to control the position of the outer radius.
 
-Fitting parameters of the disks in X-ray transients is one of the Freddi goals. 
+The initial distribution of the matter in the disk should be specified with
+`--initialcond` option. `Freddi` can start from several types of initial
+distributions: power-law distribution of the surface density
+(`--initialcond=powerSigma`), power-law (`--initialcond=powerF`) or sinus-law
+(`--initialcond=sinusF`) distribution of the viscous torque, quasi-stationary
+distribution (`--initialcond=quasistat`). The choice of the initial distribution
+defines what type of evolution is to be calculated. Starting from the
+quasi-stationary distribution, the solution describes the decaying part of the
+outburst, otherwise, the rise to the peak is also computed.
 
+Fitting parameters of the disks in X-ray transients is one of the `Freddi`
+goals.
 
 License
 -------
 
 Copyright (c) 2016, Konstantin L. Malanchev & Galina V. Lipunova.
 
-`Freddi` is distributed under the terms of the GPLv3.
+`Freddi` is distributed under the terms of the
+[GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
 
 Please, accompany any results obtained using this code with reference to
 Lipunova & Malanchev (2016) (in prep.)
