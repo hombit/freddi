@@ -83,7 +83,7 @@ int main(int ac, char *av[]){
 	double Mdisk = 0.;
 
 	{
-		po::options_description desc("Freddi - numerical calculation of accretion disc evolution");
+		po::options_description desc("Freddi - numerical calculation of accretion disk evolution");
 
 		po::options_description general("General options");
 		general.add_options()
@@ -94,7 +94,7 @@ int main(int ac, char *av[]){
 		;
 		desc.add(general);
 		
-		po::options_description binary("Basic binary and disc parameters");
+		po::options_description binary("Basic binary and disk parameters");
 		binary.add_options()
 			( "Mx,M", po::value<double>()->default_value(Mx/GSL_CONST_CGSM_SOLAR_MASS), "Mass of the central object, in the units of solar masses" )
 			( "kerr", po::value<double>(&kerr)->default_value(kerr), "Dimensionless Kerr parameter of the black hole" )
@@ -107,13 +107,13 @@ int main(int ac, char *av[]){
 		;
 		desc.add(binary);
 
-		po::options_description internal("Parameters of the disc model");
+		po::options_description internal("Parameters of the disk model");
 		internal.add_options()
 			( "opacity,O", po::value<string>(&opacity_type)->default_value(opacity_type), "Opacity law: Kramers (varkappa ~ rho / T^7/2) or OPAL (varkappa ~ rho / T^5/2)" )
 			( "boundcond", po::value<string>(&bound_cond_type)->default_value(bound_cond_type), "Outer boundary movement condition\n\n"
 				"Values:\n"
-				"  Teff: outer radius of the disc moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"
-				"  Tirr: outer radius of the disc moves inwards to keep irradiation flux of the disc larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
+				"  Teff: outer radius of the disk moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"
+				"  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
 			( "Thot", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description" )
 			( "F0", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque at the outer boundary of the disk, dyn*cm" )
 			( "Mdot0", po::value<double>(&Mdot_in)->default_value(Mdot_in), "Initial mass accretion rate through the inner radius, g/s. If both --F0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to sinusF or quasistat" )
@@ -147,7 +147,7 @@ int main(int ac, char *av[]){
 		;
 		desc.add(optical);
 
-		po::options_description numeric("Parameters of disc evolution calculation");
+		po::options_description numeric("Parameters of disk evolution calculation");
 		numeric.add_options()
 			( "time,T", po::value<double>()->default_value(Time/DAY), "Time interval to calculate evolution, days" )
 			( "tau",	po::value<double>()->default_value(tau/DAY), "Time step, days" )

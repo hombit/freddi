@@ -67,7 +67,7 @@ See full list of command line options with `--help` option:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ ./freddi --help
-Freddi - numerical calculation of accretion disc evolution:
+Freddi - numerical calculation of accretion disk evolution:
 
 General options:
   -h [ --help ]                         Produce help message
@@ -82,7 +82,7 @@ General options:
                                         global disk parameters for every time 
                                         step
 
-Basic binary and disc parameters:
+Basic binary and disk parameters:
   -M [ --Mx ] arg (=10)                 Mass of the central object, in the 
                                         units of solar masses
   --kerr arg (=0)                       Dimensionless Kerr parameter of the 
@@ -105,20 +105,20 @@ Basic binary and disc parameters:
                                         --Mopt and --period values
   -i [ --inclination ] arg (=0)         Inclination of the system, degrees
 
-Parameters of the disc model:
+Parameters of the disk model:
   -O [ --opacity ] arg (=Kramers)       Opacity law: Kramers (varkappa ~ rho / 
                                         T^7/2) or OPAL (varkappa ~ rho / T^5/2)
   --boundcond arg (=Teff)               Outer boundary movement condition
                                         
                                         Values:
-                                          Teff: outer radius of the disc moves 
+                                          Teff: outer radius of the disk moves 
                                         inwards to keep photosphere temperature
                                         of the disk larger than some value. 
                                         This value is specified by --Thot 
                                         option
-                                          Tirr: outer radius of the disc moves 
+                                          Tirr: outer radius of the disk moves 
                                         inwards to keep irradiation flux of the
-                                        disc larger than some value. The value 
+                                        disk larger than some value. The value 
                                         of this minimal irradiation flux is 
                                         [Stefan-Boltzmann constant] * Tirr^4, 
                                         where Tirr is specified by --Thot 
@@ -175,13 +175,14 @@ Parameters of X-ray emission:
 Parameters of optical magnitudes calculation:
   --distance arg (=10)                  Distance to the system, kpc
 
-Parameters of disc evolution calculation:
+Parameters of disk evolution calculation:
   -T [ --time ] arg (=25)               Time interval to calculate evolution, 
                                         days
   --tau arg (=0.25)                     Time step, days
   --Nx arg (=1000)                      Size of calculation grid
   --gridscale arg (=log)                Type of grid for angular momentum h: 
                                         log or linear
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Physical Background
