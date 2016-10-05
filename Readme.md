@@ -220,9 +220,9 @@ are implemented to control the position of the outer radius.
 The initial distribution of the matter in the disk should be specified with
 `--initialcond` option. `Freddi` can start from several types of initial
 distributions: power-law distribution of the surface density
-(`--initialcond=powerSigma`), power-law (`--initialcond=powerF`) or sinus-law
-(`--initialcond=sinusF`) distribution of the viscous torque, quasi-stationary
-distribution (`--initialcond=quasistat`). The choice of the initial distribution
+`--initialcond=powerSigma`, power-law `--initialcond=powerF` or sinus-law
+`--initialcond=sinusF` distribution of the viscous torque, quasi-stationary
+distribution `--initialcond=quasistat`. The choice of the initial distribution
 defines what type of evolution is to be calculated. Starting from the
 quasi-stationary distribution, the solution describes the decaying part of the
 outburst, otherwise, the rise to the peak is also computed.
