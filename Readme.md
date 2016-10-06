@@ -171,9 +171,7 @@ Parameters of self-irradiation:
                                         [rad. flux] = Cirr (z/r)^2 L / (4 pi 
                                         r^2)
                                         Here L is bolometric Luminosity:
-                                        L = eta M c^2
-                                        
-                                        
+                                        L = eta Mdot c^2
 
 Parameters of optical magnitudes calculation:
   --colourfactor arg (=1.7)             Colour factor to calculate X-ray flux
@@ -189,6 +187,7 @@ Parameters of disk evolution calculation:
   --Nx arg (=1000)                      Size of calculation grid
   --gridscale arg (=log)                Type of grid for angular momentum h: 
                                         log or linear
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `Freddi` outputs time; the accretion rate; the mass of the hot part of the disk;

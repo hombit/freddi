@@ -134,7 +134,7 @@ int main(int ac, char *av[]){
 				"Values:\n"
 				"  const: doesn't depend on disk shape:\n[rad. flux] = Cirr  L / (4 pi r^2)\n"
 				"  square: Cirr depends on the disk relative half-thickness:\n[rad. flux] = Cirr (z/r)^2 L / (4 pi r^2)\n"
-				"Here L is bolometric Luminosity:\nL = eta M c^2\n\n" )
+				"Here L is bolometric Luminosity:\nL = eta Mdot c^2" )
 		;
 		desc.add(irradiation);
 
