@@ -212,7 +212,9 @@ black hole at the distance of 5 kpc has the mass of 9 solar masses, and the
 Kerr's parameter is 0.4. The outer disk is irradiated with Cirr=1e-3.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./freddi --alpha=0.5 --Mx=9 --rout=1 --time=50 --tau=0.25 --dir=data/ --F0=2e+37 --dilution=1.7 --Nx=1000 --distance=5 --gridscale=log --kerr=0.4 --Cirr=0.001 --opacity=OPAL --initialcond=quasistat
+./freddi --alpha=0.5 --Mx=9 --rout=1 --time=50 --tau=0.25 --dir=data/ \
+  --F0=2e+37 --dilution=1.7 --Nx=1000 --distance=5 --gridscale=log --kerr=0.4 \
+  --Cirr=0.001 --opacity=OPAL --initialcond=quasistat
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Physical Background
