@@ -74,11 +74,11 @@ Freddi - numerical calculation of accretion disk evolution:
 
 General options:
   -h [ --help ]                         Produce help message
-  --prefix arg (=freddi)                Prefix for output filenames. Output 
+  --prefix arg (=freddi)                Set prefix for output filenames. Output
                                         file with distribution of parameters 
                                         over time is PREFIX.dat
-  -d [ --dir ] arg (=.)                 Directory to write output files. It 
-                                        should exist
+  -d [ --dir ] arg (=.)                 Choose the directory to write output 
+                                        files. It should exist
   --fulldata                            Output files PREFIX_%d.dat with radial 
                                         structure for every time step. Default 
                                         is to output only PREFIX.dat with 
@@ -106,7 +106,6 @@ Basic binary and disk parameters:
                                         solar radius. If it isn't set then the 
                                         tidal radius is used defined by --Mx, 
                                         --Mopt and --period values
-  -i [ --inclination ] arg (=0)         Inclination of the system, degrees
 
 Parameters of the disk model:
   -O [ --opacity ] arg (=Kramers)       Opacity law: Kramers (varkappa ~ rho / 
@@ -160,22 +159,27 @@ Parameters of the disk model:
                                         works only with --initialcond=powerF or
                                         powerSigma
 
-Parameters of X-ray emission:
+Parameters of self-irradiation:
   --Cirr arg (=0)                       Irradiation factor
   --irrfactortype arg (=const)          Type of irradiation factor Cirr
                                         
                                         Values:
                                           const: doesn't depend on disk shape:
                                         [rad. flux] = Cirr  L / (4 pi r^2)
-                                          square: disk has polynomial shape:
+                                          square: Cirr depends on the disk 
+                                        relative half-thickness:
                                         [rad. flux] = Cirr (z/r)^2 L / (4 pi 
                                         r^2)
+                                        Here L is bolometric Luminosity:
+                                        L = eta M c^2
                                         
-  --colourfactor arg (=1.7)             Colour factor
-  --emin arg (=1)                       Lower bound of X-ray band, keV
-  --emax arg (=12)                      Upper bound of X-ray band, keV
+                                        
 
 Parameters of optical magnitudes calculation:
+  --colourfactor arg (=1.7)             Colour factor to calculate X-ray flux
+  --emin arg (=1)                       Minimum energy of X-ray band, keV
+  --emax arg (=12)                      Maximum energy of X-ray band, keV
+  -i [ --inclination ] arg (=0)         Inclination of the system, degrees
   --distance arg (=10)                  Distance to the system, kpc
 
 Parameters of disk evolution calculation:
@@ -185,6 +189,7 @@ Parameters of disk evolution calculation:
   --Nx arg (=1000)                      Size of calculation grid
   --gridscale arg (=log)                Type of grid for angular momentum h: 
                                         log or linear
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Physical Background

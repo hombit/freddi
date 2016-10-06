@@ -88,8 +88,8 @@ int main(int ac, char *av[]){
 		po::options_description general("General options");
 		general.add_options()
 			( "help,h", "Produce help message" )
-			( "prefix", po::value<string>(&filename_prefix)->default_value(filename_prefix), "Prefix for output filenames. Output file with distribution of parameters over time is PREFIX.dat" )
-			( "dir,d", po::value<string>(&output_dir)->default_value(output_dir), "Directory to write output files. It should exist" )
+			( "prefix", po::value<string>(&filename_prefix)->default_value(filename_prefix), "Set prefix for output filenames. Output file with distribution of parameters over time is PREFIX.dat" )
+			( "dir,d", po::value<string>(&output_dir)->default_value(output_dir), "Choose the directory to write output files. It should exist" )
 			( "fulldata", "Output files PREFIX_%d.dat with radial structure for every time step. Default is to output only PREFIX.dat with global disk parameters for every time step" )
 		;
 		desc.add(general);
@@ -103,7 +103,6 @@ int main(int ac, char *av[]){
 			( "Mopt",	po::value<double>()->default_value(Mopt/GSL_CONST_CGSM_SOLAR_MASS), "Mass of the optical star, in units of solar masses" )
 			( "period,P", po::value<double>()->default_value(P/DAY), "Orbital period of the binary system, in units of days" )
 			( "rout,R", po::value<double>()->default_value(r_out/solar_radius), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used defined by --Mx, --Mopt and --period values" )
-			( "inclination,i", po::value<double>(&inclination)->default_value(inclination), "Inclination of the system, degrees" )
 		;
 		desc.add(binary);
 
@@ -128,24 +127,26 @@ int main(int ac, char *av[]){
 		;
 		desc.add(internal);
 
-		po::options_description x_ray("Parameters of X-ray emission");
-		x_ray.add_options()
+		po::options_description irradiation("Parameters of self-irradiation");
+		irradiation.add_options()
 			( "Cirr", po::value<double>(&C_irr_input)->default_value(C_irr_input), "Irradiation factor" )
 			( "irrfactortype", po::value<string>(&irr_factor_type)->default_value(irr_factor_type), "Type of irradiation factor Cirr\n\n"
 				"Values:\n"
 				"  const: doesn't depend on disk shape:\n[rad. flux] = Cirr  L / (4 pi r^2)\n"
-				"  square: disk has polynomial shape:\n[rad. flux] = Cirr (z/r)^2 L / (4 pi r^2)\n" )
-			( "colourfactor", po::value<double>(&fc)->default_value(fc), "Colour factor"  )
-			( "emin", po::value<double>()->default_value(nu_min/keV), "Lower bound of X-ray band, keV" )
-			( "emax", po::value<double>()->default_value(nu_max/keV), "Upper bound of X-ray band, keV" )
+				"  square: Cirr depends on the disk relative half-thickness:\n[rad. flux] = Cirr (z/r)^2 L / (4 pi r^2)\n"
+				"Here L is bolometric Luminosity:\nL = eta M c^2\n\n" )
 		;
-		desc.add(x_ray);
+		desc.add(irradiation);
 
-		po::options_description optical("Parameters of optical magnitudes calculation");
-		optical.add_options()
+		po::options_description emission("Parameters of optical magnitudes calculation");
+		emission.add_options()
+			( "colourfactor", po::value<double>(&fc)->default_value(fc), "Colour factor to calculate X-ray flux"  )
+			( "emin", po::value<double>()->default_value(nu_min/keV), "Minimum energy of X-ray band, keV" )
+			( "emax", po::value<double>()->default_value(nu_max/keV), "Maximum energy of X-ray band, keV" )
+			( "inclination,i", po::value<double>(&inclination)->default_value(inclination), "Inclination of the system, degrees" )
 			( "distance", po::value<double>()->default_value(Distance/kpc), "Distance to the system, kpc" )
 		;
-		desc.add(optical);
+		desc.add(emission);
 
 		po::options_description numeric("Parameters of disk evolution calculation");
 		numeric.add_options()
