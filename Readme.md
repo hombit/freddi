@@ -52,18 +52,20 @@ sudo make install
 Usage
 -----
 
-`Freddi` always outputs `freddi.dat` file with temporal distribution of various
-physical values. If `--fulldata` is specified then `freddi_%d.dat` files for
-each time step are outputted to the same directory with various radial
-distributions. These `*.dat` data-files contain whitespace-seporated data
-columns with header lines started with `#` symbol. You can use another prefix
-instead of `freddi` with `--prefix` option and change output directory with
-`--dir` option. If you chose Docker way and would like to specify directory then
-avoid to use `--dir` option and just replace `` "`pwd`" `` with some local path
-(for more details see [Docker
+`Freddi` runs from the command line with optionally set arguments decribed
+below.`Freddi` always outputs file `freddi.dat` with  distribution of various
+physical values over time. If `--fulldata` is specified then files
+`freddi_%d.dat` for each time step are created in the same directory with
+snapshot radial distributions. These `*.dat` data-files contain
+whitespace-separated data columns with header lines starting with `#` symbol.
+You can use another prefix instead of `freddi` with `--prefix` option and change
+output directory with `--dir` option. If you choose Docker way and would like to
+specify the directory, then avoid to use `--dir` option and just replace ``
+"`pwd`" `` with some local path (for more details see [Docker
 documentation](https://docs.docker.com/engine/tutorials/dockervolumes)).
 
-See full list of command line options with `--help` option:
+See the full list of command line options with `--help` option. Default values
+are given in brackets.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ ./freddi --help
@@ -71,11 +73,11 @@ Freddi - numerical calculation of accretion disk evolution:
 
 General options:
   -h [ --help ]                         Produce help message
-  --prefix arg (=freddi)                Prefix for output filenames. Output 
+  --prefix arg (=freddi)                Set prefix for output filenames. Output
                                         file with distribution of parameters 
                                         over time is PREFIX.dat
-  -d [ --dir ] arg (=.)                 Directory to write output files. It 
-                                        should exist
+  -d [ --dir ] arg (=.)                 Choose the directory to write output 
+                                        files. It should exist
   --fulldata                            Output files PREFIX_%d.dat with radial 
                                         structure for every time step. Default 
                                         is to output only PREFIX.dat with 
@@ -103,7 +105,6 @@ Basic binary and disk parameters:
                                         solar radius. If it isn't set then the 
                                         tidal radius is used defined by --Mx, 
                                         --Mopt and --period values
-  -i [ --inclination ] arg (=0)         Inclination of the system, degrees
 
 Parameters of the disk model:
   -O [ --opacity ] arg (=Kramers)       Opacity law: Kramers (varkappa ~ rho / 
@@ -157,22 +158,27 @@ Parameters of the disk model:
                                         works only with --initialcond=powerF or
                                         powerSigma
 
-Parameters of X-ray emission:
+Parameters of self-irradiation:
   --Cirr arg (=0)                       Irradiation factor
   --irrfactortype arg (=const)          Type of irradiation factor Cirr
                                         
                                         Values:
                                           const: doesn't depend on disk shape:
                                         [rad. flux] = Cirr  L / (4 pi r^2)
-                                          square: disk has polynomial shape:
+                                          square: Cirr depends on the disk 
+                                        relative half-thickness:
                                         [rad. flux] = Cirr (z/r)^2 L / (4 pi 
                                         r^2)
+                                        Here L is bolometric Luminosity:
+                                        L = eta M c^2
                                         
-  --colourfactor arg (=1.7)             Colour factor
-  --emin arg (=1)                       Lower bound of X-ray band, keV
-  --emax arg (=12)                      Upper bound of X-ray band, keV
+                                        
 
 Parameters of optical magnitudes calculation:
+  --colourfactor arg (=1.7)             Colour factor to calculate X-ray flux
+  --emin arg (=1)                       Minimum energy of X-ray band, keV
+  --emax arg (=12)                      Maximum energy of X-ray band, keV
+  -i [ --inclination ] arg (=0)         Inclination of the system, degrees
   --distance arg (=10)                  Distance to the system, kpc
 
 Parameters of disk evolution calculation:
