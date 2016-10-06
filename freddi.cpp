@@ -133,7 +133,7 @@ int main(int ac, char *av[]){
 			( "irrfactortype", po::value<string>(&irr_factor_type)->default_value(irr_factor_type), "Type of irradiation factor Cirr\n\n"
 				"Values:\n"
 				"  const: doesn't depend on disk shape:\n[rad. flux] = Cirr  L / (4 pi r^2)\n"
-				"  square: Cirr depends on the disk relative half-thickness:\n[rad. flux] = Cirr (z/r)^2 L / (4 pi r^2)\n"
+				"  square: Cirr depends on the disk relative half-thickness:\n[rad. flux] = Cirr (z/r)^2 L / (4 pi r^2)\n\n"
 				"Here L is bolometric Luminosity:\nL = eta Mdot c^2" )
 		;
 		desc.add(irradiation);

@@ -170,6 +170,7 @@ Parameters of self-irradiation:
                                         relative half-thickness:
                                         [rad. flux] = Cirr (z/r)^2 L / (4 pi 
                                         r^2)
+                                        
                                         Here L is bolometric Luminosity:
                                         L = eta Mdot c^2
 
