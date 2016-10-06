@@ -194,10 +194,10 @@ Parameters of disk evolution calculation:
 `Freddi` outputs time; the accretion rate; the mass of the hot part of the disk;
 the outer radius of the hot zone; the irradiation factor; the relative
 half-height, effective and irradiation temperature, ratio of the irradiation to
-viscous flux at the outer radius of the hot zone; X-ray luminosity in the band
-from E\_min to Emax (erg/s); the optical magnitudes in *U*, *B*, *V*, *R*, *I*,
-and *J* band ([Allen's Astrophysical Quantities, Cox
-2015](http://www.springer.com/book/9780387951898)).
+viscous flux at the outer radius of the hot zone; X-ray luminosity (erg/s) in
+the band from E\_min to E\_max (`--emin` and `--emax` options); the optical
+magnitudes in *U*, *B*, *V*, *R*, *I*, and *J* band ([Allen's Astrophysical
+Quantities, Cox 2015](http://www.springer.com/book/9780387951898)).
 
 Snapshot distributions at each time step, if produced, contain the following
 data: radial coordinate in terms of the specific angular momentum, radius,
@@ -235,8 +235,8 @@ be found on solving the equation. The accretion rate defines the emission from
 the source.
 
 The standard model for the accretion disk is implied, which is developed by
-[Shakura & Sunyaev (1973)](http://adsabs.harvard.edu/abs/1973A%26A....24..337S
-). The inner boundary of the disk is at the ISCO or can be explicitely set. The
+[Shakura & Sunyaev (1973)](http://adsabs.harvard.edu/abs/1973A%26A....24..337S).
+The inner boundary of the disk is at the ISCO or can be explicitely set. The
 boundary conditions in the disk are the zero stress at the inner boundary and
 the zero accretion rate at the outer boundary. The conditions are suitable
 during the outbursts in X-ray binary transients with black holes.
@@ -244,13 +244,13 @@ during the outbursts in X-ray binary transients with black holes.
 In a binary system, the accretion disk is radially confined. In `Freddi`, the
 outer radius of the disk can be set explicitely or calculated as the position of
 the tidal truncation radius as calculated by [Paczynski
-(1997)](<http://adsabs.harvard.edu/abs/1977ApJ...216..822P> ) for small mass
-ratios of the black using the approximation by [Suleimanov et al
-(2008)](http://adsabs.harvard.edu/abs/2008A%26A...491..267S ).
+(1997)](http://adsabs.harvard.edu/abs/1977ApJ...216..822P) for small mass ratios
+of the black using the approximation by [Suleimanov et al
+(2008)](http://adsabs.harvard.edu/abs/2008A%26A...491..267S).
 
 The vertical structure of the disk is included in the code using the analytic
 approximations by [Suleimanov et al.
-(2007)](http://adsabs.harvard.edu/abs/2007ARep...51..549S ), valid for the
+(2007)](http://adsabs.harvard.edu/abs/2007ARep...51..549S), valid for the
 effective surface temperatures from 10 000 to 100 000 K, approximately. It is
 assumed that the gas pressure dominates, the gas is completely ionized, and the
 photon opacity is defined by the free-free and free-bound transitions. Opacity
