@@ -299,7 +299,7 @@ Questions and comments
 ----------------------
 
 If you have any problems, questions or comments please address them to
-[Issues](https://github.com/hombit/freddi/issues) or to hombit\@gmail.com
+[Issues](https://github.com/hombit/freddi/issues) or to hombit@gmail.com
 
 License
 -------
