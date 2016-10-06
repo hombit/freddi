@@ -8,7 +8,8 @@ The code solves 1-D evolution equation of Shakura-Sunyaev accretion disk. The
 code is developed to simulate fast rise exponential decay (FRED) light curves of
 low mass X-ray binaries (LMXBs) for the paper “Determination of the turbulent
 parameter in the accretion disks: effects of self-irradiation in 4U 1543-47
-during the 2002 outburst” by Lipunova & Malanchev (2016) [arXiv:1610.01399](https://arxiv.org/abs/1610.01399).
+during the 2002 outburst” by Lipunova & Malanchev (2016)
+[arXiv:1610.01399](https://arxiv.org/abs/1610.01399).
 
 Installation
 ------------
@@ -52,18 +53,20 @@ sudo make install
 Usage
 -----
 
-`Freddi` always outputs `freddi.dat` file with temporal distribution of various
-physical values. If `--fulldata` is specified then `freddi_%d.dat` files for
-each time step are outputted to the same directory with various radial
-distributions. These `*.dat` data-files contain whitespace-seporated data
-columns with header lines started with `#` symbol. You can use another prefix
-instead of `freddi` with `--prefix` option and change output directory with
-`--dir` option. If you chose Docker way and would like to specify directory then
-avoid to use `--dir` option and just replace `` "`pwd`" `` with some local path
-(for more details see [Docker
+`Freddi` runs from the command line with optionally set arguments decribed
+below.`Freddi` always outputs file `freddi.dat` with  distribution of various
+physical values over time. If `--fulldata` is specified then files
+`freddi_%d.dat` for each time step are created in the same directory with
+snapshot radial distributions. These `*.dat` data-files contain
+whitespace-separated data columns with header lines starting with `#` symbol.
+You can use another prefix instead of `freddi` with `--prefix` option and change
+output directory with `--dir` option. If you choose Docker way and would like to
+specify the directory, then avoid to use `--dir` option and just replace ``
+"`pwd`" `` with some local path (for more details see [Docker
 documentation](https://docs.docker.com/engine/tutorials/dockervolumes)).
 
-See full list of command line options with `--help` option:
+See the full list of command line options with `--help` option. Default values
+are given in brackets.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ ./freddi --help
@@ -182,7 +185,6 @@ Parameters of disk evolution calculation:
   --Nx arg (=1000)                      Size of calculation grid
   --gridscale arg (=log)                Type of grid for angular momentum h: 
                                         log or linear
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Physical Background
