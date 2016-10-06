@@ -203,8 +203,7 @@ data: radial coordinate in terms of the specific angular momentum, radius,
 viscous torque, surface density, effective temperature Teff, viscous temperature
 Tvis, irradiation temperature Tirr, and the absolute half-height of the disk.
 
-Example
--------
+### Example
 
 The following arguments instruct `Freddi` to calculate the decay of the outburst
 in the disk with the constant outer radius equal to 1 solar radius. The Kerr
@@ -258,7 +257,7 @@ opacity is defined by the free-free and free-bound transitions. Opacity law is
 for the solar element abundancies and can be chosen from two types: (1) Kramers'
 opacity: kappa = 5e24 rho/T\^(7/2) cm2/g (2) approximation to OPAL tables: kappa
 = 1.5e20 rho/T\^(5/2) cm2/g ([Bell & Lin
-1994](<http://adsabs.harvard.edu/abs/1994ApJ...427..987B>))
+1994](http://adsabs.harvard.edu/abs/1994ApJ...427..987B))
 
 The disk at each radius is in the "hot" state if the gas is completely ionized.
 Otherwise, the disk is considered to be "cold" locally. Alpha-parameter in the
@@ -289,12 +288,18 @@ results in the larger size of the hot disk if such model is assumed. Also, the
 optical flux is increased because the flux outgoing from the disk surface is
 proportional to Teff\^4 = Tvis4+Tirr4. Self-irradiation of the disk is included
 in the computation if irradiation parameter is not zero. The simplest way is to
-set a constant irradiation factor (the studies of X-ray novae suggest the range
-for Cirr 1e-5—5e-3).
+set a constant irradiation factor `--Cirr` (the studies of X-ray novae suggest
+the range for Cirr 1e-5—5e-3).
 
 Observed flux depends on the distance to the source and the inclination of the
 disk plane. The inclination angle is the angle between the line of sight and the
 normal to the disk.
+
+Questions and comments
+----------------------
+
+If you have any problems, questions or comments please address them to
+[Issues](<https://github.com/hombit/freddi/issues>) or to hombit\@gmail.com
 
 License
 -------
