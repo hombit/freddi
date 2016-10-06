@@ -195,8 +195,9 @@ Parameters of disk evolution calculation:
 the outer radius of the hot zone; the irradiation factor; the relative
 half-height, effective and irradiation temperature, ratio of the irradiation to
 viscous flux at the outer radius of the hot zone; X-ray luminosity in the band
-from E\_min to Emax (erg/s); the optical magnitudes in U, B, V, R, I, and J band
-(Allen's Astrophysical Quantites, Cox 2015).
+from E\_min to Emax (erg/s); the optical magnitudes in *U*, *B*, *V*, *R*, *I*,
+and *J* band ([Allen's Astrophysical Quantities, Cox
+2015](http://www.springer.com/book/9780387951898)).
 
 Snapshot distributions at each time step, if produced, contain the following
 data: radial coordinate in terms of the specific angular momentum, radius,
@@ -234,29 +235,28 @@ be found on solving the equation. The accretion rate defines the emission from
 the source.
 
 The standard model for the accretion disk is implied, which is developed by
-[Shakura & Sunyaev (1973)]
-(http://adsabs.harvard.edu/abs/1973A%26A....24..337S). The inner boundary of the
-disk is at the ISCO or can be explicitely set. The boundary conditions in the
-disk are the zero stress at the inner boundary and the zero accretion rate at
-the outer boundary. The conditions are suitable during the outbursts in X-ray
-binary transients with black holes.
+[Shakura & Sunyaev (1973)](http://adsabs.harvard.edu/abs/1973A%26A....24..337S
+). The inner boundary of the disk is at the ISCO or can be explicitely set. The
+boundary conditions in the disk are the zero stress at the inner boundary and
+the zero accretion rate at the outer boundary. The conditions are suitable
+during the outbursts in X-ray binary transients with black holes.
 
 In a binary system, the accretion disk is radially confined. In `Freddi`, the
 outer radius of the disk can be set explicitely or calculated as the position of
-the tidal truncation radius as calculated by [Paczynski (1997)]
-(<http://adsabs.harvard.edu/abs/1977ApJ...216..822P>) for small mass ratios of
-the black using the approximation by [Suleimanov et al (2008)]
-(http://adsabs.harvard.edu/abs/2008A%26A...491..267S).
+the tidal truncation radius as calculated by [Paczynski
+(1997)](<http://adsabs.harvard.edu/abs/1977ApJ...216..822P> ) for small mass
+ratios of the black using the approximation by [Suleimanov et al
+(2008)](http://adsabs.harvard.edu/abs/2008A%26A...491..267S ).
 
 The vertical structure of the disk is included in the code using the analytic
-approximations by [Suleimanov et al. (2007)]
-(http://adsabs.harvard.edu/abs/2007ARep...51..549S), valid for the effective
-surface temperatures from 10 000 to 100 000 K, approximately. It is assumed that
-the gas pressure dominates, the gas is completely ionized, and the photon
-opacity is defined by the free-free and free-bound transitions. Opacity law is
-for the solar element abundancies and can be chosen from two types: (1) Kramers'
-opacity: kappa = 5e24 rho/T\^(7/2) cm2/g (2) approximation to OPAL tables: kappa
-= 1.5e20 rho/T\^(5/2) cm2/g ([Bell & Lin
+approximations by [Suleimanov et al.
+(2007)](http://adsabs.harvard.edu/abs/2007ARep...51..549S ), valid for the
+effective surface temperatures from 10 000 to 100 000 K, approximately. It is
+assumed that the gas pressure dominates, the gas is completely ionized, and the
+photon opacity is defined by the free-free and free-bound transitions. Opacity
+law is for the solar element abundancies and can be chosen from two types: (1)
+Kramers' opacity: kappa = 5e24 rho/T\^(7/2) cm2/g (2) approximation to OPAL
+tables: kappa = 1.5e20 rho/T\^(5/2) cm2/g ([Bell & Lin
 1994](http://adsabs.harvard.edu/abs/1994ApJ...427..987B))
 
 The disk at each radius is in the "hot" state if the gas is completely ionized.
@@ -286,10 +286,10 @@ Self-irradiation by the central X-rays heats the outer parts of the disk. A
 fraction of the bolometric flux is supposed to illuminate the disk surface. This
 results in the larger size of the hot disk if such model is assumed. Also, the
 optical flux is increased because the flux outgoing from the disk surface is
-proportional to Teff\^4 = Tvis4+Tirr4. Self-irradiation of the disk is included
-in the computation if irradiation parameter is not zero. The simplest way is to
-set a constant irradiation factor `--Cirr` (the studies of X-ray novae suggest
-the range for Cirr 1e-5—5e-3).
+proportional to Teff\^4 = Tvis\^4+Tirr\^4. Self-irradiation of the disk is
+included in the computation if irradiation parameter is not zero. The simplest
+way is to set a constant irradiation factor `--Cirr` (the studies of X-ray novae
+suggest the range for Cirr 1e-5—5e-3).
 
 Observed flux depends on the distance to the source and the inclination of the
 disk plane. The inclination angle is the angle between the line of sight and the
@@ -299,8 +299,7 @@ Questions and comments
 ----------------------
 
 If you have any problems, questions or comments please address them to
-[Issues](https://github.com/hombit/freddi/issues) or to
-hombit@gmail.com
+[Issues](https://github.com/hombit/freddi/issues) or to hombit\@gmail.com
 
 License
 -------
