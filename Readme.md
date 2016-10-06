@@ -8,7 +8,7 @@ The code solves 1-D evolution equation of Shakura-Sunyaev accretion disk. The
 code is developed to simulate fast rise exponential decay (FRED) light curves of
 low mass X-ray binaries (LMXBs) for the paper “Determination of the turbulent
 parameter in the accretion disks: effects of self-irradiation in 4U 1543-47
-during the 2002 outburst” by Lipunova & Malanchev (2016) (in prep.).
+during the 2002 outburst” by Lipunova & Malanchev (2016) [arXiv:1610.01399](https://arxiv.org/abs/1610.01399).
 
 Installation
 ------------
@@ -240,4 +240,4 @@ Copyright (c) 2016, Konstantin L. Malanchev & Galina V. Lipunova.
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
 
 Please, accompany any results obtained using this code with reference to
-Lipunova & Malanchev (2016) (in prep.)
+Lipunova & Malanchev (2016) [arXiv:1610.01399](https://arxiv.org/abs/1610.01399)
