@@ -300,8 +300,8 @@ int main(int ac, char *av[]){
 	}
 
 	ofstream output_sum( output_dir + "/" + filename_prefix + ".dat" );
-	output_sum << "#t    Mdot Lx    H2R   Rhot Tphout Mdisk kxout Qiir2Qvisout mU  mB  mV  mR  mI  mJ" << "\n";
-	output_sum << "#days g/s  erg/s float Rsun K      g     float float        mag mag mag mag mag mag" << "\n";
+	output_sum << "#t    Mdot Mdisk Rhot Cirrout H2R   Teffout Tirrout Qiir2Qvisout Lx    mU  mB  mV  mR  mI  mJ" << "\n";
+	output_sum << "#days g/s  g     Rsun float   float K       K       float        erg/s mag mag mag mag mag mag" << "\n";
 	output_sum << "# r_out = " << r_out << "\n";
 	output_sum << "#";
 	for ( int i = 0; i < ac; ++i ){
@@ -421,13 +421,14 @@ int main(int ac, char *av[]){
 
 		output_sum		<< t / DAY
 				<< "\t" << Mdot_in
-				<< "\t" << Lx
-				<< "\t" << Height.at(Nx-1) / R.at(Nx-1)
-				<< "\t" << R.at(Nx-1) / solar_radius
-				<< "\t" << Tph.at(Nx-1)
 				<< "\t" << Mdisk
+				<< "\t" << R.at(Nx-1) / solar_radius
 				<< "\t" << C_irr
+				<< "\t" << Height.at(Nx-1) / R.at(Nx-1)
+				<< "\t" << Tph.at(Nx-1)
+				<< "\t" << Tirr.at(Nx-1)
 				<< "\t" << pow( Tirr.at(Nx-1) / Tph_vis.at(Nx-1), 4. )
+				<< "\t" << Lx
 				<< "\t" << mU
 				<< "\t" << mB
 				<< "\t" << mV
