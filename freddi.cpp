@@ -404,8 +404,8 @@ int main(int ac, char *av[]){
 			ostringstream filename;
 			filename << output_dir << "/" << filename_prefix << "_" << static_cast<int>(t/tau) << ".dat";
 			ofstream output( filename.str() );
-			output << "#h      R  F      Sigma  Tph_vis Tph Height" << "\n";
-			output << "#cm^2/s cm dyn*cm g/cm^2 K       K   cm" << "\n";
+			output << "#h      R  F      Sigma  Teff Tvis Tirr Height" << "\n";
+			output << "#cm^2/s cm dyn*cm g/cm^2 K    K    K    cm" << "\n";
 			output << "# Time = " << t / DAY << " Mdot_in = " << Mdot_in << endl;
 			for ( int i = 1; i < Nx; ++i ){
 				output		<< h.at(i)
@@ -414,6 +414,7 @@ int main(int ac, char *av[]){
 					<< "\t" << Sigma.at(i)
 					<< "\t" << Tph.at(i)
 					<< "\t" << Tph_vis.at(i)
+					<< "\t" << Tirr.at(i)
 					<< "\t" << Height.at(i)
 					<< endl;
 			}
