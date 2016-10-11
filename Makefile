@@ -1,15 +1,17 @@
 CC = g++
 CPP = g++
-CPPFLAGS = -std=c++11
 prefix=/usr/local
+CPPFLAGS = -std=c++11 -D INSTALLPATHPREFIX='"$(prefix)"'
 
 LDLIBS = -lboost_program_options
 
 OBJ = nonlinear_diffusion.o opacity_related.o orbit.o spectrum.o
 
 
-all: freddi
+all: freddi ini
 freddi: $(OBJ) freddi.o
+ini: freddi.ini
+	sed -i'' -e '3 s_[a-zA-Z/]*/etc/_$(prefix)/etc/_' freddi.ini
 
 readme: all
 	./freddi --help > ./.freddi_help_message

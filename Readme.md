@@ -53,19 +53,21 @@ sudo make install
 Usage
 -----
 
-`Freddi` runs from the command line with optionally set arguments.`Freddi` 
-outputs file `freddi.dat` with distribution of various physical values over time. 
-If `--fulldata` is specified then files `freddi_%d.dat` for each time step are created 
-in the same directory with snapshot radial distributions. These data-files contain
-whitespace-separated data columns with header lines starting with `#` symbol.
-You can set another prefix instead of `freddi` with `--prefix` option and change
-the output directory with `--dir` option. If you choose the Docker way and would like to
-specify the directory, then avoid using `--dir` option and just replace ``
-"`pwd`" `` with some local path (for more details see [Docker
-documentation](https://docs.docker.com/engine/tutorials/dockervolumes)).
+`Freddi` runs from the command line with optionally set arguments.`Freddi`
+outputs file `freddi.dat` with distribution of various physical values over
+time. If `--fulldata` is specified then files `freddi_%d.dat` for each time step
+are created in the same directory with snapshot radial distributions. These
+data-files contain whitespace-separated data columns with header lines starting
+with `#` symbol. You can set another prefix instead of `freddi` with `--prefix`
+option and change the output directory with `--dir` option. If you choose the
+Docker way and would like to specify the directory, then avoid using `--dir`
+option and just replace `` "`pwd`" `` with some local path (for more details see
+[Docker documentation](https://docs.docker.com/engine/tutorials/dockervolumes)).
 
-The full list of command line options is viewed with `--help` option. Default values
-are given in brackets.
+### Options
+
+The full list of command line options is viewed with `--help` option. Default
+values are given in brackets.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ ./freddi --help
@@ -190,6 +192,19 @@ Parameters of disk evolution calculation:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Also you can use `freddi.ini` configuration file to store options. This [INI
+file](https://en.wikipedia.org/wiki/INI_file) contains lines `option=value`,
+option names are the as provided by the help message above. Command line option
+overwrites configuration file option. For example [see
+default](https://github.com/hombit/freddi/blob/master/freddi.ini) `freddi.ini`.
+
+Paths where this file is searched are `./freddi.ini` (execution path),
+`$HOME/.config/freddi/freddi.ini`, `/usr/local/etc/freddi.ini` and
+`/etc/freddi.ini`. You can provide configuration file to Docker container as a
+volume: `` -v "`pwd`/freddi.ini":/etc/freddi.ini ``.
+
+### Output values
+
 `Freddi` outputs time; the accretion rate; the mass of the hot part of the disk;
 the outer radius of the hot zone; the irradiation factor; the relative
 half-height, effective and irradiation temperature, ratio of the irradiation to
@@ -230,7 +245,7 @@ observatories.
 
 The basic equation of the viscous evolution relates the surface density and
 viscous stresses and is of diffusion type. Evolution of the accretion rate can
-be found on solving the equation. The distribution of viscous stresss defines 
+be found on solving the equation. The distribution of viscous stresss defines
 the emission from the source.
 
 The standard model for the accretion disk is implied, which is developed by
@@ -247,7 +262,8 @@ the tidal truncation radius following [Paczynski
 of the black using the approximation by [Suleimanov et al
 (2008)](http://adsabs.harvard.edu/abs/2008A%26A...491..267S).
 
-The parameters at the disk central plane are defined by the analytic approximations ([Suleimanov et al.
+The parameters at the disk central plane are defined by the analytic
+approximations ([Suleimanov et al.
 (2007)](http://adsabs.harvard.edu/abs/2007ARep...51..549S)), valid for the
 effective surface temperatures from 10 000 to 100 000 K, approximately. It is
 assumed that the gas pressure dominates, the gas is completely ionized, and the
@@ -292,14 +308,18 @@ suggest the range for Cirr 1e-5—5e-3).
 Observed flux depends on the distance to the source and the inclination of the
 disk plane. The inclination angle is the angle between the line of sight and the
 normal to the disk. The flux, emitted from the disk surface, is defined by the
-sum of the visous and irradiating flux, where the viscous flux is calculated taking
-into account general relativity effects near the black hole, following [Page & Thorne (1974)](http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=1974ApJ...191..499P) and [Riffert & Herold (1995)] (http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=1995ApJ...450..508R).
+sum of the visous and irradiating flux, where the viscous flux is calculated
+taking into account general relativity effects near the black hole, following
+[Page & Thorne
+(1974)](http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=1974ApJ...191..499P)
+and [Riffert & Herold (1995)]
+(http://adsabs.harvard.edu/cgi-bin/nph-bib\_query?bibcode=1995ApJ...450..508R).
 
 Questions and comments
 ----------------------
 
 If you have any problems, questions, or comments, please address them to
-[Issues](https://github.com/hombit/freddi/issues) or to hombit@gmail.com
+[Issues](https://github.com/hombit/freddi/issues) or to hombit\@gmail.com
 
 License
 -------
