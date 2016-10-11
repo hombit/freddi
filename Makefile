@@ -17,8 +17,9 @@ readme: all
 	mv .freddi_Readme.md Readme.md
 	rm -f ./.freddi_help_message
 
-install: all
+install: all freddi.ini
 	install -m 0755 freddi $(prefix)/bin
+	install -m 0755 freddi.ini $(prefix)/etc
 
 clean:
 	rm -f *.o
