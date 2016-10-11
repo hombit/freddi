@@ -76,6 +76,10 @@ int main(int ac, char *av[]){
 	string opacity_type = "Kramers";
 	string irr_factor_type = "const";
 
+	const string config_filename = "freddi.ini";
+	const char* home = getenv("HOME");
+	const string path_config_file[] = {"/etc", home, "."};
+
 	double Mdot_in = 0.;
 	double Mdot_in_prev;
 	double Mdot_out = 0.;
@@ -160,8 +164,10 @@ int main(int ac, char *av[]){
 		po::variables_map vm;
 
 		try {
-			ifstream config("freddi.ini");
-			po::store( po::parse_config_file(config, desc), vm );
+			for (auto &path : path_config_file){
+				ifstream config(path + "/" + config_filename);
+				po::store( po::parse_config_file(config, desc), vm );
+			}
 			po::store( po::parse_command_line(ac, av, desc), vm );
 			po::notify(vm);
 		} catch (exception &e){
