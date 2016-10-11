@@ -79,9 +79,10 @@ General options:
   -d [ --dir ] arg (=.)                 Choose the directory to write output 
                                         files. It should exist
   --fulldata                            Output files PREFIX_%d.dat with radial 
-                                        structure at every time step. Default 
+                                        structure for every time step. Default 
                                         is to output only PREFIX.dat with 
-                                        global disk parameters versus time 
+                                        global disk parameters for every time 
+                                        step
 
 Basic binary and disk parameters:
   -M [ --Mx ] arg (=10)                 Mass of the central object, in the 
