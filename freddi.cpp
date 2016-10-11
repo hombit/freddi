@@ -72,7 +72,7 @@ int main(int ac, char *av[]){
 	string filename_prefix = "freddi";
 	string output_dir = ".";
 	bool output_fulldata = false;
-	string initial_cond_shape = "power";
+	string initial_cond_shape = "powerF";
 	string opacity_type = "Kramers";
 	string irr_factor_type = "const";
 

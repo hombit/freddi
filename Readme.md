@@ -136,7 +136,7 @@ Parameters of the disk model:
                                         --Mdot0 are specified then --Mdot0 is 
                                         used. Works only when --initialcond is 
                                         set to sinusF or quasistat
-  --initialcond arg (=power)            Type of the initial condition for 
+  --initialcond arg (=powerF)           Type of the initial condition for 
                                         viscous torque F or surface density 
                                         Sigma
                                         
