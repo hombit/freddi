@@ -1,3 +1,4 @@
+#include <boost/any.hpp>
 #include <boost/program_options.hpp>
 #include <cmath>
 #include <fstream>
@@ -41,6 +42,8 @@ int main(int ac, char *av[]){
 	// Campins et al., 1985, AJ, 90, 896
 	const double lambdaJ = 12600 * Angstrem;
 	const double irr0J = 1600 * Jy *  GSL_CONST_CGSM_SPEED_OF_LIGHT / (lambdaJ*lambdaJ); 
+
+	po::variables_map po_vm;
 
 	double alpha = 0.25;
 	double fc = 1.7;
@@ -161,40 +164,38 @@ int main(int ac, char *av[]){
 		;
 		desc.add(numeric);
 
-		po::variables_map vm;
-
 		try {
-			po::store( po::parse_command_line(ac, av, desc), vm );
-			for (auto &path : path_config_file){
+			po::store( po::parse_command_line(ac, av, desc), po_vm );
+			for (const auto &path : path_config_file){
 				ifstream config(path + "/" + config_filename);
-				po::store( po::parse_config_file(config, desc), vm );
+				po::store( po::parse_config_file(config, desc), po_vm );
 			}
-			po::notify(vm);
+			po::notify(po_vm);
 		} catch (exception &e){
 			cerr << "Error: " << e.what() << endl;
 			return 1;
 		}
 
-		if ( vm.count("help") ){
+		if ( po_vm.count("help") ){
 			cout << desc << endl;
 			return 0;
 		}
-		output_fulldata = vm.count("fulldata");
-		Mopt = vm["Mopt"].as<double>() * GSL_CONST_CGSM_SOLAR_MASS;
-		Mx = vm["Mx"].as<double>() * GSL_CONST_CGSM_SOLAR_MASS;
-		P = vm["period"].as<double>() * DAY;
-		Distance = vm["distance"].as<double>() * kpc;
-		nu_min = vm["emin"].as<double>() * keV;
-		nu_max = vm["emax"].as<double>() * keV;
-		tau = vm["tau"].as<double>() * DAY;
-		Time = vm["time"].as<double>() * DAY;
-		if ( not vm["rout"].defaulted() ){
-			r_out = vm["rout"].as<double>() * solar_radius;
+		output_fulldata = po_vm.count("fulldata");
+		Mopt = po_vm["Mopt"].as<double>() * GSL_CONST_CGSM_SOLAR_MASS;
+		Mx = po_vm["Mx"].as<double>() * GSL_CONST_CGSM_SOLAR_MASS;
+		P = po_vm["period"].as<double>() * DAY;
+		Distance = po_vm["distance"].as<double>() * kpc;
+		nu_min = po_vm["emin"].as<double>() * keV;
+		nu_max = po_vm["emax"].as<double>() * keV;
+		tau = po_vm["tau"].as<double>() * DAY;
+		Time = po_vm["time"].as<double>() * DAY;
+		if ( not po_vm["rout"].defaulted() ){
+			r_out = po_vm["rout"].as<double>() * solar_radius;
 		} else{
 			r_out = r_out_func( Mx, Mopt, P );
 		}
-		if ( vm.count("rin") ){
-			r_in = vm["rin"].as<double>() * 3. * 2. * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+		if ( po_vm.count("rin") ){
+			r_in = po_vm["rin"].as<double>() * 3. * 2. * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
 		} else{
 			r_in = r_in_func( Mx, kerr );
 		}
@@ -310,12 +311,26 @@ int main(int ac, char *av[]){
 	ofstream output_sum( output_dir + "/" + filename_prefix + ".dat" );
 	output_sum << "#t    Mdot Mdisk Rhot Cirrout H2R   Teffout Tirrout Qiir2Qvisout Lx    mU  mB  mV  mR  mI  mJ" << "\n";
 	output_sum << "#days g/s  g     Rsun float   float K       K       float        erg/s mag mag mag mag mag mag" << "\n";
-	output_sum << "# r_out = " << r_out << "\n";
-	output_sum << "#";
-	for ( int i = 0; i < ac; ++i ){
-		output_sum << " " << av[i];
+	for ( const auto &it : po_vm ){
+		output_sum << "# "
+			 << it.first.c_str()
+			 << " = ";
+		auto &value = it.second.value();
+		if ( auto v = boost::any_cast<uint32_t>(&value) ){
+			output_sum << *v;
+		} else if ( auto v = boost::any_cast<string>(&value) ){
+			output_sum << *v;
+		} else if ( auto v = boost::any_cast<double>(&value) ){
+			output_sum << *v;
+		} else if ( auto v = boost::any_cast<int>(&value) ){
+			output_sum << *v;
+		} else {
+			output_sum << "error";
+			// throw po::invalid_option_value(it.first.c_str());
+		}
+		output_sum << "\n";
 	}
-	output_sum << endl;
+	output_sum << flush;
 
 	for( double t = 0.; t <= Time; t += tau ){
 		// cout << t/DAY << endl;
