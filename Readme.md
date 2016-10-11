@@ -53,19 +53,18 @@ sudo make install
 Usage
 -----
 
-`Freddi` runs from the command line with optionally set arguments decribed
-below.`Freddi` always outputs file `freddi.dat` with distribution of various
-physical values over time. If `--fulldata` is specified then files
-`freddi_%d.dat` for each time step are created in the same directory with
-snapshot radial distributions. These `*.dat` data-files contain
+`Freddi` runs from the command line with optionally set arguments.`Freddi` 
+outputs file `freddi.dat` with distribution of various physical values over time. 
+If `--fulldata` is specified then files `freddi_%d.dat` for each time step are created 
+in the same directory with snapshot radial distributions. These data-files contain
 whitespace-separated data columns with header lines starting with `#` symbol.
-You can use another prefix instead of `freddi` with `--prefix` option and change
-output directory with `--dir` option. If you choose Docker way and would like to
-specify the directory, then avoid to use `--dir` option and just replace ``
+You can set another prefix instead of `freddi` with `--prefix` option and change
+the output directory with `--dir` option. If you choose the Docker way and would like to
+specify the directory, then avoid using `--dir` option and just replace ``
 "`pwd`" `` with some local path (for more details see [Docker
 documentation](https://docs.docker.com/engine/tutorials/dockervolumes)).
 
-See the full list of command line options with `--help` option. Default values
+The full list of command line options is viewed with `--help` option. Default values
 are given in brackets.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,10 +79,9 @@ General options:
   -d [ --dir ] arg (=.)                 Choose the directory to write output 
                                         files. It should exist
   --fulldata                            Output files PREFIX_%d.dat with radial 
-                                        structure for every time step. Default 
+                                        structure at every time step. Default 
                                         is to output only PREFIX.dat with 
-                                        global disk parameters for every time 
-                                        step
+                                        global disk parameters versus time 
 
 Basic binary and disk parameters:
   -M [ --Mx ] arg (=10)                 Mass of the central object, in the 
@@ -213,7 +211,7 @@ Kerr's parameter is 0.4. The outer disk is irradiated with Cirr=1e-3.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ./freddi --alpha=0.5 --Mx=9 --rout=1 --time=50 --tau=0.25 --dir=data/ \
-  --F0=2e+37 --dilution=1.7 --Nx=1000 --distance=5 --gridscale=log --kerr=0.4 \
+  --F0=2e+37 --colourfactor=1.7 --Nx=1000 --distance=5 --gridscale=log --kerr=0.4 \
   --Cirr=0.001 --opacity=OPAL --initialcond=quasistat
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -231,8 +229,8 @@ observatories.
 
 The basic equation of the viscous evolution relates the surface density and
 viscous stresses and is of diffusion type. Evolution of the accretion rate can
-be found on solving the equation. The accretion rate defines the emission from
-the source.
+be found on solving the equation. The distribution of viscous stresss defines 
+the emission from the source.
 
 The standard model for the accretion disk is implied, which is developed by
 [Shakura & Sunyaev (1973)](http://adsabs.harvard.edu/abs/1973A%26A....24..337S).
@@ -243,14 +241,13 @@ during the outbursts in X-ray binary transients with black holes.
 
 In a binary system, the accretion disk is radially confined. In `Freddi`, the
 outer radius of the disk can be set explicitely or calculated as the position of
-the tidal truncation radius as calculated by [Paczynski
+the tidal truncation radius following [Paczynski
 (1997)](http://adsabs.harvard.edu/abs/1977ApJ...216..822P) for small mass ratios
 of the black using the approximation by [Suleimanov et al
 (2008)](http://adsabs.harvard.edu/abs/2008A%26A...491..267S).
 
-The vertical structure of the disk is included in the code using the analytic
-approximations by [Suleimanov et al.
-(2007)](http://adsabs.harvard.edu/abs/2007ARep...51..549S), valid for the
+The parameters at the disk central plane are defined by the analytic approximations ([Suleimanov et al.
+(2007)](http://adsabs.harvard.edu/abs/2007ARep...51..549S)), valid for the
 effective surface temperatures from 10 000 to 100 000 K, approximately. It is
 assumed that the gas pressure dominates, the gas is completely ionized, and the
 photon opacity is defined by the free-free and free-bound transitions. Opacity
@@ -293,13 +290,15 @@ suggest the range for Cirr 1e-5—5e-3).
 
 Observed flux depends on the distance to the source and the inclination of the
 disk plane. The inclination angle is the angle between the line of sight and the
-normal to the disk.
+normal to the disk. The flux, emitted from the disk surface, is defined by the
+sum of the visous and irradiating flux, where the viscous flux is calculated taking
+into account general relativity effects near the black hole, following [Page & Thorne (1974)](http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=1974ApJ...191..499P) and [Riffert & Herold (1995)] (http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=1995ApJ...450..508R).
 
 Questions and comments
 ----------------------
 
-If you have any problems, questions or comments please address them to
-[Issues](https://github.com/hombit/freddi/issues) or to hombit\@gmail.com
+If you have any problems, questions, or comments, please address them to
+[Issues](https://github.com/hombit/freddi/issues) or to hombit@gmail.com
 
 License
 -------
