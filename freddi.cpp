@@ -160,6 +160,8 @@ int main(int ac, char *av[]){
 		po::variables_map vm;
 
 		try {
+			ifstream config("freddi.ini");
+			po::store( po::parse_config_file(config, desc), vm );
 			po::store( po::parse_command_line(ac, av, desc), vm );
 			po::notify(vm);
 		} catch (exception &e){
