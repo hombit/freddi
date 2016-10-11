@@ -78,7 +78,7 @@ int main(int ac, char *av[]){
 
 	const string config_filename = "freddi.ini";
 	const char* home = getenv("HOME");
-	const string path_config_file[] = {"/etc", home, "."};
+	const string path_config_file[] = {".", home, "/etc"};
 
 	double Mdot_in = 0.;
 	double Mdot_in_prev;
@@ -164,11 +164,11 @@ int main(int ac, char *av[]){
 		po::variables_map vm;
 
 		try {
+			po::store( po::parse_command_line(ac, av, desc), vm );
 			for (auto &path : path_config_file){
 				ifstream config(path + "/" + config_filename);
 				po::store( po::parse_config_file(config, desc), vm );
 			}
-			po::store( po::parse_command_line(ac, av, desc), vm );
 			po::notify(vm);
 		} catch (exception &e){
 			cerr << "Error: " << e.what() << endl;
