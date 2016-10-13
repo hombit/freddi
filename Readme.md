@@ -269,7 +269,7 @@ of the black using the approximation by [Suleimanov et al
 
 The parameters at the disk central plane are defined by the analytic
 approximations ([Suleimanov et al.
-(2007)](http://adsabs.harvard.edu/abs/2007ARep...51..549S)), valid for the
+2007](http://adsabs.harvard.edu/abs/2007ARep...51..549S)), valid for the
 effective surface temperatures from 10 000 to 100 000 K, approximately. It is
 assumed that the gas pressure dominates, the gas is completely ionized, and the
 photon opacity is defined by the free-free and free-bound transitions. Opacity
