@@ -53,7 +53,7 @@ sudo make install
 Usage
 -----
 
-`Freddi` runs from the command line with optionally set arguments.`Freddi`
+`Freddi` runs from the command line with inline options and/or with a configuration file. `Freddi`
 outputs file `freddi.dat` with distribution of various physical values over
 time. If `--fulldata` is specified then files `freddi_%d.dat` for each time step
 are created in the same directory with snapshot radial distributions. These
