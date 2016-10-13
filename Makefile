@@ -8,7 +8,7 @@ LDLIBS = -lboost_program_options
 OBJ = nonlinear_diffusion.o opacity_related.o orbit.o spectrum.o
 
 
-all: freddi ini
+all: freddi
 freddi: $(OBJ) freddi.o
 ini: freddi.ini
 	sed -i '' -e '3 s_[a-zA-Z/]*/etc/_$(prefix)/etc/_' freddi.ini
@@ -19,7 +19,7 @@ readme: all
 	mv .freddi_Readme.md Readme.md
 	rm -f ./.freddi_help_message
 
-install: all freddi.ini
+install: all ini
 	install -m 0755 freddi $(prefix)/bin
 	install -m 0755 freddi.ini $(prefix)/etc
 
