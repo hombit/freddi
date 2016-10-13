@@ -216,7 +216,8 @@ half-height, effective and irradiation temperature, ratio of the irradiation to
 viscous flux at the outer radius of the hot zone; X-ray luminosity (erg/s) in
 the band from E\_min to E\_max (`--emin` and `--emax` options); the optical
 magnitudes in *U*, *B*, *V*, *R*, *I*, and *J* band ([Allen's Astrophysical
-Quantities, Cox 2015](http://www.springer.com/book/9780387951898)).
+Quantities, Cox 2015](http://www.springer.com/book/9780387951898)); the optical
+fluxes in wavelengths set by one or more `--lambda` options.
 
 Snapshot distributions at each time step, if produced, contain the following
 data: radial coordinate in terms of the specific angular momentum, radius,
@@ -232,8 +233,8 @@ Kerr's parameter is 0.4. The outer disk is irradiated with Cirr=1e-3.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ./freddi --alpha=0.5 --Mx=9 --rout=1 --time=50 --tau=0.25 --dir=data/ \
-  --F0=2e+37 --colourfactor=1.7 --Nx=1000 --distance=5 --gridscale=log --kerr=0.4 \
-  --Cirr=0.001 --opacity=OPAL --initialcond=quasistat
+  --F0=2e+37 --colourfactor=1.7 --Nx=1000 --distance=5 --gridscale=log \
+  --kerr=0.4 --Cirr=0.001 --opacity=OPAL --initialcond=quasistat
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Physical Background
