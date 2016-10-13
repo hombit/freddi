@@ -494,7 +494,7 @@ int main(int ac, char *av[]){
 				<< "\t" << mI
 				<< "\t" << mJ;
 		for ( auto &lambda : additional_lambdas ){
-			output_sum  << "\t" << I_lambda(R, Tph, lambda) * cosiOverD2;
+			output_sum  << "\t" << I_lambda(R, Tph, lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2;
 		}
 		output_sum      << endl;
 		
