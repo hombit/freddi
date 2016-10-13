@@ -153,7 +153,7 @@ int main(int ac, char *av[]){
 			( "emax", po::value<double>()->default_value(nu_max/keV), "Maximum energy of X-ray band, keV" )
 			( "inclination,i", po::value<double>(&inclination)->default_value(inclination), "Inclination of the system, degrees" )
 			( "distance", po::value<double>()->default_value(Distance/kpc), "Distance to the system, kpc" )
-			( "lambda", po::value< vector<double> >(&additional_lambdas)->multitoken(), "Wavelength to calculate Fnu, Angstrom. You can use this options multiple times, for each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is outputted. It is recommend to use wavelength corresponding to IR-optical-UV emission, for calculation of X-ray luminosity use --emin and --emax" )
+			( "lambda", po::value< vector<double> >(&additional_lambdas)->multitoken(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced" )
 		;
 		desc.add(emission);
 

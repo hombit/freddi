@@ -182,15 +182,10 @@ Parameters of optical magnitudes calculation:
   -i [ --inclination ] arg (=0)         Inclination of the system, degrees
   --distance arg (=10)                  Distance to the system, kpc
   --lambda arg                          Wavelength to calculate Fnu, Angstrom. 
-                                        You can use this options multiple 
-                                        times, for each lambda one additional 
-                                        column with values of spectral flux 
-                                        density Fnu [erg/s/cm^2/Hz] is 
-                                        outputted. It is recommend to use 
-                                        wavelength corresponding to 
-                                        IR-optical-UV emission, for calculation
-                                        of X-ray luminosity use --emin and 
-                                        --emax
+                                        You can use this option multiple times.
+                                        For each lambda one additional column 
+                                        with values of spectral flux density 
+                                        Fnu [erg/s/cm^2/Hz] is produced
 
 Parameters of disk evolution calculation:
   -T [ --time ] arg (=25)               Time interval to calculate evolution, 
