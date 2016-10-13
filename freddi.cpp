@@ -329,34 +329,35 @@ int main(int ac, char *av[]){
 		if ( auto v = boost::any_cast<uint32_t>(&value) ){
 			output_sum << "# "
 			           << it.first.c_str()
-			           << " = "
+			           << "="
 			           << *v
 					   << "\n";
 		} else if ( auto v = boost::any_cast<string>(&value) ){
 			output_sum << "# "
 			           << it.first.c_str()
-			           << " = "
+			           << "="
 			           << *v
 					   << "\n";
 		} else if ( auto v = boost::any_cast<double>(&value) ){
 			output_sum << "# "
 			           << it.first.c_str()
-			           << " = "
+			           << "="
 			           << *v
 					   << "\n";
 		} else if ( auto v = boost::any_cast<int>(&value) ){
 			output_sum << "# "
 			           << it.first.c_str()
-			           << " = "
+			           << "="
 			           << *v
 					   << "\n";
 		} else if ( auto v = boost::any_cast< vector<double> >(&value) ){
 			for ( int i = 0; i < v->size(); ++i ){
 				output_sum << "# "
 						   << it.first.c_str()
-						   << i
-						   << " = "
+						   << "="
 						   << v->at(i)
+						   << "  # "
+						   << i
 						   << "\n";
 				}
 		} else {
