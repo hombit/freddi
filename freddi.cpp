@@ -78,6 +78,7 @@ int main(int ac, char *av[]){
 	string initial_cond_shape = "powerF";
 	string opacity_type = "Kramers";
 	string irr_factor_type = "const";
+	vector<double> additional_lambdas;
 
 	const string config_filename = "freddi.ini";
 	const char* home = getenv("HOME");
@@ -152,6 +153,7 @@ int main(int ac, char *av[]){
 			( "emax", po::value<double>()->default_value(nu_max/keV), "Maximum energy of X-ray band, keV" )
 			( "inclination,i", po::value<double>(&inclination)->default_value(inclination), "Inclination of the system, degrees" )
 			( "distance", po::value<double>()->default_value(Distance/kpc), "Distance to the system, kpc" )
+			( "lambda", po::value< vector<double> >(&additional_lambdas)->multitoken(), "Wavelength to calculate Fnu, Angstrom. You can use this options multiple times, for each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is outputted. It is recommend to use wavelength corresponding to IR-optical-UV emission, for calculation of X-ray luminosity use --emin and --emax" )
 		;
 		desc.add(emission);
 
@@ -309,26 +311,58 @@ int main(int ac, char *av[]){
 	}
 
 	ofstream output_sum( output_dir + "/" + filename_prefix + ".dat" );
-	output_sum << "#t    Mdot Mdisk Rhot Cirrout H2R   Teffout Tirrout Qiir2Qvisout Lx    mU  mB  mV  mR  mI  mJ" << "\n";
-	output_sum << "#days g/s  g     Rsun float   float K       K       float        erg/s mag mag mag mag mag mag" << "\n";
+	output_sum << "#t    Mdot Mdisk Rhot Cirrout H2R   Teffout Tirrout Qiir2Qvisout Lx    mU  mB  mV  mR  mI  mJ ";
+	for ( int i = 0; i < additional_lambdas.size(); ++i ){
+		output_sum << " Fnu" << i;
+		for ( double j = 0; j < 9 - log10(additional_lambdas.size()); ++j ){
+			output_sum << " ";
+		}
+	}
+	output_sum << "\n";
+	output_sum << "#days g/s  g     Rsun float   float K       K       float        erg/s mag mag mag mag mag mag";
+	for ( int i = 0; i < additional_lambdas.size(); ++i ){
+		output_sum << " erg/s/cm^2/Hz";
+	}
+	output_sum << "\n";
 	for ( const auto &it : po_vm ){
-		output_sum << "# "
-			 << it.first.c_str()
-			 << " = ";
 		auto &value = it.second.value();
 		if ( auto v = boost::any_cast<uint32_t>(&value) ){
-			output_sum << *v;
+			output_sum << "# "
+			           << it.first.c_str()
+			           << " = "
+			           << *v
+					   << "\n";
 		} else if ( auto v = boost::any_cast<string>(&value) ){
-			output_sum << *v;
+			output_sum << "# "
+			           << it.first.c_str()
+			           << " = "
+			           << *v
+					   << "\n";
 		} else if ( auto v = boost::any_cast<double>(&value) ){
-			output_sum << *v;
+			output_sum << "# "
+			           << it.first.c_str()
+			           << " = "
+			           << *v
+					   << "\n";
 		} else if ( auto v = boost::any_cast<int>(&value) ){
-			output_sum << *v;
+			output_sum << "# "
+			           << it.first.c_str()
+			           << " = "
+			           << *v
+					   << "\n";
+		} else if ( auto v = boost::any_cast< vector<double> >(&value) ){
+			for ( int i = 0; i < v->size(); ++i ){
+				output_sum << "# "
+						   << it.first.c_str()
+						   << i
+						   << " = "
+						   << v->at(i)
+						   << "\n";
+				}
 		} else {
-			output_sum << "error";
+			output_sum << "error\n";
 			// throw po::invalid_option_value(it.first.c_str());
 		}
-		output_sum << "\n";
 	}
 	output_sum << flush;
 
@@ -458,9 +492,12 @@ int main(int ac, char *av[]){
 				<< "\t" << mV
 				<< "\t" << mR
 				<< "\t" << mI
-				<< "\t" << mJ
-				<< endl;
-
+				<< "\t" << mJ;
+		for ( auto &lambda : additional_lambdas ){
+			output_sum  << "\t" << I_lambda(R, Tph, lambda) * cosiOverD2;
+		}
+		output_sum      << endl;
+		
 	}
 
 	delete oprel;
