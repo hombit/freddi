@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <boost/any.hpp>
 #include <boost/program_options.hpp>
 #include <cmath>
@@ -205,6 +206,7 @@ int main(int ac, char *av[]){
 		if ( C_irr_input <= 0. and bound_cond_type == "Tirr" ){
 			throw po::error("It is obvious to use nonpositive --Cirr with --boundcond=Tirr");
 		}
+		transform(additional_lambdas.begin(), additional_lambdas.end(), additional_lambdas.begin(), bind1st(multiplies<double>(), Angstrem));
 	}
 
 	const double GM = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx;
@@ -315,7 +317,7 @@ int main(int ac, char *av[]){
 	output_sum << "#t    Mdot Mdisk Rhot Cirrout H2R   Teffout Tirrout Qiir2Qvisout Lx    mU  mB  mV  mR  mI  mJ ";
 	for ( int i = 0; i < additional_lambdas.size(); ++i ){
 		output_sum << " Fnu" << i;
-		for ( double j = 0; j < 9 - log10(additional_lambdas.size()); ++j ){
+		for ( double j = 0; j < 9 - log10(i+0.1); ++j ){
 			output_sum << " ";
 		}
 	}
@@ -496,7 +498,8 @@ int main(int ac, char *av[]){
 				<< "\t" << mI
 				<< "\t" << mJ;
 		for ( auto &lambda : additional_lambdas ){
-			output_sum  << "\t" << I_lambda(R, Tph, lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2;
+			output_sum
+			    << "\t" << I_lambda(R, Tph, lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2;
 		}
 		output_sum      << endl;
 		
