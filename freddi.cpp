@@ -48,13 +48,13 @@ int main(int ac, char *av[]){
 	double alpha = 0.25;
 	double fc = 1.7;
 	double kerr = 0.;
-	double Mx = 10. * GSL_CONST_CGSM_SOLAR_MASS;
-	double Mopt = 1. * GSL_CONST_CGSM_SOLAR_MASS;
-	double P = 1. * DAY;
+	double Mx = 5. * GSL_CONST_CGSM_SOLAR_MASS;
+	double Mopt = 0.5 * GSL_CONST_CGSM_SOLAR_MASS;
+	double P = 0.25 * DAY;
 	double inclination = 0.;  // degrees
 	double Distance = 10. * kpc;
 	double r_in = 0.;
-	double r_out = r_out_func( Mx, Mopt, P );
+	double r_out;
 	double T_min_hot_disk = 0.;
 //	double k_irr = 0.05; //0.05; // (dlog H / dlog r - 1)
 	double C_irr_input = 0.; // 1e-4;
@@ -63,11 +63,11 @@ int main(int ac, char *av[]){
 	double nu_max = 12. * keV;
 	int Nx = 1000;
 	string grid_scale = "log";
-	double Time = 25. * DAY;
+	double Time = 50. * DAY;
 	double tau = 0.25 * DAY;
 	double eps = 1e-6;
 	string bound_cond_type = "Teff";
-	double F0_gauss = 1e36;
+	double F0_gauss = 2e38;
 	double sigma_for_F_gauss = 5.;
 	double r_gauss_cut_to_r_out = 0.01;
 	double power_order = 6.;
@@ -110,7 +110,7 @@ int main(int ac, char *av[]){
 			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the Schwarzschild radius of the central object 2GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
 			( "Mopt",	po::value<double>()->default_value(Mopt/GSL_CONST_CGSM_SOLAR_MASS), "Mass of the optical star, in units of solar masses" )
 			( "period,P", po::value<double>()->default_value(P/DAY), "Orbital period of the binary system, in units of days" )
-			( "rout,R", po::value<double>()->default_value(r_out/solar_radius), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used defined by --Mx, --Mopt and --period values" )
+			( "rout,R", po::value<double>(), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used defined by --Mx, --Mopt and --period values" )
 		;
 		desc.add(binary);
 
@@ -191,10 +191,11 @@ int main(int ac, char *av[]){
 		nu_max = po_vm["emax"].as<double>() * keV;
 		tau = po_vm["tau"].as<double>() * DAY;
 		Time = po_vm["time"].as<double>() * DAY;
-		if ( not po_vm["rout"].defaulted() ){
+		if ( po_vm.count("rout") ){
 			r_out = po_vm["rout"].as<double>() * solar_radius;
 		} else{
 			r_out = r_out_func( Mx, Mopt, P );
+			cout << "--rout isn't specified, using tidal radius " << r_out/solar_radius << " solar radii" << endl;
 		}
 		if ( po_vm.count("rin") ){
 			r_in = po_vm["rin"].as<double>() * 3. * 2. * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
