@@ -200,7 +200,7 @@ Parameters of disk evolution calculation:
 Also you can use `freddi.ini` configuration file to store options. This [INI
 file](https://en.wikipedia.org/wiki/INI_file) contains lines `option=value`,
 option names are the as provided by the help message above. Command line option
-overwrites configuration file option. For example [see
+overwrites configuration file option. For example, [see
 default](https://github.com/hombit/freddi/blob/master/freddi.ini) `freddi.ini`.
 
 Paths where this file is searched are `./freddi.ini` (execution path),
@@ -216,8 +216,7 @@ half-height, effective and irradiation temperature, ratio of the irradiation to
 viscous flux at the outer radius of the hot zone; X-ray luminosity (erg/s) in
 the band from E\_min to E\_max (`--emin` and `--emax` options); the optical
 magnitudes in *U*, *B*, *V*, *R*, *I*, and *J* band ([Allen's Astrophysical
-Quantities, Cox 2015](http://www.springer.com/book/9780387951898)); the optical
-fluxes in wavelengths set by one or more `--lambda` options.
+Quantities, Cox 2015](http://www.springer.com/book/9780387951898)); the spectral density flux (erg/s/cm^2/Hz) at some wavelengths set by one or more `--lambda` options.
 
 Snapshot distributions at each time step, if produced, contain the following
 data: radial coordinate in terms of the specific angular momentum, radius,
