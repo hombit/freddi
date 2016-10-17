@@ -83,7 +83,7 @@ int main(int ac, char *av[]){
 
 	const string config_filename = "freddi.ini";
 	const char* home = getenv("HOME");
-	const string path_config_file[] = {".", home, INSTALLPATHPREFIX"/etc", "/etc"};
+	const array<const string, 4> path_config_file = {".", home, INSTALLPATHPREFIX"/etc", "/etc"};
 
 	double Mdot_in = 0.;
 	double Mdot_in_prev;
