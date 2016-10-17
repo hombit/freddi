@@ -2,18 +2,17 @@ FROM ubuntu
 
 MAINTAINER Konstantin Malanchev <malanchev@sai.msu.ru>
 
-ENV COMPILETIME_PACKAGES "g++ make git"
-ENV RUNTIME_PACKAGES "libboost-program-options-dev"
+ENV PACKAGES "g++ make git libboost-program-options-dev"
 ENV SOURCE "/tmp/freddi"
 
 RUN apt-get update &&\
-    apt-get install -y ${COMPILETIME_PACKAGES} ${RUNTIME_PACKAGES} &&\
+    apt-get install -y ${PACKAGES} &&\
     git clone https://github.com/hombit/freddi.git ${SOURCE} &&\
     cd ${SOURCE} &&\
     mkdir -p /usr/local/bin &&\
-    make install &&\
+    make install LDLIBS=-static &&\
     rm -r ${SOURCE} &&\
-    apt-get remove -y ${COMPILETIME_PACKAGES} &&\
+    apt-get remove -y ${PACKAGES} &&\
     apt-get autoremove -y
 
 VOLUME /data
