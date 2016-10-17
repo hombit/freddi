@@ -1,9 +1,9 @@
 CC = g++
 CPP = g++
 prefix=/usr/local
-CPPFLAGS += -std=c++11 -D INSTALLPATHPREFIX='"$(prefix)"'
+override CPPFLAGS += -std=c++11 -D INSTALLPATHPREFIX='"$(prefix)"'
 
-LDLIBS += -lboost_program_options
+override LDLIBS += -lboost_program_options
 
 OBJ = nonlinear_diffusion.o opacity_related.o orbit.o spectrum.o
 
