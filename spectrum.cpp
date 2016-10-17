@@ -27,10 +27,10 @@ double Luminosity( const std::vector<double> &R, const std::vector<double> &T, d
 
 
 
-double I_lambda( const std::vector<double> &R, const std::vector<double> &T, double lambda ){
+double I_lambda( const std::vector<double> &R, const std::vector<double> &T, const double lambda ){
 	double I = 0;
-	int NR = fmin(R.size(), T.size());
-	for ( int i_R = 1; i_R < NR; ++i_R ){
+	const int NR = fmin(R.size(), T.size());
+	for ( int i_R = 0; i_R < NR; ++i_R ){
 		double stepR;
 		if ( i_R == 0              ) stepR = R.at(i_R+1) - R.at(i_R  );
 		if ( i_R == NR-1           ) stepR = R.at(i_R  ) - R.at(i_R-1);
