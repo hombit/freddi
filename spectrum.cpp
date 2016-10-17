@@ -9,9 +9,14 @@ double Luminosity( const std::vector<double> &R, const std::vector<double> &T, d
 		double Inu = 0;
 		for ( int i_R = 0; i_R < NR; ++i_R ){
 			double stepR;
-			if ( i_R == 0               ) stepR = R.at(i_R+1) - R.at(i_R  );
-			if ( i_R == NR-1            ) stepR = R.at(i_R  ) - R.at(i_R-1);
-			if ( i_R > 1 and i_R < NR-1 ) stepR = R.at(i_R+1) - R.at(i_R-1);
+			if ( i_R == 0               ){
+				stepR = R.at(i_R+1) - R.at(i_R  );
+			} else
+			if ( i_R == NR-1            ){
+				stepR = R.at(i_R  ) - R.at(i_R-1);
+			} else{
+				stepR = R.at(i_R+1) - R.at(i_R-1);
+			}
 			const double Bnu = 2. * GSL_CONST_CGSM_PLANCKS_CONSTANT_H * nu * nu * nu / GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_SPEED_OF_LIGHT / ( exp( nu*GSL_CONST_CGSM_PLANCKS_CONSTANT_H / GSL_CONST_CGSM_BOLTZMANN / T.at(i_R) ) - 1. );
 			Inu += .5 * Bnu * 2. * M_PI * R.at(i_R) * stepR;
 		}
@@ -32,9 +37,14 @@ double I_lambda( const std::vector<double> &R, const std::vector<double> &T, con
 	const int NR = fmin(R.size(), T.size());
 	for ( int i_R = 0; i_R < NR; ++i_R ){
 		double stepR;
-		if ( i_R == 0              ) stepR = R.at(i_R+1) - R.at(i_R  );
-		if ( i_R == NR-1           ) stepR = R.at(i_R  ) - R.at(i_R-1);
-		if ( i_R > 1 and i_R < NR-1 ) stepR = R.at(i_R+1) - R.at(i_R-1);
+		if ( i_R == 0               ){
+			stepR = R.at(i_R+1) - R.at(i_R  );
+		} else
+		if ( i_R == NR-1            ){
+			stepR = R.at(i_R  ) - R.at(i_R-1);
+		} else{
+			stepR = R.at(i_R+1) - R.at(i_R-1);
+		}
 		const double B_lambda =  2. * GSL_CONST_CGSM_PLANCKS_CONSTANT_H * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / pow(lambda,5.) / ( exp( GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_PLANCKS_CONSTANT_H / lambda / GSL_CONST_CGSM_BOLTZMANN / T.at(i_R) ) - 1. );
 		I += .5 * B_lambda * 2. * M_PI * R.at(i_R) * stepR;
 	}
