@@ -12,8 +12,8 @@ RUN apt-get update &&\
     mkdir -p /usr/local/bin &&\
     make install LDLIBS=-static &&\
     rm -r ${SOURCE} &&\
-    apt-get remove -y ${PACKAGES} &&\
-    apt-get autoremove -y
+    apt-get purge -y ${PACKAGES} &&\
+    apt-get autoremove --purge -y
 
 VOLUME /data
 WORKDIR /
