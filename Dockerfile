@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:16.04
 
 MAINTAINER Konstantin Malanchev <malanchev@sai.msu.ru>
 
