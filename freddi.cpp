@@ -71,6 +71,8 @@ int main(int ac, char *av[]){
 	double F0_gauss = 2e38;
 	double sigma_for_F_gauss = 5.;
 	double r_gauss_cut_to_r_out = 0.01;
+	double gauss_sigma = 0.2;
+	double gauss_mu = 1.;
 	double power_order = 6.;
 	double kMdot_out = 2.;
 	string filename_prefix = "freddi";
@@ -130,9 +132,12 @@ int main(int ac, char *av[]){
 				"  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power option does the same
 				"  powerSigma: Sigma ~ xi^powerorder, powerorder is specified by --powerorder option\n"
 				"  sinusF: F ~ sin( xi * pi/2 )\n" // sinus option does the same
+				"  gaussF: F ~ exp(-(xi-mu)**2 / 2 sigma**2), mu and sigma are specified by --gaussmu and --gausssigma options\n"
 				"  quasistat: F ~ f(h/h_out) * xi * h_out/h, where f is quasi-stationary solution found in Lipunova & Shakura 2000. f(xi=0) = 0, df/dxi(xi=1) = 0\n\n"
 				"Here xi is (h - h_in) / (h_out - h_in)\n") // sinusparabola, sinusgauss
 			( "powerorder", po::value<double>(&power_order)->default_value(power_order), "Parameter for the powerlaw initial condition distribution. This option works only with --initialcond=powerF or powerSigma" )
+			( "gaussmu", po::value<double>(&gauss_mu)->default_value(gauss_mu), "Position of the maximum for Gauss distribution. This option works only with --initialcond=gaussF" )
+			( "gausssigma", po::value<double>(&gauss_sigma)->default_value(gauss_sigma), "Width of for Gauss distribution. This option works only with --initialcond=gaussF" )
 		;
 		desc.add(internal);
 
@@ -308,6 +313,15 @@ int main(int ac, char *av[]){
 		for ( int i = 0; i < Nx; ++i ){
 			const double xi_LS2000 = h.at(i) / h_out;
 			F.at(i) = F0_gauss * oprel->f_F(xi_LS2000) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
+		}
+	} else if( initial_cond_shape == "gaussF" ){
+		if ( Mdot_in > 0. ){
+			F0_gauss = Mdot_in * (h_out - h_in) * gauss_sigma*gauss_sigma / gauss_mu * exp( gauss_mu*gauss_mu / (2. * gauss_sigma*gauss_sigma) );
+		}
+		for ( int i = 0; i < Nx; ++i ){
+			const double xi = (h.at(i) - h_in) / (h_out - h_in);
+			F.at(i) = F0_gauss * exp( -(xi - gauss_mu)*(xi - gauss_mu) / (2. * gauss_sigma*gauss_sigma) );
+//			F.at(i) -= F.at(0);
 		}
 	} else{
 		throw po::invalid_option_value(initial_cond_shape);
