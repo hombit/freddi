@@ -370,7 +370,8 @@ int main(int ac, char *av[]){
 	}
 	output_sum << flush;
 
-	for( double t = 0.; t <= Time; t += tau ){
+	for( int i_t = 0; i_t < Time/tau; ++i_t ){
+		const double t = i_t * tau;
 		// cout << t/DAY << endl;
 
 		vector<double> W(Nx, 0.), Tph(Nx, 0.), Tph_vis(Nx, 0.), Tph_X(Nx, 0.), Tirr(Nx,0.), Sigma(Nx, 0.), Height(Nx, 0.);
@@ -463,7 +464,7 @@ int main(int ac, char *av[]){
 
 		if (output_fulldata){
 			ostringstream filename;
-			filename << output_dir << "/" << filename_prefix << "_" << static_cast<int>(t/tau) << ".dat";
+			filename << output_dir << "/" << filename_prefix << "_" << i_t << ".dat";
 			ofstream output( filename.str() );
 			output << "#h      R  F      Sigma  Teff Tvis Tirr Height" << "\n";
 			output << "#cm^2/s cm dyn*cm g/cm^2 K    K    K    cm" << "\n";
