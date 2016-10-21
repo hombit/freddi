@@ -68,7 +68,7 @@ int main(int ac, char *av[]){
 	double tau = 0.25 * DAY;
 	double eps = 1e-6;
 	string bound_cond_type = "Teff";
-	double F0_gauss = 2e38;
+	double F0 = 2e38;
 	double sigma_for_F_gauss = 5.;
 	double r_gauss_cut_to_r_out = 0.01;
 	double power_order = 6.;
@@ -123,7 +123,7 @@ int main(int ac, char *av[]){
 				"  Teff: outer radius of the disk moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"
 				"  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
 			( "Thot", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description" )
-			( "F0", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque at the outer boundary of the disk, dyn*cm" )
+			( "F0", po::value<double>(&F0)->default_value(F0), "Initial viscous torque at the outer boundary of the disk, dyn*cm" )
 			( "Mdot0", po::value<double>(&Mdot_in)->default_value(Mdot_in), "Initial mass accretion rate through the inner radius, g/s. If both --F0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to sinusF or quasistat" )
 			( "initialcond", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 				"Values:\n"
@@ -255,11 +255,11 @@ int main(int ac, char *av[]){
 
 	vector<double> F(Nx);
 	if ( initial_cond_shape == "sinusgauss" ){
-		const double F0_sinus = 1e-6 * F0_gauss;
+		const double F0_sinus = 1e-6 * F0;
 		const double h_cut_for_F_gauss = h_out / sqrt(r_gauss_cut_to_r_out);
-		const double F_gauss_cut = F0_gauss * exp( - (h_cut_for_F_gauss-h_out)*(h_cut_for_F_gauss-h_out) / (2. * h_out*h_out/(sigma_for_F_gauss*sigma_for_F_gauss)) );
+		const double F_gauss_cut = F0 * exp( - (h_cut_for_F_gauss-h_out)*(h_cut_for_F_gauss-h_out) / (2. * h_out*h_out/(sigma_for_F_gauss*sigma_for_F_gauss)) );
 		for ( int i = 0; i < Nx; ++i ){
-			double F_gauss = F0_gauss * exp( - (h.at(i)-h_out)*(h.at(i)-h_out) / (2. * h_out*h_out/(sigma_for_F_gauss*sigma_for_F_gauss)) ) - F_gauss_cut;
+			double F_gauss = F0 * exp( - (h.at(i)-h_out)*(h.at(i)-h_out) / (2. * h_out*h_out/(sigma_for_F_gauss*sigma_for_F_gauss)) ) - F_gauss_cut;
 			F_gauss = F_gauss >= 0 ? F_gauss : 0.;
 			const double F_sinus =  F0_sinus * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI / 2. );
 			F.at(i) = F_gauss + F_sinus;
@@ -269,7 +269,7 @@ int main(int ac, char *av[]){
 			throw po::invalid_option_value("It is obvious to use --Mdot with --initialcond=powerF");
 		}
 		for ( int i = 0; i < Nx; ++i ){
-			F.at(i) = F0_gauss * pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
+			F.at(i) = F0 * pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
 		}
 	} else if ( initial_cond_shape == "powerSigma" ){
 		if ( Mdot_in != 0. ){
@@ -277,37 +277,37 @@ int main(int ac, char *av[]){
 		}
 		for ( int i = 0; i < Nx; ++i ){
 			const double Sigma_to_Sigmaout = pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
-			F.at(i) = F0_gauss * pow( h.at(i) / h_out, (3. - oprel->n) / (1. - oprel->m) ) * pow( Sigma_to_Sigmaout, 1. / (1. - oprel->m) );
+			F.at(i) = F0 * pow( h.at(i) / h_out, (3. - oprel->n) / (1. - oprel->m) ) * pow( Sigma_to_Sigmaout, 1. / (1. - oprel->m) );
 		}
 	} else if ( initial_cond_shape == "sinus" or initial_cond_shape == "sinusF" ){
 		if ( Mdot_in > 0. ){
-			F0_gauss = Mdot_in * (h_out - h_in) * 2./M_PI;
+			F0 = Mdot_in * (h_out - h_in) * 2./M_PI;
 		}
 		for ( int i = 0; i < Nx; ++i ){
-			F.at(i) = F0_gauss * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI / 2. );
+			F.at(i) = F0 * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI / 2. );
 		}
 	} else if ( initial_cond_shape == "sinusparabola" ){
 		const double h_F0 = h_out * 0.9;
 		const double delta_h = h_out - h_F0;
 
-		F0_gauss = 1.24e13 * pow(Sigma_hot_disk(R.at(Nx-1)), 10./7.) * pow(h.at(Nx-1), 22./7.) * pow(GM, -10./7.) * pow(alpha, 8./7.);
+		F0 = 1.24e13 * pow(Sigma_hot_disk(R.at(Nx-1)), 10./7.) * pow(h.at(Nx-1), 22./7.) * pow(GM, -10./7.) * pow(alpha, 8./7.);
 
-		Mdot_out = -kMdot_out * F0_gauss / (h_F0 - h_in) * M_PI*M_PI;
+		Mdot_out = -kMdot_out * F0 / (h_F0 - h_in) * M_PI*M_PI;
 
 		for ( int i = 0; i < Nx; ++i ){
 			if ( h.at(i) < h_F0 ){
-				F.at(i) = F0_gauss * sin( (h.at(i) - h_in) / (h_F0 - h_in) * M_PI / 2. );
+				F.at(i) = F0 * sin( (h.at(i) - h_in) / (h_F0 - h_in) * M_PI / 2. );
 			} else{
-				F.at(i) = F0_gauss * ( 1. - kMdot_out / (h_F0-h_in) / delta_h * M_PI / 4. * (h.at(i) - h_F0)*(h.at(i) - h_F0) );
+				F.at(i) = F0 * ( 1. - kMdot_out / (h_F0-h_in) / delta_h * M_PI / 4. * (h.at(i) - h_F0)*(h.at(i) - h_F0) );
 			}
 		}
 	} else if( initial_cond_shape == "quasistat" ){
 		if ( Mdot_in > 0. ){
-			F0_gauss = Mdot_in * (h_out - h_in) / h_out * h_in / oprel->f_F(h_in/h_out);
+			F0 = Mdot_in * (h_out - h_in) / h_out * h_in / oprel->f_F(h_in/h_out);
 		}
 		for ( int i = 0; i < Nx; ++i ){
 			const double xi_LS2000 = h.at(i) / h_out;
-			F.at(i) = F0_gauss * oprel->f_F(xi_LS2000) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
+			F.at(i) = F0 * oprel->f_F(xi_LS2000) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
 		}
 	} else{
 		throw po::invalid_option_value(initial_cond_shape);
