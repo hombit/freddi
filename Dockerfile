@@ -13,7 +13,10 @@ RUN apt-get update &&\
     make install LDLIBS=-static &&\
     rm -r ${SOURCE} &&\
     apt-get purge -y ${PACKAGES} &&\
-    apt-get autoremove --purge -y
+    apt-get autoremove --purge -y &&\
+    apt-get clean -y &&\
+    rm -rf /var/lib/apt/lists/* &&\
+    truncate -s 0 /var/log/*log
 
 VOLUME /data
 WORKDIR /
