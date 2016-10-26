@@ -1,6 +1,21 @@
 `Freddi` — compute FRED-like light curves of LMXB
 =================================================
 
+Table of contents
+-----------------
+
+* [Overview](#overview)
+* [Installation](#installation)
+  * [Docker](#docker)
+  * [Requirements](#requirements)
+  * [Get and compile source files](#get-and-compile-source-files)
+* [Usage](#usage)
+  * [Options](#options)
+  * [Output values](#output-values)
+  * [Example](#example)
+* [Questions and comments](#questions-and-comments)
+* [License](#license)
+
 Overview
 --------
 
@@ -17,7 +32,7 @@ Installation
 ### Docker
 
 If you are familiar with [Docker](http://docker.com) then you can skip all
-further installation instructions and go straight to the Usage section, using
+further installation instructions and go straight to the [Usage section](#usage), using
 following string instead of `./freddi`.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
