@@ -2,7 +2,7 @@ FROM ubuntu:16.04
 
 MAINTAINER Konstantin Malanchev <malanchev@sai.msu.ru>
 
-ENV PACKAGES "g++ make git libboost-program-options-dev"
+ENV PACKAGES "g++ make git libboost-all-dev"
 ENV SOURCE "/tmp/freddi"
 
 RUN apt-get update &&\
