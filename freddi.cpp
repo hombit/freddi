@@ -272,19 +272,17 @@ int main(int ac, char *av[]){
 			throw po::invalid_option_value("It is obvious to use --Mdot with --initialcond=powerF");
 		}
 		if ( Mdisk > 0. ){
-			odeint::runge_kutta4<double> stepper;
+			odeint::runge_kutta_cash_karp54<double> stepper;
 			const double a = (1. - oprel->m) * power_order;
 			const double b = oprel->n;
 			const double x0 = h_in / (h_out - h_in);
 			double integral = 0.;
-			integrate_const(
+			integrate_adaptive(
 				stepper,
 				[a,b,x0]( const double &y, double &dydx, double x ){
 					dydx = pow(x, a) * pow(x + x0, b);
 				},
-				integral,
-				0., 1.,
-				eps
+				integral, 0., 1., 0.01
 			);
 			F0 = pow( Mdisk * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m) );
 		}
@@ -294,6 +292,21 @@ int main(int ac, char *av[]){
 	} else if ( initial_cond_shape == "powerSigma" ){
 		if ( Mdot_in != 0. ){
 			throw po::invalid_option_value("It is obvious to use --Mdot with --initialcond=powerSigma");
+		}
+		if ( Mdisk > 0. ){
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = power_order;
+			const double b = 3.;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+				stepper,
+				[a,b,x0]( const double &y, double &dydx, double x ){
+					dydx = pow(x, a) * pow(x + x0, b);
+				},
+				integral, 0., 1., 0.01
+			);
+			F0 = pow( Mdisk * (1. - oprel->m) * oprel->D * pow(h_out, 3. - oprel->n) / pow(h_out - h_in, 4.) / integral, 1. / (1. - oprel->m) );
 		}
 		for ( int i = 0; i < Nx; ++i ){
 			const double Sigma_to_Sigmaout = pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
