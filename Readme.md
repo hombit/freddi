@@ -41,11 +41,11 @@ docker run -v "`pwd`":/data --rm -ti hombit/freddi
 
 ### Requirements
 
--   [Boost.Program\_options](http://www.boost.org/doc/libs/release/doc/html/program_options.html)
+-   [Boost](http://www.boost.org/)
 
 -   C++ compiler with C++11 support, e.g. `gcc` version 4.8+ or `clang` 3.4+
 
-`Freddi` was tested on Linux and macOS but it should work on Windows as well.
+`Freddi` was tested on Linux and macOS.
 
 ### Get and compile source files
 
