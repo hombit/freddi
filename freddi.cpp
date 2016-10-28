@@ -125,9 +125,9 @@ int main(int ac, char *av[]){
 				"  Teff: outer radius of the disk moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"
 				"  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
 			( "Thot", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description" )
-			( "F0", po::value<double>(&F0)->default_value(F0), "Initial viscous torque at the outer boundary of the disk, dyn*cm" )
-			( "Mdot0", po::value<double>(&Mdot_in), "Initial mass accretion rate through the inner radius, g/s. If both --F0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to sinusF or quasistat" )
-			( "Mdisk0", po::value<double>(&Mdisk), "Initial disk mass, g" )
+			( "F0", po::value<double>(&F0)->default_value(F0), "Initial viscous torque at the outer boundary of the disk, dyn*cm. Can be overwritten via --Mdisk0 and --Mdot0" )
+			( "Mdisk0", po::value<double>(&Mdisk), "Initial disk mass, g. If both --F0 and --Mdisk0 are specified then --Mdisk0 is used. If both --Mdot0 and --Mdisk0 are specified then --Mdot0 is used" )
+			( "Mdot0", po::value<double>(&Mdot_in), "Initial mass accretion rate through the inner radius, g/s. If --F0, --Mdisk0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to sinusF or quasistat" )
 			( "initialcond", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 				"Values:\n"
 				"  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power option does the same
