@@ -315,9 +315,23 @@ int main(int ac, char *av[]){
 	} else if ( initial_cond_shape == "sinus" or initial_cond_shape == "sinusF" ){
 		if ( Mdot_in > 0. ){
 			F0 = Mdot_in * (h_out - h_in) * 2./M_PI;
+		} else if ( Mdisk > 0. ){
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = 1. - oprel->m;
+			const double b = oprel->n;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+				stepper,
+				[a,b,x0]( const double &y, double &dydx, double x ){
+					dydx = pow(sin(x * M_PI_2), a) * pow(x + x0, b);
+				},
+				integral, 0., 1., 0.01
+			);
+			F0 = pow( Mdisk * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m) );
 		}
 		for ( int i = 0; i < Nx; ++i ){
-			F.at(i) = F0 * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI / 2. );
+			F.at(i) = F0 * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI_2 );
 		}
 	} else if ( initial_cond_shape == "sinusparabola" ){
 		const double h_F0 = h_out * 0.9;
@@ -337,6 +351,19 @@ int main(int ac, char *av[]){
 	} else if( initial_cond_shape == "quasistat" ){
 		if ( Mdot_in > 0. ){
 			F0 = Mdot_in * (h_out - h_in) / h_out * h_in / oprel->f_F(h_in/h_out);
+		} else if ( Mdisk > 0. ){
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double x0 = h_in / (h_out - h_in);
+			const double x1 = h_in / h_out;
+			double integral = 0.;
+			integrate_adaptive(
+				stepper,
+				[x0,x1,oprel]( const double &y, double &dydx, double x ){
+					dydx = pow(oprel->f_F(x * (1. - x1) + x1) * x / (x * (1. - x1) + x1), 1. - oprel->m) * pow(x + x0, oprel->n);
+				},
+				integral, 0., 1., 0.01
+			);
+			F0 = pow( Mdisk * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m) );
 		}
 		for ( int i = 0; i < Nx; ++i ){
 			const double xi_LS2000 = h.at(i) / h_out;
