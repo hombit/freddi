@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <boost/any.hpp>
+#include <boost/numeric/odeint.hpp>
 #include <boost/program_options.hpp>
 #include <cmath>
 #include <fstream>
@@ -16,6 +17,7 @@
 
 
 namespace po = boost::program_options;
+namespace odeint = boost::numeric::odeint;
 using namespace std;
 using namespace std::placeholders;
 
@@ -125,6 +127,7 @@ int main(int ac, char *av[]){
 			( "Thot", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description" )
 			( "F0", po::value<double>(&F0)->default_value(F0), "Initial viscous torque at the outer boundary of the disk, dyn*cm" )
 			( "Mdot0", po::value<double>(&Mdot_in), "Initial mass accretion rate through the inner radius, g/s. If both --F0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to sinusF or quasistat" )
+			( "Mdisk0", po::value<double>(&Mdisk), "Initial disk mass, g" )
 			( "initialcond", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 				"Values:\n"
 				"  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power option does the same
@@ -267,6 +270,23 @@ int main(int ac, char *av[]){
 	} else if ( initial_cond_shape == "power" or initial_cond_shape == "powerF" ){
 		if ( Mdot_in != 0. ){
 			throw po::invalid_option_value("It is obvious to use --Mdot with --initialcond=powerF");
+		}
+		if ( Mdisk > 0. ){
+			odeint::runge_kutta4<double> stepper;
+			const double a = (1. - oprel->m) * power_order;
+			const double b = oprel->n;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_const(
+				stepper,
+				[a,b,x0]( const double &y, double &dydx, double x ){
+					dydx = pow(x, a) * pow(x + x0, b);
+				},
+				integral,
+				0., 1.,
+				eps
+			);
+			F0 = pow( Mdisk * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m) );
 		}
 		for ( int i = 0; i < Nx; ++i ){
 			F.at(i) = F0 * pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
