@@ -50,7 +50,7 @@ void nonlenear_diffusion_nonuniform_1_2 (const double tau,
 		K_1.at(i) = frac.at(i) * W.at(i) / y.at(i);
 		CC.at(i) = K_0.at(i) = K_1.at(i) * (1. + 2.*eps);
     }
-	auto iteration = [&](vecd &K) -> void{ // [&] <-> [&wunc, &x, &y, &frac, &a, &b, &f, N, left_bounder_cond, right_bounder_cond]
+	auto iteration = [&](vecd &K) -> void{ 
 		vecd alpha(N), beta(N);
 		alpha.at(1) = 0.;
 		beta.at(1) = left_bounder_cond;
@@ -59,7 +59,6 @@ void nonlenear_diffusion_nonuniform_1_2 (const double tau,
 			alpha.at(i+1) = b.at(i) / ( c - alpha.at(i) * a.at(i) );
 			beta.at(i+1) = ( beta.at(i) * a.at(i) + f.at(i) ) / ( c - alpha.at(i) * a.at(i) );
 		}
-		// y.at(N-1) = ( (x.at(N-1) - x.at(N-2) ) * right_bounder_cond + beta.at(N-1) ) / ( 1. - alpha.at(N-1) );
 		y.at(N-1) = ( (x.at(N-1) - x.at(N-2) ) * right_bounder_cond + f.at(N-1) + beta.at(N-1) ) / ( 1. + K.at(N-1) - alpha.at(N-1) );
 		for ( int i = N-2; i > 0; --i )
 			y.at(i) = alpha.at(i+1) * y.at(i+1) + beta.at(i+1);
@@ -71,20 +70,23 @@ void nonlenear_diffusion_nonuniform_1_2 (const double tau,
 
 	bool flag = false;	int j = 0;	double delta;	vecd D_1(N), D_2(N);
 	while( max_dif_rel(K_1, K_0, 1, N-2) > eps ){
-		if ( max_dif_rel(K_1, CC, 1, N-2) > 0. and flag == false ){
-			K_0 = K_1;
-			iteration(K_1);
+		K_0 = K_1;
 
-			j++;
-			if ( j % 2 == 0 )
-				CC = K_0;
-			if ( j % 4 == 1 )
-				delta = max_dif_rel (K_1, K_0, 1, N-2);
-			if ( j % 4 == 3 and max_dif_rel (K_1, K_0, 1, N-2) >= delta ){
-				flag = true;
-			}
-		} else{
-			throw std::runtime_error("Divergence in nonlinear_diffusion");
+		vecd alpha(N), beta(N);
+		alpha.at(1) = 0.;
+		beta.at(1) = left_bounder_cond;
+		for ( int i = 1; i < N-1; ++i ){
+			double c = 2. + K_1.at(i);
+			alpha.at(i+1) = b.at(i) / ( c - alpha.at(i) * a.at(i) );
+			beta.at(i+1) = ( beta.at(i) * a.at(i) + f.at(i) ) / ( c - alpha.at(i) * a.at(i) );
+		}
+		y.at(N-1) = ( (x.at(N-1) - x.at(N-2) ) * right_bounder_cond + f.at(N-1) + beta.at(N-1) ) / ( 1. + K_1.at(N-1) - alpha.at(N-1) );
+		for ( int i = N-2; i > 0; --i )
+			y.at(i) = alpha.at(i+1) * y.at(i+1) + beta.at(i+1);
+		y.at(0) = left_bounder_cond;
+		auto WW = wunc(x, y, 1, N-1);
+		for ( int i = 1; i < N-1; ++i ){
+			K_1.at(i) = frac.at(i) * WW.at(i) / y.at(i);
 		}
 	}
 }
