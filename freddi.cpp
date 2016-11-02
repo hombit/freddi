@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <boost/any.hpp>
+#include <boost/numeric/odeint.hpp>
 #include <boost/program_options.hpp>
 #include <cmath>
 #include <fstream>
@@ -16,6 +17,7 @@
 
 
 namespace po = boost::program_options;
+namespace odeint = boost::numeric::odeint;
 using namespace std;
 using namespace std::placeholders;
 
@@ -68,7 +70,7 @@ int main(int ac, char *av[]){
 	double tau = 0.25 * DAY;
 	double eps = 1e-6;
 	string bound_cond_type = "Teff";
-	double F0_gauss = 2e38;
+	double F0 = 2e38;
 	double sigma_for_F_gauss = 5.;
 	double r_gauss_cut_to_r_out = 0.01;
 	double gauss_sigma = 0.2;
@@ -125,8 +127,9 @@ int main(int ac, char *av[]){
 				"  Teff: outer radius of the disk moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"
 				"  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
 			( "Thot", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description" )
-			( "F0", po::value<double>(&F0_gauss)->default_value(F0_gauss), "Initial viscous torque at the outer boundary of the disk, dyn*cm" )
-			( "Mdot0", po::value<double>(&Mdot_in)->default_value(Mdot_in), "Initial mass accretion rate through the inner radius, g/s. If both --F0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to sinusF or quasistat" )
+			( "F0", po::value<double>(&F0)->default_value(F0), "Initial viscous torque at the outer boundary of the disk, dyn*cm. Can be overwritten via --Mdisk0 and --Mdot0" )
+			( "Mdisk0", po::value<double>(&Mdisk), "Initial disk mass, g. If both --F0 and --Mdisk0 are specified then --Mdisk0 is used. If both --Mdot0 and --Mdisk0 are specified then --Mdot0 is used" )
+			( "Mdot0", po::value<double>(&Mdot_in), "Initial mass accretion rate through the inner radius, g/s. If --F0, --Mdisk0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to sinusF or quasistat" )
 			( "initialcond", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 				"Values:\n"
 				"  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power option does the same
@@ -260,11 +263,11 @@ int main(int ac, char *av[]){
 
 	vector<double> F(Nx);
 	if ( initial_cond_shape == "sinusgauss" ){
-		const double F0_sinus = 1e-6 * F0_gauss;
+		const double F0_sinus = 1e-6 * F0;
 		const double h_cut_for_F_gauss = h_out / sqrt(r_gauss_cut_to_r_out);
-		const double F_gauss_cut = F0_gauss * exp( - (h_cut_for_F_gauss-h_out)*(h_cut_for_F_gauss-h_out) / (2. * h_out*h_out/(sigma_for_F_gauss*sigma_for_F_gauss)) );
+		const double F_gauss_cut = F0 * exp( - (h_cut_for_F_gauss-h_out)*(h_cut_for_F_gauss-h_out) / (2. * h_out*h_out/(sigma_for_F_gauss*sigma_for_F_gauss)) );
 		for ( int i = 0; i < Nx; ++i ){
-			double F_gauss = F0_gauss * exp( - (h.at(i)-h_out)*(h.at(i)-h_out) / (2. * h_out*h_out/(sigma_for_F_gauss*sigma_for_F_gauss)) ) - F_gauss_cut;
+			double F_gauss = F0 * exp( - (h.at(i)-h_out)*(h.at(i)-h_out) / (2. * h_out*h_out/(sigma_for_F_gauss*sigma_for_F_gauss)) ) - F_gauss_cut;
 			F_gauss = F_gauss >= 0 ? F_gauss : 0.;
 			const double F_sinus =  F0_sinus * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI / 2. );
 			F.at(i) = F_gauss + F_sinus;
@@ -273,46 +276,103 @@ int main(int ac, char *av[]){
 		if ( Mdot_in != 0. ){
 			throw po::invalid_option_value("It is obvious to use --Mdot with --initialcond=powerF");
 		}
+		if ( Mdisk > 0. ){
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = (1. - oprel->m) * power_order;
+			const double b = oprel->n;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+				stepper,
+				[a,b,x0]( const double &y, double &dydx, double x ){
+					dydx = pow(x, a) * pow(x + x0, b);
+				},
+				integral, 0., 1., 0.01
+			);
+			F0 = pow( Mdisk * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m) );
+		}
 		for ( int i = 0; i < Nx; ++i ){
-			F.at(i) = F0_gauss * pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
+			F.at(i) = F0 * pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
 		}
 	} else if ( initial_cond_shape == "powerSigma" ){
 		if ( Mdot_in != 0. ){
 			throw po::invalid_option_value("It is obvious to use --Mdot with --initialcond=powerSigma");
 		}
+		if ( Mdisk > 0. ){
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = power_order;
+			const double b = 3.;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+				stepper,
+				[a,b,x0]( const double &y, double &dydx, double x ){
+					dydx = pow(x, a) * pow(x + x0, b);
+				},
+				integral, 0., 1., 0.01
+			);
+			F0 = pow( Mdisk * (1. - oprel->m) * oprel->D * pow(h_out, 3. - oprel->n) / pow(h_out - h_in, 4.) / integral, 1. / (1. - oprel->m) );
+		}
 		for ( int i = 0; i < Nx; ++i ){
 			const double Sigma_to_Sigmaout = pow( (h.at(i) - h_in) / (h_out - h_in), power_order );
-			F.at(i) = F0_gauss * pow( h.at(i) / h_out, (3. - oprel->n) / (1. - oprel->m) ) * pow( Sigma_to_Sigmaout, 1. / (1. - oprel->m) );
+			F.at(i) = F0 * pow( h.at(i) / h_out, (3. - oprel->n) / (1. - oprel->m) ) * pow( Sigma_to_Sigmaout, 1. / (1. - oprel->m) );
 		}
 	} else if ( initial_cond_shape == "sinus" or initial_cond_shape == "sinusF" ){
 		if ( Mdot_in > 0. ){
-			F0_gauss = Mdot_in * (h_out - h_in) * 2./M_PI;
+			F0 = Mdot_in * (h_out - h_in) * 2./M_PI;
+		} else if ( Mdisk > 0. ){
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = 1. - oprel->m;
+			const double b = oprel->n;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+				stepper,
+				[a,b,x0]( const double &y, double &dydx, double x ){
+					dydx = pow(sin(x * M_PI_2), a) * pow(x + x0, b);
+				},
+				integral, 0., 1., 0.01
+			);
+			F0 = pow( Mdisk * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m) );
 		}
 		for ( int i = 0; i < Nx; ++i ){
-			F.at(i) = F0_gauss * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI / 2. );
+			F.at(i) = F0 * sin( (h.at(i) - h_in) / (h_out - h_in) * M_PI_2 );
 		}
 	} else if ( initial_cond_shape == "sinusparabola" ){
 		const double h_F0 = h_out * 0.9;
 		const double delta_h = h_out - h_F0;
 
-		F0_gauss = 1.24e13 * pow(Sigma_hot_disk(R.at(Nx-1)), 10./7.) * pow(h.at(Nx-1), 22./7.) * pow(GM, -10./7.) * pow(alpha, 8./7.);
+		F0 = 1.24e13 * pow(Sigma_hot_disk(R.at(Nx-1)), 10./7.) * pow(h.at(Nx-1), 22./7.) * pow(GM, -10./7.) * pow(alpha, 8./7.);
 
-		Mdot_out = -kMdot_out * F0_gauss / (h_F0 - h_in) * M_PI*M_PI;
+		Mdot_out = -kMdot_out * F0 / (h_F0 - h_in) * M_PI*M_PI;
 
 		for ( int i = 0; i < Nx; ++i ){
 			if ( h.at(i) < h_F0 ){
-				F.at(i) = F0_gauss * sin( (h.at(i) - h_in) / (h_F0 - h_in) * M_PI / 2. );
+				F.at(i) = F0 * sin( (h.at(i) - h_in) / (h_F0 - h_in) * M_PI / 2. );
 			} else{
-				F.at(i) = F0_gauss * ( 1. - kMdot_out / (h_F0-h_in) / delta_h * M_PI / 4. * (h.at(i) - h_F0)*(h.at(i) - h_F0) );
+				F.at(i) = F0 * ( 1. - kMdot_out / (h_F0-h_in) / delta_h * M_PI / 4. * (h.at(i) - h_F0)*(h.at(i) - h_F0) );
 			}
 		}
 	} else if( initial_cond_shape == "quasistat" ){
 		if ( Mdot_in > 0. ){
-			F0_gauss = Mdot_in * (h_out - h_in) / h_out * h_in / oprel->f_F(h_in/h_out);
+			F0 = Mdot_in * (h_out - h_in) / h_out * h_in / oprel->f_F(h_in/h_out);
+		} else if ( Mdisk > 0. ){
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double x0 = h_in / (h_out - h_in);
+			const double x1 = h_in / h_out;
+			double integral = 0.;
+			integrate_adaptive(
+				stepper,
+				[x0,x1,oprel]( const double &y, double &dydx, double x ){
+					dydx = pow(oprel->f_F(x * (1. - x1) + x1) * x / (x * (1. - x1) + x1), 1. - oprel->m) * pow(x + x0, oprel->n);
+				},
+				integral, 0., 1., 0.01
+			);
+			F0 = pow( Mdisk * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m) );
 		}
 		for ( int i = 0; i < Nx; ++i ){
 			const double xi_LS2000 = h.at(i) / h_out;
-			F.at(i) = F0_gauss * oprel->f_F(xi_LS2000) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
+			F.at(i) = F0 * oprel->f_F(xi_LS2000) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
 		}
 	} else if( initial_cond_shape == "gaussF" ){
 		if ( Mdot_in > 0. ){
@@ -384,7 +444,8 @@ int main(int ac, char *av[]){
 	}
 	output_sum << flush;
 
-	for( double t = 0.; t <= Time; t += tau ){
+	for( int i_t = 0; i_t < Time/tau; ++i_t ){
+		const double t = i_t * tau;
 		// cout << t/DAY << endl;
 
 		vector<double> W(Nx, 0.), Tph(Nx, 0.), Tph_vis(Nx, 0.), Tph_X(Nx, 0.), Tirr(Nx,0.), Sigma(Nx, 0.), Height(Nx, 0.);
@@ -477,7 +538,7 @@ int main(int ac, char *av[]){
 
 		if (output_fulldata){
 			ostringstream filename;
-			filename << output_dir << "/" << filename_prefix << "_" << static_cast<int>(t/tau) << ".dat";
+			filename << output_dir << "/" << filename_prefix << "_" << i_t << ".dat";
 			ofstream output( filename.str() );
 			output << "#h      R  F      Sigma  Teff Tvis Tirr Height" << "\n";
 			output << "#cm^2/s cm dyn*cm g/cm^2 K    K    K    cm" << "\n";

@@ -2,7 +2,7 @@ FROM ubuntu:16.04
 
 MAINTAINER Konstantin Malanchev <malanchev@sai.msu.ru>
 
-ENV PACKAGES "g++ make git libboost-program-options-dev"
+ENV PACKAGES "g++ make git libboost-all-dev"
 ENV SOURCE "/tmp/freddi"
 
 RUN apt-get update &&\
@@ -13,7 +13,10 @@ RUN apt-get update &&\
     make install LDLIBS=-static &&\
     rm -r ${SOURCE} &&\
     apt-get purge -y ${PACKAGES} &&\
-    apt-get autoremove --purge -y
+    apt-get autoremove --purge -y &&\
+    apt-get clean -y &&\
+    rm -rf /var/lib/apt/lists/* &&\
+    truncate -s 0 /var/log/*log
 
 VOLUME /data
 WORKDIR /
