@@ -139,7 +139,7 @@ int main(int ac, char *av[]){
 				"  quasistat: F ~ f(h/h_out) * xi * h_out/h, where f is quasi-stationary solution found in Lipunova & Shakura 2000. f(xi=0) = 0, df/dxi(xi=1) = 0\n\n"
 				"Here xi is (h - h_in) / (h_out - h_in)\n") // sinusparabola, sinusgauss
 			( "powerorder", po::value<double>(&power_order)->default_value(power_order), "Parameter for the powerlaw initial condition distribution. This option works only with --initialcond=powerF or powerSigma" )
-			( "gaussmu", po::value<double>(&gauss_mu)->default_value(gauss_mu), "Position of the maximum for Gauss distribution. This option works only with --initialcond=gaussF" )
+			( "gaussmu", po::value<double>(&gauss_mu)->default_value(gauss_mu), "Position of the maximum for Gauss distribution, positive number not greater than unity. This option works only with --initialcond=gaussF" )
 			( "gausssigma", po::value<double>(&gauss_sigma)->default_value(gauss_sigma), "Width of for Gauss distribution. This option works only with --initialcond=gaussF" )
 		;
 		desc.add(internal);
@@ -375,8 +375,11 @@ int main(int ac, char *av[]){
 			F.at(i) = F0 * oprel->f_F(xi_LS2000) * (1. - h_in / h.at(i)) / (1. - h_in / h_out);
 		}
 	} else if( initial_cond_shape == "gaussF" ){
+		if ( gauss_mu <= 0. or gauss_mu > 1. ){
+			throw po::invalid_option_value("--gaussmu value should be large than 0 and not large than 1");
+		}
 		if ( Mdot_in != 0. ){
-			throw po::invalid_option_value("Usage of --Mdot with --initialcond=gaussF produces unstable results and isn't motivated physically. Use --F0 or --Mdisk0 instead");
+			throw po::invalid_option_value("Usage of --Mdot with --initialcond=gaussF produces unstable results and it isn't motivated physically. Use --F0 or --Mdisk0 instead");
 			//F0 = Mdot_in * (h_out - h_in) * gauss_sigma*gauss_sigma / gauss_mu * exp( gauss_mu*gauss_mu / (2. * gauss_sigma*gauss_sigma) );
 		} else if ( Mdisk > 0. ){
 			odeint::runge_kutta_cash_karp54<double> stepper;
