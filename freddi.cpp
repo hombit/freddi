@@ -376,11 +376,11 @@ int main(int ac, char *av[]){
 		}
 	} else if( initial_cond_shape == "gaussF" ){
 		if ( Mdot_in > 0. ){
-			F0_gauss = Mdot_in * (h_out - h_in) * gauss_sigma*gauss_sigma / gauss_mu * exp( gauss_mu*gauss_mu / (2. * gauss_sigma*gauss_sigma) );
+			F0 = Mdot_in * (h_out - h_in) * gauss_sigma*gauss_sigma / gauss_mu * exp( gauss_mu*gauss_mu / (2. * gauss_sigma*gauss_sigma) );
 		}
 		for ( int i = 0; i < Nx; ++i ){
 			const double xi = (h.at(i) - h_in) / (h_out - h_in);
-			F.at(i) = F0_gauss * exp( -(xi - gauss_mu)*(xi - gauss_mu) / (2. * gauss_sigma*gauss_sigma) );
+			F.at(i) = F0 * exp( -(xi - gauss_mu)*(xi - gauss_mu) / (2. * gauss_sigma*gauss_sigma) );
 //			F.at(i) -= F.at(0);
 		}
 	} else{
