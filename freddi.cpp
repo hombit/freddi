@@ -127,9 +127,9 @@ int main(int ac, char *av[]){
 				"  Teff: outer radius of the disk moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"
 				"  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
 			( "Thot", po::value<double>(&T_min_hot_disk)->default_value(T_min_hot_disk), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description" )
-			( "F0", po::value<double>(&F0)->default_value(F0), "Initial viscous torque at the outer boundary of the disk, dyn*cm. Can be overwritten via --Mdisk0 and --Mdot0" )
+			( "F0", po::value<double>(&F0)->default_value(F0), "Initial maximum viscous torque in the disk, dyn*cm. Can be overwritten via --Mdisk0 and --Mdot0" )
 			( "Mdisk0", po::value<double>(&Mdisk), "Initial disk mass, g. If both --F0 and --Mdisk0 are specified then --Mdisk0 is used. If both --Mdot0 and --Mdisk0 are specified then --Mdot0 is used" )
-			( "Mdot0", po::value<double>(&Mdot_in), "Initial mass accretion rate through the inner radius, g/s. If --F0, --Mdisk0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to sinusF or quasistat" )
+			( "Mdot0", po::value<double>(&Mdot_in), "Initial mass accretion rate through the inner radius, g/s. If --F0, --Mdisk0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to sinusF, gaussF or quasistat" )
 			( "initialcond", po::value<string>(&initial_cond_shape)->default_value(initial_cond_shape), "Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 				"Values:\n"
 				"  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power option does the same
@@ -377,11 +377,24 @@ int main(int ac, char *av[]){
 	} else if( initial_cond_shape == "gaussF" ){
 		if ( Mdot_in > 0. ){
 			F0 = Mdot_in * (h_out - h_in) * gauss_sigma*gauss_sigma / gauss_mu * exp( gauss_mu*gauss_mu / (2. * gauss_sigma*gauss_sigma) );
+		} else if ( Mdisk > 0. ){
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = 1. - oprel->m;
+			const double b = oprel->n;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+				stepper,
+				[a,b,x0,gauss_mu,gauss_sigma]( const double &y, double &dydx, double x ){
+					dydx = exp( -(x - gauss_mu)*(x - gauss_mu) * a / (2. * gauss_sigma*gauss_sigma) ) * pow(x + x0, b);
+				},
+				integral, 0., 1., 0.01
+			);
+			F0 = pow( Mdisk * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m) );
 		}
 		for ( int i = 0; i < Nx; ++i ){
 			const double xi = (h.at(i) - h_in) / (h_out - h_in);
 			F.at(i) = F0 * exp( -(xi - gauss_mu)*(xi - gauss_mu) / (2. * gauss_sigma*gauss_sigma) );
-//			F.at(i) -= F.at(0);
 		}
 	} else{
 		throw po::invalid_option_value(initial_cond_shape);
