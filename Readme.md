@@ -140,9 +140,9 @@ Parameters of the disk model:
                                    temperature at the outer edge of the hot 
                                    disk, Kelvin. For details see --boundcond 
                                    description
-  --F0 arg (=2e+38)                Initial viscous torque at the outer boundary
-                                   of the disk, dyn*cm. Can be overwritten via 
-                                   --Mdisk0 and --Mdot0
+  --F0 arg (=2e+38)                Initial maximum viscous torque in the disk, 
+                                   dyn*cm. Can be overwritten via --Mdisk0 and 
+                                   --Mdot0
   --Mdisk0 arg                     Initial disk mass, g. If both --F0 and 
                                    --Mdisk0 are specified then --Mdisk0 is 
                                    used. If both --Mdot0 and --Mdisk0 are 
@@ -162,6 +162,9 @@ Parameters of the disk model:
                                    powerorder is specified by --powerorder 
                                    option
                                      sinusF: F ~ sin( xi * pi/2 )
+                                     gaussF: F ~ exp(-(xi-mu)**2 / 2 sigma**2),
+                                   mu and sigma are specified by --gaussmu and 
+                                   --gausssigma options
                                      quasistat: F ~ f(h/h_out) * xi * h_out/h, 
                                    where f is quasi-stationary solution found 
                                    in Lipunova & Shakura 2000. f(xi=0) = 0, 
@@ -172,6 +175,12 @@ Parameters of the disk model:
   --powerorder arg (=6)            Parameter for the powerlaw initial condition
                                    distribution. This option works only with 
                                    --initialcond=powerF or powerSigma
+  --gaussmu arg (=1)               Position of the maximum for Gauss 
+                                   distribution, positive number not greater 
+                                   than unity. This option works only with 
+                                   --initialcond=gaussF
+  --gausssigma arg (=0.25)         Width of for Gauss distribution. This option
+                                   works only with --initialcond=gaussF
 
 Parameters of self-irradiation:
   --Cirr arg (=0)                  Irradiation factor
