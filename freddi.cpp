@@ -73,7 +73,7 @@ int main(int ac, char *av[]){
 	double F0 = 2e38;
 	double sigma_for_F_gauss = 5.;
 	double r_gauss_cut_to_r_out = 0.01;
-	double gauss_sigma = 0.2;
+	double gauss_sigma = 0.25;
 	double gauss_mu = 1.;
 	double power_order = 6.;
 	double kMdot_out = 2.;
