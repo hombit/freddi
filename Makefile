@@ -1,5 +1,4 @@
 CC = g++
-CPP = g++
 prefix=/usr/local
 override CPPFLAGS += -std=c++11 -D INSTALLPATHPREFIX='"$(prefix)"'
 

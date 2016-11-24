@@ -1,15 +1,14 @@
 language: cpp
+dist: precise
+sudo: false
 
 compiler:
   - gcc
 #  - clang
 
 script:
-  - make
+  - make CC=g++-4.9 CXX=g++-4.9
   - make test
-
-dist: precise
-sudo: false
 
 addons:
   apt:
