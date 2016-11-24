@@ -17,6 +17,6 @@ addons:
       - boost-latest
 #      - llvm-toolchain-precise-3.6
     packages:
-      - libboost-all-dev
+      - libboost-all-dev-1.55
       - g++-4.9
 #      - clang-3.6
