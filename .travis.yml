@@ -1,6 +1,6 @@
 language: cpp
 dist: precise
-sudo: false
+sudo: required
 
 compiler:
   - gcc
@@ -17,6 +17,10 @@ addons:
       - boost-latest
 #      - llvm-toolchain-precise-3.6
     packages:
-      - libboost-all-dev-1.55
       - g++-4.9
+#      - libboost-all-dev
 #      - clang-3.6
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libboost-all-dev-1.55
