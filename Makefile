@@ -24,5 +24,8 @@ install: all
 	install -m 0755 freddi $(prefix)/bin
 	install -m 0755 freddi.ini $(prefix)/etc
 
+test: all
+	./freddi
+
 clean:
 	rm -f *.o
