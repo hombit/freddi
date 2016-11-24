@@ -1,10 +1,9 @@
 language: cpp
 dist: precise
-sudo: required
+sudo: false
 
 compiler:
   - gcc
-#  - clang
 
 script:
   - make CC=g++-4.9 CXX=g++-4.9
@@ -14,13 +13,5 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-      - boost-latest
-#      - llvm-toolchain-precise-3.6
     packages:
       - g++-4.9
-#      - libboost-all-dev
-#      - clang-3.6
-
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libboost-all-dev-1.55
