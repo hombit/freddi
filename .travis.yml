@@ -13,7 +13,11 @@ sudo: false
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.5
     packages:
       - libboost-all-dev
       - gcc-4.9
+      - g++-4.9
       - clang-3.5
