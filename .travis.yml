@@ -1,8 +1,8 @@
 language: cpp
 
 compiler:
-  - clang
   - gcc
+#  - clang
 
 script:
   - make
@@ -15,9 +15,8 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.6
+#      - llvm-toolchain-precise-3.6
     packages:
       - libboost-all-dev
-      - gcc-5
-      - g++-5
-      - clang-3.6
+      - g++-4.9
+#      - clang-3.6
