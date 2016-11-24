@@ -8,7 +8,7 @@ script:
   - make
   - make test
 
-dist: trusty
+dist: precise
 sudo: false
 
 addons:
