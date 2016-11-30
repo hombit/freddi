@@ -7,7 +7,11 @@ compiler:
 env: GCC_VERSION=4.9.0 BOOST_VERSION=1.58.0
 
 script:
-  - make
+  - echo $CC
+  - echo $CXX
+  - echo $GCC_VERSION
+  - echo $BOOST_ROOT
+  - make CC=$CC CXX=$CXX
   - make test
 
 addons:
