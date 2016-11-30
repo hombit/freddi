@@ -1,5 +1,5 @@
 language: cpp
-sudo: false
+sudo: required
 
 cache:
   directories:
@@ -11,6 +11,9 @@ compiler:
 env: GCC_VERSION=5.3.0 BOOST_VERSION=1.58.0
 
 script:
+  - echo $CC
+  - echo $CXX
+  - echo $BOOST_ROOT
   - make CC=g++-5.3 CXX=g++-5.3
   - make test
 
