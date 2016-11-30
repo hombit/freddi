@@ -1,17 +1,17 @@
 language: cpp
 sudo: false
 
+cache:
+  directories:
+    - ${TRAVIS_BUILD_DIR}/deps
+
 compiler:
   - gcc
 
-env: GCC_VERSION=4.9.0 BOOST_VERSION=1.58.0
+env: GCC_VERSION=5.3.0 BOOST_VERSION=1.58.0
 
 script:
-  - echo $CC
-  - echo $CXX
-  - echo $GCC_VERSION
-  - echo $BOOST_ROOT
-  - make CC=$CC CXX=$CXX
+  - make CC=g++-5.3 CXX=g++-5.3
   - make test
 
 addons:
@@ -21,7 +21,7 @@ addons:
     packages:
       - g++-4.9
 
-after_install:
+install:
   - wget https://raw.githubusercontent.com/cbeck88/travis-cpp-assistant/master/install.sh
   - chmod +x install.sh
   - source ./install.sh
