@@ -14,7 +14,7 @@ script:
   - echo $CC
   - echo $CXX
   - echo $BOOST_ROOT
-  - make CC=g++-5.3 CXX=g++-5.3
+  - g++ -v
   - make test
 
 addons:
