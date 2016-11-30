@@ -1,12 +1,13 @@
 language: cpp
-dist: precise
 sudo: false
 
 compiler:
   - gcc
 
+env: GCC_VERSION=4.9.0 BOOST_VERSION=1.58.0
+
 script:
-  - make CC=g++-4.9 CXX=g++-4.9
+  - make
   - make test
 
 addons:
@@ -15,3 +16,8 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.9
+
+after_install:
+  - wget https://raw.githubusercontent.com/cbeck88/travis-cpp-assistant/master/install.sh
+  - chmod +x install.sh
+  - source ./install.sh
