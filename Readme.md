@@ -337,8 +337,7 @@ sum of the visous and irradiating flux, where the viscous flux is calculated
 taking into account general relativity effects near the black hole, following
 [Page & Thorne
 (1974)](http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=1974ApJ...191..499P)
-and [Riffert & Herold (1995)]
-(http://adsabs.harvard.edu/cgi-bin/nph-bib\_query?bibcode=1995ApJ...450..508R).
+and [Riffert & Herold (1995)](http://adsabs.harvard.edu/cgi-bin/nph-bib\_query?bibcode=1995ApJ...450..508R).
 
 Questions and comments
 ----------------------
