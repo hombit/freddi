@@ -466,14 +466,6 @@ int main(int ac, char *av[]){
 		// cout << t/DAY << endl;
 
 		vector<double> W(Nx, 0.), Tph(Nx, 0.), Tph_vis(Nx, 0.), Tph_X(Nx, 0.), Tirr(Nx,0.), Sigma(Nx, 0.), Height(Nx, 0.);
-		
-		try{
-			nonlenear_diffusion_nonuniform_1_2 (tau, eps, 0., Mdot_out, wunc, h, F);
-			W = wunc(h, F, 1, Nx-1);
-		} catch (runtime_error er){
-			cout << er.what() << endl;
-			break;
-		}
 
 		Mdot_in_prev = Mdot_in;
 		Mdot_in = ( F.at(1) - F.at(0) ) / ( h.at(1) - h.at(0) );
@@ -595,6 +587,14 @@ int main(int ac, char *av[]){
 		}
 		output_sum      << endl;
 		
+				
+		try{
+			nonlenear_diffusion_nonuniform_1_2 (tau, eps, 0., Mdot_out, wunc, h, F);
+			W = wunc(h, F, 1, Nx-1);
+		} catch (runtime_error er){
+			cout << er.what() << endl;
+			break;
+		}
 	}
 
 	delete oprel;
