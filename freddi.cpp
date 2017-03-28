@@ -465,7 +465,7 @@ int main(int ac, char *av[]){
 	}
 
 
-	for( int i_t = 0; i_t <= Time/tau; ++i_t ){
+	for( int i_t = 0; i_t <= Time/tau + 0.001; ++i_t ){
 		const double t = i_t * tau;
 		// cout << t/DAY << endl;
 
