@@ -460,6 +460,10 @@ int main(int ac, char *av[]){
 		}
 	}
 	output_sum << flush;
+	if ( po_vm.count("rout") == 0 ){
+		output_sum << "# --rout hadn't been specified, tidal radius " << r_out/solar_radius << " Rsun was used" << std::endl;
+	}
+
 
 	for( int i_t = 0; i_t <= Time/tau; ++i_t ){
 		const double t = i_t * tau;
