@@ -1,7 +1,7 @@
 CC = g++
 CPP = g++
 prefix=/usr/local
-override CPPFLAGS += -std=c++11 -D INSTALLPATHPREFIX='"$(prefix)"'
+override CPPFLAGS += -std=c++11 -O2 -D INSTALLPATHPREFIX='"$(prefix)"'
 
 override LDLIBS += -lboost_program_options
 
