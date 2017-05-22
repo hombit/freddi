@@ -43,6 +43,8 @@ docker run -v "`pwd`":/data --rm -ti hombit/freddi
 
 -   [Boost](http://www.boost.org/)
 
+-   Make
+
 -   C++ compiler with C++11 support, e.g. `gcc` version 4.8+ or `clang` 3.4+
 
 Requirements installation on Debian based systems (e.g. Ubuntu):
