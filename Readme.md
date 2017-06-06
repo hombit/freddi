@@ -41,7 +41,7 @@ docker run -v "`pwd`":/data --rm -ti hombit/freddi
 
 ### Requirements
 
--   [Boost](http://www.boost.org/) 1.56+
+-   [Boost](http://www.boost.org/) 1.57+
 
 -   [Make](https://en.wikipedia.org/wiki/Make_(software))
 
