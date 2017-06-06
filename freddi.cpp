@@ -460,20 +460,18 @@ int main(int ac, char *av[]){
 		}
 	}
 	output_sum << flush;
+	if ( po_vm.count("rout") == 0 ){
+		output_sum << "# --rout hadn't been specified, tidal radius " << r_out/solar_radius << " Rsun was used" << std::endl;
+	}
 
-	for( int i_t = 0; i_t < Time/tau; ++i_t ){
+	vector<double> W(Nx, 0.);
+	W = wunc(h, F, 1, Nx-1);
+
+	for( int i_t = 0; i_t <= Time/tau + 0.001; ++i_t ){
 		const double t = i_t * tau;
 		// cout << t/DAY << endl;
 
-		vector<double> W(Nx, 0.), Tph(Nx, 0.), Tph_vis(Nx, 0.), Tph_X(Nx, 0.), Tirr(Nx,0.), Sigma(Nx, 0.), Height(Nx, 0.);
-		
-		try{
-			nonlenear_diffusion_nonuniform_1_2 (tau, eps, 0., Mdot_out, wunc, h, F);
-			W = wunc(h, F, 1, Nx-1);
-		} catch (runtime_error er){
-			cout << er.what() << endl;
-			break;
-		}
+		vector<double> Tph(Nx, 0.), Tph_vis(Nx, 0.), Tph_X(Nx, 0.), Tirr(Nx,0.), Sigma(Nx, 0.), Height(Nx, 0.);
 
 		Mdot_in_prev = Mdot_in;
 		Mdot_in = ( F.at(1) - F.at(0) ) / ( h.at(1) - h.at(0) );
@@ -500,42 +498,6 @@ int main(int ac, char *av[]){
 		}
 		
 		const double Lx = Luminosity( R, Tph_X, nu_min, nu_max, 100 ) / pow(fc, 4.);
-
-		int ii = Nx;
-		if (bound_cond_type == "MdotOut"){
-			Mdot_out = - kMdot_out * Mdot_in;
-			do{
-				ii--;
-			} while( Sigma.at(ii) < Sigma_hot_disk(R[ii]) );
-
-		} else if (bound_cond_type == "fourSigmaCrit"){
-			do{
-				ii--;
-				// Equation from Menou et al. 1999. Factor 4 is from their fig 8 and connected to point where Mdot = 0.
-			} while( Sigma.at(ii) <  4 * Sigma_hot_disk(R[ii]) );
-		} else if ( bound_cond_type == "Teff" ){
-			do{
-				ii--;
-			} while( Tph.at(ii) < T_min_hot_disk );
-		} else if (  bound_cond_type == "Tirr" ){
-			if ( Mdot_in >= Mdot_in_prev  and ( initial_cond_shape == "power" or initial_cond_shape == "sinusgauss" ) ){
-				do{
-					ii--;
-				} while( Tph.at(ii) < T_min_hot_disk );
-			} else{
-				do{
-					ii--;
-				} while( Tirr.at(ii) < T_min_hot_disk );
-			}
-		} else{
-			throw po::invalid_option_value(bound_cond_type);
-		}
-
-		if ( ii < Nx-1 ){
-			Nx = ii+1;
-			// F.at(Nx-2) = F.at(Nx-1) - Mdot_out / (2.*M_PI) * (h.at(Nx-1) - h.at(Nx-2));
-			h.resize(Nx);
-		}
 	
 		const double mU = -2.5 * log10( I_lambda(R, Tph, lambdaU) * cosiOverD2 / irr0U );
 		const double mB = -2.5 * log10( I_lambda(R, Tph, lambdaB) * cosiOverD2 / irr0B );
@@ -595,6 +557,51 @@ int main(int ac, char *av[]){
 		}
 		output_sum      << endl;
 		
+				
+		try{
+			nonlenear_diffusion_nonuniform_1_2 (tau, eps, 0., Mdot_out, wunc, h, F);
+			W = wunc(h, F, 1, Nx-1);
+		} catch (runtime_error er){
+			cout << er.what() << endl;
+			break;
+		}
+
+		
+		int ii = Nx;
+		if (bound_cond_type == "MdotOut"){
+			Mdot_out = - kMdot_out * Mdot_in;
+			do{
+				ii--;
+			} while( Sigma.at(ii) < Sigma_hot_disk(R[ii]) );
+
+		} else if (bound_cond_type == "fourSigmaCrit"){
+			do{
+				ii--;
+				// Equation from Menou et al. 1999. Factor 4 is from their fig 8 and connected to point where Mdot = 0.
+			} while( Sigma.at(ii) <  4 * Sigma_hot_disk(R[ii]) );
+		} else if ( bound_cond_type == "Teff" ){
+			do{
+				ii--;
+			} while( Tph.at(ii) < T_min_hot_disk );
+		} else if (  bound_cond_type == "Tirr" ){
+			if ( Mdot_in >= Mdot_in_prev  and ( initial_cond_shape == "power" or initial_cond_shape == "sinusgauss" ) ){
+				do{
+					ii--;
+				} while( Tph.at(ii) < T_min_hot_disk );
+			} else{
+				do{
+					ii--;
+				} while( Tirr.at(ii) < T_min_hot_disk );
+			}
+		} else{
+			throw po::invalid_option_value(bound_cond_type);
+		}
+
+		if ( ii < Nx-1 ){
+			Nx = ii+1;
+			// F.at(Nx-2) = F.at(Nx-1) - Mdot_out / (2.*M_PI) * (h.at(Nx-1) - h.at(Nx-2));
+			h.resize(Nx);
+		}
 	}
 
 	delete oprel;

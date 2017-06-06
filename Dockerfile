@@ -2,12 +2,13 @@ FROM ubuntu:16.04
 
 MAINTAINER Konstantin Malanchev <malanchev@sai.msu.ru>
 
-ENV PACKAGES "g++ make git libboost-all-dev"
+ENV PACKAGES "g++ make libboost-all-dev"
 ENV SOURCE "/tmp/freddi"
+
+COPY ./ ${SOURCE}/
 
 RUN apt-get update &&\
     apt-get install -y ${PACKAGES} &&\
-    git clone https://github.com/hombit/freddi.git ${SOURCE} &&\
     cd ${SOURCE} &&\
     mkdir -p /usr/local/bin &&\
     make install LDLIBS=-static &&\

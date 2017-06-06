@@ -41,9 +41,21 @@ docker run -v "`pwd`":/data --rm -ti hombit/freddi
 
 ### Requirements
 
--   [Boost](http://www.boost.org/)
+-   [Boost](http://www.boost.org/) 1.56+
+
+-   [Make](https://en.wikipedia.org/wiki/Make_(software))
 
 -   C++ compiler with C++11 support, e.g. `gcc` version 4.8+ or `clang` 3.4+
+
+Requirements installation on Debian based systems (e.g. Ubuntu):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+apt-get install g++ make libboost-all-dev
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On Red Hat based systems (e.g. Fedora):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+dnf install gcc-c++ make boost-devel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `Freddi` was tested on Linux and macOS.
 
@@ -337,8 +349,7 @@ sum of the visous and irradiating flux, where the viscous flux is calculated
 taking into account general relativity effects near the black hole, following
 [Page & Thorne
 (1974)](http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=1974ApJ...191..499P)
-and [Riffert & Herold (1995)]
-(http://adsabs.harvard.edu/cgi-bin/nph-bib\_query?bibcode=1995ApJ...450..508R).
+and [Riffert & Herold (1995)](http://adsabs.harvard.edu/cgi-bin/nph-bib\_query?bibcode=1995ApJ...450..508R).
 
 Questions and comments
 ----------------------
