@@ -1,6 +1,8 @@
 `Freddi` — compute FRED-like light curves of LMXB
 =================================================
 
+[![arXiv](https://img.shields.io/badge/arXiv-1610.01399%20-green.svg)](https://arxiv.org/abs/1610.01399)
+
 Table of contents
 -----------------
 
