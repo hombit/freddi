@@ -155,7 +155,7 @@ int main(int ac, char *av[]){
 		;
 		desc.add(irradiation);
 
-		po::options_description emission("Parameters of optical magnitudes calculation");
+		po::options_description emission("Parameters of flux calculation");
 		emission.add_options()
 			( "colourfactor", po::value<double>(&fc)->default_value(fc), "Colour factor to calculate X-ray flux"  )
 			( "emin", po::value<double>()->default_value(nu_min/keV), "Minimum energy of X-ray band, keV" )
