@@ -2,6 +2,7 @@
 #define _ARGUMENTS_HPP
 
 #include <cmath>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -9,6 +10,7 @@
 
 #include "gsl_const_cgsm.h"
 #include "constants.hpp"
+#include "opacity_related.hpp"
 #include "orbit.hpp"
 
 
@@ -20,11 +22,12 @@ public:
 	constexpr static const char default_prefix[] = "freddi";
 	constexpr static const char default_dir[] = "freddi";
 public:
-	std::string prefix;
-	std::string dir;
-	bool fulldata;
+	const std::string prefix;
+	const std::string dir;
+	const bool fulldata;
 public:
 	GeneralArguments(const char prefix[], const char dir[], bool fulldata=false) = default;
+	GeneralArguments(const po::variables_map& vm);
 	static po::options_description description();
 };
 
@@ -49,6 +52,18 @@ public:
 	}
 	static inline double cmToKpc(const double length_cm) {
 		return length_cm / (1000. * GSL_CONST_CGSM_PARSEC);
+	}
+	static inline double sunToCm(const double length_solar_radius) {
+		return length_solar_radius / solar_radius;
+	}
+	static inline double cmToSun(const double length_cm) {
+		return length_cm * solar_radius;
+	}
+	static inline double angstromToCm(const double length_angstrom) {
+		return length_angstrom * 1e-8;
+	}
+	static inline double cmToAngstrom(const double length_cm) {
+		return length_cm * 1e8;
 	}
 };
 
@@ -92,13 +107,16 @@ public:
 	constexpr static const double default_Mopt = sunToGram(0.5);
 	constexpr static const double default_period = dayToS(0.25);
 public:
-	double alpha;
-	double Mx;
-	double kerr;
-	double Mopt;
-	double period;
-	double rin;
-	double rout;
+	const double alpha;
+	const double Mx;
+	const double kerr;
+	const double Mopt;
+	const double period;
+	const double rin;
+	const double rout;
+protected:
+	double rinInitializer(const po::variables_map& vm) const;
+	double routInitializer(const po::variables_map& vm) const;
 public:
 	BasicDiskBinaryArguments(double alpha,
 							 double Mx, double kerr,
@@ -128,6 +146,9 @@ public:
 		return {alpha, Mx, kerr, Mopt, period,
 				rin, routFromMxMoptPeriod(Mx, Mopt, period)};
 	}
+	BasicDiskBinaryArguments(const po::variables_map& vm);
+	inline double h(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx * r); }
+	inline double omega(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx / r); }
 	static po::options_description description();
 };
 
@@ -143,22 +164,34 @@ public:
 	constexpr static const double default_gaussmu = 1.;
 	constexpr static const double default_gausssigma = 0.25;
 public:
-	std::string opacity;
-	std::string boundcond;
-	double Thot;
-	std::string initialcond;
-	double F0;
-	double powerorder;
-	double gaussmu;
-	double gausssigma;
-	double Mdisk0;
-	double Mdot0;
+	constexpr static const double mu = 0.62;
+public:
+	const std::string opacity;
+	const std::string boundcond;
+	const double Thot;
+	const std::string initialcond;
+	const double F0;
+	const double powerorder;
+	const double gaussmu;
+	const double gausssigma;
+	const double Mdisk0;
+	const double Mdot0;
+public:
+	std::unique_ptr<const OpacityRelated> oprel;
+protected:
+	const bool is_Mdisk0_specified;
+	const bool is_Mdot0_specified;
+protected:
+	double Mdisk0Initializer(const po::variables_map& vm) const;
+	double Mdot0Initializer(const po::variables_map& vm) const;
+	double F0Initializer(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args) const;
 public:
 	DiskStructureArguments(const std::string& opacity,
 						   const std::string& boundcond, double Thot,
 						   const std::string& initialcond, double F0,
 						   double powerorder, double gaussmu, double gausssigma,
 						   double Mdisk0=-1, double Mdot0=-1) = default;
+	DiskStructureArguments(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args);
 	static po::options_description description();
 };
 
@@ -168,8 +201,11 @@ public:
 	constexpr static const double default_Cirr = 0.;
 	constexpr static const char default_irrfactortype[] = "const";
 public:
-	double Cirr;
-	std::string irrfactortype;
+	const double Cirr;
+	const std::string irrfactortype;
+public:
+	SelfIrradiationArguments(double Cirr, const std::string& irrfactortype) = default;
+	SelfIrradiationArguments(const po::variables_map& vm, const DiskStructureArguments& dsa_args);
 	static po::options_description description();
 };
 
@@ -193,13 +229,20 @@ public:
 	constexpr static const double default_inclination = 0.;  // degrees
 	constexpr static const double default_distance = kpcToCm(10.);
 public:
-	double colourfactor;
-	double emin;
-	double emax;
-	double inclination;  // degrees
-	double distance;
-	std::vector<double> lambda;
+	const double colourfactor;
+	const double emin;
+	const double emax;
+	const double inclination;  // degrees
+	const double distance;
+	const std::vector<double> lambdas;
+protected:
+	std::vector<double>& lambdasInitializer(const po::variables_map& vm) const;
 public:
+	FluxArguments(double colourfactor,
+				  double emin, double emax,
+				  double inclination, double distance,
+	              const std::vector<double>& lambdas) = default;
+	FluxArguments(const po::variables_map& vm);
 	static po::options_description description();
 };
 
@@ -211,14 +254,15 @@ public:
 	constexpr static const unsigned int default_Nx = 1000;
 	constexpr static const char default_gridscale[] = "log";
 public:
-	double time;
-	double tau;
-	unsigned int Nx;
-	std::string gridscale;
-	double eps;
+	const double time;
+	const double tau;
+	const unsigned int Nx;
+	const std::string gridscale;
+	const double eps;
 public:
 	CalculationArguments(double time, double tau, unsigned int Nx, const std::string& gridscale,
 						 double eps=1e-6) = default;
+	CalculationArguments(const po::variables_map& vm);
 	static po::options_description description();
 };
 

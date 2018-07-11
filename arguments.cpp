@@ -1,8 +1,21 @@
+#include <algorithm>  // transform
+
+#include <boost/numeric/odeint.hpp>
+
 #include "arguments.hpp"
+
+
+namespace odeint = boost::numeric::odeint;
 
 
 constexpr const char GeneralArguments::default_prefix[];
 constexpr const char GeneralArguments::default_dir[];
+
+GeneralArguments::GeneralArguments(const po::variables_map& vm):
+		prefix(vm["prefix"].as<std::string>()),
+		dir(vm["dir"].as<std::string>()),
+		fulldata(vm.count("fulldata") > 0) {
+}
 
 po::options_description GeneralArguments::description() {
 	po::options_description od("General options");
@@ -16,8 +29,35 @@ po::options_description GeneralArguments::description() {
 }
 
 
+BasicDiskBinaryArguments::BasicDiskBinaryArguments(const po::variables_map &vm):
+		alpha(vm["alpha"].as<double>()),
+		Mx(sunToGram(vm["Mx"].as<double>())),
+		kerr(vm["kerr"].as<double>()),
+		Mopt(sunToGram(vm["Mopt"].as<double>())),
+		period(dayToS(vm["period"].as<double>())),
+		rin(rinInitializer(vm)),
+		rout(routInitializer(vm)) {
+	if (rin >= rout) {
+		throw po::invalid_option_value("rin should be smaller rout");
+	}
+}
+
+double BasicDiskBinaryArguments::rinInitializer(const po::variables_map &vm) const {
+	if (vm.count("rin")) {
+		return rgToCm(vm["rin"].as<double>(), Mx);
+	}
+	return rinFromMxKerr(Mx, kerr);
+}
+
+double BasicDiskBinaryArguments::routInitializer(const po::variables_map &vm) const {
+	if (vm.count("rout")) {
+		return sunToCm(vm["rout"].as<double>());
+	}
+	return routFromMxMoptPeriod(Mx, Mopt, period);
+}
+
 po::options_description BasicDiskBinaryArguments::description() {
-	po::options_description od("General options");
+	po::options_description od("Basic binary and disk parameter");
 	od.add_options()
 			( "alpha,a", po::value<double>()->default_value(default_alpha), "Alpha parameter of Shakura-Sunyaev model" )
 			( "Mx,M", po::value<double>()->default_value(gramToSun(default_Mx)), "Mass of the central object, in the units of solar masses" )
@@ -48,8 +88,161 @@ constexpr const char DiskStructureArguments::default_opacity[];
 constexpr const char DiskStructureArguments::default_initialcond[];
 constexpr const char DiskStructureArguments::default_boundcond[];
 
+DiskStructureArguments::DiskStructureArguments(const po::variables_map &vm, const BasicDiskBinaryArguments& bdb_args):
+		opacity(vm["opacity"].as<std::string>()),
+		oprel(new OpacityRelated(opacity, bdb_args.Mx, bdb_args.alpha, mu)),
+		boundcond(vm["boundcond"].as<std::string>()),
+		Thot(vm["Thot"].as<double>()),
+		initialcond(vm["initialcond"].as<std::string>()),
+		is_Mdisk0_specified(vm.count("Mdisk0") > 0),
+		is_Mdot0_specified(vm.count("Mdot0") > 0),
+		Mdisk0(Mdisk0Initializer(vm)),
+		Mdot0(Mdot0Initializer(vm)),
+		powerorder(vm["powerorder"].as<double>()),
+		gaussmu(vm["gaussmu"].as<double>()),
+		gausssigma(vm["gausssigma"].as<double>()),
+		F0(F0Initializer(vm, bdb_args)) {}
+
+double DiskStructureArguments::Mdisk0Initializer(const po::variables_map& vm) const {
+	if (is_Mdisk0_specified) {
+		return vm["Mdisk0"].as<double>();
+	}
+	return -1;
+}
+
+double DiskStructureArguments::Mdot0Initializer(const po::variables_map& vm) const {
+	if (is_Mdot0_specified) {
+		return vm["Mdot0"].as<double>();
+	}
+	return -1;
+}
+
+double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const BasicDiskBinaryArguments& bdb_args) const {
+	double F0 = vm["F0"].as<double>();
+
+	const double h_in = bdb_args.h(bdb_args.rin);
+	const double h_out = bdb_args.h(bdb_args.rout);
+
+	if (initialcond == "powerF" || initialcond == "power") {
+		if (is_Mdot0_specified) {
+			throw po::invalid_option_value("It is obvious to use --Mdot with --initialcond=powerF");
+		}
+		if (is_Mdisk0_specified) {
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = (1. - oprel->m) * powerorder;
+			const double b = oprel->n;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+					stepper,
+					[a,b,x0]( const double &y, double &dydx, double x ){
+						dydx = pow(x, a) * pow(x + x0, b);
+					},
+					integral, 0., 1., 0.01
+			);
+			F0 = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m));
+			return F0;
+		}
+		return F0;
+	}
+	if (initialcond == "powerSigma") {
+		if (is_Mdot0_specified) {
+			throw po::invalid_option_value("It is obvious to use --Mdot with --initialcond=powerSigma");
+		}
+		if (is_Mdisk0_specified) {
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = powerorder;
+			const double b = 3.;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+					stepper,
+					[a, b, x0](const double &y, double &dydx, double x) {
+						dydx = pow(x, a) * pow(x + x0, b);
+					},
+					integral, 0., 1., 0.01
+			);
+			F0 = pow(Mdisk0 * (1. - oprel->m) * oprel->D * pow(h_out, 3. - oprel->n) / pow(h_out - h_in, 4.) / integral, 1. / (1. - oprel->m));
+			return F0;
+		}
+		return F0;
+	}
+	if (initialcond == "sinusF" || initialcond == "sinus") {
+		if (is_Mdot0_specified) {
+			F0 = Mdot0 * (h_out - h_in) * 2./M_PI;
+			return F0;
+		}
+		if (is_Mdisk0_specified) {
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = 1. - oprel->m;
+			const double b = oprel->n;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+					stepper,
+					[a, b, x0](const double &y, double &dydx, double x) {
+						dydx = pow(sin(x * M_PI_2), a) * pow(x + x0, b);
+					},
+					integral, 0., 1., 0.01
+			);
+			F0 = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m));
+			return F0;
+		}
+		return F0;
+	}
+	if (initialcond == "gaussF") {
+		if ( gaussmu <= 0. or gaussmu > 1. ){
+			throw po::invalid_option_value("--gaussmu value should be large than 0 and not large than 1");
+		}
+		if (is_Mdot0_specified) {
+			throw po::invalid_option_value("Usage of --Mdot with --initialcond=gaussF produces unstable results and it isn't motivated physically. Use --F0 or --Mdisk0 instead");
+			//F0 = Mdot_in * (h_out - h_in) * gauss_sigma*gauss_sigma / gauss_mu * exp( gauss_mu*gauss_mu / (2. * gauss_sigma*gauss_sigma) );
+		}
+		if (is_Mdisk0_specified){
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = 1. - oprel->m;
+			const double b = oprel->n;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+					stepper,
+					[a,b,x0,gaussmu,gausssigma]( const double &y, double &dydx, double x ){
+						dydx = exp( -(x - gaussmu)*(x - gaussmu) * a / (2. * gausssigma*gausssigma) ) * pow(x + x0, b);
+					},
+					integral, 0., 1., 0.01
+			);
+			F0 = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m));
+			return F0;
+		}
+		return F0;
+	}
+	if (initialcond == "quasistat") {
+		if (is_Mdot0_specified) {
+			F0 = Mdot0 * (h_out - h_in) / h_out * h_in / oprel->f_F(h_in/h_out);
+			return F0;
+		}
+		if (is_Mdisk0_specified) {
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double x0 = h_in / (h_out - h_in);
+			const double x1 = h_in / h_out;
+			double integral = 0.;
+			integrate_adaptive(
+					stepper,
+					[x0,x1,oprel]( const double &y, double &dydx, double x ){
+						dydx = pow(oprel->f_F(x * (1. - x1) + x1) * x / (x * (1. - x1) + x1), 1. - oprel->m) * pow(x + x0, oprel->n);
+					},
+					integral, 0., 1., 0.01
+			);
+			F0 = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m));
+			return F0;
+		}
+		return F0;
+	}
+	throw po::invalid_option_value(initialcond);
+}
+
 po::options_description DiskStructureArguments::description() {
-	po::options_description od("General options");
+	po::options_description od("Parameters of the disk mode");
 	od.add_options()
 			( "opacity,O", po::value<std::string>()->default_value(default_opacity), "Opacity law: Kramers (varkappa ~ rho / T^7/2) or OPAL (varkappa ~ rho / T^5/2)" )
 			( "boundcond", po::value<std::string>()->default_value(default_boundcond), "Outer boundary movement condition\n\n"
@@ -78,8 +271,19 @@ po::options_description DiskStructureArguments::description() {
 
 constexpr const char SelfIrradiationArguments::irrfactortype[];
 
+SelfIrradiationArguments::SelfIrradiationArguments(const po::variables_map &vm, const DiskStructureArguments &dsa_args):
+		Cirr(vm["Cirr"].as<double>()),
+		irrfactortype(vm["irrfactortype"].as<std::string>()) {
+	if (Cirr <= 0. && dsa_args.boundcond == "Tirr") {
+		throw po::error("It is obvious to use nonpositive --Cirr with --boundcond=Tirr");
+	}
+	if (irrfactortype != "const" && irrfactortype != "square") {
+		throw po::invalid_option_value("--irrfactortype has invalid value");
+	}
+}
+
 po::options_description SelfIrradiationArguments::description() {
-	po::options_description od("General options");
+	po::options_description od("Parameters of self-irradiatio");
 	od.add_options()
 			( "Cirr", po::value<double>()->default_value(default_Cirr), "Irradiation factor" )
 			( "irrfactortype", po::value<std::string>()->default_value(default_irrfactortype), "Type of irradiation factor Cirr\n\n"
@@ -92,7 +296,57 @@ po::options_description SelfIrradiationArguments::description() {
 }
 
 
+FluxArguments::FluxArguments(const po::variables_map &vm):
+		colourfactor(vm["colourfactor"].as<double>()),
+		emin(kevToHertz(vm["emin"].as<double>())),
+		emax(kevToHertz(vm["emax"].as<double>())),
+		inclination(vm["inclination"].as<double>()),
+		distance(vm["distance"].as<double>()),
+		lambdas(lambdaInitializer(vm)) {}
+
+std::vector<double>& FluxArguments::lambdasInitializer(const po::variables_map &vm) const {
+	std::vector<double> lambdas(vm["lambda"].as< std::vector<double> >());
+	transform(lambdas.begin(), lambdas.end(), lambdas.begin(), angstromToCm);
+	return lambdas;
+}
+
+po::options_description FluxArguments::description() {
+	po::options_description od("Parameters of flux calculation");
+	od.add_options()
+			( "colourfactor", po::value<double>()->default_value(default_colourfactor), "Colour factor to calculate X-ray flux"  )
+			( "emin", po::value<double>()->default_value(hertzToKev(default_emin)), "Minimum energy of X-ray band, keV" )
+			( "emax", po::value<double>()->default_value(hertzToKev(default_emax)), "Maximum energy of X-ray band, keV" )
+			( "inclination,i", po::value<double>()->default_value(default_inclination), "Inclination of the system, degrees" )
+			( "distance", po::value<double>()->default_value(cmToKpc(default_distance)), "Distance to the system, kpc" )
+			( "lambda", po::value< std::vector<double> >()->multitoken(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced" )
+			;
+	return od;
+}
+
+
 constexpr const char CalculationArguments::default_gridscale[];
+
+CalculationArguments::CalculationArguments(const po::variables_map &vm):
+		time(dayToS(vm["time"].as<double>())),
+		tau(dayToS(vm["tau"].as<double>())),
+		Nx(vm["Nx"].as<unsigned int>()),
+		gridscale(vm["gridscale"].as<std::string>()),
+		eps(1e-6) {
+	if (gridscale != "log" || gridscale != "linear") {
+		throw po::invalid_option_value("Invalid --gridscale value");
+	}
+}
+
+po::options_description CalculationArguments::description() {
+	po::options_description od("Parameters of disk evolution calculation");
+	od.add_options()
+			( "time,T", po::value<double>()->default_value(sToDay(default_time)), "Time interval to calculate evolution, days" )
+			( "tau",	po::value<double>()->default_value(sToDay(default_tau)), "Time step, days" )
+			( "Nx",	po::value<unsigned int>()->default_value(default_Nx), "Size of calculation grid" )
+			( "gridscale", po::value<std::string>()->default_value(default_gridscale), "Type of grid for angular momentum h: log or linear" )
+			;
+	return od;
+}
 
 
 FreddiArguments::FreddiArguments(int argc, const char *argv[]) {

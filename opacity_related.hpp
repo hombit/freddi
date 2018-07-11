@@ -33,8 +33,8 @@ public:
 	double m, n, varkappa0, Pi1, Pi2, Pi3, Pi4, Pi_Sigma, Pi_Height, D, Height_exp_F, Height_exp_R, Height_coef;
 	double a0, a1, a2, k, l;
 
-	double Height(double R, double F);
-	double f_F(double xi);
+	double Height(double R, double F) const;
+	double f_F(double xi) const;
 };
 
 
