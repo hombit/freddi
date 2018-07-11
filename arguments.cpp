@@ -1,4 +1,8 @@
 #include <algorithm>  // transform
+#include <array>
+#include <cstdlib>  // getenv
+#include <exception>
+#include <fstream>
 
 #include <boost/numeric/odeint.hpp>
 
@@ -29,27 +33,33 @@ po::options_description GeneralArguments::description() {
 }
 
 
+constexpr const double BasicDiskBinaryArguments::default_alpha;
+constexpr const double BasicDiskBinaryArguments::default_Mx;
+constexpr const double BasicDiskBinaryArguments::default_kerr;
+constexpr const double BasicDiskBinaryArguments::default_Mopt;
+constexpr const double BasicDiskBinaryArguments::default_period;
+
 BasicDiskBinaryArguments::BasicDiskBinaryArguments(const po::variables_map &vm):
 		alpha(vm["alpha"].as<double>()),
 		Mx(sunToGram(vm["Mx"].as<double>())),
 		kerr(vm["kerr"].as<double>()),
 		Mopt(sunToGram(vm["Mopt"].as<double>())),
 		period(dayToS(vm["period"].as<double>())),
-		rin(rinInitializer(vm)),
-		rout(routInitializer(vm)) {
+		rin(rinInitializer(vm, Mx, kerr)),
+		rout(routInitializer(vm, Mx, Mopt, period)) {
 	if (rin >= rout) {
 		throw po::invalid_option_value("rin should be smaller rout");
 	}
 }
 
-double BasicDiskBinaryArguments::rinInitializer(const po::variables_map &vm) const {
+double BasicDiskBinaryArguments::rinInitializer(const po::variables_map &vm, double Mx, double kerr) {
 	if (vm.count("rin")) {
 		return rgToCm(vm["rin"].as<double>(), Mx);
 	}
 	return rinFromMxKerr(Mx, kerr);
 }
 
-double BasicDiskBinaryArguments::routInitializer(const po::variables_map &vm) const {
+double BasicDiskBinaryArguments::routInitializer(const po::variables_map &vm, double Mx, double Mopt, double period) {
 	if (vm.count("rout")) {
 		return sunToCm(vm["rout"].as<double>());
 	}
@@ -83,10 +93,15 @@ double BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(const double MxToMopt) { /
 	return 0.49 * q * q / (0.6 * q * q + std::log(1. + q));
 }
 
-
 constexpr const char DiskStructureArguments::default_opacity[];
 constexpr const char DiskStructureArguments::default_initialcond[];
+constexpr const double DiskStructureArguments::default_Thot;
 constexpr const char DiskStructureArguments::default_boundcond[];
+constexpr const double DiskStructureArguments::default_F0;
+constexpr const double DiskStructureArguments::default_powerorder;
+constexpr const double DiskStructureArguments::default_gaussmu;
+constexpr const double DiskStructureArguments::default_gausssigma;
+constexpr const double DiskStructureArguments::mu;
 
 DiskStructureArguments::DiskStructureArguments(const po::variables_map &vm, const BasicDiskBinaryArguments& bdb_args):
 		opacity(vm["opacity"].as<std::string>()),
@@ -94,8 +109,6 @@ DiskStructureArguments::DiskStructureArguments(const po::variables_map &vm, cons
 		boundcond(vm["boundcond"].as<std::string>()),
 		Thot(vm["Thot"].as<double>()),
 		initialcond(vm["initialcond"].as<std::string>()),
-		is_Mdisk0_specified(vm.count("Mdisk0") > 0),
-		is_Mdot0_specified(vm.count("Mdot0") > 0),
 		Mdisk0(Mdisk0Initializer(vm)),
 		Mdot0(Mdot0Initializer(vm)),
 		powerorder(vm["powerorder"].as<double>()),
@@ -103,25 +116,36 @@ DiskStructureArguments::DiskStructureArguments(const po::variables_map &vm, cons
 		gausssigma(vm["gausssigma"].as<double>()),
 		F0(F0Initializer(vm, bdb_args)) {}
 
-double DiskStructureArguments::Mdisk0Initializer(const po::variables_map& vm) const {
-	if (is_Mdisk0_specified) {
+double DiskStructureArguments::Mdisk0Initializer(const po::variables_map& vm) {
+	if (vm.count("Mdisk0") > 0) {
 		return vm["Mdisk0"].as<double>();
 	}
 	return -1;
 }
 
-double DiskStructureArguments::Mdot0Initializer(const po::variables_map& vm) const {
-	if (is_Mdot0_specified) {
+double DiskStructureArguments::Mdot0Initializer(const po::variables_map& vm) {
+	if (vm.count("Mdot0") > 0) {
 		return vm["Mdot0"].as<double>();
 	}
 	return -1;
 }
 
-double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const BasicDiskBinaryArguments& bdb_args) const {
-	double F0 = vm["F0"].as<double>();
+double DiskStructureArguments::F0Initializer(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args) {
+	auto opacity = vm["opacity"].as<std::string>();
+	OpacityRelated oprel(opacity, bdb_args.Mx, bdb_args.alpha, mu);
+	auto initialcond = vm["initialcond"].as<std::string>();
+	auto Mdisk0 = Mdisk0Initializer(vm);
+	auto Mdot0 = Mdot0Initializer(vm);
+	auto powerorder = vm["powerorder"].as<double>();
+	auto gaussmu = vm["gaussmu"].as<double>();
+	auto gausssigma = vm["gausssigma"].as<double>();
+	auto F0 = vm["F0"].as<double>();
 
 	const double h_in = bdb_args.h(bdb_args.rin);
 	const double h_out = bdb_args.h(bdb_args.rout);
+
+	const bool is_Mdot0_specified = (vm.count("Mdot0") > 0);
+	const bool is_Mdisk0_specified = (vm.count("Mdisk0") > 0);
 
 	if (initialcond == "powerF" || initialcond == "power") {
 		if (is_Mdot0_specified) {
@@ -129,8 +153,8 @@ double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const 
 		}
 		if (is_Mdisk0_specified) {
 			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double a = (1. - oprel->m) * powerorder;
-			const double b = oprel->n;
+			const double a = (1. - oprel.m) * powerorder;
+			const double b = oprel.n;
 			const double x0 = h_in / (h_out - h_in);
 			double integral = 0.;
 			integrate_adaptive(
@@ -140,7 +164,7 @@ double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const 
 					},
 					integral, 0., 1., 0.01
 			);
-			F0 = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m));
+			F0 = pow(Mdisk0 * (1. - oprel.m) * oprel.D / pow(h_out - h_in, oprel.n + 1.) / integral, 1. / (1. - oprel.m));
 			return F0;
 		}
 		return F0;
@@ -162,7 +186,7 @@ double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const 
 					},
 					integral, 0., 1., 0.01
 			);
-			F0 = pow(Mdisk0 * (1. - oprel->m) * oprel->D * pow(h_out, 3. - oprel->n) / pow(h_out - h_in, 4.) / integral, 1. / (1. - oprel->m));
+			F0 = pow(Mdisk0 * (1. - oprel.m) * oprel.D * pow(h_out, 3. - oprel.n) / pow(h_out - h_in, 4.) / integral, 1. / (1. - oprel.m));
 			return F0;
 		}
 		return F0;
@@ -174,8 +198,8 @@ double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const 
 		}
 		if (is_Mdisk0_specified) {
 			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double a = 1. - oprel->m;
-			const double b = oprel->n;
+			const double a = 1. - oprel.m;
+			const double b = oprel.n;
 			const double x0 = h_in / (h_out - h_in);
 			double integral = 0.;
 			integrate_adaptive(
@@ -185,13 +209,13 @@ double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const 
 					},
 					integral, 0., 1., 0.01
 			);
-			F0 = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m));
+			F0 = pow(Mdisk0 * (1. - oprel.m) * oprel.D / pow(h_out - h_in, oprel.n + 1.) / integral, 1. / (1. - oprel.m));
 			return F0;
 		}
 		return F0;
 	}
 	if (initialcond == "gaussF") {
-		if ( gaussmu <= 0. or gaussmu > 1. ){
+		if (gaussmu <= 0. or gaussmu > 1.){
 			throw po::invalid_option_value("--gaussmu value should be large than 0 and not large than 1");
 		}
 		if (is_Mdot0_specified) {
@@ -200,8 +224,8 @@ double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const 
 		}
 		if (is_Mdisk0_specified){
 			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double a = 1. - oprel->m;
-			const double b = oprel->n;
+			const double a = 1. - oprel.m;
+			const double b = oprel.n;
 			const double x0 = h_in / (h_out - h_in);
 			double integral = 0.;
 			integrate_adaptive(
@@ -211,14 +235,14 @@ double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const 
 					},
 					integral, 0., 1., 0.01
 			);
-			F0 = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m));
+			F0 = pow(Mdisk0 * (1. - oprel.m) * oprel.D / pow(h_out - h_in, oprel.n + 1.) / integral, 1. / (1. - oprel.m));
 			return F0;
 		}
 		return F0;
 	}
 	if (initialcond == "quasistat") {
 		if (is_Mdot0_specified) {
-			F0 = Mdot0 * (h_out - h_in) / h_out * h_in / oprel->f_F(h_in/h_out);
+			F0 = Mdot0 * (h_out - h_in) / h_out * h_in / oprel.f_F(h_in/h_out);
 			return F0;
 		}
 		if (is_Mdisk0_specified) {
@@ -228,12 +252,12 @@ double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const 
 			double integral = 0.;
 			integrate_adaptive(
 					stepper,
-					[x0,x1,oprel]( const double &y, double &dydx, double x ){
-						dydx = pow(oprel->f_F(x * (1. - x1) + x1) * x / (x * (1. - x1) + x1), 1. - oprel->m) * pow(x + x0, oprel->n);
+					[x0,x1,&oprel]( const double &y, double &dydx, double x ){
+						dydx = pow(oprel.f_F(x * (1. - x1) + x1) * x / (x * (1. - x1) + x1), 1. - oprel.m) * pow(x + x0, oprel.n);
 					},
 					integral, 0., 1., 0.01
 			);
-			F0 = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m));
+			F0 = pow(Mdisk0 * (1. - oprel.m) * oprel.D / pow(h_out - h_in, oprel.n + 1.) / integral, 1. / (1. - oprel.m));
 			return F0;
 		}
 		return F0;
@@ -269,7 +293,8 @@ po::options_description DiskStructureArguments::description() {
 }
 
 
-constexpr const char SelfIrradiationArguments::irrfactortype[];
+constexpr const double SelfIrradiationArguments::default_Cirr;
+constexpr const char SelfIrradiationArguments::default_irrfactortype[];
 
 SelfIrradiationArguments::SelfIrradiationArguments(const po::variables_map &vm, const DiskStructureArguments &dsa_args):
 		Cirr(vm["Cirr"].as<double>()),
@@ -296,18 +321,27 @@ po::options_description SelfIrradiationArguments::description() {
 }
 
 
+constexpr const double FluxArguments::default_colourfactor;
+constexpr const double FluxArguments::default_emin;
+constexpr const double FluxArguments::default_emax;
+constexpr const double FluxArguments::default_inclination;
+constexpr const double FluxArguments::default_distance;
+
 FluxArguments::FluxArguments(const po::variables_map &vm):
 		colourfactor(vm["colourfactor"].as<double>()),
 		emin(kevToHertz(vm["emin"].as<double>())),
 		emax(kevToHertz(vm["emax"].as<double>())),
 		inclination(vm["inclination"].as<double>()),
 		distance(vm["distance"].as<double>()),
-		lambdas(lambdaInitializer(vm)) {}
+		lambdas(lambdasInitializer(vm)) {}
 
-std::vector<double>& FluxArguments::lambdasInitializer(const po::variables_map &vm) const {
-	std::vector<double> lambdas(vm["lambda"].as< std::vector<double> >());
-	transform(lambdas.begin(), lambdas.end(), lambdas.begin(), angstromToCm);
-	return lambdas;
+std::vector<double> FluxArguments::lambdasInitializer(const po::variables_map &vm) const {
+	if (vm.count("lambda") > 0) {
+		std::vector<double> lambdas(vm["lambda"].as<std::vector<double> >());
+		transform(lambdas.begin(), lambdas.end(), lambdas.begin(), angstromToCm);
+		return lambdas;
+	}
+	return std::vector<double>();
 }
 
 po::options_description FluxArguments::description() {
@@ -324,6 +358,9 @@ po::options_description FluxArguments::description() {
 }
 
 
+constexpr const double CalculationArguments::default_time;
+constexpr const double CalculationArguments::default_tau;
+constexpr const unsigned int CalculationArguments::default_Nx;
 constexpr const char CalculationArguments::default_gridscale[];
 
 CalculationArguments::CalculationArguments(const po::variables_map &vm):
@@ -332,7 +369,7 @@ CalculationArguments::CalculationArguments(const po::variables_map &vm):
 		Nx(vm["Nx"].as<unsigned int>()),
 		gridscale(vm["gridscale"].as<std::string>()),
 		eps(1e-6) {
-	if (gridscale != "log" || gridscale != "linear") {
+	if (gridscale != "log" && gridscale != "linear") {
 		throw po::invalid_option_value("Invalid --gridscale value");
 	}
 }
@@ -349,6 +386,38 @@ po::options_description CalculationArguments::description() {
 }
 
 
-FreddiArguments::FreddiArguments(int argc, const char *argv[]) {
+FreddiArguments::FreddiArguments(const po::variables_map& vm):
+		general(new GeneralArguments(vm)),
+		basic(new BasicDiskBinaryArguments(vm)),
+		disk(new DiskStructureArguments(vm, *basic)),
+		irr(new SelfIrradiationArguments(vm, *disk)),
+		flux(new FluxArguments(vm)),
+		calc(new CalculationArguments(vm)) {
+}
 
+po::options_description FreddiArguments::description() {
+	po::options_description desc("Freddi - numerical calculation of accretion disk evolutio");
+	desc.add(GeneralArguments::description());
+	desc.add(BasicDiskBinaryArguments::description());
+	desc.add(DiskStructureArguments::description());
+	desc.add(SelfIrradiationArguments::description());
+	desc.add(FluxArguments::description());
+	desc.add(CalculationArguments::description());
+	return desc;
+}
+
+
+po::variables_map parseArguments(int ac, char* av[]) {
+	const std::string config_filename = "freddi.ini";
+	const char* home = getenv("HOME");
+	const std::array<const std::string, 4> path_config_file = {".", home, INSTALLPATHPREFIX"/etc", "/etc"};
+	auto desc = FreddiArguments::description();
+	po::variables_map vm;
+	po::store( po::parse_command_line(ac, av, desc), vm );
+	for (const auto &path : path_config_file){
+		std::ifstream config(path + "/" + config_filename);
+		po::store( po::parse_config_file(config, desc), vm );
+	}
+	po::notify(vm);
+	return vm;
 }

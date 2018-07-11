@@ -26,7 +26,10 @@ public:
 	const std::string dir;
 	const bool fulldata;
 public:
-	GeneralArguments(const char prefix[], const char dir[], bool fulldata=false) = default;
+	GeneralArguments(const std::string& prefix, const std::string& dir, bool fulldata=false):
+			prefix(prefix),
+			dir(dir),
+			fulldata(fulldata) {}
 	GeneralArguments(const po::variables_map& vm);
 	static po::options_description description();
 };
@@ -34,23 +37,23 @@ public:
 
 class MassTransformation {
 public:
-	static inline double gramToSun(const double mass_gram) { return mass_gram / GSL_CONST_CGSM_SOLAR_MASS; }
-	static inline double sunToGram(const double mass_sun) { return mass_sun * GSL_CONST_CGSM_SOLAR_MASS; }
+	constexpr static inline double gramToSun(const double mass_gram) { return mass_gram / GSL_CONST_CGSM_SOLAR_MASS; }
+	constexpr static inline double sunToGram(const double mass_sun) { return mass_sun * GSL_CONST_CGSM_SOLAR_MASS; }
 };
 
 
 class LengthTransformation {
 public:
-	static inline double cmToRg(const double length_cm, const double mass_gram) {
+	constexpr static inline double cmToRg(const double length_cm, const double mass_gram) {
 		return length_cm * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * mass_gram / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
 	}
-	static inline double rgToCm(const double length_rg, const double mass_gram) {
+	constexpr static inline double rgToCm(const double length_rg, const double mass_gram) {
 		return length_rg * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / (GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * mass_gram);
 	}
-	static inline double kpcToCm(const double length_kpc) {
+	constexpr static inline double kpcToCm(const double length_kpc) {
 		return length_kpc * 1000. * GSL_CONST_CGSM_PARSEC;
 	}
-	static inline double cmToKpc(const double length_cm) {
+	constexpr static inline double cmToKpc(const double length_cm) {
 		return length_cm / (1000. * GSL_CONST_CGSM_PARSEC);
 	}
 	static inline double sunToCm(const double length_solar_radius) {
@@ -59,10 +62,10 @@ public:
 	static inline double cmToSun(const double length_cm) {
 		return length_cm * solar_radius;
 	}
-	static inline double angstromToCm(const double length_angstrom) {
+	constexpr static inline double angstromToCm(const double length_angstrom) {
 		return length_angstrom * 1e-8;
 	}
-	static inline double cmToAngstrom(const double length_cm) {
+	constexpr static inline double cmToAngstrom(const double length_cm) {
 		return length_cm * 1e8;
 	}
 };
@@ -70,8 +73,8 @@ public:
 
 class TimeTransformation {
 public:
-	static inline double sToDay(double time_s) { return time_s / 86400.; }
-	static inline double dayToS(double time_day) { return time_day * 86400.; }
+	constexpr static inline double sToDay(double time_s) { return time_s / 86400.; }
+	constexpr static inline double dayToS(double time_day) { return time_day * 86400.; }
 };
 
 
@@ -115,13 +118,19 @@ public:
 	const double rin;
 	const double rout;
 protected:
-	double rinInitializer(const po::variables_map& vm) const;
-	double routInitializer(const po::variables_map& vm) const;
+	static double rinInitializer(const po::variables_map& vm, double Mx, double kerr);
+	static double routInitializer(const po::variables_map& vm, double Mx, double Mopt, double period);
 public:
-	BasicDiskBinaryArguments(double alpha,
-							 double Mx, double kerr,
-							 double Mopt, double period,
-							 double rin, double rout) = default;
+	BasicDiskBinaryArguments(
+			double alpha,
+			double Mx, double kerr,
+			double Mopt, double period,
+			double rin, double rout
+	):
+			alpha(alpha),
+			Mx(Mx), kerr(kerr),
+			Mopt(Mopt), period(period),
+			rin(rin), rout(rout) {}
 	static inline double rinFromMxKerr(double Mx, double kerr) { return rISCO(Mx, kerr); }
 	static inline double routFromMxMoptPeriod(double Mx, double Mopt, double period) {
 		return 0.8 * rocheLobeVolumeRadius(Mx, Mopt, period);
@@ -179,18 +188,21 @@ public:
 public:
 	std::unique_ptr<const OpacityRelated> oprel;
 protected:
-	const bool is_Mdisk0_specified;
-	const bool is_Mdot0_specified;
-protected:
-	double Mdisk0Initializer(const po::variables_map& vm) const;
-	double Mdot0Initializer(const po::variables_map& vm) const;
-	double F0Initializer(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args) const;
+	static double Mdisk0Initializer(const po::variables_map& vm);
+	static double Mdot0Initializer(const po::variables_map& vm);
+	static double F0Initializer(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args);
 public:
-	DiskStructureArguments(const std::string& opacity,
-						   const std::string& boundcond, double Thot,
-						   const std::string& initialcond, double F0,
-						   double powerorder, double gaussmu, double gausssigma,
-						   double Mdisk0=-1, double Mdot0=-1) = default;
+	DiskStructureArguments(
+			const std::string& opacity,
+			const std::string& boundcond, double Thot,
+			const std::string& initialcond, double F0,
+			double powerorder, double gaussmu, double gausssigma,
+			double Mdisk0=-1, double Mdot0=-1):
+			opacity(opacity),
+			boundcond(boundcond), Thot(Thot),
+			initialcond(initialcond), F0(F0),
+			powerorder(powerorder), gaussmu(gaussmu), gausssigma(gausssigma),
+			Mdisk0(Mdisk0), Mdot0(Mdot0) {}
 	DiskStructureArguments(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args);
 	static po::options_description description();
 };
@@ -204,7 +216,8 @@ public:
 	const double Cirr;
 	const std::string irrfactortype;
 public:
-	SelfIrradiationArguments(double Cirr, const std::string& irrfactortype) = default;
+	SelfIrradiationArguments(double Cirr, const std::string& irrfactortype):
+			Cirr(Cirr), irrfactortype(irrfactortype) {}
 	SelfIrradiationArguments(const po::variables_map& vm, const DiskStructureArguments& dsa_args);
 	static po::options_description description();
 };
@@ -212,10 +225,10 @@ public:
 
 class PhotonTransformation {
 public:
-	static inline double kevToHertz(const double energy_keV) {
+	constexpr static inline double kevToHertz(const double energy_keV) {
 		return energy_keV * 1000. * GSL_CONST_CGSM_ELECTRON_VOLT / GSL_CONST_CGSM_PLANCKS_CONSTANT_H;
 	}
-	static inline double hertzToKev(const double nu_hertz) {
+	constexpr static inline double hertzToKev(const double nu_hertz) {
 		return nu_hertz * GSL_CONST_CGSM_PLANCKS_CONSTANT_H / (1000. * GSL_CONST_CGSM_ELECTRON_VOLT);
 	}
 };
@@ -236,12 +249,17 @@ public:
 	const double distance;
 	const std::vector<double> lambdas;
 protected:
-	std::vector<double>& lambdasInitializer(const po::variables_map& vm) const;
+	std::vector<double> lambdasInitializer(const po::variables_map& vm) const;
 public:
-	FluxArguments(double colourfactor,
-				  double emin, double emax,
-				  double inclination, double distance,
-	              const std::vector<double>& lambdas) = default;
+	FluxArguments(
+			double colourfactor,
+			double emin, double emax,
+			double inclination, double distance,
+	        const std::vector<double>& lambdas):
+			colourfactor(colourfactor),
+			emin(emin), emax(emax),
+			inclination(inclination), distance(distance),
+			lambdas(lambdas) {}
 	FluxArguments(const po::variables_map& vm);
 	static po::options_description description();
 };
@@ -260,8 +278,10 @@ public:
 	const std::string gridscale;
 	const double eps;
 public:
-	CalculationArguments(double time, double tau, unsigned int Nx, const std::string& gridscale,
-						 double eps=1e-6) = default;
+	CalculationArguments(
+			double time, double tau, unsigned int Nx, const std::string& gridscale,
+			double eps=1e-6):
+			time(time), tau(tau), Nx(Nx), gridscale(gridscale), eps(eps) {}
 	CalculationArguments(const po::variables_map& vm);
 	static po::options_description description();
 };
@@ -269,15 +289,27 @@ public:
 
 class FreddiArguments {
 public:
-	GeneralArguments general;
-	BasicDiskBinaryArguments basic;
-	DiskStructureArguments disk;
-	SelfIrradiationArguments irr;
-	FluxArguments flux;
-	CalculationArguments calc;
+	std::shared_ptr<GeneralArguments> general;
+	std::shared_ptr<BasicDiskBinaryArguments> basic;
+	std::shared_ptr<DiskStructureArguments> disk;
+	std::shared_ptr<SelfIrradiationArguments> irr;
+	std::shared_ptr<FluxArguments> flux;
+	std::shared_ptr<CalculationArguments> calc;
 public:
-	FreddiArguments(int argc, const char *argv[]);
+	FreddiArguments(
+			GeneralArguments* general,
+			BasicDiskBinaryArguments* basic,
+			DiskStructureArguments* disk,
+			SelfIrradiationArguments* irr,
+			FluxArguments* flux,
+			CalculationArguments* calc):
+			general(general), basic(basic), disk(disk), irr(irr), flux(flux), calc(calc) {}
+	FreddiArguments(const po::variables_map& vm);
+	static po::options_description description();
 };
+
+
+po::variables_map parseArguments(int ac, char* av[]);
 
 
 #endif // _ARGUMENTS_HPP
