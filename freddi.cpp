@@ -23,17 +23,7 @@ using namespace std;
 using namespace std::placeholders;
 
 
-int main(int ac, char *av[]) {
-	auto vm = parseArguments(ac, av);
-	if (vm.count("help") > 0) {
-		cout << FreddiArguments::description() << endl;
-		return 0;
-	}
-	FreddiArguments args(vm);
-}
-
-//
-//int main(int ac, char *av[]){
+void freddi(const FreddiArguments& args) {
 //	const double DAY = 86400.;
 //	const double Angstrem = 1e-8;
 //	const double keV = 1000. * GSL_CONST_CGSM_ELECTRON_VOLT / GSL_CONST_CGSM_PLANCKS_CONSTANT_H;
@@ -617,4 +607,4 @@ int main(int ac, char *av[]) {
 //	delete oprel;
 //
 //	return 0;
-//}
+}

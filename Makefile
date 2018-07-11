@@ -5,11 +5,11 @@ override CPPFLAGS += -std=c++11 -O2 -D INSTALLPATHPREFIX='"$(prefix)"'
 
 override LDLIBS += -lboost_program_options
 
-OBJ = arguments.o nonlinear_diffusion.o opacity_related.o orbit.o spectrum.o
+OBJ = arguments.o freddi.o nonlinear_diffusion.o opacity_related.o orbit.o spectrum.o
 
 
 all: freddi ini
-freddi: $(OBJ) freddi.o
+freddi: $(OBJ) main.o
 ini: freddi.ini
 	sed -e '3 s_[a-zA-Z/]*/etc/_$(prefix)/etc/_' freddi.ini > .freddi.ini
 	mv .freddi.ini freddi.ini
