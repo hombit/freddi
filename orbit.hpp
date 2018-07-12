@@ -9,13 +9,13 @@
 
 namespace disk_orbit {
 
-double r_out_func(const double Mx, const double Mopt, const double P);
+double r_out_func(double Mx, double Mopt, double P);
 
-double r_ISCO(const double kerr);
+double r_ISCO(double kerr);
 
 double r_in_func(double Mx, double kerr);
 
-double efficiency_of_accretion(const double kerr);
+double efficiency_of_accretion(double kerr);
 
 } // disk_orbit
 

@@ -9,7 +9,6 @@ const double Jy = 1e-23;
 const double solar_radius = 6.955e10;
 const double kpc = 1000. * GSL_CONST_CGSM_PARSEC;
 
-namespace photometry_bands{
 // Allen's Astrophysical Quantities (4th ed.)
 const double lambdaU = 3600. * Angstrem;
 const double irr0U = 4.22e-9 / Angstrem;
@@ -24,6 +23,5 @@ const double irr0I = 0.84e-9 / Angstrem;
 // Campins et al., 1985, AJ, 90, 896
 const double lambdaJ = 12600 * Angstrem;
 const double irr0J = 1600 * Jy *  GSL_CONST_CGSM_SPEED_OF_LIGHT / (lambdaJ*lambdaJ); 
-} // photometry_bands
 
 #endif // _CONSTANTS_HPP

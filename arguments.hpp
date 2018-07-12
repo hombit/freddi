@@ -20,7 +20,7 @@ namespace po = boost::program_options;
 class GeneralArguments {
 public:
 	constexpr static const char default_prefix[] = "freddi";
-	constexpr static const char default_dir[] = "freddi";
+	constexpr static const char default_dir[] = ".";
 public:
 	const std::string prefix;
 	const std::string dir;

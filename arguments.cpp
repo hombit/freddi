@@ -332,7 +332,7 @@ FluxArguments::FluxArguments(const po::variables_map &vm):
 		emin(kevToHertz(vm["emin"].as<double>())),
 		emax(kevToHertz(vm["emax"].as<double>())),
 		inclination(vm["inclination"].as<double>()),
-		distance(vm["distance"].as<double>()),
+		distance(kpcToCm(vm["distance"].as<double>())),
 		lambdas(lambdasInitializer(vm)) {}
 
 std::vector<double> FluxArguments::lambdasInitializer(const po::variables_map &vm) const {
