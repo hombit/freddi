@@ -45,10 +45,10 @@ public:
 class LengthTransformation {
 public:
 	constexpr static inline double cmToRg(const double length_cm, const double mass_gram) {
-		return length_cm * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * mass_gram / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+		return length_cm * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / (GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * mass_gram);
 	}
 	constexpr static inline double rgToCm(const double length_rg, const double mass_gram) {
-		return length_rg * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / (GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * mass_gram);
+		return length_rg * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * mass_gram / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
 	}
 	constexpr static inline double kpcToCm(const double length_kpc) {
 		return length_kpc * 1000. * GSL_CONST_CGSM_PARSEC;
