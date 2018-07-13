@@ -92,6 +92,7 @@ public:
 			Mx(Mx), kerr(kerr),
 			Mopt(Mopt), period(period),
 			rin(rin), rout(rout) {}
+	BasicDiskBinaryArguments(BasicDiskBinaryArguments&&) = default;
 	static inline double rinFromMxKerr(double Mx, double kerr) { return rISCO(Mx, kerr); }
 	static inline double routFromMxMoptPeriod(double Mx, double Mopt, double period) {
 		return 0.8 * rocheLobeVolumeRadius(Mx, Mopt, period);
@@ -152,6 +153,7 @@ protected:
 	static double Mdisk0Initializer(const po::variables_map& vm);
 	static double Mdot0Initializer(const po::variables_map& vm);
 	static double F0Initializer(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args);
+public:
 	static double F0Initializer(const BasicDiskBinaryArguments& bdb_args,
 								const std::string& opacity,
 								const std::string& initialcond,
