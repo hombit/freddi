@@ -2,6 +2,7 @@
 
 #include "arguments.hpp"
 #include "freddi.hpp"
+#include "output.hpp"
 
 using namespace std;
 
@@ -13,5 +14,11 @@ int main(int ac, char *av[]) {
 		return 0;
 	}
 	FreddiArguments args(vm);
-	freddi(args);
+	Freddi freddi(args);
+	FreddiFileOutput output(freddi, vm);
+	for (int i_t = 0; i_t <= static_cast<int>(freddi.args->calc->time / freddi.args->calc->tau); i_t++) {
+		output.dump();
+		freddi.next();
+	}
+	output.dump();
 }

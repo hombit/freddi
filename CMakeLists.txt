@@ -15,7 +15,9 @@ set(SOURCE_FILES
     orbit.hpp
     spectrum.cpp
     spectrum.hpp constants.hpp
-    freddi.cpp freddi.hpp)
+    freddi.cpp freddi.hpp
+    output.cpp output.hpp
+)
 
 SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/local/inlcude")
 SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/lib")
