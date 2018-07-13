@@ -152,6 +152,13 @@ protected:
 	static double Mdisk0Initializer(const po::variables_map& vm);
 	static double Mdot0Initializer(const po::variables_map& vm);
 	static double F0Initializer(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args);
+	static double F0Initializer(const BasicDiskBinaryArguments& bdb_args,
+								const std::string& opacity,
+								const std::string& initialcond,
+								double F0,
+								double powerorder, double gaussmu, double gausssigma,
+								bool is_Mdisk0_specified, bool is_Mdot0_specified,
+								double Mdisk0, double Mdot);
 public:
 	DiskStructureArguments(
 			const std::string& opacity,

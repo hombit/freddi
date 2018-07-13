@@ -130,22 +130,36 @@ double DiskStructureArguments::Mdot0Initializer(const po::variables_map& vm) {
 	return -1;
 }
 
-double DiskStructureArguments::F0Initializer(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args) {
-	auto opacity = vm["opacity"].as<std::string>();
+double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const BasicDiskBinaryArguments &bdb_args) {
+	double Mdisk0 = Mdisk0Initializer(vm);
+	double Mdot0 = Mdot0Initializer(vm);
+
+	return F0Initializer(
+			bdb_args,
+			vm["opacity"].as<std::string>(),
+			vm["initialcond"].as<std::string>(),
+			vm["F0"].as<double>(),
+			vm["powerorder"].as<double>(),
+			vm["gaussmu"].as<double>(),
+			vm["gausssigma"].as<double>(),
+			(vm.count("Mdisk0") > 0),
+			(vm.count("Mdot0") > 0),
+			Mdisk0,
+			Mdot0);
+}
+
+double DiskStructureArguments::F0Initializer(
+		const BasicDiskBinaryArguments& bdb_args,
+		const std::string& opacity,
+		const std::string& initialcond,
+		double F0,
+		const double powerorder, const double gaussmu, const double gausssigma,
+		const bool is_Mdisk0_specified, const bool is_Mdot0_specified,
+		const double Mdisk0, const double Mdot0) {
 	OpacityRelated oprel(opacity, bdb_args.Mx, bdb_args.alpha, mu);
-	auto initialcond = vm["initialcond"].as<std::string>();
-	auto Mdisk0 = Mdisk0Initializer(vm);
-	auto Mdot0 = Mdot0Initializer(vm);
-	auto powerorder = vm["powerorder"].as<double>();
-	auto gaussmu = vm["gaussmu"].as<double>();
-	auto gausssigma = vm["gausssigma"].as<double>();
-	auto F0 = vm["F0"].as<double>();
 
 	const double h_in = bdb_args.h(bdb_args.rin);
 	const double h_out = bdb_args.h(bdb_args.rout);
-
-	const bool is_Mdot0_specified = (vm.count("Mdot0") > 0);
-	const bool is_Mdisk0_specified = (vm.count("Mdisk0") > 0);
 
 	if (initialcond == "powerF" || initialcond == "power") {
 		if (is_Mdot0_specified) {
