@@ -4,20 +4,20 @@ project(freddi)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DINSTALLPATHPREFIX=''")
 
 set(SOURCE_FILES
-        main.cpp
-    arguments.hpp arguments.cpp
-    gsl_const_cgsm.h
-    nonlinear_diffusion.cpp
-    nonlinear_diffusion.hpp
-    opacity_related.cpp
-    opacity_related.hpp
-    orbit.cpp
-    orbit.hpp
-    spectrum.cpp
-    spectrum.hpp constants.hpp
-    freddi.cpp freddi.hpp
-    output.cpp output.hpp
-    unit_transfomation.hpp
+        src/main.cpp
+        src/arguments.hpp src/arguments.cpp
+        src/gsl_const_cgsm.h
+        src/nonlinear_diffusion.cpp
+        src/nonlinear_diffusion.hpp
+        src/opacity_related.cpp
+        src/opacity_related.hpp
+        src/orbit.cpp
+        src/orbit.hpp
+        src/spectrum.cpp
+        src/spectrum.hpp src/constants.hpp
+        src/freddi.cpp src/freddi.hpp
+        src/output.cpp src/output.hpp
+        src/unit_transfomation.hpp
 )
 
 SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/local/inlcude")
