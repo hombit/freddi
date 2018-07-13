@@ -1,6 +1,10 @@
 #ifndef _ARGUMENTS_HPP
 #define _ARGUMENTS_HPP
 
+#ifndef INSTALLPATHPREFIX
+#define INSTALLPATHPREFIX ""
+#endif  // INSTALLPATHPREFIX
+
 #include <cmath>
 #include <memory>
 #include <string>
