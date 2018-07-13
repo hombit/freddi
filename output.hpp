@@ -20,6 +20,8 @@ public:
 
 
 class FreddiFileOutput {
+protected:
+	constexpr static const char fulldata_header[] = "#h\tR\tF\tSigma\tTeff\tTvis\tTirr\tHeight\n#cm^2/s\tcm\tdyn*cm\tg/cm^2\tK\tK\tK\tcm\n# Time = ";
 private:
 	const Freddi* freddi;
 	FstreamWithPath output;

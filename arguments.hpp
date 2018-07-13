@@ -12,6 +12,7 @@
 #include "constants.hpp"
 #include "opacity_related.hpp"
 #include "orbit.hpp"
+#include "unit_transfomation.hpp"
 
 
 namespace po = boost::program_options;
@@ -35,50 +36,7 @@ public:
 };
 
 
-class MassTransformation {
-public:
-	constexpr static inline double gramToSun(const double mass_gram) { return mass_gram / GSL_CONST_CGSM_SOLAR_MASS; }
-	constexpr static inline double sunToGram(const double mass_sun) { return mass_sun * GSL_CONST_CGSM_SOLAR_MASS; }
-};
-
-
-class LengthTransformation {
-public:
-	constexpr static inline double cmToRg(const double length_cm, const double mass_gram) {
-		return length_cm * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / (GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * mass_gram);
-	}
-	constexpr static inline double rgToCm(const double length_rg, const double mass_gram) {
-		return length_rg * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * mass_gram / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
-	}
-	constexpr static inline double kpcToCm(const double length_kpc) {
-		return length_kpc * 1000. * GSL_CONST_CGSM_PARSEC;
-	}
-	constexpr static inline double cmToKpc(const double length_cm) {
-		return length_cm / (1000. * GSL_CONST_CGSM_PARSEC);
-	}
-	static inline double sunToCm(const double length_solar_radius) {
-		return length_solar_radius / solar_radius;
-	}
-	static inline double cmToSun(const double length_cm) {
-		return length_cm * solar_radius;
-	}
-	constexpr static inline double angstromToCm(const double length_angstrom) {
-		return length_angstrom * 1e-8;
-	}
-	constexpr static inline double cmToAngstrom(const double length_cm) {
-		return length_cm * 1e8;
-	}
-};
-
-
-class TimeTransformation {
-public:
-	constexpr static inline double sToDay(double time_s) { return time_s / 86400.; }
-	constexpr static inline double dayToS(double time_day) { return time_day * 86400.; }
-};
-
-
-class BlackHoleFunctions: public LengthTransformation {
+class BlackHoleFunctions {
 public:
 	static double rISCORg(double kerr);
 	static inline double rISCO(const double Mx, const double kerr) { return rgToCm(rISCORg(kerr), Mx); }
@@ -101,8 +59,7 @@ public:
 };
 
 
-class BasicDiskBinaryArguments:
-		public MassTransformation, public BlackHoleFunctions, public BinaryFunctions, public TimeTransformation {
+class BasicDiskBinaryArguments: public BlackHoleFunctions, public BinaryFunctions {
 public:
 	constexpr static const double default_alpha = 0.25;
 	constexpr static const double default_Mx = sunToGram(5.);
@@ -223,18 +180,7 @@ public:
 };
 
 
-class PhotonTransformation {
-public:
-	constexpr static inline double kevToHertz(const double energy_keV) {
-		return energy_keV * 1000. * GSL_CONST_CGSM_ELECTRON_VOLT / GSL_CONST_CGSM_PLANCKS_CONSTANT_H;
-	}
-	constexpr static inline double hertzToKev(const double nu_hertz) {
-		return nu_hertz * GSL_CONST_CGSM_PLANCKS_CONSTANT_H / (1000. * GSL_CONST_CGSM_ELECTRON_VOLT);
-	}
-};
-
-
-class FluxArguments: public PhotonTransformation, public LengthTransformation {
+class FluxArguments {
 public:
 	constexpr static const double default_colourfactor = 1.7;
 	constexpr static const double default_emin = kevToHertz(1.);
@@ -265,7 +211,7 @@ public:
 };
 
 
-class CalculationArguments: public TimeTransformation {
+class CalculationArguments {
 public:
 	constexpr static const double default_time = dayToS(50.);
 	constexpr static const double default_tau = dayToS(0.25);

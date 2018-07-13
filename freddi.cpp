@@ -32,6 +32,7 @@ Freddi::Freddi(const FreddiArguments &args_):
 		Tph_vis(args_.calc->Nx, 0.),
 		Tph_X(args_.calc->Nx, 0.),
 		Tirr(args_.calc->Nx, 0.),
+		Cirr(args_.calc->Nx, 0.),
 		Sigma(args_.calc->Nx, 0.),
 		Height(args_.calc->Nx, 0.) {
 	initializeRadialStructure();
@@ -92,12 +93,12 @@ void Freddi::calculateRadialStructure() {
 
 		double Qx;
 		if (args->irr->irrfactortype == "const") {
-			const double C_irr = args->irr->Cirr;
-			Qx = args->irr->Cirr * eta * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT /
+			Cirr[i] = args->irr->Cirr;
+			Qx = Cirr[i] * eta * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT /
 				 (4. * M_PI * R[i] * R[i]);
 		} else if (args->irr->irrfactortype == "square") {
-			const double C_irr = args->irr->Cirr * (Height[i] / R[i]) * (Height[i] / R[i]);
-			Qx = C_irr * eta * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT /
+			Cirr[i] = args->irr->Cirr * (Height[i] / R[i]) * (Height[i] / R[i]);
+			Qx = Cirr[i] * eta * Mdot_in * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT /
 				 (4. * M_PI * R[i] * R[i]);
 		} else {
 			throw std::logic_error("Wrong irrfactor");

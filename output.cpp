@@ -1,19 +1,25 @@
 #include "output.hpp"
 
+#include <sstream>
+
+#include "unit_transfomation.hpp"
+
+constexpr const char FreddiFileOutput::fulldata_header[];
+
 FreddiFileOutput::FreddiFileOutput(const Freddi &freddi_, const boost::program_options::variables_map& vm):
 		freddi(&freddi_),
 		output(freddi_.args->general->dir + "/" + freddi_.args->general->prefix + ".dat") {
-	output << "#t    Mdot Mdisk Rhot Cirrout H2R   Teffout Tirrout Qiir2Qvisout Lx    mU  mB  mV  mR  mI  mJ ";
+	output << "#t\tMdot\tMdisk\tRhot\tCirrout\tH2R\tTeffout\tTirrout\tQiir2Qvisout\tLx\tmU\tmB\tmV\tmR\tmI\tmJ\t";
 	for (int i = 0; i < freddi->args->flux->lambdas.size(); ++i) {
 		output << " Fnu" << i;
 		for (double j = 0; j < 9 - log10(i + 0.1); ++j) {
-			output << " ";
+			output << "\t";
 		}
 	}
 	output << "\n";
-	output << "#days g/s  g     Rsun float   float K       K       float        erg/s mag mag mag mag mag mag";
+	output << "#days\tg/s\tg\tRsun\tfloat\tfloat\tK\tK\tfloat\terg/s\tmag\tmag\tmag\tmag\tmag\tmag";
 	for (int i = 0; i < freddi->args->flux->lambdas.size(); ++i) {
-		output << " erg/s/cm^2/Hz";
+		output << "\terg/s/cm^2/Hz";
 	}
 	output << "\n";
 	for (const auto &it : vm) {
@@ -65,47 +71,44 @@ FreddiFileOutput::FreddiFileOutput(const Freddi &freddi_, const boost::program_o
 }
 
 void FreddiFileOutput::dump() {
-//	output  << freddi->t / DAY
-//			<< "\t" << Mdot_in
-//			<< "\t" << Mdisk
-//			<< "\t" << R.at(Nx-1) / solar_radius
-//			<< "\t" << C_irr
-//			<< "\t" << Height.at(Nx-1) / R.at(Nx-1)
-//			<< "\t" << Tph.at(Nx-1)
-//			<< "\t" << Tirr.at(Nx-1)
-//			<< "\t" << pow( Tirr.at(Nx-1) / Tph_vis.at(Nx-1), 4. )
-//			<< "\t" << Lx
-//			<< "\t" << mU
-//			<< "\t" << mB
-//			<< "\t" << mV
-//			<< "\t" << mR
-//			<< "\t" << mI
-//			<< "\t" << mJ;
-//	for ( auto &lambda : args->flux->lambdas ){
-//		output_sum
-//			<< "\t" << I_lambda(R, Tph, lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2;
-//	}
-//	output_sum      << endl;
+	auto Nx = freddi->get_Nx();
+	output  << sToDay(freddi->get_t())
+			<< "\t" << freddi->get_Mdot_in()
+			<< "\t" << freddi->Mdisk()
+			<< "\t" << cmToSun(freddi->get_R()[Nx-1])
+			<< "\t" << freddi->get_Cirr()[Nx-1]
+			<< "\t" << freddi->get_Height()[Nx-1] / freddi->get_R()[Nx-1]
+			<< "\t" << freddi->get_Tph()[Nx-1]
+			<< "\t" << freddi->get_Tirr()[Nx-1]
+			<< "\t" << pow( freddi->get_Tirr()[Nx-1] / freddi->get_Tph_vis()[Nx-1], 4. )
+			<< "\t" << freddi->get_Lx()
+			<< "\t" << freddi->mU()
+			<< "\t" << freddi->mB()
+			<< "\t" << freddi->mV()
+			<< "\t" << freddi->mR()
+			<< "\t" << freddi->mI()
+			<< "\t" << freddi->mJ();
+	for ( auto &lambda : freddi->args->flux->lambdas ){
+		output << "\t" << freddi->flux(lambda);
+	}
+	output << std::endl;
+
+	if (freddi->args->general->fulldata) {
+		std::ostringstream filename;
+		auto i_t = static_cast<int>(std::round(freddi->get_t() / freddi->args->calc->tau));
+		filename << freddi->args->general->dir << "/" << freddi->args->general->prefix << "_" << i_t << ".dat";
+		FstreamWithPath output(filename.str());
+		output << fulldata_header << sToDay(freddi->get_t()) << " Mdot_in = " << freddi->get_Mdot_in() << std::endl;
+		for ( int i = 1; i < Nx; ++i ){
+			output		<< freddi->get_h()[i]
+				<< "\t" << freddi->get_R()[i]
+				<< "\t" << freddi->get_F()[i]
+				<< "\t" << freddi->get_Sigma()[i]
+				<< "\t" << freddi->get_Tph()[i]
+				<< "\t" << freddi->get_Tph_vis()[i]
+				<< "\t" << freddi->get_Tirr()[i]
+				<< "\t" << freddi->get_Height()[i]
+				<< std::endl;
+		}
+	}
 }
-
-
-
-//	if (freddi->args->general->fulldata){
-//		ostringstream filename;
-//		filename << args->general->dir << "/" << args->general->prefix << "_" << i_t << ".dat";
-//		ofstream output( filename.str() );
-//		output << "#h      R  F      Sigma  Teff Tvis Tirr Height" << "\n";
-//		output << "#cm^2/s cm dyn*cm g/cm^2 K    K    K    cm" << "\n";
-//		output << "# Time = " << t / DAY << " Mdot_in = " << Mdot_in << endl;
-//		for ( int i = 1; i < Nx; ++i ){
-//			output		<< h.at(i)
-//				<< "\t" << R.at(i)
-//				<< "\t" << F.at(i)
-//				<< "\t" << Sigma.at(i)
-//				<< "\t" << Tph.at(i)
-//				<< "\t" << Tph_vis.at(i)
-//				<< "\t" << Tirr.at(i)
-//				<< "\t" << Height.at(i)
-//				<< endl;
-//		}
-//	}

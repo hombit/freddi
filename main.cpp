@@ -20,5 +20,4 @@ int main(int ac, char *av[]) {
 		output.dump();
 		freddi.next();
 	}
-	output.dump();
 }

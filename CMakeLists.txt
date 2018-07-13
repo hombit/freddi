@@ -17,6 +17,7 @@ set(SOURCE_FILES
     spectrum.hpp constants.hpp
     freddi.cpp freddi.hpp
     output.cpp output.hpp
+    unit_transfomation.hpp
 )
 
 SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/local/inlcude")

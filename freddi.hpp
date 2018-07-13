@@ -25,6 +25,7 @@ private:
 	vecd Tph_vis;
 	vecd Tph_X;
 	vecd Tirr;
+	vecd Cirr;
 	vecd Sigma;
 	vecd Height;
 public:
@@ -59,8 +60,17 @@ public:
 	inline const vecd& get_R() const { return R; }
 	inline const vecd& get_F() const { return F; }
 	inline const vecd& get_W() const { return W; }
+	inline const vecd& get_Tph() const { return Tph; }
+	inline const vecd& get_Tph_vis() const { return Tph_vis; }
+	inline const vecd& get_Tirr() const { return Tirr; }
+	inline const vecd& get_Cirr() const { return Cirr; }
+	inline const vecd& get_Sigma() const { return Sigma; }
+	inline const vecd& get_Height() const { return Height; }
 	inline const double magnitude(double lambda, double F0) const {
 		return -2.5 * log10( I_lambda(R, Tph, lambda) * cosiOverD2 / F0 );
+	}
+	inline const double flux(double lambda) const {
+		return I_lambda(R, Tph, lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2;
 	}
 	inline double mU() const { return magnitude(lambdaU, irr0U); }
 	inline double mB() const { return magnitude(lambdaB, irr0B); }
