@@ -1,11 +1,7 @@
-
-# Created by https://www.gitignore.io/api/python,linux,osx,vim,c++,ipythonnotebook
-
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*$py.class
 
 # C extensions
 *.so
@@ -156,11 +152,3 @@ X-ray_novae_modeling
 *.png
 *.txt
 
-# Bin
-freddi
-
-# Mathematica notebooks
-*.nb
-
-# Jupyter notebooks
-Untitled*.ipynb
