@@ -2,7 +2,11 @@
 
 from cython.operator cimport dereference
 
+import numpy as np
+cimport numpy as cnp
+
 from freddi cimport *
+
 
 cdef class Arguments:
     cdef GeneralArguments* general
@@ -45,7 +49,41 @@ cdef class Arguments:
             self.calc = new CalculationArguments(time, tau, Nx, gridscale, eps)
         self.cpp_args = new FreddiArguments(self.general, self.basic, self.disk, self.irr, self.flux, self.calc)
 
+    def __dealloc__(self):
+        del self.cpp_args
+
     @property
     def time(self):
         return self.cpp_args.calc.get().time
 
+
+cdef class State:
+    cdef FreddiState* cpp_state
+
+    def __cinit__(self, Freddi freddi):
+        self.cpp_state = new FreddiState(freddi.evolution.get_state())
+
+    def __dealloc__(self):
+        del self.cpp_state
+
+
+cdef class Freddi:
+    cdef FreddiEvolution* evolution
+    cdef Arguments args
+
+    def __cinit__(self, Arguments args):
+        self.args = args
+        self.evolution = new FreddiEvolution(dereference(self.args.cpp_args))
+
+    def __dealloc__(self):
+        del self.evolution
+
+    cdef State get_state(self):
+        return State(self)
+
+    def __iter__(self):
+        yield self.get_state()
+        for tau in self.tau_view:
+            self.evolution.step(tau)
+            yield self.get_state()
+            

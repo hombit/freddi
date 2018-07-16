@@ -3,6 +3,17 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 
+cdef extern from 'freddi.hpp':
+    cdef cppclass FreddiState:
+        FreddiState(const FreddiState&)
+    cdef cppclass FreddiEvolution:
+        FreddiEvolution(const FreddiArguments&) except +
+        void step() except +
+        void step(double) except +
+        vector[FreddiState] evolve() except +
+        const FreddiState& get_state() 
+
+
 cdef extern from 'arguments.hpp':
     cdef cppclass GeneralArguments:
         GeneralArguments(const string&, const string&, bint)
@@ -78,3 +89,4 @@ cdef extern from 'arguments.hpp' namespace 'CalculationArguments':
     cdef const double default_tau
     cdef const unsigned int default_Nx
     cdef const char* default_gridscale
+
