@@ -13,19 +13,19 @@
 
 using namespace std::placeholders;
 
-Freddi::Freddi(const FreddiArguments &args_):
+FreddiEvolution::FreddiEvolution(const FreddiArguments &args_):
 		args(&args_),
 		GM(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * args_.basic->Mx),
 		eta(disk_orbit::efficiency_of_accretion(args_.basic->kerr)),
 		cosi(std::cos(args_.flux->inclination / 180 * M_PI)),
 		cosiOverD2(std::cos(args_.flux->inclination / 180 * M_PI) / (args_.flux->distance * args_.flux->distance)),
 		oprel(args_.disk->oprel.get()),
-		wunc(std::bind(&Freddi::wunction, this, _1, _2, _3, _4)),
+		wunc(std::bind(&FreddiEvolution::wunction, this, _1, _2, _3, _4)),
 		state_(new FreddiState(initializeState())) {
 	calculateRadialStructure();
 }
 
-FreddiState Freddi::initializeState() {
+FreddiState FreddiEvolution::initializeState() {
 	FreddiState state(this);
 
 	const double h_in = args->basic->h(args->basic->rin);
@@ -74,7 +74,7 @@ FreddiState Freddi::initializeState() {
 	return state;
 }
 
-void Freddi::calculateRadialStructure() {
+void FreddiEvolution::calculateRadialStructure() {
 	state_->W = wunc(state_->h, state_->F, 1, state_->Nx - 1);
 
 	Mdot_in_prev = state_->Mdot_in;
@@ -111,7 +111,7 @@ void Freddi::calculateRadialStructure() {
 	state_->Lx = Luminosity(state_->R, state_->Tph_X, args->flux->emin, args->flux->emax, 100) / pow(args->flux->colourfactor, 4.);
 }
 
-void Freddi::step(const double tau) {
+void FreddiEvolution::step(const double tau) {
 	state_.reset(new FreddiState(*state_));
 
 	nonlenear_diffusion_nonuniform_1_2(args->calc->tau, args->calc->eps, 0., state_->Mdot_out, wunc, state_->h, state_->F);
@@ -122,7 +122,7 @@ void Freddi::step(const double tau) {
 }
 
 
-std::vector<FreddiState> Freddi::evolve() {
+std::vector<FreddiState> FreddiEvolution::evolve() {
 	auto Nt = static_cast<unsigned int>(std::round(args->calc->time / args->calc->tau));
 	std::vector<FreddiState> states;
 	states.push_back(*state_);
@@ -134,7 +134,7 @@ std::vector<FreddiState> Freddi::evolve() {
 }
 
 
-void Freddi::truncateOuterRadius() {
+void FreddiEvolution::truncateOuterRadius() {
 	int ii = state_->Nx;
 //		if (bound_cond_type == "MdotOut"){
 //			Mdot_out = - kMdot_out * Mdot_in;
@@ -173,7 +173,7 @@ void Freddi::truncateOuterRadius() {
 	}
 }
 
-vecd Freddi::wunction(const vecd &h, const vecd &F, int first, int last) const {
+vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, int first, int last) const {
 	vecd W(first > 0 ? first : 0,  0.);
 	for ( int i = first; i <= last; ++i ){
 		W.push_back(pow(F[i], 1. - oprel->m) * pow(h[i], oprel->n) / (1. - oprel->m) / oprel->D);
@@ -183,13 +183,13 @@ vecd Freddi::wunction(const vecd &h, const vecd &F, int first, int last) const {
 
 
 // Equation from Lasota, Dubus, Kruk A&A 2008, Menou et al. 1999. Sigma_cr is from their fig 8 and connected to point where Mdot is minimal.
-double Freddi::Sigma_hot_disk(double r) const {
+double FreddiEvolution::Sigma_hot_disk(double r) const {
 	return 39.9 * pow(args->basic->alpha/0.1, -0.80) * pow(r/1e10, 1.11) * pow(args->basic->Mx/GSL_CONST_CGSM_SOLAR_MASS, -0.37);
 };
 
 
 
-FreddiState::FreddiState(const Freddi *freddi):
+FreddiState::FreddiState(const FreddiEvolution *freddi):
 		freddi(freddi),
 		Nx(freddi->args->calc->Nx),
 		h(Nx),

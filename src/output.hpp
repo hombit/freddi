@@ -23,10 +23,10 @@ class FreddiFileOutput {
 protected:
 	constexpr static const char fulldata_header[] = "#h\tR\tF\tSigma\tTeff\tTvis\tTirr\tHeight\n#cm^2/s\tcm\tdyn*cm\tg/cm^2\tK\tK\tK\tcm\n# Time = ";
 private:
-	const Freddi* freddi;
+	const FreddiEvolution* freddi;
 	FstreamWithPath output;
 public:
-	FreddiFileOutput(const Freddi& freddi, const boost::program_options::variables_map& vm);
+	FreddiFileOutput(const FreddiEvolution& freddi, const boost::program_options::variables_map& vm);
 	void dump();
 	inline std::string path() const { return output.path; }
 };

@@ -6,7 +6,7 @@
 
 constexpr const char FreddiFileOutput::fulldata_header[];
 
-FreddiFileOutput::FreddiFileOutput(const Freddi &freddi_, const boost::program_options::variables_map& vm):
+FreddiFileOutput::FreddiFileOutput(const FreddiEvolution &freddi_, const boost::program_options::variables_map& vm):
 		freddi(&freddi_),
 		output(freddi_.args->general->dir + "/" + freddi_.args->general->prefix + ".dat") {
 	output << "#t\tMdot\tMdisk\tRhot\tCirrout\tH2R\tTeffout\tTirrout\tQiir2Qvisout\tLx\tmU\tmB\tmV\tmR\tmI\tmJ\t";

@@ -11,7 +11,7 @@
 class FreddiState;
 
 
-class Freddi {
+class FreddiEvolution {
 	typedef std::vector<double> vecd;
 private:
 	double Mdot_in_prev;
@@ -33,7 +33,7 @@ protected:
 	vecd wunction(const vecd& h, const vecd& F, int first, int last) const;
 	double Sigma_hot_disk(double r) const;
 public:
-	Freddi(const FreddiArguments& args);
+	FreddiEvolution(const FreddiArguments& args);
 	void step(double tau);
 	inline void step() { return step(args->calc->tau); }
 	std::vector<FreddiState> evolve();
@@ -45,12 +45,12 @@ public:
 class FreddiState {
 	typedef std::vector<double> vecd;
 private:
-	const Freddi* freddi;
+	const FreddiEvolution* freddi;
 public:
-	FreddiState(const Freddi* freddi);
+	FreddiState(const FreddiEvolution* freddi);
 	FreddiState(const FreddiState&) = default;
 	FreddiState(FreddiState&&) = default;
-	friend Freddi;
+	friend FreddiEvolution;
 private:
 	double Mdot_in = 0;
 	double Mdot_out = 0;
