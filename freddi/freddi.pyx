@@ -9,12 +9,6 @@ from freddi cimport *
 
 
 cdef class Arguments:
-    cdef GeneralArguments* general
-    cdef BasicDiskBinaryArguments* basic
-    cdef DiskStructureArguments* disk
-    cdef SelfIrradiationArguments* irr
-    cdef FluxArguments* flux
-    cdef CalculationArguments* calc
     cdef FreddiArguments* cpp_args
 
     def __cinit__(
@@ -25,29 +19,31 @@ cdef class Arguments:
         double colourfactor=default_colourfactor, double emin=default_emin, double emax=default_emax, double inclination=default_inclination, double distance=default_distance, vector[double] lambdas=[],
         double time=default_time, double tau=default_tau, unsigned int Nx=default_Nx, string gridscale=default_gridscale, eps=None
     ):
-        self.general = new GeneralArguments(b'', b'', False)
+        cdef GeneralArguments* general = new GeneralArguments(b'', b'', False)
+        cdef BasicDiskBinaryArguments* basic
         if rin is None and rout is None:
-            self.basic = new BasicDiskBinaryArguments(constructWithoutRinRout(alpha, Mx, kerr, Mopt, period))
+            basic = new BasicDiskBinaryArguments(constructWithoutRinRout(alpha, Mx, kerr, Mopt, period))
         elif rin is None:
-            self.basic = new BasicDiskBinaryArguments(constructWithoutRin(alpha, Mx, kerr, Mopt, period, rout))
+            basic = new BasicDiskBinaryArguments(constructWithoutRin(alpha, Mx, kerr, Mopt, period, rout))
         elif rout is None:
-            self.basic = new BasicDiskBinaryArguments(constructWithoutRout(alpha, Mx, kerr, Mopt, period, rin))
+            basic = new BasicDiskBinaryArguments(constructWithoutRout(alpha, Mx, kerr, Mopt, period, rin))
         else:
-            self.basic = new BasicDiskBinaryArguments(alpha, Mx, kerr, Mopt, period, rin, rout)
+            basic = new BasicDiskBinaryArguments(alpha, Mx, kerr, Mopt, period, rin, rout)
         cdef bint is_Mdisk0_specified = Mdisk0 is not None
         if Mdisk0 is None:
             Mdisk0 = -1.0
         cdef bint is_Mdot0_specified = Mdot0 is not None
         if Mdot0 is None:
             Mdot0 = -1.0
-        self.disk = new DiskStructureArguments(dereference(self.basic), opacity, boundcond, Thot, initialcond, F0, powerorder, gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0)
-        self.irr = new SelfIrradiationArguments(Cirr, irrfactortype)
-        self.flux = new FluxArguments(colourfactor, emin, emax, inclination, distance, lambdas)
+        cdef DiskStructureArguments* disk = new DiskStructureArguments(dereference(basic), opacity, boundcond, Thot, initialcond, F0, powerorder, gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0)
+        cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(Cirr, irrfactortype)
+        cdef FluxArguments* flux = new FluxArguments(colourfactor, emin, emax, inclination, distance, lambdas)
+        cdef CalculationArguments* calc
         if eps is None:
-            self.calc = new CalculationArguments(time, tau, Nx, gridscale)
+            calc = new CalculationArguments(time, tau, Nx, gridscale)
         else:
-            self.calc = new CalculationArguments(time, tau, Nx, gridscale, eps)
-        self.cpp_args = new FreddiArguments(self.general, self.basic, self.disk, self.irr, self.flux, self.calc)
+            calc = new CalculationArguments(time, tau, Nx, gridscale, eps)
+        self.cpp_args = new FreddiArguments(general, basic, disk, irr, flux, calc)
 
     def __dealloc__(self):
         del self.cpp_args
