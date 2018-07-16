@@ -34,7 +34,8 @@ protected:
 	double Sigma_hot_disk(double r) const;
 public:
 	Freddi(const FreddiArguments& args);
-	void next();
+	void step(double tau);
+	inline void step() { return step(args->calc->tau); }
 	std::vector<FreddiState> evolve();
 public:
 	inline const FreddiState& get_state() const { return *state_; }

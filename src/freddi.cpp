@@ -111,12 +111,12 @@ void Freddi::calculateRadialStructure() {
 	state_->Lx = Luminosity(state_->R, state_->Tph_X, args->flux->emin, args->flux->emax, 100) / pow(args->flux->colourfactor, 4.);
 }
 
-void Freddi::next() {
+void Freddi::step(const double tau) {
 	state_.reset(new FreddiState(*state_));
 
 	nonlenear_diffusion_nonuniform_1_2(args->calc->tau, args->calc->eps, 0., state_->Mdot_out, wunc, state_->h, state_->F);
 
-	state_->increase_t(args->calc->tau);
+	state_->increase_t(tau);
 	calculateRadialStructure();
 	truncateOuterRadius();
 }
@@ -127,7 +127,7 @@ std::vector<FreddiState> Freddi::evolve() {
 	std::vector<FreddiState> states;
 	states.push_back(*state_);
 	for (size_t i_t = 0; i_t < Nt; i_t++) {
-		next();
+		step();
 		states.push_back(*state_);
 	}
 	return states;

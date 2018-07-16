@@ -18,6 +18,6 @@ int main(int ac, char *av[]) {
 	FreddiFileOutput output(freddi, vm);
 	for (int i_t = 0; i_t <= static_cast<int>(freddi.args->calc->time / freddi.args->calc->tau); i_t++) {
 		output.dump();
-		freddi.next();
+		freddi.step();
 	}
 }
