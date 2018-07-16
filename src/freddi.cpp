@@ -50,7 +50,11 @@ FreddiState Freddi::initializeState() {
 		for (int i = 0; i < state.Nx; ++i) {
 			const double Sigma_to_Sigmaout = pow((state.h[i] - h_in) / (h_out - h_in), args->disk->powerorder);
 			state.F[i] = args->disk->F0 * pow(state.h[i] / h_out, (3. - oprel->n) / (1. - oprel->m)) *
-				   pow(Sigma_to_Sigmaout, 1. / (1. - oprel->m));
+						 pow(Sigma_to_Sigmaout, 1. / (1. - oprel->m));
+		}
+	} else if (args->disk->initialcond == "sinusF" || args->disk->initialcond == "sinus") {
+		for (int i = 0; i < state.Nx; ++i){
+			state.F[i] = args->disk->F0 * sin((state.h[i] - h_in) / (h_out - h_in) * M_PI_2);
 		}
 	} else if (args->disk->initialcond == "quasistat") {
 		for (int i = 0; i < state.Nx; ++i) {
