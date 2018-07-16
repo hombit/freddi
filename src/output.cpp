@@ -71,43 +71,43 @@ FreddiFileOutput::FreddiFileOutput(const Freddi &freddi_, const boost::program_o
 }
 
 void FreddiFileOutput::dump() {
-	auto Nx = freddi->get_Nx();
-	output  << sToDay(freddi->get_t())
-			<< "\t" << freddi->get_Mdot_in()
-			<< "\t" << freddi->Mdisk()
-			<< "\t" << cmToSun(freddi->get_R()[Nx-1])
-			<< "\t" << freddi->get_Cirr()[Nx-1]
-			<< "\t" << freddi->get_Height()[Nx-1] / freddi->get_R()[Nx-1]
-			<< "\t" << freddi->get_Tph()[Nx-1]
-			<< "\t" << freddi->get_Tirr()[Nx-1]
-			<< "\t" << pow( freddi->get_Tirr()[Nx-1] / freddi->get_Tph_vis()[Nx-1], 4. )
-			<< "\t" << freddi->get_Lx()
-			<< "\t" << freddi->mU()
-			<< "\t" << freddi->mB()
-			<< "\t" << freddi->mV()
-			<< "\t" << freddi->mR()
-			<< "\t" << freddi->mI()
-			<< "\t" << freddi->mJ();
+	auto Nx = freddi->get_state().get_Nx();
+	output  << sToDay(freddi->get_state().get_t())
+			<< "\t" << freddi->get_state().get_Mdot_in()
+			<< "\t" << freddi->get_state().Mdisk()
+			<< "\t" << cmToSun(freddi->get_state().get_R()[Nx-1])
+			<< "\t" << freddi->get_state().get_Cirr()[Nx-1]
+			<< "\t" << freddi->get_state().get_Height()[Nx-1] / freddi->get_state().get_R()[Nx-1]
+			<< "\t" << freddi->get_state().get_Tph()[Nx-1]
+			<< "\t" << freddi->get_state().get_Tirr()[Nx-1]
+			<< "\t" << pow( freddi->get_state().get_Tirr()[Nx-1] / freddi->get_state().get_Tph_vis()[Nx-1], 4. )
+			<< "\t" << freddi->get_state().get_Lx()
+			<< "\t" << freddi->get_state().mU()
+			<< "\t" << freddi->get_state().mB()
+			<< "\t" << freddi->get_state().mV()
+			<< "\t" << freddi->get_state().mR()
+			<< "\t" << freddi->get_state().mI()
+			<< "\t" << freddi->get_state().mJ();
 	for ( auto &lambda : freddi->args->flux->lambdas ){
-		output << "\t" << freddi->flux(lambda);
+		output << "\t" << freddi->get_state().flux(lambda);
 	}
 	output << std::endl;
 
 	if (freddi->args->general->fulldata) {
 		std::ostringstream filename;
-		auto i_t = static_cast<int>(std::round(freddi->get_t() / freddi->args->calc->tau));
+		auto i_t = static_cast<int>(std::round(freddi->get_state().get_t() / freddi->args->calc->tau));
 		filename << freddi->args->general->dir << "/" << freddi->args->general->prefix << "_" << i_t << ".dat";
 		FstreamWithPath output(filename.str());
-		output << fulldata_header << sToDay(freddi->get_t()) << " Mdot_in = " << freddi->get_Mdot_in() << std::endl;
+		output << fulldata_header << sToDay(freddi->get_state().get_t()) << " Mdot_in = " << freddi->get_state().get_Mdot_in() << std::endl;
 		for ( int i = 1; i < Nx; ++i ){
-			output		<< freddi->get_h()[i]
-				<< "\t" << freddi->get_R()[i]
-				<< "\t" << freddi->get_F()[i]
-				<< "\t" << freddi->get_Sigma()[i]
-				<< "\t" << freddi->get_Tph()[i]
-				<< "\t" << freddi->get_Tph_vis()[i]
-				<< "\t" << freddi->get_Tirr()[i]
-				<< "\t" << freddi->get_Height()[i]
+			output		<< freddi->get_state().get_h()[i]
+				<< "\t" << freddi->get_state().get_R()[i]
+				<< "\t" << freddi->get_state().get_F()[i]
+				<< "\t" << freddi->get_state().get_Sigma()[i]
+				<< "\t" << freddi->get_state().get_Tph()[i]
+				<< "\t" << freddi->get_state().get_Tph_vis()[i]
+				<< "\t" << freddi->get_state().get_Tirr()[i]
+				<< "\t" << freddi->get_state().get_Height()[i]
 				<< std::endl;
 		}
 	}

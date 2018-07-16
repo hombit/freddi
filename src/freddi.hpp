@@ -8,14 +8,52 @@
 #include "spectrum.hpp"
 
 
+class FreddiState;
+
+
 class Freddi {
 	typedef std::vector<double> vecd;
 private:
-	double Mdot_in = 0.;
 	double Mdot_in_prev;
-	double Mdot_out = 0.;
-	double Lx = 0.;
-	double t = 0.;
+public:
+	const double GM;
+	const double eta;
+	const double cosi;
+	const double cosiOverD2;
+	const OpacityRelated* oprel;
+	std::function<vecd (const vecd&, const vecd&, unsigned int, unsigned int)> wunc;
+	const FreddiArguments* args;
+private:
+	std::unique_ptr<FreddiState> state_;
+private:
+	FreddiState initializeState();
+	void calculateRadialStructure();
+	void truncateOuterRadius();
+protected:
+	vecd wunction(const vecd& h, const vecd& F, int first, int last) const;
+	double Sigma_hot_disk(double r) const;
+public:
+	Freddi(const FreddiArguments& args);
+	void next();
+	inline const FreddiState& get_state() const { return *state_; }
+};
+
+
+class FreddiState {
+	typedef std::vector<double> vecd;
+private:
+	const Freddi* freddi;
+public:
+	FreddiState(const Freddi* freddi);
+	FreddiState(const FreddiState&) = default;
+	FreddiState(FreddiState&&) = default;
+	friend Freddi;
+private:
+	double Mdot_in = 0;
+	double Mdot_out = 0;
+	double Lx;
+	double t = 0;
+	size_t i_t = 0;
 	unsigned int Nx;
 	vecd h;
 	vecd R;
@@ -28,28 +66,6 @@ private:
 	vecd Cirr;
 	vecd Sigma;
 	vecd Height;
-public:
-	const double GM;
-	const double eta;
-	const double h_in;
-	const double h_out;
-	const double cosi;
-	const double cosiOverD2;
-	const OpacityRelated* oprel;
-	std::function<vecd (const vecd&, const vecd&, unsigned int, unsigned int)> wunc;
-public:
-	const FreddiArguments* args;
-private:
-	void initializeRadialStructure();
-	void calculateRadialStructure();
-	void truncateOuterRadius();
-public:
-	vecd wunction(const vecd& h, const vecd& F, int first, int last) const;
-	double Sigma_hot_disk(double r) const;
-public:
-	Freddi(const FreddiArguments& args);
-public:
-	void next();
 public:
 	inline double get_Mdot_in() const { return Mdot_in; }
 	inline double get_Mdot_out() const { return Mdot_out; }
@@ -67,10 +83,10 @@ public:
 	inline const vecd& get_Sigma() const { return Sigma; }
 	inline const vecd& get_Height() const { return Height; }
 	inline const double magnitude(double lambda, double F0) const {
-		return -2.5 * log10( I_lambda(R, Tph, lambda) * cosiOverD2 / F0 );
+		return -2.5 * log10( I_lambda(R, Tph, lambda) * freddi->cosiOverD2 / F0 );
 	}
 	inline const double flux(double lambda) const {
-		return I_lambda(R, Tph, lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2;
+		return I_lambda(R, Tph, lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * freddi->cosiOverD2;
 	}
 	inline double mU() const { return magnitude(lambdaU, irr0U); }
 	inline double mB() const { return magnitude(lambdaB, irr0B); }
@@ -80,8 +96,8 @@ public:
 	inline double mJ() const { return magnitude(lambdaJ, irr0J); }
 	double integrate(const vecd& values) const;
 	inline double Mdisk() const { return integrate(Sigma); }
+private:
+	void increase_t(double tau);
 };
-
-void freddi(const FreddiArguments& args);
 
 #endif //FREDDI_FREDDI_HPP
