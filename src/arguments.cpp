@@ -104,17 +104,43 @@ constexpr const double DiskStructureArguments::default_gausssigma;
 constexpr const double DiskStructureArguments::mu;
 
 DiskStructureArguments::DiskStructureArguments(const po::variables_map &vm, const BasicDiskBinaryArguments& bdb_args):
-		opacity(vm["opacity"].as<std::string>()),
+		DiskStructureArguments(
+			bdb_args,
+			vm["opacity"].as<std::string>(),
+			vm["boundcond"].as<std::string>(),
+			vm["Thot"].as<double>(),
+			vm["initialcond"].as<std::string>(),
+			vm["F0"].as<double>(),
+			vm["powerorder"].as<double>(),
+			vm["gaussmu"].as<double>(),
+			vm["gausssigma"].as<double>(),
+			(vm.count("Mdisk0") > 0),
+			(vm.count("Mdot0") > 0),
+			Mdisk0Initializer(vm),
+			Mdot0Initializer(vm)) {}
+
+DiskStructureArguments::DiskStructureArguments(
+	const BasicDiskBinaryArguments &bdb_args,
+	const std::string &opacity,
+	const std::string &boundcond, double Thot,
+	const std::string &initialcond,
+	double F0,
+	double powerorder, double gaussmu, double gausssigma,
+	bool is_Mdisk0_specified, bool is_Mdot0_specified,
+	double Mdisk0, double Mdot0):
+		opacity(opacity),
 		oprel(new OpacityRelated(opacity, bdb_args.Mx, bdb_args.alpha, mu)),
-		boundcond(vm["boundcond"].as<std::string>()),
-		Thot(vm["Thot"].as<double>()),
-		initialcond(vm["initialcond"].as<std::string>()),
-		Mdisk0(Mdisk0Initializer(vm)),
-		Mdot0(Mdot0Initializer(vm)),
-		powerorder(vm["powerorder"].as<double>()),
-		gaussmu(vm["gaussmu"].as<double>()),
-		gausssigma(vm["gausssigma"].as<double>()),
-		F0(F0Initializer(vm, bdb_args)) {}
+		boundcond(boundcond),
+		Thot(Thot),
+		initialcond(initialcond),
+		powerorder(powerorder),
+		gaussmu(gaussmu),
+		gausssigma(gausssigma),
+		is_Mdisk0_specified(is_Mdisk0_specified),
+		is_Mdot0_specified(is_Mdot0_specified),
+		Mdisk0(Mdisk0),
+		Mdot0(Mdot0),
+		F0(F0Initializer(F0, bdb_args)) {}
 
 double DiskStructureArguments::Mdisk0Initializer(const po::variables_map& vm) {
 	if (vm.count("Mdisk0") > 0) {
@@ -130,34 +156,7 @@ double DiskStructureArguments::Mdot0Initializer(const po::variables_map& vm) {
 	return -1;
 }
 
-double DiskStructureArguments::F0Initializer(const po::variables_map &vm, const BasicDiskBinaryArguments &bdb_args) {
-	double Mdisk0 = Mdisk0Initializer(vm);
-	double Mdot0 = Mdot0Initializer(vm);
-
-	return F0Initializer(
-			bdb_args,
-			vm["opacity"].as<std::string>(),
-			vm["initialcond"].as<std::string>(),
-			vm["F0"].as<double>(),
-			vm["powerorder"].as<double>(),
-			vm["gaussmu"].as<double>(),
-			vm["gausssigma"].as<double>(),
-			(vm.count("Mdisk0") > 0),
-			(vm.count("Mdot0") > 0),
-			Mdisk0,
-			Mdot0);
-}
-
-double DiskStructureArguments::F0Initializer(
-		const BasicDiskBinaryArguments& bdb_args,
-		const std::string& opacity,
-		const std::string& initialcond,
-		double F0,
-		const double powerorder, const double gaussmu, const double gausssigma,
-		const bool is_Mdisk0_specified, const bool is_Mdot0_specified,
-		const double Mdisk0, const double Mdot0) {
-	OpacityRelated oprel(opacity, bdb_args.Mx, bdb_args.alpha, mu);
-
+double DiskStructureArguments::F0Initializer(double F0_, const BasicDiskBinaryArguments& bdb_args) {
 	const double h_in = bdb_args.h(bdb_args.rin);
 	const double h_out = bdb_args.h(bdb_args.rout);
 
@@ -167,8 +166,8 @@ double DiskStructureArguments::F0Initializer(
 		}
 		if (is_Mdisk0_specified) {
 			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double a = (1. - oprel.m) * powerorder;
-			const double b = oprel.n;
+			const double a = (1. - oprel->m) * powerorder;
+			const double b = oprel->n;
 			const double x0 = h_in / (h_out - h_in);
 			double integral = 0.;
 			integrate_adaptive(
@@ -178,10 +177,11 @@ double DiskStructureArguments::F0Initializer(
 					},
 					integral, 0., 1., 0.01
 			);
-			F0 = pow(Mdisk0 * (1. - oprel.m) * oprel.D / pow(h_out - h_in, oprel.n + 1.) / integral, 1. / (1. - oprel.m));
-			return F0;
+			F0_ = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral,
+					 1. / (1. - oprel->m));
+			return F0_;
 		}
-		return F0;
+		return F0_;
 	}
 	if (initialcond == "powerSigma") {
 		if (is_Mdot0_specified) {
@@ -200,20 +200,21 @@ double DiskStructureArguments::F0Initializer(
 					},
 					integral, 0., 1., 0.01
 			);
-			F0 = pow(Mdisk0 * (1. - oprel.m) * oprel.D * pow(h_out, 3. - oprel.n) / pow(h_out - h_in, 4.) / integral, 1. / (1. - oprel.m));
-			return F0;
+			F0_ = pow(Mdisk0 * (1. - oprel->m) * oprel->D * pow(h_out, 3. - oprel->n) / pow(h_out - h_in, 4.) / integral,
+					  1. / (1. - oprel->m));
+			return F0_;
 		}
-		return F0;
+		return F0_;
 	}
 	if (initialcond == "sinusF" || initialcond == "sinus") {
 		if (is_Mdot0_specified) {
-			F0 = Mdot0 * (h_out - h_in) * 2./M_PI;
-			return F0;
+			F0_ = Mdot0 * (h_out - h_in) * 2./M_PI;
+			return F0_;
 		}
 		if (is_Mdisk0_specified) {
 			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double a = 1. - oprel.m;
-			const double b = oprel.n;
+			const double a = 1. - oprel->m;
+			const double b = oprel->n;
 			const double x0 = h_in / (h_out - h_in);
 			double integral = 0.;
 			integrate_adaptive(
@@ -223,41 +224,43 @@ double DiskStructureArguments::F0Initializer(
 					},
 					integral, 0., 1., 0.01
 			);
-			F0 = pow(Mdisk0 * (1. - oprel.m) * oprel.D / pow(h_out - h_in, oprel.n + 1.) / integral, 1. / (1. - oprel.m));
-			return F0;
+			F0_ = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral,
+					  1. / (1. - oprel->m));
+			return F0_;
 		}
-		return F0;
+		return F0_;
 	}
 	if (initialcond == "gaussF") {
 		if (gaussmu <= 0. or gaussmu > 1.){
 			throw po::invalid_option_value("--gaussmu value should be large than 0 and not large than 1");
 		}
 		if (is_Mdot0_specified) {
-			throw po::invalid_option_value("Usage of --Mdot with --initialcond=gaussF produces unstable results and it isn't motivated physically. Use --F0 or --Mdisk0 instead");
-			//F0 = Mdot_in * (h_out - h_in) * gauss_sigma*gauss_sigma / gauss_mu * exp( gauss_mu*gauss_mu / (2. * gauss_sigma*gauss_sigma) );
+			throw po::invalid_option_value("Usage of --Mdot with --initialcond=gaussF produces unstable results and it isn't motivated physically. Use --F0_ or --Mdisk0 instead");
+			//F0_ = Mdot_in * (h_out - h_in) * gauss_sigma*gauss_sigma / gauss_mu * exp( gauss_mu*gauss_mu / (2. * gauss_sigma*gauss_sigma) );
 		}
 		if (is_Mdisk0_specified){
 			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double a = 1. - oprel.m;
-			const double b = oprel.n;
+			const double a = 1. - oprel->m;
+			const double b = oprel->n;
 			const double x0 = h_in / (h_out - h_in);
 			double integral = 0.;
 			integrate_adaptive(
 					stepper,
-					[a,b,x0,gaussmu,gausssigma]( const double &y, double &dydx, double x ){
-						dydx = exp( -(x - gaussmu)*(x - gaussmu) * a / (2. * gausssigma*gausssigma) ) * pow(x + x0, b);
+					[a,b,x0,this]( const double &y, double &dydx, double x ){
+						dydx = exp( -(x - this->gaussmu)*(x - this->gaussmu) * a / (2. * this->gausssigma*this->gausssigma) ) * pow(x + x0, b);
 					},
 					integral, 0., 1., 0.01
 			);
-			F0 = pow(Mdisk0 * (1. - oprel.m) * oprel.D / pow(h_out - h_in, oprel.n + 1.) / integral, 1. / (1. - oprel.m));
-			return F0;
+			F0_ = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral,
+					  1. / (1. - oprel->m));
+			return F0_;
 		}
-		return F0;
+		return F0_;
 	}
 	if (initialcond == "quasistat") {
 		if (is_Mdot0_specified) {
-			F0 = Mdot0 * (h_out - h_in) / h_out * h_in / oprel.f_F(h_in/h_out);
-			return F0;
+			F0_ = Mdot0 * (h_out - h_in) / h_out * h_in / oprel->f_F(h_in/h_out);
+			return F0_;
 		}
 		if (is_Mdisk0_specified) {
 			odeint::runge_kutta_cash_karp54<double> stepper;
@@ -266,15 +269,15 @@ double DiskStructureArguments::F0Initializer(
 			double integral = 0.;
 			integrate_adaptive(
 					stepper,
-					[x0,x1,&oprel]( const double &y, double &dydx, double x ){
-						dydx = pow(oprel.f_F(x * (1. - x1) + x1) * x / (x * (1. - x1) + x1), 1. - oprel.m) * pow(x + x0, oprel.n);
+					[x0,x1,this]( const double &y, double &dydx, double x ){
+						dydx = pow(this->oprel->f_F(x * (1. - x1) + x1) * x / (x * (1. - x1) + x1), 1. - this->oprel->m) * pow(x + x0, this->oprel->n);
 					},
 					integral, 0., 1., 0.01
 			);
-			F0 = pow(Mdisk0 * (1. - oprel.m) * oprel.D / pow(h_out - h_in, oprel.n + 1.) / integral, 1. / (1. - oprel.m));
-			return F0;
+			F0_ = pow(Mdisk0 * (1. - oprel->m) * oprel->D / pow(h_out - h_in, oprel->n + 1.) / integral, 1. / (1. - oprel->m));
+			return F0_;
 		}
-		return F0;
+		return F0_;
 	}
 	throw po::invalid_option_value(initialcond);
 }

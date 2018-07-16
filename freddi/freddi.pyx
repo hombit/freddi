@@ -2,7 +2,7 @@
 
 from cython.operator cimport dereference
 
-from args cimport *
+from freddi cimport *
 
 cdef class Arguments:
     cdef GeneralArguments* general
@@ -36,8 +36,7 @@ cdef class Arguments:
         cdef bint is_Mdot0_specified = Mdot0 is not None
         if Mdot0 is None:
             Mdot0 = -1.0
-        F0 = F0Initializer(dereference(self.basic), opacity, initialcond, F0, powerorder, gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0)
-        self.disk = new DiskStructureArguments(opacity, boundcond, Thot, initialcond, F0, powerorder, gaussmu, gausssigma, Mdisk0, Mdot0)
+        self.disk = new DiskStructureArguments(dereference(self.basic), opacity, boundcond, Thot, initialcond, F0, powerorder, gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0)
         self.irr = new SelfIrradiationArguments(Cirr, irrfactortype)
         self.flux = new FluxArguments(colourfactor, emin, emax, inclination, distance, lambdas)
         if eps is None:

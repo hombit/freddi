@@ -141,38 +141,29 @@ public:
 	const std::string boundcond;
 	const double Thot;
 	const std::string initialcond;
-	const double F0;
 	const double powerorder;
 	const double gaussmu;
 	const double gausssigma;
 	const double Mdisk0;
 	const double Mdot0;
+	const bool is_Mdisk0_specified;
+	const bool is_Mdot0_specified;
+	const double F0;
 public:
 	std::unique_ptr<const OpacityRelated> oprel;
-protected:
+private:
 	static double Mdisk0Initializer(const po::variables_map& vm);
 	static double Mdot0Initializer(const po::variables_map& vm);
-	static double F0Initializer(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args);
-public:
-	static double F0Initializer(const BasicDiskBinaryArguments& bdb_args,
-								const std::string& opacity,
-								const std::string& initialcond,
-								double F0,
-								double powerorder, double gaussmu, double gausssigma,
-								bool is_Mdisk0_specified, bool is_Mdot0_specified,
-								double Mdisk0, double Mdot);
+	double F0Initializer(double F0_, const BasicDiskBinaryArguments& bdb_args);
 public:
 	DiskStructureArguments(
+			const BasicDiskBinaryArguments &bdb_args,
 			const std::string& opacity,
 			const std::string& boundcond, double Thot,
 			const std::string& initialcond, double F0,
 			double powerorder, double gaussmu, double gausssigma,
-			double Mdisk0=-1, double Mdot0=-1):
-			opacity(opacity),
-			boundcond(boundcond), Thot(Thot),
-			initialcond(initialcond), F0(F0),
-			powerorder(powerorder), gaussmu(gaussmu), gausssigma(gausssigma),
-			Mdisk0(Mdisk0), Mdot0(Mdot0) {}
+			bool is_Mdisk0_specified, bool is_Mdot0_specified,
+			double Mdisk0, double Mdot0);
 	DiskStructureArguments(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args);
 	static po::options_description description();
 };
