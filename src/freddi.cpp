@@ -108,10 +108,11 @@ void Freddi::calculateRadialStructure() {
 }
 
 void Freddi::next() {
-	state_->increase_t(args->calc->tau);
+	state_.reset(new FreddiState(*state_));
 
 	nonlenear_diffusion_nonuniform_1_2(args->calc->tau, args->calc->eps, 0., state_->Mdot_out, wunc, state_->h, state_->F);
 
+	state_->increase_t(args->calc->tau);
 	calculateRadialStructure();
 	truncateOuterRadius();
 }
