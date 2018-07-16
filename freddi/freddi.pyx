@@ -14,7 +14,7 @@ cdef class Arguments:
     cdef FreddiArguments* cpp_args
 
     def __cinit__(
-        self,
+        self, *,
         double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt, double period=default_period, rin=None, rout=None,
         string opacity=default_opacity, string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond, double F0=default_F0, double powerorder=default_powerorder, double gaussmu=default_gaussmu, double gausssigma=default_gausssigma, Mdisk0=None, Mdot0=None,
         double Cirr=default_Cirr, string irrfactortype=default_irrfactortype,
