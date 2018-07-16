@@ -35,6 +35,8 @@ protected:
 public:
 	Freddi(const FreddiArguments& args);
 	void next();
+	std::vector<FreddiState> evolve();
+public:
 	inline const FreddiState& get_state() const { return *state_; }
 };
 

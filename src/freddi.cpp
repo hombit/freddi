@@ -122,6 +122,18 @@ void Freddi::next() {
 }
 
 
+std::vector<FreddiState> Freddi::evolve() {
+	auto Nt = static_cast<unsigned int>(std::round(args->calc->time / args->calc->tau));
+	std::vector<FreddiState> states;
+	states.push_back(*state_);
+	for (size_t i_t = 0; i_t < Nt; i_t++) {
+		next();
+		states.push_back(*state_);
+	}
+	return states;
+}
+
+
 void Freddi::truncateOuterRadius() {
 	int ii = state_->Nx;
 //		if (bound_cond_type == "MdotOut"){
