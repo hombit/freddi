@@ -86,84 +86,84 @@ cdef class State:
         return self.cpp_state.get_Nx()
 
     @property
-    def h(self):
+    def h(self) -> np.ndarray[np.float]:
         cdef vector[double] vec = self.cpp_state.get_h()
         return np.asarray(<double[:vec.size()]> vec.data())
 
     @property
-    def R(self):
+    def R(self) -> np.ndarray[np.float]:
         cdef vector[double] vec = self.cpp_state.get_R()
         return np.asarray(<double[:vec.size()]> vec.data())
 
     @property
-    def F(self):
+    def F(self) -> np.ndarray[np.float]:
         cdef vector[double] vec = self.cpp_state.get_F()
         return np.asarray(<double[:vec.size()]> vec.data())
 
     @property
-    def W(self):
+    def W(self) -> np.ndarray[np.float]:
         cdef vector[double] vec = self.cpp_state.get_W()
         return np.asarray(<double[:vec.size()]> vec.data())
         
     @property
-    def Tph(self):
+    def Tph(self) -> np.ndarray[np.float]:
         cdef vector[double] vec = self.cpp_state.get_Tph()
         return np.asarray(<double[:vec.size()]> vec.data())
         
     @property
-    def Tph_vis(self):
+    def Tph_vis(self) -> np.ndarray[np.float]:
         cdef vector[double] vec = self.cpp_state.get_Tph_vis()
         return np.asarray(<double[:vec.size()]> vec.data())
         
     @property
-    def Tirr(self):
+    def Tirr(self) -> np.ndarray[np.float]:
         cdef vector[double] vec = self.cpp_state.get_Tirr()
         return np.asarray(<double[:vec.size()]> vec.data())
         
     @property
-    def Cirr(self):
+    def Cirr(self) -> np.ndarray[np.float]:
         cdef vector[double] vec = self.cpp_state.get_Cirr()
         return np.asarray(<double[:vec.size()]> vec.data())
         
     @property
-    def Sigma(self):
+    def Sigma(self) -> np.ndarray[np.float]:
         cdef vector[double] vec = self.cpp_state.get_Sigma()
         return np.asarray(<double[:vec.size()]> vec.data())
         
     @property
-    def Height(self):
+    def Height(self) -> np.ndarray[np.float]:
         cdef vector[double] vec = self.cpp_state.get_Height()
         return np.asarray(<double[:vec.size()]> vec.data())        
 
     @property
-    def mU(self):
+    def mU(self) -> double:
         return self.cpp_state.mU()
 
     @property
-    def mB(self):
+    def mB(self) -> double:
         return self.cpp_state.mB()
 
     @property
-    def mV(self):
+    def mV(self) -> double:
         return self.cpp_state.mV()
 
     @property
-    def mR(self):
+    def mR(self) -> double:
         return self.cpp_state.mR()
 
     @property
-    def mI(self):
+    def mI(self) -> double:
         return self.cpp_state.mI()
 
     @property
-    def mJ(self):
+    def mJ(self) -> double:
         return self.cpp_state.mJ()
 
     @property
-    def Mdisk(self):
+    def Mdisk(self) -> double:
         return self.cpp_state.Mdisk()
 
-    def flux(self, double lmbd):
+    def flux(self, double lmbd) -> double:
         return self.cpp_state.flux(lmbd)
    
 
@@ -179,12 +179,28 @@ cdef class EvolutionResults:
 
     def __cinit__(self, Freddi freddi):
         self.cpp_states = freddi.evolution.evolve()
-        self.states = np.empty(self.cpp_states.size(), dtype=object)
-        for i in range(self.cpp_states.size()):
+        self.states = np.empty(<Py_ssize_t> self.cpp_states.size(), dtype=object)
+        cdef Py_ssize_t i
+        for i in range(self.states.size):
             self.states[i] = state_from_cpp(self.cpp_states[i])
 
-    def __getattr__(self, attr):
-        return np.vstack([getattr(state, attr) for state in self.states])
+    def __getattr__(self, attr) -> np.ndarray:
+        value = getattr(self.states[0], attr)
+        cdef Py_ssize_t size = 1
+        dtype = type(value)
+        if isinstance(value, np.ndarray):
+            size = value.size
+            dtype = value.dtype
+        arr = np.zeros((self.states.size, size), dtype=dtype)
+        arr[0, :] = value
+        cdef size_t i
+        for i in range(1, self.states.size):
+            value = getattr(self.states[i], attr)
+            if size == 1:
+                arr[i, 0] = value
+            else:
+                arr[i, :value.size] = value
+        return arr
 
 
 cdef class Freddi:
