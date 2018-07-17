@@ -1,5 +1,6 @@
 from glob import glob
 
+import numpy as np
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 
@@ -10,7 +11,7 @@ extensions = [
     Extension('freddi.freddi',
               cpp_source + ['freddi/freddi.pyx'],
               extra_compile_args=['-std=c++11'],
-              include_dirs=['src/'],
+              include_dirs=['src/'] + [np.get_include()],
               libraries=['boost_program_options'])
 ]
 

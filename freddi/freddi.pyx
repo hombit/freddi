@@ -1,6 +1,7 @@
 # distutils: language = c++
 
 from cython.operator cimport dereference
+from cython cimport view
 
 import numpy as np
 cimport numpy as cnp
@@ -56,30 +57,160 @@ cdef class Arguments:
 cdef class State:
     cdef FreddiState* cpp_state
 
-    def __cinit__(self, Freddi freddi):
-        self.cpp_state = new FreddiState(freddi.evolution.get_state())
-
     def __dealloc__(self):
-        del self.cpp_state
+        if self.cpp_state:
+            del self.cpp_state
+
+    @property
+    def Mdot_in(self) -> double:
+       return self.cpp_state.get_Mdot_in()
+
+    @property
+    def Mdot_out(self) -> double:
+        return self.cpp_state.get_Mdot_out()
+
+    @property
+    def Lx(self) -> double:
+        return self.cpp_state.get_Lx()
+        
+    @property
+    def t(self) -> double:
+        return self.cpp_state.get_t()
+
+    @property
+    def t(self) -> int:
+        return self.cpp_state.get_i_t()
+
+    @property
+    def Nx(self) -> int:
+        return self.cpp_state.get_Nx()
+
+    @property
+    def h(self):
+        cdef vector[double] vec = self.cpp_state.get_h()
+        return np.asarray(<double[:vec.size()]> vec.data())
+
+    @property
+    def R(self):
+        cdef vector[double] vec = self.cpp_state.get_R()
+        return np.asarray(<double[:vec.size()]> vec.data())
+
+    @property
+    def F(self):
+        cdef vector[double] vec = self.cpp_state.get_F()
+        return np.asarray(<double[:vec.size()]> vec.data())
+
+    @property
+    def W(self):
+        cdef vector[double] vec = self.cpp_state.get_W()
+        return np.asarray(<double[:vec.size()]> vec.data())
+        
+    @property
+    def Tph(self):
+        cdef vector[double] vec = self.cpp_state.get_Tph()
+        return np.asarray(<double[:vec.size()]> vec.data())
+        
+    @property
+    def Tph_vis(self):
+        cdef vector[double] vec = self.cpp_state.get_Tph_vis()
+        return np.asarray(<double[:vec.size()]> vec.data())
+        
+    @property
+    def Tirr(self):
+        cdef vector[double] vec = self.cpp_state.get_Tirr()
+        return np.asarray(<double[:vec.size()]> vec.data())
+        
+    @property
+    def Cirr(self):
+        cdef vector[double] vec = self.cpp_state.get_Cirr()
+        return np.asarray(<double[:vec.size()]> vec.data())
+        
+    @property
+    def Sigma(self):
+        cdef vector[double] vec = self.cpp_state.get_Sigma()
+        return np.asarray(<double[:vec.size()]> vec.data())
+        
+    @property
+    def Height(self):
+        cdef vector[double] vec = self.cpp_state.get_Height()
+        return np.asarray(<double[:vec.size()]> vec.data())        
+
+    @property
+    def mU(self):
+        return self.cpp_state.mU()
+
+    @property
+    def mB(self):
+        return self.cpp_state.mB()
+
+    @property
+    def mV(self):
+        return self.cpp_state.mV()
+
+    @property
+    def mR(self):
+        return self.cpp_state.mR()
+
+    @property
+    def mI(self):
+        return self.cpp_state.mI()
+
+    @property
+    def mJ(self):
+        return self.cpp_state.mJ()
+
+    @property
+    def Mdisk(self):
+        return self.cpp_state.Mdisk()
+
+    def flux(self, double lmbd):
+        return self.cpp_state.flux(lmbd)
+   
+
+cdef State state_from_cpp(const FreddiState& cpp_state):
+    cdef State state = State()
+    state.cpp_state = new FreddiState(cpp_state)
+    return state
+
+
+cdef class EvolutionResults:
+    cdef vector[FreddiState] cpp_states
+    cdef object[:] states
+
+    def __cinit__(self, Freddi freddi):
+        self.cpp_states = freddi.evolution.evolve()
+        self.states = np.empty(self.cpp_states.size(), dtype=object)
+        for i in range(self.cpp_states.size()):
+            self.states[i] = state_from_cpp(self.cpp_states[i])
+
+    def __getattr__(self, attr):
+        return np.vstack([getattr(state, attr) for state in self.states])
 
 
 cdef class Freddi:
     cdef FreddiEvolution* evolution
     cdef Arguments args
+    cdef double time
 
     def __cinit__(self, Arguments args):
         self.args = args
         self.evolution = new FreddiEvolution(dereference(self.args.cpp_args))
+        self.time = self.args.cpp_args.calc.get().time
 
     def __dealloc__(self):
         del self.evolution
 
     cdef State get_state(self):
-        return State(self)
+        return state_from_cpp(self.evolution.get_state())
 
     def __iter__(self):
-        yield self.get_state()
-        for tau in self.tau_view:
-            self.evolution.step(tau)
-            yield self.get_state()
-            
+        state = self.get_state()
+        yield state
+        while state.t <= self.time:
+            self.evolution.step()
+            state = self.get_state()
+            yield state
+
+    def evolve(self):
+        return EvolutionResults(self)
+

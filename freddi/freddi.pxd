@@ -6,12 +6,38 @@ from libcpp.vector cimport vector
 cdef extern from 'freddi.hpp':
     cdef cppclass FreddiState:
         FreddiState(const FreddiState&)
+        double get_Mdot_in()
+        double get_Mdot_out()
+        double get_Lx()
+        double get_t()
+        size_t get_i_t()
+        unsigned int get_Nx()
+        const vector[double]& get_h() 
+        const vector[double]& get_R() 
+        const vector[double]& get_F() 
+        const vector[double]& get_W() 
+        const vector[double]& get_Tph() 
+        const vector[double]& get_Tph_vis() 
+        const vector[double]& get_Tirr()
+        const vector[double]& get_Cirr() 
+        const vector[double]& get_Sigma() 
+        const vector[double]& get_Height() 
+        double flux(double)
+        double mU() 
+        double mB() 
+        double mV() 
+        double mR() 
+        double mI() 
+        double mJ() 
+        double integrate(const vector[double]&)
+        double Mdisk()
     cdef cppclass FreddiEvolution:
         FreddiEvolution(const FreddiArguments&) except +
         void step() except +
         void step(double) except +
         vector[FreddiState] evolve() except +
-        const FreddiState& get_state() 
+        const FreddiState& get_state()
+        size_t Nt
 
 
 cdef extern from 'arguments.hpp':
