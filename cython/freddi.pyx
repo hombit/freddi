@@ -136,53 +136,43 @@ cdef class State:
 
     @property
     def last_h(self) -> double:
-        cdef vector[double] vec = self.cpp_state.get_h()
-        return vec[vec.size() - (<size_t> 1)]
+        return self.cpp_state.get_h().back()
 
     @property
     def last_R(self) -> double:
-        cdef vector[double] vec = self.cpp_state.get_R()
-        return vec[vec.size() - (<size_t> 1)]
+        return self.cpp_state.get_R().back()
 
     @property
     def last_F(self) -> double:
-        cdef vector[double] vec = self.cpp_state.get_F()
-        return vec[vec.size() - (<size_t> 1)]        
+        return self.cpp_state.get_F().back()
 
     @property
     def last_W(self) -> double:
-        cdef vector[double] vec = self.cpp_state.get_W()
-        return vec[vec.size() - (<size_t> 1)]
+        return self.cpp_state.get_W().back()
 
     @property
     def last_Tph(self) -> double:
-        cdef vector[double] vec = self.cpp_state.get_Tph()
-        return vec[vec.size() - (<size_t> 1)]
+        return self.cpp_state.get_Tph().back()
 
     @property
     def last_Tph_vis(self) -> double:
-        cdef vector[double] vec = self.cpp_state.get_Tph_vis()
-        return vec[vec.size() - (<size_t> 1)]
+        return self.cpp_state.get_Tph_vis().back()
 
     @property
     def last_Tirr(self) -> double:
-        cdef vector[double] vec = self.cpp_state.get_Tirr()
-        return vec[vec.size() - (<size_t> 1)]
+        return self.cpp_state.get_Tirr().back()
 
     @property
     def last_Cirr(self) -> double:
-        cdef vector[double] vec = self.cpp_state.get_Cirr()
-        return vec[vec.size() - (<size_t> 1)]
+        return self.cpp_state.get_Cirr().back()
 
     @property
     def last_Sigma(self) -> double:
-        cdef vector[double] vec = self.cpp_state.get_Sigma()
-        return vec[vec.size() - (<size_t> 1)]
+        return self.cpp_state.get_Sigma().back()
 
     @property
     def last_Height(self) -> double:
-        cdef vector[double] vec = self.cpp_state.get_Height()
-        return vec[vec.size() - (<size_t> 1)]
+        return self.cpp_state.get_Height().back()
 
     @property
     def mU(self) -> double:
