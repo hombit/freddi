@@ -29,7 +29,6 @@ cdef extern from 'freddi.hpp':
         double mR() 
         double mI() 
         double mJ() 
-        double integrate(const vector[double]&)
         double Mdisk()
     cdef cppclass FreddiEvolution:
         FreddiEvolution(const FreddiArguments&) except +

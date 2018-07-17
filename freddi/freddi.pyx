@@ -1,7 +1,6 @@
 # distutils: language = c++
 
 from cython.operator cimport dereference
-from cython cimport view
 
 import numpy as np
 cimport numpy as cnp
@@ -133,7 +132,57 @@ cdef class State:
     @property
     def Height(self) -> np.ndarray[np.float]:
         cdef vector[double] vec = self.cpp_state.get_Height()
-        return np.asarray(<double[:vec.size()]> vec.data())        
+        return np.asarray(<double[:vec.size()]> vec.data())   
+
+    @property
+    def last_h(self) -> double:
+        cdef vector[double] vec = self.cpp_state.get_h()
+        return vec[vec.size() - (<size_t> 1)]
+
+    @property
+    def last_R(self) -> double:
+        cdef vector[double] vec = self.cpp_state.get_R()
+        return vec[vec.size() - (<size_t> 1)]
+
+    @property
+    def last_F(self) -> double:
+        cdef vector[double] vec = self.cpp_state.get_F()
+        return vec[vec.size() - (<size_t> 1)]        
+
+    @property
+    def last_W(self) -> double:
+        cdef vector[double] vec = self.cpp_state.get_W()
+        return vec[vec.size() - (<size_t> 1)]
+
+    @property
+    def last_Tph(self) -> double:
+        cdef vector[double] vec = self.cpp_state.get_Tph()
+        return vec[vec.size() - (<size_t> 1)]
+
+    @property
+    def last_Tph_vis(self) -> double:
+        cdef vector[double] vec = self.cpp_state.get_Tph_vis()
+        return vec[vec.size() - (<size_t> 1)]
+
+    @property
+    def last_Tirr(self) -> double:
+        cdef vector[double] vec = self.cpp_state.get_Tirr()
+        return vec[vec.size() - (<size_t> 1)]
+
+    @property
+    def last_Cirr(self) -> double:
+        cdef vector[double] vec = self.cpp_state.get_Cirr()
+        return vec[vec.size() - (<size_t> 1)]
+
+    @property
+    def last_Sigma(self) -> double:
+        cdef vector[double] vec = self.cpp_state.get_Sigma()
+        return vec[vec.size() - (<size_t> 1)]
+
+    @property
+    def last_Height(self) -> double:
+        cdef vector[double] vec = self.cpp_state.get_Height()
+        return vec[vec.size() - (<size_t> 1)]
 
     @property
     def mU(self) -> double:
@@ -215,6 +264,10 @@ cdef class Freddi:
 
     def __dealloc__(self):
         del self.evolution
+
+    @property
+    def Nt(self) -> int:
+        return self.evolution.Nt
 
     cdef State get_state(self):
         return state_from_cpp(self.evolution.get_state())
