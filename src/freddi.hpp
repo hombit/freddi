@@ -16,6 +16,7 @@ class FreddiEvolution {
 private:
 	double Mdot_in_prev;
 public:
+	const size_t Nt;
 	const double GM;
 	const double eta;
 	const double cosi;
@@ -37,7 +38,6 @@ public:
 	void step(double tau);
 	inline void step() { return step(args->calc->tau); }
 	std::vector<FreddiState> evolve();
-public:
 	inline const FreddiState& get_state() const { return *state_; }
 };
 
@@ -50,6 +50,8 @@ public:
 	FreddiState(const FreddiEvolution* freddi);
 	FreddiState(const FreddiState&) = default;
 	FreddiState(FreddiState&&) = default;
+	FreddiState& operator=(const FreddiState&) = default;
+	FreddiState& operator=(FreddiState&&) = delete;
 	friend FreddiEvolution;
 private:
 	double Mdot_in = 0;
@@ -74,6 +76,7 @@ public:
 	inline double get_Mdot_out() const { return Mdot_out; }
 	inline double get_Lx() const { return Lx; }
 	inline double get_t() const { return t; }
+	inline size_t get_i_t() const { return i_t; };
 	inline unsigned int get_Nx() const { return Nx; }
 	inline const vecd& get_h() const { return h; }
 	inline const vecd& get_R() const { return R; }
@@ -88,7 +91,7 @@ public:
 	inline const double magnitude(double lambda, double F0) const {
 		return -2.5 * log10( I_lambda(R, Tph, lambda) * freddi->cosiOverD2 / F0 );
 	}
-	inline const double flux(double lambda) const {
+	inline double flux(double lambda) const {
 		return I_lambda(R, Tph, lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * freddi->cosiOverD2;
 	}
 	inline double mU() const { return magnitude(lambdaU, irr0U); }

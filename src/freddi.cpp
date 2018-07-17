@@ -14,6 +14,7 @@
 using namespace std::placeholders;
 
 FreddiEvolution::FreddiEvolution(const FreddiArguments &args_):
+		Nt(static_cast<size_t>(std::round(args_.calc->time / args_.calc->tau))),
 		args(&args_),
 		GM(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * args_.basic->Mx),
 		eta(disk_orbit::efficiency_of_accretion(args_.basic->kerr)),
@@ -123,7 +124,6 @@ void FreddiEvolution::step(const double tau) {
 
 
 std::vector<FreddiState> FreddiEvolution::evolve() {
-	auto Nt = static_cast<unsigned int>(std::round(args->calc->time / args->calc->tau));
 	std::vector<FreddiState> states;
 	states.push_back(*state_);
 	for (size_t i_t = 0; i_t < Nt; i_t++) {
