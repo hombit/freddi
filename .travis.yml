@@ -1,16 +1,133 @@
-sudo: required
+matrix:
+  include:
+    - name: "C++ on Linux"
+      os: linux
+      dist: xenial
+      sudo: true
+      language: cpp
+      addons:
+        apt:
+          packages:
+            - libboost-all-dev
+            - cmake
+      install:
+        - mkdir cmake-build
+        - cd cmake-build
+        - cmake ..
+        - make VERBOSE=1
+        - sudo make install VERBOSE=1
+      script:
+        - freddi
+    - name: "C++ on MacOS"
+      os: osx
+      language: cpp
+      install:
+        - mkdir cmake-build
+        - cd cmake-build
+        - cmake ..
+        - make VERBOSE=1
+      script:
+        - ./freddi
+    - name: "Python 3.5 on Linux"
+      os: linux
+      dist: xenial
+      sudo: true
+      language: python
+      python: "3.5"
+      addons:
+        apt:
+          packages:
+            - libboost-all-dev
+      install:
+        - pip install numpy
+        - python setup.py install
+      script:
+        - python -c "import freddi"
+        - python setup.py test
+      before_deploy:
+        - python setup.py bdist_wheel
+    - name: "Python 3.6 on Linux"
+      os: linux
+      dist: xenial
+      sudo: true
+      language: python
+      python: "3.6"
+      addons:
+        apt:
+          packages:
+            - libboost-all-dev
+      install:
+        - pip install numpy
+        - python setup.py install
+      script:
+        - python -c "import freddi"
+        - python setup.py test
+      before_deploy:
+        - python setup.py bdist_wheel
+    - name: "Python 3.7 on Linux"
+      os: linux
+      dist: xenial
+      sudo: true
+      language: python
+      python: "3.7"
+      addons:
+        apt:
+          packages:
+            - libboost-all-dev
+      install:
+        - pip install numpy
+        - python setup.py install
+      script:
+        - python -c "import freddi"
+        - python setup.py test
+      before_deploy:
+        - python setup.py bdist_wheel
+    - name: "Python 3.6 on MacOS"
+      os: osx
+      language: c++
+      before_install:
+        - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.6.6/python-3.6.6-macosx10.9.pkg
+        - sudo installer -pkg /tmp/Python.pkg -target /
+      install:
+        - pip3 install numpy
+        - python3 setup.py install
+      script:
+        - python3 -c "import freddi"
+        - python3 setup.py test
+      before_deploy:
+        - pip3 install wheel
+        - python3 setup.py bdist_wheel
+    - name: "Python 3.7 on MacOS"
+      os: osx
+      language: c++
+      before_install:
+        - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.7.0/python-3.7.0-macosx10.9.pkg
+        - sudo installer -pkg /tmp/Python.pkg -target /
+      install:
+        - pip3 install numpy
+        - python3 setup.py install
+      script:
+        - python3 -c "import freddi"
+        - python3 setup.py test
+      before_deploy:
+        - pip3 install wheel
+        - python3 setup.py bdist_wheel
+    - name: "C++ in Docker"
+      os: linux
+      language: generic
+      services:
+        - docker
+      install:
+        - docker build -f Dockerfile -t freddi:exe-travis .
+      script:
+        - docker run --rm -t freddi:exe-travis
+    - name: "Python Wheel in Docker"
+      os: linux
+      language: generic
+      services:
+        - docker
+      install:
+        - docker build -f Dockerfile.python -t freddi:python-travis .
+      script:
+        - docker run --rm -t freddi:python-travis python -c "import freddi"
 
-services:
-  - docker
-
-before_install:
-  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  - sudo apt-get update
-  - sudo apt-get -y install docker-ce
-
-install:
-  - docker build . -t hombit/freddi
-
-script:
-  - docker run -v "`pwd`":/data --rm -i hombit/freddi
