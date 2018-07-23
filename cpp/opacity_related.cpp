@@ -6,7 +6,7 @@ OpacityRelated::OpacityRelated(
 	double Mx,
 	double alpha,
 	double mu
-) throw(std::invalid_argument):
+):
 	type(opacity_type),
 	Mx(Mx),
 	alpha(alpha),

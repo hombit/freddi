@@ -22,7 +22,7 @@ public:
 		double Mx,
 		double alpha,
 		double mu
-	) throw(std::invalid_argument);
+	);
 	~OpacityRelated(){};
 
 	const std::array<std::string, 2> supported_types {{ "Kramers", "OPAL" }};
