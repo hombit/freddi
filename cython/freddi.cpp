@@ -6,31 +6,26 @@
         "depends": [
             "/usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/arrayobject.h",
             "/usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/ufuncobject.h",
-            "cpp/arguments.hpp",
-            "cpp/freddi.hpp"
+            "cpp/include/arguments.hpp",
+            "cpp/include/freddi.hpp"
         ],
         "extra_compile_args": [
             "-std=c++11"
         ],
         "include_dirs": [
-            "cpp",
+            "cpp/include",
             "/usr/local/lib/python3.7/site-packages/numpy/core/include"
         ],
         "language": "c++",
-        "libraries": [
-            "boost_program_options"
-        ],
         "name": "freddi",
         "sources": [
             "cython/freddi.pyx",
-            "cpp/opacity_related.cpp",
-            "cpp/arguments.cpp",
-            "cpp/freddi.cpp",
-            "cpp/spectrum.cpp",
-            "cpp/output.cpp",
-            "cpp/nonlinear_diffusion.cpp",
-            "cpp/main.cpp",
-            "cpp/orbit.cpp"
+            "cpp/src/arguments.cpp",
+            "cpp/src/opacity_related.cpp",
+            "cpp/src/freddi.cpp",
+            "cpp/src/spectrum.cpp",
+            "cpp/src/nonlinear_diffusion.cpp",
+            "cpp/src/orbit.cpp"
         ]
     },
     "module_name": "freddi"

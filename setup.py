@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 from glob import glob
 from sys import argv
 
@@ -16,14 +17,19 @@ except ValueError:
 ext = '.pyx' if USE_CYTHON else '.cpp'
 cython_source = 'cython/freddi' + ext
 
-cpp_source = glob('cpp/*.cpp')
+cpp_source = ('arguments.cpp',
+              'opacity_related.cpp',
+              'freddi.cpp',
+              'spectrum.cpp',
+              'nonlinear_diffusion.cpp',
+              'orbit.cpp')
+cpp_source = [os.path.join('cpp/src', f) for f in cpp_source]
 
 extensions = [
     Extension('freddi',
               cpp_source + [cython_source],
               extra_compile_args=['-std=c++11'],
-              include_dirs=['cpp', np.get_include()],
-              libraries=['boost_program_options'])
+              include_dirs=['cpp/include', np.get_include()],)
 ]
 
 if USE_CYTHON:
