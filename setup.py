@@ -28,7 +28,7 @@ extensions = [
 
 if USE_CYTHON:
     from Cython.Build import cythonize
-    extensions = cythonize(extensions)
+    extensions = cythonize(extensions, annotate=True, force=True)
 
 
 setup(
