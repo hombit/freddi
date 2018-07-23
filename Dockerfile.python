@@ -1,0 +1,21 @@
+FROM python:3.7 as builder
+
+RUN apt-get update &&\
+    apt-get install -y g++ libboost-all-dev
+RUN pip install numpy
+
+ENV SOURCE "/source"
+COPY ./ ${SOURCE}/
+WORKDIR ${SOURCE}
+
+RUN python setup.py bdist_wheel --dist-dir=/dist
+
+
+FROM python:3.7
+
+RUN pip install numpy
+
+COPY --from=builder /dist /dist
+
+RUN wheel install /dist/*.whl
+
