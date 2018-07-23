@@ -1,17 +1,22 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.0)
 project(freddi)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+set(STATIC_LINKING FALSE CACHE BOOL "Build a static binary?")
+if(STATIC_LINKING)
+    set(CMAKE_EXE_LINKER_FLAGS "-static")
+endif(STATIC_LINKING)
+
 file(GLOB_RECURSE SOURCES cpp/*.cpp cpp/*.h cpp/*.hpp)
 
-SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/local/inlcude")
-SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/lib")
+find_package(Boost COMPONENTS program_options REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
 
-FIND_PACKAGE(Boost COMPONENTS program_options REQUIRED)
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
-ADD_DEFINITIONS( "-DHAS_BOOST" )
+set(TARGET freddi)
+add_executable(${TARGET} ${SOURCES})
+target_compile_definitions(${TARGET} PUBLIC INSTALLPATHPREFIX="${CMAKE_INSTALL_PREFIX}")
+target_link_libraries(${TARGET} LINK_PUBLIC ${Boost_LIBRARIES})
+install(TARGETS ${TARGET} DESTINATION bin)
+install(FILES ${PROJECT_SOURCE_DIR}/freddi.ini DESTINATION etc)
 
-add_executable(freddi ${SOURCES})
-
-target_link_libraries(freddi LINK_PUBLIC ${Boost_LIBRARIES})
