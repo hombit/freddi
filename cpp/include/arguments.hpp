@@ -1,25 +1,16 @@
 #ifndef _ARGUMENTS_HPP
 #define _ARGUMENTS_HPP
 
-#ifndef INSTALLPATHPREFIX
-#define INSTALLPATHPREFIX ""
-#endif  // INSTALLPATHPREFIX
-
 #include <cmath>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <boost/program_options.hpp>
 
 #include "gsl_const_cgsm.h"
 #include "constants.hpp"
 #include "opacity_related.hpp"
 #include "orbit.hpp"
 #include "unit_transfomation.hpp"
-
-
-namespace po = boost::program_options;
 
 
 class GeneralArguments {
@@ -35,8 +26,6 @@ public:
 			prefix(prefix),
 			dir(dir),
 			fulldata(fulldata) {}
-	GeneralArguments(const po::variables_map& vm);
-	static po::options_description description();
 };
 
 
@@ -78,9 +67,6 @@ public:
 	const double period;
 	const double rin;
 	const double rout;
-protected:
-	static double rinInitializer(const po::variables_map& vm, double Mx, double kerr);
-	static double routInitializer(const po::variables_map& vm, double Mx, double Mopt, double period);
 public:
 	BasicDiskBinaryArguments(
 			double alpha,
@@ -117,10 +103,8 @@ public:
 		return {alpha, Mx, kerr, Mopt, period,
 				rin, routFromMxMoptPeriod(Mx, Mopt, period)};
 	}
-	BasicDiskBinaryArguments(const po::variables_map& vm);
 	inline double h(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx * r); }
 	inline double omega(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx / r); }
-	static po::options_description description();
 };
 
 
@@ -151,9 +135,7 @@ public:
 	const double F0;
 public:
 	std::unique_ptr<const OpacityRelated> oprel;
-private:
-	static double Mdisk0Initializer(const po::variables_map& vm);
-	static double Mdot0Initializer(const po::variables_map& vm);
+protected:
 	double F0Initializer(double F0_, const BasicDiskBinaryArguments& bdb_args);
 public:
 	DiskStructureArguments(
@@ -164,8 +146,6 @@ public:
 			double powerorder, double gaussmu, double gausssigma,
 			bool is_Mdisk0_specified, bool is_Mdot0_specified,
 			double Mdisk0, double Mdot0);
-	DiskStructureArguments(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args);
-	static po::options_description description();
 };
 
 
@@ -179,8 +159,6 @@ public:
 public:
 	SelfIrradiationArguments(double Cirr, const std::string& irrfactortype):
 			Cirr(Cirr), irrfactortype(irrfactortype) {}
-	SelfIrradiationArguments(const po::variables_map& vm, const DiskStructureArguments& dsa_args);
-	static po::options_description description();
 };
 
 
@@ -198,8 +176,6 @@ public:
 	const double inclination;  // degrees
 	const double distance;
 	const std::vector<double> lambdas;
-protected:
-	std::vector<double> lambdasInitializer(const po::variables_map& vm) const;
 public:
 	FluxArguments(
 			double colourfactor,
@@ -210,8 +186,6 @@ public:
 			emin(emin), emax(emax),
 			inclination(inclination), distance(distance),
 			lambdas(lambdas) {}
-	FluxArguments(const po::variables_map& vm);
-	static po::options_description description();
 };
 
 
@@ -232,8 +206,6 @@ public:
 			double time, double tau, unsigned int Nx, const std::string& gridscale,
 			double eps=1e-6):
 			time(time), tau(tau), Nx(Nx), gridscale(gridscale), eps(eps) {}
-	CalculationArguments(const po::variables_map& vm);
-	static po::options_description description();
 };
 
 
@@ -246,6 +218,7 @@ public:
 	std::shared_ptr<FluxArguments> flux;
 	std::shared_ptr<CalculationArguments> calc;
 public:
+	FreddiArguments() = default;
 	FreddiArguments(
 			GeneralArguments* general,
 			BasicDiskBinaryArguments* basic,
@@ -254,12 +227,7 @@ public:
 			FluxArguments* flux,
 			CalculationArguments* calc):
 			general(general), basic(basic), disk(disk), irr(irr), flux(flux), calc(calc) {}
-	FreddiArguments(const po::variables_map& vm);
-	static po::options_description description();
 };
-
-
-po::variables_map parseArguments(int ac, char* av[]);
 
 
 #endif // _ARGUMENTS_HPP
