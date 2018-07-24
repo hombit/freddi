@@ -65,6 +65,10 @@ cdef class State:
        return self.cpp_state.get_Mdot_in()
 
     @property
+    def Mdot(self) -> double:
+        return self.Mdot_in
+
+    @property
     def Mdot_out(self) -> double:
         return self.cpp_state.get_Mdot_out()
 
