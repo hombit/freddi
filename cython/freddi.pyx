@@ -77,7 +77,7 @@ cdef class State:
         return self.cpp_state.get_t()
 
     @property
-    def t(self) -> int:
+    def i_t(self) -> int:
         return self.cpp_state.get_i_t()
 
     @property

@@ -2707,6 +2707,7 @@ static PyObject *__pyx_pf_6freddi_5State_7Mdot_in___get__(struct __pyx_obj_6fred
 static PyObject *__pyx_pf_6freddi_5State_8Mdot_out___get__(struct __pyx_obj_6freddi_State *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_5State_2Lx___get__(struct __pyx_obj_6freddi_State *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_5State_1t___get__(struct __pyx_obj_6freddi_State *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_6freddi_5State_3i_t___get__(struct __pyx_obj_6freddi_State *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_5State_2Nx___get__(struct __pyx_obj_6freddi_State *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_5State_1h___get__(struct __pyx_obj_6freddi_State *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_5State_1R___get__(struct __pyx_obj_6freddi_State *__pyx_v_self); /* proto */
@@ -3948,11 +3949,11 @@ static PyObject *__pyx_pf_6freddi_5State_2Lx___get__(struct __pyx_obj_6freddi_St
   return __pyx_r;
 }
 
-/* "freddi.pyx":80
+/* "freddi.pyx":76
  * 
  *     @property
- *     def t(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_i_t()
+ *     def t(self) -> double:             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_t()
  * 
  */
 
@@ -3975,9 +3976,69 @@ static PyObject *__pyx_pf_6freddi_5State_1t___get__(struct __pyx_obj_6freddi_Sta
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
+  /* "freddi.pyx":77
+ *     @property
+ *     def t(self) -> double:
+ *         return self.cpp_state.get_t()             # <<<<<<<<<<<<<<
+ * 
+ *     @property
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_t()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "freddi.pyx":76
+ * 
+ *     @property
+ *     def t(self) -> double:             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_t()
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("freddi.State.t.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "freddi.pyx":80
+ * 
+ *     @property
+ *     def i_t(self) -> int:             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_i_t()
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_6freddi_5State_3i_t_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_6freddi_5State_3i_t_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_6freddi_5State_3i_t___get__(((struct __pyx_obj_6freddi_State *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_6freddi_5State_3i_t___get__(struct __pyx_obj_6freddi_State *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+
   /* "freddi.pyx":81
  *     @property
- *     def t(self) -> int:
+ *     def i_t(self) -> int:
  *         return self.cpp_state.get_i_t()             # <<<<<<<<<<<<<<
  * 
  *     @property
@@ -3992,7 +4053,7 @@ static PyObject *__pyx_pf_6freddi_5State_1t___get__(struct __pyx_obj_6freddi_Sta
   /* "freddi.pyx":80
  * 
  *     @property
- *     def t(self) -> int:             # <<<<<<<<<<<<<<
+ *     def i_t(self) -> int:             # <<<<<<<<<<<<<<
  *         return self.cpp_state.get_i_t()
  * 
  */
@@ -4000,7 +4061,7 @@ static PyObject *__pyx_pf_6freddi_5State_1t___get__(struct __pyx_obj_6freddi_Sta
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("freddi.State.t.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("freddi.State.i_t.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -24100,6 +24161,10 @@ static PyObject *__pyx_getprop_6freddi_5State_t(PyObject *o, CYTHON_UNUSED void 
   return __pyx_pw_6freddi_5State_1t_1__get__(o);
 }
 
+static PyObject *__pyx_getprop_6freddi_5State_i_t(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_6freddi_5State_3i_t_1__get__(o);
+}
+
 static PyObject *__pyx_getprop_6freddi_5State_Nx(PyObject *o, CYTHON_UNUSED void *x) {
   return __pyx_pw_6freddi_5State_2Nx_1__get__(o);
 }
@@ -24224,6 +24289,7 @@ static struct PyGetSetDef __pyx_getsets_6freddi_State[] = {
   {(char *)"Mdot_out", __pyx_getprop_6freddi_5State_Mdot_out, 0, (char *)0, 0},
   {(char *)"Lx", __pyx_getprop_6freddi_5State_Lx, 0, (char *)0, 0},
   {(char *)"t", __pyx_getprop_6freddi_5State_t, 0, (char *)0, 0},
+  {(char *)"i_t", __pyx_getprop_6freddi_5State_i_t, 0, (char *)0, 0},
   {(char *)"Nx", __pyx_getprop_6freddi_5State_Nx, 0, (char *)0, 0},
   {(char *)"h", __pyx_getprop_6freddi_5State_h, 0, (char *)0, 0},
   {(char *)"R", __pyx_getprop_6freddi_5State_R, 0, (char *)0, 0},
