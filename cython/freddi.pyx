@@ -12,13 +12,28 @@ cdef class Arguments:
     cdef FreddiArguments* cpp_args
 
     def __cinit__(
-        self, *,
+        self, *, bint cgs=True,
         double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt, double period=default_period, rin=None, rout=None,
         string opacity=default_opacity, string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond, double F0=default_F0, double powerorder=default_powerorder, double gaussmu=default_gaussmu, double gausssigma=default_gausssigma, Mdisk0=None, Mdot0=None,
         double Cirr=default_Cirr, string irrfactortype=default_irrfactortype,
         double colourfactor=default_colourfactor, double emin=default_emin, double emax=default_emax, double inclination=default_inclination, double distance=default_distance, vector[double] lambdas=[],
         double time=default_time, double tau=default_tau, unsigned int Nx=default_Nx, string gridscale=default_gridscale, eps=None
     ):
+        if not cgs:
+            Mx = sunToGram(Mx)
+            Mopt = sunToGram(Mopt)
+            period = dayToS(period)
+            if rin is not None:
+                rin = rgToCm(rin, Mx)
+            if rout is not None:
+                rout = sunToCm(rout)
+            emin = kevToHertz(emin)
+            emax = kevToHertz(emax)
+            distance = kpcToCm(distance)
+            for i in range(lambdas.size()):
+                lambdas[i] = angstromToCm(lambdas[i])
+            time = dayToS(time)
+            tau = dayToS(tau)
         cdef GeneralArguments* general = new GeneralArguments(b'', b'', False)
         cdef BasicDiskBinaryArguments* basic
         if rin is None and rout is None:

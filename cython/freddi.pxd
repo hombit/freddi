@@ -115,3 +115,12 @@ cdef extern from 'arguments.hpp' namespace 'CalculationArguments':
     cdef const unsigned int default_Nx
     cdef const char* default_gridscale
 
+
+cdef extern from 'unit_transformation.hpp':
+    cdef double sunToGram(double)
+    cdef double rgToCm(double, double)
+    cdef double sunToCm(double)
+    cdef double kpcToCm(double)
+    cdef double angstromToCm(double)
+    cdef double dayToS(double)
+    cdef double kevToHertz(double)
