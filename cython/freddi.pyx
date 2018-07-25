@@ -67,6 +67,16 @@ cdef class Arguments:
     def time(self):
         return self.cpp_args.calc.get().time
 
+    @property
+    def lambdas(self):
+        cdef const double* data = self.cpp_args.flux.get().lambdas.data()
+        cdef size_t size = self.cpp_args.flux.get().lambdas.size()
+        if size == (<size_t> 0):
+            return np.array([], dtype=np.float)
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
+
 
 cdef class State:
     cdef FreddiState* cpp_state
@@ -105,53 +115,83 @@ cdef class State:
 
     @property
     def h(self) -> np.ndarray[np.float]:
-        cdef vector[double] vec = self.cpp_state.get_h()
-        return np.asarray(<double[:vec.size()]> vec.data())
+        cdef const double* data = self.cpp_state.get_h().data()
+        cdef size_t size = self.cpp_state.get_h().size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
 
     @property
     def R(self) -> np.ndarray[np.float]:
-        cdef vector[double] vec = self.cpp_state.get_R()
-        return np.asarray(<double[:vec.size()]> vec.data())
+        cdef const double* data = self.cpp_state.get_R().data()
+        cdef size_t size = self.cpp_state.get_R().size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
 
     @property
     def F(self) -> np.ndarray[np.float]:
-        cdef vector[double] vec = self.cpp_state.get_F()
-        return np.asarray(<double[:vec.size()]> vec.data())
+        cdef const double* data = self.cpp_state.get_F().data()
+        cdef size_t size = self.cpp_state.get_F().size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
 
     @property
     def W(self) -> np.ndarray[np.float]:
-        cdef vector[double] vec = self.cpp_state.get_W()
-        return np.asarray(<double[:vec.size()]> vec.data())
-        
+        cdef const double* data = self.cpp_state.get_W().data()
+        cdef size_t size = self.cpp_state.get_W().size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
+
     @property
     def Tph(self) -> np.ndarray[np.float]:
-        cdef vector[double] vec = self.cpp_state.get_Tph()
-        return np.asarray(<double[:vec.size()]> vec.data())
-        
+        cdef const double* data = self.cpp_state.get_Tph().data()
+        cdef size_t size = self.cpp_state.get_Tph().size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
+
     @property
     def Tph_vis(self) -> np.ndarray[np.float]:
-        cdef vector[double] vec = self.cpp_state.get_Tph_vis()
-        return np.asarray(<double[:vec.size()]> vec.data())
-        
+        cdef const double* data = self.cpp_state.get_Tph_vis().data()
+        cdef size_t size = self.cpp_state.get_Tph_vis().size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
+
     @property
     def Tirr(self) -> np.ndarray[np.float]:
-        cdef vector[double] vec = self.cpp_state.get_Tirr()
-        return np.asarray(<double[:vec.size()]> vec.data())
-        
+        cdef const double* data = self.cpp_state.get_Tirr().data()
+        cdef size_t size = self.cpp_state.get_Tirr().size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
+
     @property
     def Cirr(self) -> np.ndarray[np.float]:
-        cdef vector[double] vec = self.cpp_state.get_Cirr()
-        return np.asarray(<double[:vec.size()]> vec.data())
-        
+        cdef const double* data = self.cpp_state.get_Cirr().data()
+        cdef size_t size = self.cpp_state.get_Cirr().size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
+
     @property
     def Sigma(self) -> np.ndarray[np.float]:
-        cdef vector[double] vec = self.cpp_state.get_Sigma()
-        return np.asarray(<double[:vec.size()]> vec.data())
-        
+        cdef const double* data = self.cpp_state.get_Sigma().data()
+        cdef size_t size = self.cpp_state.get_Sigma().size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
+
     @property
     def Height(self) -> np.ndarray[np.float]:
-        cdef vector[double] vec = self.cpp_state.get_Height()
-        return np.asarray(<double[:vec.size()]> vec.data())   
+        cdef const double* data = self.cpp_state.get_Height().data()
+        cdef size_t size = self.cpp_state.get_Height().size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
 
     @property
     def last_h(self) -> double:
@@ -241,6 +281,13 @@ cdef class EvolutionResults:
         cdef Py_ssize_t i
         for i in range(self.states.size):
             self.states[i] = state_from_cpp(self.cpp_states[i])
+
+    def flux(self, double lmbd) -> double:
+        arr = np.zeros((self.states.size, 1), dtype=np.float)
+        cdef size_t i
+        for i in range(self.states.size):
+            arr[i] = self.states[i].flux(lmbd)
+        return arr
 
     def __getattr__(self, attr) -> np.ndarray:
         value = getattr(self.states[0], attr)
