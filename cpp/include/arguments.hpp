@@ -132,9 +132,8 @@ public:
 	const double Mdot0;
 	const bool is_Mdisk0_specified;
 	const bool is_Mdot0_specified;
-	const double F0;
-public:
 	std::unique_ptr<const OpacityRelated> oprel;
+	const double F0;
 protected:
 	double F0Initializer(double F0_, const BasicDiskBinaryArguments& bdb_args);
 public:
