@@ -9,6 +9,57 @@ from freddi cimport *
 
 
 cdef class Arguments:
+    """Arguments for Freddi
+
+    All parameters are keyword-only, all physical values are in CGS units.
+    See detailed description of parameters in documentation
+
+    Parameters
+    ----------
+    alpha : float, optional
+    Mx : float, optional
+    kerr : float, optional
+    Mopt : float, optional
+    period : float, optional
+    rin : float or None, optional
+    rout : float or None, optional
+    opacity : bytes, optional
+        Should be `b'Kramers'` or `b'OPAL'`
+    boundcond : bytes, optional
+        Should be `b'Teff'` or `b'Tirr'`
+    Thot : float, optional
+    initialcond : bytes, optional
+        Should be `b'powerF'`, `b'powerSigma'`, `b'sinusF'`, `b'gaussF'` or
+        `b'quasistat'`
+    FO : float, optional
+    Mdisk0 : float, optional
+    Mdot0 : float, optional
+    powerorder : float, optional
+    gaussmu : float, optional
+    gausssigma : float, optional
+    Cirr : float, optional
+    irrfactortype : bytes, optional
+        Should be `b'const'` or `b'square'`
+    colourfactor : float, optional
+    emin : float, optional
+    emax : float, optional
+    inclination : float, optional
+        In degrees
+    distance : float, optional
+    lambda : list of float, optional
+    time : float, optional
+    tau : float, optional
+    Nx : int, optional
+    gridscale : bytes, optional
+        Should be `b'log'` or `b'linear'`
+
+    Attributes
+    ----------
+    lambdas: numpy.ndarray
+        Specified lambdas, in cm
+
+    """
+
     cdef FreddiArguments* cpp_args
 
     def __cinit__(
@@ -79,6 +130,13 @@ cdef class Arguments:
 
 
 cdef class State:
+    """Disk radial structure
+
+    Objects of this class shouldn't be created manually, normally they are
+    obtained from `Freddi` methods
+
+    """
+
     cdef FreddiState* cpp_state
 
     def __dealloc__(self):
@@ -273,12 +331,27 @@ cdef class State:
    
 
 cdef State state_from_cpp(const FreddiState& cpp_state):
+    """Construct State object from C++ FreddiState"""
     cdef State state = State()
     state.cpp_state = new FreddiState(cpp_state)
     return state
 
 
 cdef class EvolutionResults:
+    """Temporal distribution of various disk parameters
+
+    Parameters
+    ----------
+    freddi: Freddi
+        Freddi object to be evolved and prepared
+
+    Methods
+    -------
+    flux(lmbd) : array
+        Optical flux of the disk
+
+    """
+
     cdef vector[FreddiState] cpp_states
     cdef object[:] states
 
@@ -290,6 +363,18 @@ cdef class EvolutionResults:
             self.states[i] = state_from_cpp(self.cpp_states[i])
 
     def flux(self, lmbd) -> np.ndarray:
+        """Optical flux of the disk
+
+        Parameters
+        ----------
+        lmbd : array_like
+            Observation wavelength
+
+        Returns
+        -------
+        array
+
+        """
         cdef tuple lmbd_shape = cnp.broadcast(lmbd).shape
         arr = np.empty((self.states.size,) + cnp.broadcast(lmbd).shape, dtype=np.float)
         cdef size_t i
@@ -303,6 +388,27 @@ cdef class EvolutionResults:
 
 
 cdef class Freddi:
+    """Accretion disk evolution modeller
+
+    This object is iterable, it yields `State` object on each iteration step
+
+    Parameters
+    ----------
+    args : Arguments
+
+    Attributions
+    ------------
+    Nt : int
+        Number of evolutions steps. The number of time moments where disk
+        structure will be obtained is more by one
+
+    Methods
+    -------
+    evolve() : EvolutionResults
+        Calculate disk evolution
+
+    """
+
     cdef FreddiEvolution* evolution
     cdef Arguments args
     cdef double time
@@ -323,6 +429,16 @@ cdef class Freddi:
         return state_from_cpp(self.evolution.get_state())
 
     def __iter__(self):
+        """Iterate disk over time
+
+        The first yielded object is for initial distribution
+
+        Yields
+        ------
+        State
+            `State` disk radial structure object
+
+        """
         state = self.get_state()
         yield state
         while state.t <= self.time:
@@ -331,5 +447,12 @@ cdef class Freddi:
             yield state
 
     def evolve(self):
+        """Calculate disk evolution
+
+        Returns
+        -------
+        EvolutionResults
+
+        """
         return EvolutionResults(self)
 
