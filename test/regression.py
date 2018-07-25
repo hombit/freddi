@@ -70,15 +70,15 @@ class RegressionTestCase(unittest.TestCase):
             f = Freddi(args)
             result = f.evolve()
             data = np.genfromtxt(data_file, names=True)
-            assert_equal(result.i_t[:, 0], np.arange(f.Nt + 1))
-            assert_equal(result.t[:, 0], data['t'] * 86400)
+            assert_equal(result.i_t, np.arange(f.Nt + 1))
+            assert_equal(result.t, data['t'] * 86400)
             for column in columns_to_compare:
-                assert_allclose(getattr(result, column)[:, 0], data[column], rtol=1e-5,
+                assert_allclose(getattr(result, column), data[column], rtol=1e-5,
                                 err_msg='File: {}, column {}:'.format(data_file, column))
             for i_lmbd, lmbd in enumerate(args.lambdas):
                 column = 'Fnu{}'.format(i_lmbd)
                 if column in data.dtype.names:
-                    assert_allclose(result.flux(lmbd)[:, 0], data[column], rtol=1e-5,
+                    assert_allclose(result.flux(lmbd), data[column], rtol=1e-5,
                                     err_msg='File: {}, lambda {}, column {}:'.format(data_file, lmbd, column))
                 else:
                     break

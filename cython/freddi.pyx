@@ -3,7 +3,7 @@
 from cython.operator cimport dereference
 
 import numpy as np
-cimport numpy as cnp
+cimport numpy as cnp; cnp.import_array()
 
 from freddi cimport *
 
@@ -261,8 +261,15 @@ cdef class State:
     def Mdisk(self) -> double:
         return self.cpp_state.Mdisk()
 
-    def flux(self, double lmbd) -> double:
-        return self.cpp_state.flux(lmbd)
+    def flux(self, lmbd) -> np.ndarray:
+        arr = np.empty(np.broadcast(lmbd).shape, np.float)
+        cdef cnp.broadcast it = cnp.broadcast(lmbd, arr)
+        while cnp.PyArray_MultiIter_NOTDONE(it):
+            (<double*>cnp.PyArray_MultiIter_DATA(it, 1))[0] = self.cpp_state.flux(
+                (<double*>cnp.PyArray_MultiIter_DATA(it, 0))[0]
+            )
+            cnp.PyArray_MultiIter_NEXT(it)
+        return arr
    
 
 cdef State state_from_cpp(const FreddiState& cpp_state):
@@ -282,29 +289,16 @@ cdef class EvolutionResults:
         for i in range(self.states.size):
             self.states[i] = state_from_cpp(self.cpp_states[i])
 
-    def flux(self, double lmbd) -> double:
-        arr = np.zeros((self.states.size, 1), dtype=np.float)
+    def flux(self, lmbd) -> np.ndarray:
+        cdef tuple lmbd_shape = cnp.broadcast(lmbd).shape
+        arr = np.empty((self.states.size,) + cnp.broadcast(lmbd).shape, dtype=np.float)
         cdef size_t i
         for i in range(self.states.size):
             arr[i] = self.states[i].flux(lmbd)
         return arr
 
     def __getattr__(self, attr) -> np.ndarray:
-        value = getattr(self.states[0], attr)
-        cdef Py_ssize_t size = 1
-        dtype = type(value)
-        if isinstance(value, np.ndarray):
-            size = value.size
-            dtype = value.dtype
-        arr = np.zeros((self.states.size, size), dtype=dtype)
-        arr[0, :] = value
-        cdef size_t i
-        for i in range(1, self.states.size):
-            value = getattr(self.states[i], attr)
-            if size == 1:
-                arr[i, 0] = value
-            else:
-                arr[i, :value.size] = value
+        arr = np.stack(getattr(state, attr) for state in self.states)
         return arr
 
 
