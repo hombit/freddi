@@ -48,6 +48,7 @@ setup(
     ext_modules=extensions,
     install_requires=['numpy'],
     python_requires='>=3.5',
+    test_suite='test',
     classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
