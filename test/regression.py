@@ -8,7 +8,7 @@ from configparser import ConfigParser, RawConfigParser
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 
-from freddi import Arguments, Freddi
+from freddi import Freddi
 
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
@@ -66,8 +66,7 @@ class RegressionTestCase(unittest.TestCase):
         columns_to_compare = ('Mdot', 'Mdisk', 'Lx', 'mU', 'mB', 'mV', 'mR', 'mI', 'mJ')
         for data_file in self.data_files:
             config = self.load_config(data_file, ('dir', 'prefix', 'fulldata'))
-            args = Arguments(**config)
-            f = Freddi(args)
+            f = Freddi(**config)
             result = f.evolve()
             data = np.genfromtxt(data_file, names=True)
             assert_equal(result.i_t, np.arange(f.Nt + 1))
@@ -75,7 +74,7 @@ class RegressionTestCase(unittest.TestCase):
             for column in columns_to_compare:
                 assert_allclose(getattr(result, column), data[column], rtol=1e-5,
                                 err_msg='File: {}, column {}:'.format(data_file, column))
-            for i_lmbd, lmbd in enumerate(args.lambdas):
+            for i_lmbd, lmbd in enumerate(f.lambdas):
                 column = 'Fnu{}'.format(i_lmbd)
                 if column in data.dtype.names:
                     assert_allclose(result.flux(lmbd), data[column], rtol=1e-5,
