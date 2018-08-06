@@ -407,6 +407,20 @@ cdef class Freddi:
     def Nt(self) -> int:
         return self.evolution.Nt
 
+    cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):
+        cdef double c_Cirr = self.args.irr.get().Cirr if Cirr is None else Cirr
+        cdef string c_irrfactortype = self.args.irr.get().irrfactortype if irrfactortype is None else irrfactortype
+        cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(c_Cirr, c_irrfactortype)
+        self.args.irr.reset(irr)
+
+    @property
+    def Cirr(self) -> double:
+        return self.args.irr.get().Cirr
+
+    @Cirr.setter
+    def Cirr(self, val: double) -> None:
+        self.change_SelfIrradiationArguments(Cirr=val)
+
     cdef State get_state(self):
         return state_from_cpp(self.evolution.get_state())
 
