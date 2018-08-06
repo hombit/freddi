@@ -173,9 +173,9 @@ void FreddiEvolution::truncateOuterRadius() {
 	}
 }
 
-vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, int first, int last) const {
+vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t first, size_t last) const {
 	vecd W(first > 0 ? first : 0,  0.);
-	for ( int i = first; i <= last; ++i ){
+	for ( size_t i = first; i <= last; ++i ){
 		W.push_back(pow(F[i], 1. - oprel->m) * pow(h[i], oprel->n) / (1. - oprel->m) / oprel->D);
 	}
 	return W;

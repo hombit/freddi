@@ -22,7 +22,7 @@ public:
 	const double cosi;
 	const double cosiOverD2;
 	const OpacityRelated* oprel;
-	std::function<vecd (const vecd&, const vecd&, unsigned int, unsigned int)> wunc;
+	std::function<vecd (const vecd&, const vecd&, size_t, size_t)> wunc;
 	const FreddiArguments* args;
 private:
 	std::unique_ptr<FreddiState> state_;
@@ -31,7 +31,7 @@ private:
 	void calculateRadialStructure();
 	void truncateOuterRadius();
 protected:
-	vecd wunction(const vecd& h, const vecd& F, int first, int last) const;
+	vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;
 	double Sigma_hot_disk(double r) const;
 public:
 	FreddiEvolution(const FreddiArguments& args);
@@ -59,7 +59,7 @@ private:
 	double Lx;
 	double t = 0;
 	size_t i_t = 0;
-	unsigned int Nx;
+	size_t Nx;
 	vecd h;
 	vecd R;
 	vecd F;
@@ -77,7 +77,7 @@ public:
 	inline double get_Lx() const { return Lx; }
 	inline double get_t() const { return t; }
 	inline size_t get_i_t() const { return i_t; };
-	inline unsigned int get_Nx() const { return Nx; }
+	inline size_t get_Nx() const { return Nx; }
 	inline const vecd& get_h() const { return h; }
 	inline const vecd& get_R() const { return R; }
 	inline const vecd& get_F() const { return F; }
