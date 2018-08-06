@@ -17,6 +17,7 @@ class FreddiEvolution {
 	typedef std::vector<double> vecd;
 private:
 	double Mdot_in_prev;
+	double Mdot_peak = -INFINITY;
 public:
 	const size_t Nt;
 	const double GM;
@@ -26,10 +27,22 @@ public:
 	const OpacityRelated* oprel;
 	std::function<vecd (const vecd&, const vecd&, size_t, size_t)> wunc;
 	const FreddiArguments* args;
+// TODO: move to arguments
+private:
+	const double X_R = 1.;
+	const double F_dead = 1e36;
+	const double k_t = 1. / 3.;
+	const double xi = 0.7;
+	const double xi_pow_minus_7_2;
+	const double P_acc = 0.002;
+	const double R_cor;
+	double mu_magn;
+	double R_dead;
 private:
 	std::unique_ptr<FreddiState> state_;
 private:
 	void truncateOuterRadius();
+	void truncateInnerRadius();
 protected:
 	vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;
 	double Sigma_hot_disk(double r) const;
@@ -56,6 +69,7 @@ public:
 	friend FreddiEvolution;
 private:
 	double Mdot_out_ = 0;
+	double F_in_ = 0;
 	double t_ = 0;
 	size_t i_t_ = 0;
 	size_t Nx_;
@@ -64,6 +78,7 @@ private:
 public:
 	inline double Mdot_in() const { return (F()[1] - F()[0]) / (h()[1] - h()[0]); }
 	inline double Mdot_out() const { return Mdot_out_; }
+	inline double F_in() const { return F_in_; }
 	inline const vecd& h() const { return h_; }
 	inline const vecd& R() const { return R_; }
 	inline const vecd& F() const { return F_; }

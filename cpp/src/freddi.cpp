@@ -22,13 +22,15 @@ FreddiEvolution::FreddiEvolution(const FreddiArguments &args_):
 		cosiOverD2(std::cos(args_.flux->inclination / 180 * M_PI) / (args_.flux->distance * args_.flux->distance)),
 		oprel(args_.disk->oprel.get()),
 		wunc(std::bind(&FreddiEvolution::wunction, this, _1, _2, _3, _4)),
-		state_(new FreddiState(this)) {}
+		state_(new FreddiState(this)),
+		xi_pow_minus_7_2(std::pow(xi, -3.5)),
+		R_cor(std::cbrt(GM * P_acc*P_acc / (4 * M_PI*M_PI))) {}
 
 
 void FreddiEvolution::step(const double tau) {
 	Mdot_in_prev = state_->Mdot_in();
 	state_.reset(new FreddiState(*state_, tau));
-	nonlenear_diffusion_nonuniform_1_2(args->calc->tau, args->calc->eps, 0., state_->Mdot_out(), wunc, state_->h(), state_->F_);
+	nonlenear_diffusion_nonuniform_1_2(args->calc->tau, args->calc->eps, state_->F_in(), state_->Mdot_out(), wunc, state_->h(), state_->F_);
 	truncateOuterRadius();
 }
 
@@ -81,6 +83,27 @@ void FreddiEvolution::truncateOuterRadius() {
 		// F.at(Nx-2) = F.at(Nx-1) - Mdot_out / (2.*M_PI) * (h.at(Nx-1) - h.at(Nx-2));
 		state_->h_.resize(state_->Nx_);
 	}
+}
+
+void FreddiEvolution::truncateInnerRadius() {
+	if ( state_->Mdot_in() < Mdot_in_prev ) {
+		return;
+	}
+	if ( Mdot_in_prev > Mdot_peak ) {
+		Mdot_peak = Mdot_in_prev;
+		mu_magn = Mdot_peak * std::sqrt(GM) * std::pow(X_R * args->basic->rin, 3.5);
+		R_dead = std::cbrt(mu_magn*mu_magn / F_dead);
+	}
+	const double R_m_candidate = X_R * args->basic->rin * std::pow(Mdot_peak / state_->Mdot_in(), 2./7.);
+	const double R_m = std::min(R_m_candidate, R_dead);
+	double F_m;
+	if (R_m < R_cor) {
+		const double n_ws = 1 - k_t * xi_pow_minus_7_2 * std::pow(R_m / R_cor, 3);
+		F_m = (1 - n_ws) * state_->Mdot_in() * std::sqrt(GM * R_m);
+	} else {
+		F_m = F_dead;
+	}
+	const double new_F_in = F_m + state_->Mdot_in() * (std::sqrt(GM * args->basic->rin) - std::sqrt(GM * R_m));
 }
 
 vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t first, size_t last) const {
