@@ -287,6 +287,7 @@ cdef class Freddi:
         Should be `b'Kramers'` or `b'OPAL'`
     boundcond : bytes, optional
         Should be `b'Teff'` or `b'Tirr'`
+    Mdotout: float, optional
     Thot : float, optional
     initialcond : bytes, optional
         Should be `b'powerF'`, `b'powerSigma'`, `b'sinusF'`, `b'gaussF'` or
@@ -336,7 +337,7 @@ cdef class Freddi:
     def __cinit__(
         self, *, bint cgs=True,
         double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt, double period=default_period, rin=None, rout=None,
-        string opacity=default_opacity, string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond, double F0=default_F0, double powerorder=default_powerorder, double gaussmu=default_gaussmu, double gausssigma=default_gausssigma, Mdisk0=None, Mdot0=None,
+        string opacity=default_opacity, double Mdotout=default_Mdotout, string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond, double F0=default_F0, double powerorder=default_powerorder, double gaussmu=default_gaussmu, double gausssigma=default_gausssigma, Mdisk0=None, Mdot0=None,
         double Cirr=default_Cirr, string irrfactortype=default_irrfactortype,
         double colourfactor=default_colourfactor, double emin=default_emin, double emax=default_emax, double inclination=default_inclination, double distance=default_distance, vector[double] lambdas=[],
         double time=default_time, double tau=default_tau, unsigned int Nx=default_Nx, string gridscale=default_gridscale, eps=None
@@ -372,7 +373,7 @@ cdef class Freddi:
         cdef bint is_Mdot0_specified = Mdot0 is not None
         if Mdot0 is None:
             Mdot0 = -1.0
-        cdef DiskStructureArguments* disk = new DiskStructureArguments(dereference(basic), opacity, boundcond, Thot, initialcond, F0, powerorder, gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0)
+        cdef DiskStructureArguments* disk = new DiskStructureArguments(dereference(basic), opacity, Mdotout, boundcond, Thot, initialcond, F0, powerorder, gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0)
         cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(Cirr, irrfactortype)
         cdef FluxArguments* flux = new FluxArguments(colourfactor, emin, emax, inclination, distance, lambdas)
         cdef CalculationArguments* calc

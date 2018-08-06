@@ -76,6 +76,7 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 		DiskStructureArguments(
 				bdb_args,
 				vm["opacity"].as<std::string>(),
+				vm["Mdotout"].as<double>(),
 				vm["boundcond"].as<std::string>(),
 				vm["Thot"].as<double>(),
 				vm["initialcond"].as<std::string>(),
@@ -106,6 +107,7 @@ po::options_description DiskStructureOptions::description() {
 	po::options_description od("Parameters of the disk mode");
 	od.add_options()
 			( "opacity,O", po::value<std::string>()->default_value(default_opacity), "Opacity law: Kramers (varkappa ~ rho / T^7/2) or OPAL (varkappa ~ rho / T^5/2)" )
+			( "Mdotout", po::value<double>()->default_value(default_Mdotout), "Accretion rate onto the disk through its outer radius" )
 			( "boundcond", po::value<std::string>()->default_value(default_boundcond), "Outer boundary movement condition\n\n"
 																					   "Values:\n"
 																					   "  Teff: outer radius of the disk moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"

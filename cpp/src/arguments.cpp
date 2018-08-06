@@ -32,6 +32,7 @@ double BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(const double MxToMopt) { /
 }
 
 constexpr const char DiskStructureArguments::default_opacity[];
+constexpr const double DiskStructureArguments::default_Mdotout;
 constexpr const char DiskStructureArguments::default_initialcond[];
 constexpr const double DiskStructureArguments::default_Thot;
 constexpr const char DiskStructureArguments::default_boundcond[];
@@ -44,14 +45,16 @@ constexpr const double DiskStructureArguments::mu;
 DiskStructureArguments::DiskStructureArguments(
 	const BasicDiskBinaryArguments &bdb_args,
 	const std::string &opacity,
-	const std::string &boundcond, double Thot,
+	const double Mdotout,
+	const std::string &boundcond, const double Thot,
 	const std::string &initialcond,
-	double F0,
-	double powerorder, double gaussmu, double gausssigma,
-	bool is_Mdisk0_specified, bool is_Mdot0_specified,
-	double Mdisk0, double Mdot0):
+	const double F0,
+	const double powerorder, const double gaussmu, const double gausssigma,
+	const bool is_Mdisk0_specified, const bool is_Mdot0_specified,
+	const double Mdisk0, const double Mdot0):
 		opacity(opacity),
 		oprel(new OpacityRelated(opacity, bdb_args.Mx, bdb_args.alpha, mu)),
+		Mdotout(Mdotout),
 		boundcond(boundcond),
 		Thot(Thot),
 		initialcond(initialcond),

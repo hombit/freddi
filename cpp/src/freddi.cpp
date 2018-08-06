@@ -29,6 +29,8 @@ FreddiEvolution::FreddiEvolution(const FreddiArguments &args_):
 FreddiState FreddiEvolution::initializeState() {
 	FreddiState state(this);
 
+	state.Mdot_out = args->disk->Mdotout;
+
 	const double h_in = args->basic->h(args->basic->rin);
 	const double h_out = args->basic->h(args->basic->rout);
 
