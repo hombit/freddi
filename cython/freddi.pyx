@@ -262,7 +262,17 @@ cdef class EvolutionResults:
         return arr
 
     def __getattr__(self, attr) -> np.ndarray:
-        arr = np.stack(getattr(state, attr) for state in self.states)
+        cdef size_t len_states = self.cpp_states.size()
+        cdef tuple shape_val = np.asarray(getattr(self.states[0], attr)).shape
+        cdef tuple shape = (len_states,) + shape_val
+        arr = np.full(shape, np.nan)
+        arr_flat = arr.reshape(-1)
+        cdef size_t i
+        cdef size_t size_arr = arr.size
+        cdef size_t len_line = size_arr / len_states
+        for i in range(len_states):
+            value = np.asarray(getattr(self.states[i], attr))
+            arr_flat[i * len_line : i * len_line + value.size] = value.reshape(-1)
         return arr
 
 
@@ -451,4 +461,3 @@ cdef class Freddi:
 
         """
         return EvolutionResults(self)
-
