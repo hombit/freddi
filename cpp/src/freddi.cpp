@@ -32,6 +32,7 @@ void FreddiEvolution::step(const double tau) {
 	state_.reset(new FreddiState(*state_, tau));
 	nonlenear_diffusion_nonuniform_1_2(args->calc->tau, args->calc->eps, state_->F_in(), state_->Mdot_out(), wunc, state_->h(), state_->F_);
 	truncateOuterRadius();
+	truncateInnerRadius();
 }
 
 
@@ -86,6 +87,9 @@ void FreddiEvolution::truncateOuterRadius() {
 }
 
 void FreddiEvolution::truncateInnerRadius() {
+	if (mu_magn <= 0.) {
+		return;
+	}
 	if ( state_->Mdot_in() < Mdot_in_prev ) {
 		return;
 	}
@@ -94,8 +98,20 @@ void FreddiEvolution::truncateInnerRadius() {
 		mu_magn = Mdot_peak * std::sqrt(GM) * std::pow(X_R * args->basic->rin, 3.5);
 		R_dead = std::cbrt(mu_magn*mu_magn / F_dead);
 	}
-	const double R_m_candidate = X_R * args->basic->rin * std::pow(Mdot_peak / state_->Mdot_in(), 2./7.);
-	const double R_m = std::min(R_m_candidate, R_dead);
+
+	double R_m = X_R * args->basic->rin * std::pow(Mdot_peak / state_->Mdot_in(), 2./7.);
+	R_m = std::min(R_m, R_dead);
+	size_t ii;
+	for (ii = 0; ii < state_->Nx() - 1; ii++) {
+		if (state_->R().at(ii+1) > R_m){
+			break;
+		}
+	}
+	if (ii >= state_->Nx() - 2) {
+		throw std::runtime_error("R_in > R_out");
+	}
+	R_m = state_->R().at(ii);
+
 	double F_m;
 	if (R_m < R_cor) {
 		const double n_ws = 1 - k_t * xi_pow_minus_7_2 * std::pow(R_m / R_cor, 3);
@@ -104,6 +120,24 @@ void FreddiEvolution::truncateInnerRadius() {
 		F_m = F_dead;
 	}
 	const double new_F_in = F_m + state_->Mdot_in() * (std::sqrt(GM * args->basic->rin) - std::sqrt(GM * R_m));
+	if (new_F_in < 0) {
+		throw std::runtime_error("Viscous torque cannot be negative");
+	}
+
+	state_->F_in_ = new_F_in;
+	if (ii > 0) {
+		state_->Nx_ -= ii;
+		state_->h_.erase(state_->h_.begin(), state_->h_.begin() + ii);
+		state_->R_.erase(state_->R_.begin(), state_->R_.begin() + ii);
+		state_->F_.erase(state_->F_.begin(), state_->F_.begin() + ii);
+		state_->W_->erase(state_->W_->begin(), state_->W_->begin() + ii);
+		state_->Tph_->erase(state_->Tph_->begin(), state_->Tph_->begin() + ii);
+		state_->Tph_vis_->erase(state_->Tph_vis_->begin(), state_->Tph_vis_->begin() + ii);
+		state_->Tph_X_->erase(state_->Tph_X_->begin(), state_->Tph_X_->begin() + ii);
+		state_->Tirr_->erase(state_->Tirr_->begin(), state_->Tirr_->begin() + ii);
+		state_->Cirr_->erase(state_->Cirr_->begin(), state_->Cirr_->begin() + ii);
+		state_->Sigma_->erase(state_->Sigma_->begin(), state_->Sigma_->begin() + ii);
+	}
 }
 
 vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t first, size_t last) const {
