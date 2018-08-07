@@ -87,7 +87,7 @@ void FreddiEvolution::truncateOuterRadius() {
 }
 
 void FreddiEvolution::truncateInnerRadius() {
-	if (mu_magn <= 0.) {
+	if (F_dead <= 0.) {
 		return;
 	}
 	if ( state_->Mdot_in() < Mdot_in_prev ) {
