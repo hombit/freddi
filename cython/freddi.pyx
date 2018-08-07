@@ -263,9 +263,10 @@ cdef class EvolutionResults:
 
     def __getattr__(self, attr) -> np.ndarray:
         cdef size_t len_states = self.cpp_states.size()
-        cdef tuple shape_val = np.asarray(getattr(self.states[0], attr)).shape
+        first_val = np.asarray(getattr(self.states[0], attr))
+        cdef tuple shape_val = first_val.shape
         cdef tuple shape = (len_states,) + shape_val
-        arr = np.full(shape, np.nan)
+        arr = np.full(shape, np.nan, dtype=first_val.dtype)
         arr_flat = arr.reshape(-1)
         cdef size_t i
         cdef size_t size_arr = arr.size
