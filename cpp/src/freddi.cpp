@@ -95,7 +95,7 @@ void FreddiEvolution::truncateInnerRadius() {
 	}
 	if ( Mdot_in_prev > Mdot_peak ) {
 		Mdot_peak = Mdot_in_prev;
-		mu_magn = Mdot_peak * std::sqrt(GM) * std::pow(X_R * args->basic->rin, 3.5);
+		mu_magn = std::sqrt(Mdot_peak * std::sqrt(GM) * std::pow(X_R * args->basic->rin, 3.5));
 		R_dead = std::cbrt(mu_magn*mu_magn / F_dead);
 	}
 
