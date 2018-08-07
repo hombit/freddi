@@ -132,43 +132,43 @@ cdef class State:
 
     @property
     def last_h(self) -> double:
-        return self.cpp_state.get_h().back()
+        return self.cpp_state.get_h()[self.cpp_state.get_Nx()-1]
 
     @property
     def last_R(self) -> double:
-        return self.cpp_state.get_R().back()
+        return self.cpp_state.get_R()[self.cpp_state.get_Nx()-1]
 
     @property
     def last_F(self) -> double:
-        return self.cpp_state.get_F().back()
+        return self.cpp_state.get_F()[self.cpp_state.get_Nx()-1]
 
     @property
     def last_W(self) -> double:
-        return self.cpp_state.get_W().back()
+        return self.cpp_state.get_W()[self.cpp_state.get_Nx()-1]
 
     @property
     def last_Tph(self) -> double:
-        return self.cpp_state.get_Tph().back()
+        return self.cpp_state.get_Tph()[self.cpp_state.get_Nx()-1]
 
     @property
     def last_Tph_vis(self) -> double:
-        return self.cpp_state.get_Tph_vis().back()
+        return self.cpp_state.get_Tph_vis()[self.cpp_state.get_Nx()-1]
 
     @property
     def last_Tirr(self) -> double:
-        return self.cpp_state.get_Tirr().back()
+        return self.cpp_state.get_Tirr()[self.cpp_state.get_Nx()-1]
 
     @property
     def last_Cirr(self) -> double:
-        return self.cpp_state.get_Cirr().back()
+        return self.cpp_state.get_Cirr()[self.cpp_state.get_Nx()-1]
 
     @property
     def last_Sigma(self) -> double:
-        return self.cpp_state.get_Sigma().back()
+        return self.cpp_state.get_Sigma()[self.cpp_state.get_Nx()-1]
 
     @property
     def last_Height(self) -> double:
-        return self.cpp_state.get_Height().back()
+        return self.cpp_state.get_Height()[self.cpp_state.get_Nx()-1]
 
     @property
     def mU(self) -> double:

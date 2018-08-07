@@ -5232,7 +5232,7 @@ static PyObject *__pyx_pf_6freddi_5State_6Height___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_h(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_h().back()
+ *         return self.cpp_state.get_h()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5258,12 +5258,12 @@ static PyObject *__pyx_pf_6freddi_5State_6last_h___get__(struct __pyx_obj_6fredd
   /* "freddi.pyx":135
  *     @property
  *     def last_h(self) -> double:
- *         return self.cpp_state.get_h().back()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_h()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_h().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 135, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_h()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 135, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5273,7 +5273,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_h___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_h(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_h().back()
+ *         return self.cpp_state.get_h()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5292,7 +5292,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_h___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_R(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_R().back()
+ *         return self.cpp_state.get_R()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5318,12 +5318,12 @@ static PyObject *__pyx_pf_6freddi_5State_6last_R___get__(struct __pyx_obj_6fredd
   /* "freddi.pyx":139
  *     @property
  *     def last_R(self) -> double:
- *         return self.cpp_state.get_R().back()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_R()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_R().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 139, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_R()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 139, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5333,7 +5333,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_R___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_R(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_R().back()
+ *         return self.cpp_state.get_R()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5352,7 +5352,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_R___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_F(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_F().back()
+ *         return self.cpp_state.get_F()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5378,12 +5378,12 @@ static PyObject *__pyx_pf_6freddi_5State_6last_F___get__(struct __pyx_obj_6fredd
   /* "freddi.pyx":143
  *     @property
  *     def last_F(self) -> double:
- *         return self.cpp_state.get_F().back()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_F()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_F().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 143, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_F()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5393,7 +5393,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_F___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_F(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_F().back()
+ *         return self.cpp_state.get_F()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5412,7 +5412,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_F___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_W(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_W().back()
+ *         return self.cpp_state.get_W()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5438,12 +5438,12 @@ static PyObject *__pyx_pf_6freddi_5State_6last_W___get__(struct __pyx_obj_6fredd
   /* "freddi.pyx":147
  *     @property
  *     def last_W(self) -> double:
- *         return self.cpp_state.get_W().back()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_W()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_W().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 147, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_W()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5453,7 +5453,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_W___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_W(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_W().back()
+ *         return self.cpp_state.get_W()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5472,7 +5472,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_W___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_Tph(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tph().back()
+ *         return self.cpp_state.get_Tph()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5498,12 +5498,12 @@ static PyObject *__pyx_pf_6freddi_5State_8last_Tph___get__(struct __pyx_obj_6fre
   /* "freddi.pyx":151
  *     @property
  *     def last_Tph(self) -> double:
- *         return self.cpp_state.get_Tph().back()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_Tph()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_Tph().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 151, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Tph()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 151, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5513,7 +5513,7 @@ static PyObject *__pyx_pf_6freddi_5State_8last_Tph___get__(struct __pyx_obj_6fre
  * 
  *     @property
  *     def last_Tph(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tph().back()
+ *         return self.cpp_state.get_Tph()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5532,7 +5532,7 @@ static PyObject *__pyx_pf_6freddi_5State_8last_Tph___get__(struct __pyx_obj_6fre
  * 
  *     @property
  *     def last_Tph_vis(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tph_vis().back()
+ *         return self.cpp_state.get_Tph_vis()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5558,12 +5558,12 @@ static PyObject *__pyx_pf_6freddi_5State_12last_Tph_vis___get__(struct __pyx_obj
   /* "freddi.pyx":155
  *     @property
  *     def last_Tph_vis(self) -> double:
- *         return self.cpp_state.get_Tph_vis().back()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_Tph_vis()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_Tph_vis().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 155, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Tph_vis()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5573,7 +5573,7 @@ static PyObject *__pyx_pf_6freddi_5State_12last_Tph_vis___get__(struct __pyx_obj
  * 
  *     @property
  *     def last_Tph_vis(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tph_vis().back()
+ *         return self.cpp_state.get_Tph_vis()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5592,7 +5592,7 @@ static PyObject *__pyx_pf_6freddi_5State_12last_Tph_vis___get__(struct __pyx_obj
  * 
  *     @property
  *     def last_Tirr(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tirr().back()
+ *         return self.cpp_state.get_Tirr()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5618,12 +5618,12 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Tirr___get__(struct __pyx_obj_6fr
   /* "freddi.pyx":159
  *     @property
  *     def last_Tirr(self) -> double:
- *         return self.cpp_state.get_Tirr().back()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_Tirr()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_Tirr().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 159, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Tirr()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5633,7 +5633,7 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Tirr___get__(struct __pyx_obj_6fr
  * 
  *     @property
  *     def last_Tirr(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tirr().back()
+ *         return self.cpp_state.get_Tirr()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5652,7 +5652,7 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Tirr___get__(struct __pyx_obj_6fr
  * 
  *     @property
  *     def last_Cirr(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Cirr().back()
+ *         return self.cpp_state.get_Cirr()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5678,12 +5678,12 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Cirr___get__(struct __pyx_obj_6fr
   /* "freddi.pyx":163
  *     @property
  *     def last_Cirr(self) -> double:
- *         return self.cpp_state.get_Cirr().back()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_Cirr()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_Cirr().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 163, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Cirr()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5693,7 +5693,7 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Cirr___get__(struct __pyx_obj_6fr
  * 
  *     @property
  *     def last_Cirr(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Cirr().back()
+ *         return self.cpp_state.get_Cirr()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5712,7 +5712,7 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Cirr___get__(struct __pyx_obj_6fr
  * 
  *     @property
  *     def last_Sigma(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Sigma().back()
+ *         return self.cpp_state.get_Sigma()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5738,12 +5738,12 @@ static PyObject *__pyx_pf_6freddi_5State_10last_Sigma___get__(struct __pyx_obj_6
   /* "freddi.pyx":167
  *     @property
  *     def last_Sigma(self) -> double:
- *         return self.cpp_state.get_Sigma().back()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_Sigma()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_Sigma().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 167, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Sigma()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5753,7 +5753,7 @@ static PyObject *__pyx_pf_6freddi_5State_10last_Sigma___get__(struct __pyx_obj_6
  * 
  *     @property
  *     def last_Sigma(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Sigma().back()
+ *         return self.cpp_state.get_Sigma()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5772,7 +5772,7 @@ static PyObject *__pyx_pf_6freddi_5State_10last_Sigma___get__(struct __pyx_obj_6
  * 
  *     @property
  *     def last_Height(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Height().back()
+ *         return self.cpp_state.get_Height()[self.cpp_state.get_Nx()-1]
  * 
  */
 
@@ -5798,12 +5798,12 @@ static PyObject *__pyx_pf_6freddi_5State_11last_Height___get__(struct __pyx_obj_
   /* "freddi.pyx":171
  *     @property
  *     def last_Height(self) -> double:
- *         return self.cpp_state.get_Height().back()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.get_Height()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_Height().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 171, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Height()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 171, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5813,7 +5813,7 @@ static PyObject *__pyx_pf_6freddi_5State_11last_Height___get__(struct __pyx_obj_
  * 
  *     @property
  *     def last_Height(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Height().back()
+ *         return self.cpp_state.get_Height()[self.cpp_state.get_Nx()-1]
  * 
  */
 
