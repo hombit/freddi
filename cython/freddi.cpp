@@ -1225,7 +1225,7 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
 struct __pyx_opt_args_6freddi_6Freddi_change_SelfIrradiationArguments;
 
-/* "freddi.pyx":421
+/* "freddi.pyx":452
  *         return self.evolution.Nt
  * 
  *     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):             # <<<<<<<<<<<<<<
@@ -1280,7 +1280,7 @@ struct __pyx_obj_6freddi_Freddi {
 };
 
 
-/* "freddi.pyx":438
+/* "freddi.pyx":469
  *         return state_from_cpp(self.evolution.get_state())
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -1667,11 +1667,6 @@ static CYTHON_INLINE int __Pyx_PyObject_SetSlice(
         PyObject** py_start, PyObject** py_stop, PyObject** py_slice,
         int has_cstart, int has_cstop, int wraparound);
 
-/* WriteUnraisableException.proto */
-static void __Pyx_WriteUnraisable(const char *name, int clineno,
-                                  int lineno, const char *filename,
-                                  int full_traceback, int nogil);
-
 /* KeywordStringCheck.proto */
 static int __Pyx_CheckKeywordStrings(PyObject *kwdict, const char* function_name, int kw_allowed);
 
@@ -1724,6 +1719,11 @@ static CYTHON_INLINE int __Pyx_IterFinish(void);
 
 /* UnpackItemEndCheck.proto */
 static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
+
+/* WriteUnraisableException.proto */
+static void __Pyx_WriteUnraisable(const char *name, int clineno,
+                                  int lineno, const char *filename,
+                                  int full_traceback, int nogil);
 
 /* DictGetItem.proto */
 #if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
@@ -1978,6 +1978,13 @@ static int __Pyx_setup_reduce(PyObject* type_obj);
 
 /* SetVTable.proto */
 static int __Pyx_SetVtable(PyObject *dict, void *vtable);
+
+/* ClassMethod.proto */
+#include "descrobject.h"
+static PyObject* __Pyx_Method_ClassMethod(PyObject *method);
+
+/* GetNameInClass.proto */
+static PyObject *__Pyx_GetNameInClass(PyObject *nmspace, PyObject *name);
 
 /* CLineInTraceback.proto */
 #ifdef CYTHON_CLINE_IN_TRACEBACK
@@ -2487,6 +2494,7 @@ static const char __pyx_k_T[] = "T{";
   static const char __pyx_k__67[] = ":";
 static const char __pyx_k__68[] = "}";
 static const char __pyx_k__69[] = ",";
+static const char __pyx_k_alt[] = "alt";
 static const char __pyx_k_cgs[] = "cgs";
 static const char __pyx_k_eps[] = "eps";
 static const char __pyx_k_nan[] = "nan";
@@ -2504,7 +2512,6 @@ static const char __pyx_k_emax[] = "emax";
 static const char __pyx_k_emin[] = "emin";
 static const char __pyx_k_flux[] = "flux";
 static const char __pyx_k_full[] = "full";
-static const char __pyx_k_item[] = "item";
 static const char __pyx_k_iter[] = "__iter__";
 static const char __pyx_k_join[] = "join";
 static const char __pyx_k_kerr[] = "kerr";
@@ -2543,7 +2550,6 @@ static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_format[] = "format";
 static const char __pyx_k_freddi[] = "freddi";
 static const char __pyx_k_import[] = "__import__";
-static const char __pyx_k_kwargs[] = "kwargs";
 static const char __pyx_k_name_2[] = "__name__";
 static const char __pyx_k_object[] = "object";
 static const char __pyx_k_period[] = "period";
@@ -2579,7 +2585,6 @@ static const char __pyx_k_writeable[] = "writeable";
 static const char __pyx_k_IndexError[] = "IndexError";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_gausssigma[] = "gausssigma";
-static const char __pyx_k_get_freddi[] = "get_freddi";
 static const char __pyx_k_powerorder[] = "powerorder";
 static const char __pyx_k_pyx_result[] = "__pyx_result";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
@@ -2602,7 +2607,6 @@ static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
-static const char __pyx_k_cython_freddi_pyx[] = "cython/freddi.pyx";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
@@ -2686,6 +2690,7 @@ static PyObject *__pyx_kp_b__68;
 static PyObject *__pyx_kp_u__69;
 static PyObject *__pyx_n_s_allocate_buffer;
 static PyObject *__pyx_n_s_alpha;
+static PyObject *__pyx_n_s_alt;
 static PyObject *__pyx_n_s_args;
 static PyObject *__pyx_n_s_array;
 static PyObject *__pyx_n_s_asarray;
@@ -2702,7 +2707,6 @@ static PyObject *__pyx_n_s_close;
 static PyObject *__pyx_n_s_colourfactor;
 static PyObject *__pyx_kp_s_contiguous_and_direct;
 static PyObject *__pyx_kp_s_contiguous_and_indirect;
-static PyObject *__pyx_kp_s_cython_freddi_pyx;
 static PyObject *__pyx_n_s_dict;
 static PyObject *__pyx_n_s_distance;
 static PyObject *__pyx_n_s_dtype;
@@ -2724,7 +2728,6 @@ static PyObject *__pyx_n_s_freddi;
 static PyObject *__pyx_n_s_full;
 static PyObject *__pyx_n_s_gaussmu;
 static PyObject *__pyx_n_s_gausssigma;
-static PyObject *__pyx_n_s_get_freddi;
 static PyObject *__pyx_n_s_getstate;
 static PyObject *__pyx_kp_s_got_differing_extents_in_dimensi;
 static PyObject *__pyx_n_s_gridscale;
@@ -2733,14 +2736,12 @@ static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_inclination;
 static PyObject *__pyx_n_s_initialcond;
 static PyObject *__pyx_n_s_irrfactortype;
-static PyObject *__pyx_n_s_item;
 static PyObject *__pyx_n_s_items;
 static PyObject *__pyx_n_s_itemsize;
 static PyObject *__pyx_kp_s_itemsize_0_for_cython_array;
 static PyObject *__pyx_n_s_iter;
 static PyObject *__pyx_n_s_join;
 static PyObject *__pyx_n_s_kerr;
-static PyObject *__pyx_n_s_kwargs;
 static PyObject *__pyx_n_s_lambdas;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_memview;
@@ -2851,16 +2852,16 @@ static PyObject *__pyx_pf_6freddi_16EvolutionResults_6__reduce_cython__(CYTHON_U
 static PyObject *__pyx_pf_6freddi_16EvolutionResults_8__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_EvolutionResults *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *__pyx_v_self, int __pyx_v_cgs, double __pyx_v_alpha, double __pyx_v_Mx, double __pyx_v_kerr, double __pyx_v_Mopt, double __pyx_v_period, PyObject *__pyx_v_rin, PyObject *__pyx_v_rout, std::string __pyx_v_opacity, double __pyx_v_Mdotout, std::string __pyx_v_boundcond, double __pyx_v_Thot, std::string __pyx_v_initialcond, double __pyx_v_F0, double __pyx_v_powerorder, double __pyx_v_gaussmu, double __pyx_v_gausssigma, PyObject *__pyx_v_Mdisk0, PyObject *__pyx_v_Mdot0, double __pyx_v_Cirr, std::string __pyx_v_irrfactortype, double __pyx_v_colourfactor, double __pyx_v_emin, double __pyx_v_emax, double __pyx_v_inclination, double __pyx_v_distance, std::vector<double>  __pyx_v_lambdas, double __pyx_v_time, double __pyx_v_tau, unsigned int __pyx_v_Nx, std::string __pyx_v_gridscale, PyObject *__pyx_v_eps); /* proto */
 static void __pyx_pf_6freddi_6Freddi_2__dealloc__(struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_6freddi_6Freddi_4alt(PyTypeObject *__pyx_v_cls, PyObject *__pyx_v_kwargs); /* proto */
 static PyObject *__pyx_pf_6freddi_6Freddi_4time___get__(struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_6Freddi_2Nt___get__(struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_6Freddi_4Cirr___get__(struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
 static int __pyx_pf_6freddi_6Freddi_4Cirr_2__set__(struct __pyx_obj_6freddi_Freddi *__pyx_v_self, double __pyx_v_val); /* proto */
-static PyObject *__pyx_pf_6freddi_6Freddi_4__iter__(struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_6freddi_6Freddi_7evolve(struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_6freddi_6Freddi_9__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_6freddi_6Freddi_11__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_Freddi *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
-static struct __pyx_obj_6freddi_Freddi *__pyx_pf_6freddi_get_freddi(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_kwargs); /* proto */
+static PyObject *__pyx_pf_6freddi_6Freddi_6__iter__(struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_6freddi_6Freddi_9evolve(struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_6freddi_6Freddi_11__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_6freddi_6Freddi_13__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_Freddi *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
@@ -2984,14 +2985,12 @@ static PyObject *__pyx_tuple__63;
 static PyObject *__pyx_tuple__64;
 static PyObject *__pyx_tuple__65;
 static PyObject *__pyx_tuple__70;
+static PyObject *__pyx_tuple__71;
 static PyObject *__pyx_tuple__72;
 static PyObject *__pyx_tuple__73;
 static PyObject *__pyx_tuple__74;
 static PyObject *__pyx_tuple__75;
-static PyObject *__pyx_tuple__76;
-static PyObject *__pyx_tuple__77;
-static PyObject *__pyx_codeobj__71;
-static PyObject *__pyx_codeobj__78;
+static PyObject *__pyx_codeobj__76;
 /* Late includes */
 
 /* "freddi.pyx":21
@@ -7607,7 +7606,7 @@ static PyObject *__pyx_pf_6freddi_16EvolutionResults_8__setstate_cython__(CYTHON
   return __pyx_r;
 }
 
-/* "freddi.pyx":348
+/* "freddi.pyx":352
  *     cdef FreddiEvolution* evolution
  * 
  *     def __cinit__(             # <<<<<<<<<<<<<<
@@ -7657,7 +7656,7 @@ static int __pyx_pw_6freddi_6Freddi_1__cinit__(PyObject *__pyx_v_self, PyObject 
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_cgs,&__pyx_n_s_alpha,&__pyx_n_s_Mx,&__pyx_n_s_kerr,&__pyx_n_s_Mopt,&__pyx_n_s_period,&__pyx_n_s_rin,&__pyx_n_s_rout,&__pyx_n_s_opacity,&__pyx_n_s_Mdotout,&__pyx_n_s_boundcond,&__pyx_n_s_Thot,&__pyx_n_s_initialcond,&__pyx_n_s_F0,&__pyx_n_s_powerorder,&__pyx_n_s_gaussmu,&__pyx_n_s_gausssigma,&__pyx_n_s_Mdisk0,&__pyx_n_s_Mdot0,&__pyx_n_s_Cirr,&__pyx_n_s_irrfactortype,&__pyx_n_s_colourfactor,&__pyx_n_s_emin,&__pyx_n_s_emax,&__pyx_n_s_inclination,&__pyx_n_s_distance,&__pyx_n_s_lambdas,&__pyx_n_s_time,&__pyx_n_s_tau,&__pyx_n_s_Nx,&__pyx_n_s_gridscale,&__pyx_n_s_eps,0};
     PyObject* values[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-    /* "freddi.pyx":350
+    /* "freddi.pyx":354
  *     def __cinit__(
  *         self, *, bint cgs=True,
  *         double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt, double period=default_period, rin=None, rout=None,             # <<<<<<<<<<<<<<
@@ -7667,7 +7666,7 @@ static int __pyx_pw_6freddi_6Freddi_1__cinit__(PyObject *__pyx_v_self, PyObject 
     values[6] = ((PyObject *)Py_None);
     values[7] = ((PyObject *)Py_None);
 
-    /* "freddi.pyx":351
+    /* "freddi.pyx":355
  *         self, *, bint cgs=True,
  *         double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt, double period=default_period, rin=None, rout=None,
  *         string opacity=default_opacity, double Mdotout=default_Mdotout, string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond, double F0=default_F0, double powerorder=default_powerorder, double gaussmu=default_gaussmu, double gausssigma=default_gausssigma, Mdisk0=None, Mdot0=None,             # <<<<<<<<<<<<<<
@@ -7677,7 +7676,7 @@ static int __pyx_pw_6freddi_6Freddi_1__cinit__(PyObject *__pyx_v_self, PyObject 
     values[17] = ((PyObject *)Py_None);
     values[18] = ((PyObject *)Py_None);
 
-    /* "freddi.pyx":354
+    /* "freddi.pyx":358
  *         double Cirr=default_Cirr, string irrfactortype=default_irrfactortype,
  *         double colourfactor=default_colourfactor, double emin=default_emin, double emax=default_emax, double inclination=default_inclination, double distance=default_distance, vector[double] lambdas=[],
  *         double time=default_time, double tau=default_tau, unsigned int Nx=default_Nx, string gridscale=default_gridscale, eps=None             # <<<<<<<<<<<<<<
@@ -7701,17 +7700,17 @@ static int __pyx_pw_6freddi_6Freddi_1__cinit__(PyObject *__pyx_v_self, PyObject 
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, 0, "__cinit__") < 0)) __PYX_ERR(1, 348, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, 0, "__cinit__") < 0)) __PYX_ERR(1, 352, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 0) {
       goto __pyx_L5_argtuple_error;
     } else {
     }
     if (values[0]) {
-      __pyx_v_cgs = __Pyx_PyObject_IsTrue(values[0]); if (unlikely((__pyx_v_cgs == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 349, __pyx_L3_error)
+      __pyx_v_cgs = __Pyx_PyObject_IsTrue(values[0]); if (unlikely((__pyx_v_cgs == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 353, __pyx_L3_error)
     } else {
 
-      /* "freddi.pyx":349
+      /* "freddi.pyx":353
  * 
  *     def __cinit__(
  *         self, *, bint cgs=True,             # <<<<<<<<<<<<<<
@@ -7721,136 +7720,136 @@ static int __pyx_pw_6freddi_6Freddi_1__cinit__(PyObject *__pyx_v_self, PyObject 
       __pyx_v_cgs = ((int)1);
     }
     if (values[1]) {
-      __pyx_v_alpha = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_alpha == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 350, __pyx_L3_error)
+      __pyx_v_alpha = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_alpha == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 354, __pyx_L3_error)
     } else {
       __pyx_v_alpha = __pyx_k__7;
     }
     if (values[2]) {
-      __pyx_v_Mx = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_Mx == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 350, __pyx_L3_error)
+      __pyx_v_Mx = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_Mx == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 354, __pyx_L3_error)
     } else {
       __pyx_v_Mx = __pyx_k__8;
     }
     if (values[3]) {
-      __pyx_v_kerr = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_kerr == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 350, __pyx_L3_error)
+      __pyx_v_kerr = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_kerr == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 354, __pyx_L3_error)
     } else {
       __pyx_v_kerr = __pyx_k__9;
     }
     if (values[4]) {
-      __pyx_v_Mopt = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_Mopt == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 350, __pyx_L3_error)
+      __pyx_v_Mopt = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_Mopt == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 354, __pyx_L3_error)
     } else {
       __pyx_v_Mopt = __pyx_k__10;
     }
     if (values[5]) {
-      __pyx_v_period = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_period == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 350, __pyx_L3_error)
+      __pyx_v_period = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_period == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 354, __pyx_L3_error)
     } else {
       __pyx_v_period = __pyx_k__11;
     }
     __pyx_v_rin = values[6];
     __pyx_v_rout = values[7];
     if (values[8]) {
-      __pyx_v_opacity = __pyx_convert_string_from_py_std__in_string(values[8]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 351, __pyx_L3_error)
+      __pyx_v_opacity = __pyx_convert_string_from_py_std__in_string(values[8]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 355, __pyx_L3_error)
     } else {
       __pyx_v_opacity = __pyx_k__12;
     }
     if (values[9]) {
-      __pyx_v_Mdotout = __pyx_PyFloat_AsDouble(values[9]); if (unlikely((__pyx_v_Mdotout == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 351, __pyx_L3_error)
+      __pyx_v_Mdotout = __pyx_PyFloat_AsDouble(values[9]); if (unlikely((__pyx_v_Mdotout == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 355, __pyx_L3_error)
     } else {
       __pyx_v_Mdotout = __pyx_k__13;
     }
     if (values[10]) {
-      __pyx_v_boundcond = __pyx_convert_string_from_py_std__in_string(values[10]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 351, __pyx_L3_error)
+      __pyx_v_boundcond = __pyx_convert_string_from_py_std__in_string(values[10]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 355, __pyx_L3_error)
     } else {
       __pyx_v_boundcond = __pyx_k__14;
     }
     if (values[11]) {
-      __pyx_v_Thot = __pyx_PyFloat_AsDouble(values[11]); if (unlikely((__pyx_v_Thot == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 351, __pyx_L3_error)
+      __pyx_v_Thot = __pyx_PyFloat_AsDouble(values[11]); if (unlikely((__pyx_v_Thot == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 355, __pyx_L3_error)
     } else {
       __pyx_v_Thot = __pyx_k__15;
     }
     if (values[12]) {
-      __pyx_v_initialcond = __pyx_convert_string_from_py_std__in_string(values[12]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 351, __pyx_L3_error)
+      __pyx_v_initialcond = __pyx_convert_string_from_py_std__in_string(values[12]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 355, __pyx_L3_error)
     } else {
       __pyx_v_initialcond = __pyx_k__16;
     }
     if (values[13]) {
-      __pyx_v_F0 = __pyx_PyFloat_AsDouble(values[13]); if (unlikely((__pyx_v_F0 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 351, __pyx_L3_error)
+      __pyx_v_F0 = __pyx_PyFloat_AsDouble(values[13]); if (unlikely((__pyx_v_F0 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 355, __pyx_L3_error)
     } else {
       __pyx_v_F0 = __pyx_k__17;
     }
     if (values[14]) {
-      __pyx_v_powerorder = __pyx_PyFloat_AsDouble(values[14]); if (unlikely((__pyx_v_powerorder == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 351, __pyx_L3_error)
+      __pyx_v_powerorder = __pyx_PyFloat_AsDouble(values[14]); if (unlikely((__pyx_v_powerorder == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 355, __pyx_L3_error)
     } else {
       __pyx_v_powerorder = __pyx_k__18;
     }
     if (values[15]) {
-      __pyx_v_gaussmu = __pyx_PyFloat_AsDouble(values[15]); if (unlikely((__pyx_v_gaussmu == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 351, __pyx_L3_error)
+      __pyx_v_gaussmu = __pyx_PyFloat_AsDouble(values[15]); if (unlikely((__pyx_v_gaussmu == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 355, __pyx_L3_error)
     } else {
       __pyx_v_gaussmu = __pyx_k__19;
     }
     if (values[16]) {
-      __pyx_v_gausssigma = __pyx_PyFloat_AsDouble(values[16]); if (unlikely((__pyx_v_gausssigma == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 351, __pyx_L3_error)
+      __pyx_v_gausssigma = __pyx_PyFloat_AsDouble(values[16]); if (unlikely((__pyx_v_gausssigma == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 355, __pyx_L3_error)
     } else {
       __pyx_v_gausssigma = __pyx_k__20;
     }
     __pyx_v_Mdisk0 = values[17];
     __pyx_v_Mdot0 = values[18];
     if (values[19]) {
-      __pyx_v_Cirr = __pyx_PyFloat_AsDouble(values[19]); if (unlikely((__pyx_v_Cirr == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 352, __pyx_L3_error)
+      __pyx_v_Cirr = __pyx_PyFloat_AsDouble(values[19]); if (unlikely((__pyx_v_Cirr == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 356, __pyx_L3_error)
     } else {
       __pyx_v_Cirr = __pyx_k__21;
     }
     if (values[20]) {
-      __pyx_v_irrfactortype = __pyx_convert_string_from_py_std__in_string(values[20]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 352, __pyx_L3_error)
+      __pyx_v_irrfactortype = __pyx_convert_string_from_py_std__in_string(values[20]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 356, __pyx_L3_error)
     } else {
       __pyx_v_irrfactortype = __pyx_k__22;
     }
     if (values[21]) {
-      __pyx_v_colourfactor = __pyx_PyFloat_AsDouble(values[21]); if (unlikely((__pyx_v_colourfactor == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 353, __pyx_L3_error)
+      __pyx_v_colourfactor = __pyx_PyFloat_AsDouble(values[21]); if (unlikely((__pyx_v_colourfactor == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 357, __pyx_L3_error)
     } else {
       __pyx_v_colourfactor = __pyx_k__23;
     }
     if (values[22]) {
-      __pyx_v_emin = __pyx_PyFloat_AsDouble(values[22]); if (unlikely((__pyx_v_emin == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 353, __pyx_L3_error)
+      __pyx_v_emin = __pyx_PyFloat_AsDouble(values[22]); if (unlikely((__pyx_v_emin == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 357, __pyx_L3_error)
     } else {
       __pyx_v_emin = __pyx_k__24;
     }
     if (values[23]) {
-      __pyx_v_emax = __pyx_PyFloat_AsDouble(values[23]); if (unlikely((__pyx_v_emax == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 353, __pyx_L3_error)
+      __pyx_v_emax = __pyx_PyFloat_AsDouble(values[23]); if (unlikely((__pyx_v_emax == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 357, __pyx_L3_error)
     } else {
       __pyx_v_emax = __pyx_k__25;
     }
     if (values[24]) {
-      __pyx_v_inclination = __pyx_PyFloat_AsDouble(values[24]); if (unlikely((__pyx_v_inclination == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 353, __pyx_L3_error)
+      __pyx_v_inclination = __pyx_PyFloat_AsDouble(values[24]); if (unlikely((__pyx_v_inclination == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 357, __pyx_L3_error)
     } else {
       __pyx_v_inclination = __pyx_k__26;
     }
     if (values[25]) {
-      __pyx_v_distance = __pyx_PyFloat_AsDouble(values[25]); if (unlikely((__pyx_v_distance == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 353, __pyx_L3_error)
+      __pyx_v_distance = __pyx_PyFloat_AsDouble(values[25]); if (unlikely((__pyx_v_distance == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 357, __pyx_L3_error)
     } else {
       __pyx_v_distance = __pyx_k__27;
     }
     if (values[26]) {
-      __pyx_v_lambdas = __pyx_convert_vector_from_py_double(values[26]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 353, __pyx_L3_error)
+      __pyx_v_lambdas = __pyx_convert_vector_from_py_double(values[26]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 357, __pyx_L3_error)
     } else {
       __pyx_v_lambdas = __pyx_k__28;
     }
     if (values[27]) {
-      __pyx_v_time = __pyx_PyFloat_AsDouble(values[27]); if (unlikely((__pyx_v_time == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 354, __pyx_L3_error)
+      __pyx_v_time = __pyx_PyFloat_AsDouble(values[27]); if (unlikely((__pyx_v_time == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 358, __pyx_L3_error)
     } else {
       __pyx_v_time = __pyx_k__29;
     }
     if (values[28]) {
-      __pyx_v_tau = __pyx_PyFloat_AsDouble(values[28]); if (unlikely((__pyx_v_tau == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 354, __pyx_L3_error)
+      __pyx_v_tau = __pyx_PyFloat_AsDouble(values[28]); if (unlikely((__pyx_v_tau == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 358, __pyx_L3_error)
     } else {
       __pyx_v_tau = __pyx_k__30;
     }
     if (values[29]) {
-      __pyx_v_Nx = __Pyx_PyInt_As_unsigned_int(values[29]); if (unlikely((__pyx_v_Nx == (unsigned int)-1) && PyErr_Occurred())) __PYX_ERR(1, 354, __pyx_L3_error)
+      __pyx_v_Nx = __Pyx_PyInt_As_unsigned_int(values[29]); if (unlikely((__pyx_v_Nx == (unsigned int)-1) && PyErr_Occurred())) __PYX_ERR(1, 358, __pyx_L3_error)
     } else {
       __pyx_v_Nx = __pyx_k__31;
     }
     if (values[30]) {
-      __pyx_v_gridscale = __pyx_convert_string_from_py_std__in_string(values[30]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 354, __pyx_L3_error)
+      __pyx_v_gridscale = __pyx_convert_string_from_py_std__in_string(values[30]); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 358, __pyx_L3_error)
     } else {
       __pyx_v_gridscale = __pyx_k__32;
     }
@@ -7858,7 +7857,7 @@ static int __pyx_pw_6freddi_6Freddi_1__cinit__(PyObject *__pyx_v_self, PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 0, 0, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 348, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 0, 0, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 352, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("freddi.Freddi.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -7866,7 +7865,7 @@ static int __pyx_pw_6freddi_6Freddi_1__cinit__(PyObject *__pyx_v_self, PyObject 
   __pyx_L4_argument_unpacking_done:;
   __pyx_r = __pyx_pf_6freddi_6Freddi___cinit__(((struct __pyx_obj_6freddi_Freddi *)__pyx_v_self), __pyx_v_cgs, __pyx_v_alpha, __pyx_v_Mx, __pyx_v_kerr, __pyx_v_Mopt, __pyx_v_period, __pyx_v_rin, __pyx_v_rout, __pyx_v_opacity, __pyx_v_Mdotout, __pyx_v_boundcond, __pyx_v_Thot, __pyx_v_initialcond, __pyx_v_F0, __pyx_v_powerorder, __pyx_v_gaussmu, __pyx_v_gausssigma, __pyx_v_Mdisk0, __pyx_v_Mdot0, __pyx_v_Cirr, __pyx_v_irrfactortype, __pyx_v_colourfactor, __pyx_v_emin, __pyx_v_emax, __pyx_v_inclination, __pyx_v_distance, __pyx_v_lambdas, __pyx_v_time, __pyx_v_tau, __pyx_v_Nx, __pyx_v_gridscale, __pyx_v_eps);
 
-  /* "freddi.pyx":348
+  /* "freddi.pyx":352
  *     cdef FreddiEvolution* evolution
  * 
  *     def __cinit__(             # <<<<<<<<<<<<<<
@@ -7911,7 +7910,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
   __Pyx_INCREF(__pyx_v_Mdisk0);
   __Pyx_INCREF(__pyx_v_Mdot0);
 
-  /* "freddi.pyx":356
+  /* "freddi.pyx":360
  *         double time=default_time, double tau=default_tau, unsigned int Nx=default_Nx, string gridscale=default_gridscale, eps=None
  *     ):
  *         if not cgs:             # <<<<<<<<<<<<<<
@@ -7921,7 +7920,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
   __pyx_t_1 = ((!(__pyx_v_cgs != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "freddi.pyx":357
+    /* "freddi.pyx":361
  *     ):
  *         if not cgs:
  *             Mx = sunToGram(Mx)             # <<<<<<<<<<<<<<
@@ -7930,7 +7929,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
     __pyx_v_Mx = sunToGram(__pyx_v_Mx);
 
-    /* "freddi.pyx":358
+    /* "freddi.pyx":362
  *         if not cgs:
  *             Mx = sunToGram(Mx)
  *             Mopt = sunToGram(Mopt)             # <<<<<<<<<<<<<<
@@ -7939,7 +7938,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
     __pyx_v_Mopt = sunToGram(__pyx_v_Mopt);
 
-    /* "freddi.pyx":359
+    /* "freddi.pyx":363
  *             Mx = sunToGram(Mx)
  *             Mopt = sunToGram(Mopt)
  *             period = dayToS(period)             # <<<<<<<<<<<<<<
@@ -7948,7 +7947,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
     __pyx_v_period = dayToS(__pyx_v_period);
 
-    /* "freddi.pyx":360
+    /* "freddi.pyx":364
  *             Mopt = sunToGram(Mopt)
  *             period = dayToS(period)
  *             if rin is not None:             # <<<<<<<<<<<<<<
@@ -7959,20 +7958,20 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
     __pyx_t_2 = (__pyx_t_1 != 0);
     if (__pyx_t_2) {
 
-      /* "freddi.pyx":361
+      /* "freddi.pyx":365
  *             period = dayToS(period)
  *             if rin is not None:
  *                 rin = rgToCm(rin, Mx)             # <<<<<<<<<<<<<<
  *             if rout is not None:
  *                 rout = sunToCm(rout)
  */
-      __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_rin); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 361, __pyx_L1_error)
-      __pyx_t_4 = PyFloat_FromDouble(rgToCm(__pyx_t_3, __pyx_v_Mx)); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 361, __pyx_L1_error)
+      __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_rin); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 365, __pyx_L1_error)
+      __pyx_t_4 = PyFloat_FromDouble(rgToCm(__pyx_t_3, __pyx_v_Mx)); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 365, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF_SET(__pyx_v_rin, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "freddi.pyx":360
+      /* "freddi.pyx":364
  *             Mopt = sunToGram(Mopt)
  *             period = dayToS(period)
  *             if rin is not None:             # <<<<<<<<<<<<<<
@@ -7981,7 +7980,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
     }
 
-    /* "freddi.pyx":362
+    /* "freddi.pyx":366
  *             if rin is not None:
  *                 rin = rgToCm(rin, Mx)
  *             if rout is not None:             # <<<<<<<<<<<<<<
@@ -7992,20 +7991,20 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
     __pyx_t_1 = (__pyx_t_2 != 0);
     if (__pyx_t_1) {
 
-      /* "freddi.pyx":363
+      /* "freddi.pyx":367
  *                 rin = rgToCm(rin, Mx)
  *             if rout is not None:
  *                 rout = sunToCm(rout)             # <<<<<<<<<<<<<<
  *             emin = kevToHertz(emin)
  *             emax = kevToHertz(emax)
  */
-      __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_rout); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 363, __pyx_L1_error)
-      __pyx_t_4 = PyFloat_FromDouble(sunToCm(__pyx_t_3)); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 363, __pyx_L1_error)
+      __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_rout); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 367, __pyx_L1_error)
+      __pyx_t_4 = PyFloat_FromDouble(sunToCm(__pyx_t_3)); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF_SET(__pyx_v_rout, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "freddi.pyx":362
+      /* "freddi.pyx":366
  *             if rin is not None:
  *                 rin = rgToCm(rin, Mx)
  *             if rout is not None:             # <<<<<<<<<<<<<<
@@ -8014,7 +8013,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
     }
 
-    /* "freddi.pyx":364
+    /* "freddi.pyx":368
  *             if rout is not None:
  *                 rout = sunToCm(rout)
  *             emin = kevToHertz(emin)             # <<<<<<<<<<<<<<
@@ -8023,7 +8022,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
     __pyx_v_emin = kevToHertz(__pyx_v_emin);
 
-    /* "freddi.pyx":365
+    /* "freddi.pyx":369
  *                 rout = sunToCm(rout)
  *             emin = kevToHertz(emin)
  *             emax = kevToHertz(emax)             # <<<<<<<<<<<<<<
@@ -8032,7 +8031,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
     __pyx_v_emax = kevToHertz(__pyx_v_emax);
 
-    /* "freddi.pyx":366
+    /* "freddi.pyx":370
  *             emin = kevToHertz(emin)
  *             emax = kevToHertz(emax)
  *             distance = kpcToCm(distance)             # <<<<<<<<<<<<<<
@@ -8041,7 +8040,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
     __pyx_v_distance = kpcToCm(__pyx_v_distance);
 
-    /* "freddi.pyx":367
+    /* "freddi.pyx":371
  *             emax = kevToHertz(emax)
  *             distance = kpcToCm(distance)
  *             for i in range(lambdas.size()):             # <<<<<<<<<<<<<<
@@ -8053,7 +8052,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
     for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
       __pyx_v_i = __pyx_t_7;
 
-      /* "freddi.pyx":368
+      /* "freddi.pyx":372
  *             distance = kpcToCm(distance)
  *             for i in range(lambdas.size()):
  *                 lambdas[i] = angstromToCm(lambdas[i])             # <<<<<<<<<<<<<<
@@ -8063,7 +8062,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
       (__pyx_v_lambdas[__pyx_v_i]) = angstromToCm((__pyx_v_lambdas[__pyx_v_i]));
     }
 
-    /* "freddi.pyx":369
+    /* "freddi.pyx":373
  *             for i in range(lambdas.size()):
  *                 lambdas[i] = angstromToCm(lambdas[i])
  *             time = dayToS(time)             # <<<<<<<<<<<<<<
@@ -8072,7 +8071,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
     __pyx_v_time = dayToS(__pyx_v_time);
 
-    /* "freddi.pyx":370
+    /* "freddi.pyx":374
  *                 lambdas[i] = angstromToCm(lambdas[i])
  *             time = dayToS(time)
  *             tau = dayToS(tau)             # <<<<<<<<<<<<<<
@@ -8081,7 +8080,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
     __pyx_v_tau = dayToS(__pyx_v_tau);
 
-    /* "freddi.pyx":356
+    /* "freddi.pyx":360
  *         double time=default_time, double tau=default_tau, unsigned int Nx=default_Nx, string gridscale=default_gridscale, eps=None
  *     ):
  *         if not cgs:             # <<<<<<<<<<<<<<
@@ -8090,7 +8089,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
   }
 
-  /* "freddi.pyx":371
+  /* "freddi.pyx":375
  *             time = dayToS(time)
  *             tau = dayToS(tau)
  *         cdef GeneralArguments* general = new GeneralArguments(b'', b'', False)             # <<<<<<<<<<<<<<
@@ -8099,7 +8098,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
   __pyx_v_general = new GeneralArguments(__pyx_k__33, __pyx_k__33, 0);
 
-  /* "freddi.pyx":373
+  /* "freddi.pyx":377
  *         cdef GeneralArguments* general = new GeneralArguments(b'', b'', False)
  *         cdef BasicDiskBinaryArguments* basic
  *         if rin is None and rout is None:             # <<<<<<<<<<<<<<
@@ -8119,7 +8118,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
   __pyx_L9_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "freddi.pyx":374
+    /* "freddi.pyx":378
  *         cdef BasicDiskBinaryArguments* basic
  *         if rin is None and rout is None:
  *             basic = new BasicDiskBinaryArguments(constructWithoutRinRout(alpha, Mx, kerr, Mopt, period))             # <<<<<<<<<<<<<<
@@ -8128,7 +8127,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
     __pyx_v_basic = new BasicDiskBinaryArguments(BasicDiskBinaryArguments::constructWithoutRinRout(__pyx_v_alpha, __pyx_v_Mx, __pyx_v_kerr, __pyx_v_Mopt, __pyx_v_period));
 
-    /* "freddi.pyx":373
+    /* "freddi.pyx":377
  *         cdef GeneralArguments* general = new GeneralArguments(b'', b'', False)
  *         cdef BasicDiskBinaryArguments* basic
  *         if rin is None and rout is None:             # <<<<<<<<<<<<<<
@@ -8138,7 +8137,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
     goto __pyx_L8;
   }
 
-  /* "freddi.pyx":375
+  /* "freddi.pyx":379
  *         if rin is None and rout is None:
  *             basic = new BasicDiskBinaryArguments(constructWithoutRinRout(alpha, Mx, kerr, Mopt, period))
  *         elif rin is None:             # <<<<<<<<<<<<<<
@@ -8149,17 +8148,17 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "freddi.pyx":376
+    /* "freddi.pyx":380
  *             basic = new BasicDiskBinaryArguments(constructWithoutRinRout(alpha, Mx, kerr, Mopt, period))
  *         elif rin is None:
  *             basic = new BasicDiskBinaryArguments(constructWithoutRin(alpha, Mx, kerr, Mopt, period, rout))             # <<<<<<<<<<<<<<
  *         elif rout is None:
  *             basic = new BasicDiskBinaryArguments(constructWithoutRout(alpha, Mx, kerr, Mopt, period, rin))
  */
-    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_rout); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 376, __pyx_L1_error)
+    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_rout); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 380, __pyx_L1_error)
     __pyx_v_basic = new BasicDiskBinaryArguments(BasicDiskBinaryArguments::constructWithoutRin(__pyx_v_alpha, __pyx_v_Mx, __pyx_v_kerr, __pyx_v_Mopt, __pyx_v_period, __pyx_t_3));
 
-    /* "freddi.pyx":375
+    /* "freddi.pyx":379
  *         if rin is None and rout is None:
  *             basic = new BasicDiskBinaryArguments(constructWithoutRinRout(alpha, Mx, kerr, Mopt, period))
  *         elif rin is None:             # <<<<<<<<<<<<<<
@@ -8169,7 +8168,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
     goto __pyx_L8;
   }
 
-  /* "freddi.pyx":377
+  /* "freddi.pyx":381
  *         elif rin is None:
  *             basic = new BasicDiskBinaryArguments(constructWithoutRin(alpha, Mx, kerr, Mopt, period, rout))
  *         elif rout is None:             # <<<<<<<<<<<<<<
@@ -8180,17 +8179,17 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
   __pyx_t_1 = (__pyx_t_2 != 0);
   if (__pyx_t_1) {
 
-    /* "freddi.pyx":378
+    /* "freddi.pyx":382
  *             basic = new BasicDiskBinaryArguments(constructWithoutRin(alpha, Mx, kerr, Mopt, period, rout))
  *         elif rout is None:
  *             basic = new BasicDiskBinaryArguments(constructWithoutRout(alpha, Mx, kerr, Mopt, period, rin))             # <<<<<<<<<<<<<<
  *         else:
  *             basic = new BasicDiskBinaryArguments(alpha, Mx, kerr, Mopt, period, rin, rout)
  */
-    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_rin); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 378, __pyx_L1_error)
+    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_rin); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 382, __pyx_L1_error)
     __pyx_v_basic = new BasicDiskBinaryArguments(BasicDiskBinaryArguments::constructWithoutRout(__pyx_v_alpha, __pyx_v_Mx, __pyx_v_kerr, __pyx_v_Mopt, __pyx_v_period, __pyx_t_3));
 
-    /* "freddi.pyx":377
+    /* "freddi.pyx":381
  *         elif rin is None:
  *             basic = new BasicDiskBinaryArguments(constructWithoutRin(alpha, Mx, kerr, Mopt, period, rout))
  *         elif rout is None:             # <<<<<<<<<<<<<<
@@ -8200,7 +8199,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
     goto __pyx_L8;
   }
 
-  /* "freddi.pyx":380
+  /* "freddi.pyx":384
  *             basic = new BasicDiskBinaryArguments(constructWithoutRout(alpha, Mx, kerr, Mopt, period, rin))
  *         else:
  *             basic = new BasicDiskBinaryArguments(alpha, Mx, kerr, Mopt, period, rin, rout)             # <<<<<<<<<<<<<<
@@ -8208,19 +8207,19 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  *         if Mdisk0 is None:
  */
   /*else*/ {
-    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_rin); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 380, __pyx_L1_error)
-    __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_v_rout); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 380, __pyx_L1_error)
+    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_rin); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 384, __pyx_L1_error)
+    __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_v_rout); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 384, __pyx_L1_error)
     try {
       __pyx_t_10 = new BasicDiskBinaryArguments(__pyx_v_alpha, __pyx_v_Mx, __pyx_v_kerr, __pyx_v_Mopt, __pyx_v_period, __pyx_t_3, __pyx_t_9);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(1, 380, __pyx_L1_error)
+      __PYX_ERR(1, 384, __pyx_L1_error)
     }
     __pyx_v_basic = __pyx_t_10;
   }
   __pyx_L8:;
 
-  /* "freddi.pyx":381
+  /* "freddi.pyx":385
  *         else:
  *             basic = new BasicDiskBinaryArguments(alpha, Mx, kerr, Mopt, period, rin, rout)
  *         cdef bint is_Mdisk0_specified = Mdisk0 is not None             # <<<<<<<<<<<<<<
@@ -8230,7 +8229,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
   __pyx_t_1 = (__pyx_v_Mdisk0 != Py_None);
   __pyx_v_is_Mdisk0_specified = __pyx_t_1;
 
-  /* "freddi.pyx":382
+  /* "freddi.pyx":386
  *             basic = new BasicDiskBinaryArguments(alpha, Mx, kerr, Mopt, period, rin, rout)
  *         cdef bint is_Mdisk0_specified = Mdisk0 is not None
  *         if Mdisk0 is None:             # <<<<<<<<<<<<<<
@@ -8241,7 +8240,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "freddi.pyx":383
+    /* "freddi.pyx":387
  *         cdef bint is_Mdisk0_specified = Mdisk0 is not None
  *         if Mdisk0 is None:
  *             Mdisk0 = -1.0             # <<<<<<<<<<<<<<
@@ -8251,7 +8250,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
     __Pyx_INCREF(__pyx_float_neg_1_0);
     __Pyx_DECREF_SET(__pyx_v_Mdisk0, __pyx_float_neg_1_0);
 
-    /* "freddi.pyx":382
+    /* "freddi.pyx":386
  *             basic = new BasicDiskBinaryArguments(alpha, Mx, kerr, Mopt, period, rin, rout)
  *         cdef bint is_Mdisk0_specified = Mdisk0 is not None
  *         if Mdisk0 is None:             # <<<<<<<<<<<<<<
@@ -8260,7 +8259,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
   }
 
-  /* "freddi.pyx":384
+  /* "freddi.pyx":388
  *         if Mdisk0 is None:
  *             Mdisk0 = -1.0
  *         cdef bint is_Mdot0_specified = Mdot0 is not None             # <<<<<<<<<<<<<<
@@ -8270,7 +8269,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
   __pyx_t_2 = (__pyx_v_Mdot0 != Py_None);
   __pyx_v_is_Mdot0_specified = __pyx_t_2;
 
-  /* "freddi.pyx":385
+  /* "freddi.pyx":389
  *             Mdisk0 = -1.0
  *         cdef bint is_Mdot0_specified = Mdot0 is not None
  *         if Mdot0 is None:             # <<<<<<<<<<<<<<
@@ -8281,7 +8280,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
   __pyx_t_1 = (__pyx_t_2 != 0);
   if (__pyx_t_1) {
 
-    /* "freddi.pyx":386
+    /* "freddi.pyx":390
  *         cdef bint is_Mdot0_specified = Mdot0 is not None
  *         if Mdot0 is None:
  *             Mdot0 = -1.0             # <<<<<<<<<<<<<<
@@ -8291,7 +8290,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
     __Pyx_INCREF(__pyx_float_neg_1_0);
     __Pyx_DECREF_SET(__pyx_v_Mdot0, __pyx_float_neg_1_0);
 
-    /* "freddi.pyx":385
+    /* "freddi.pyx":389
  *             Mdisk0 = -1.0
  *         cdef bint is_Mdot0_specified = Mdot0 is not None
  *         if Mdot0 is None:             # <<<<<<<<<<<<<<
@@ -8300,24 +8299,24 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
   }
 
-  /* "freddi.pyx":387
+  /* "freddi.pyx":391
  *         if Mdot0 is None:
  *             Mdot0 = -1.0
  *         cdef DiskStructureArguments* disk = new DiskStructureArguments(dereference(basic), opacity, Mdotout, boundcond, Thot, initialcond, F0, powerorder, gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0)             # <<<<<<<<<<<<<<
  *         cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(Cirr, irrfactortype)
  *         cdef FluxArguments* flux = new FluxArguments(colourfactor, emin, emax, inclination, distance, lambdas)
  */
-  __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_v_Mdisk0); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 387, __pyx_L1_error)
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_Mdot0); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 387, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_v_Mdisk0); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 391, __pyx_L1_error)
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_Mdot0); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 391, __pyx_L1_error)
   try {
     __pyx_t_11 = new DiskStructureArguments((*__pyx_v_basic), __pyx_v_opacity, __pyx_v_Mdotout, __pyx_v_boundcond, __pyx_v_Thot, __pyx_v_initialcond, __pyx_v_F0, __pyx_v_powerorder, __pyx_v_gaussmu, __pyx_v_gausssigma, __pyx_v_is_Mdisk0_specified, __pyx_v_is_Mdot0_specified, __pyx_t_9, __pyx_t_3);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(1, 387, __pyx_L1_error)
+    __PYX_ERR(1, 391, __pyx_L1_error)
   }
   __pyx_v_disk = __pyx_t_11;
 
-  /* "freddi.pyx":388
+  /* "freddi.pyx":392
  *             Mdot0 = -1.0
  *         cdef DiskStructureArguments* disk = new DiskStructureArguments(dereference(basic), opacity, Mdotout, boundcond, Thot, initialcond, F0, powerorder, gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0)
  *         cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(Cirr, irrfactortype)             # <<<<<<<<<<<<<<
@@ -8328,11 +8327,11 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
     __pyx_t_12 = new SelfIrradiationArguments(__pyx_v_Cirr, __pyx_v_irrfactortype);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(1, 388, __pyx_L1_error)
+    __PYX_ERR(1, 392, __pyx_L1_error)
   }
   __pyx_v_irr = __pyx_t_12;
 
-  /* "freddi.pyx":389
+  /* "freddi.pyx":393
  *         cdef DiskStructureArguments* disk = new DiskStructureArguments(dereference(basic), opacity, Mdotout, boundcond, Thot, initialcond, F0, powerorder, gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0)
  *         cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(Cirr, irrfactortype)
  *         cdef FluxArguments* flux = new FluxArguments(colourfactor, emin, emax, inclination, distance, lambdas)             # <<<<<<<<<<<<<<
@@ -8341,7 +8340,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
   __pyx_v_flux = new FluxArguments(__pyx_v_colourfactor, __pyx_v_emin, __pyx_v_emax, __pyx_v_inclination, __pyx_v_distance, __pyx_v_lambdas);
 
-  /* "freddi.pyx":391
+  /* "freddi.pyx":395
  *         cdef FluxArguments* flux = new FluxArguments(colourfactor, emin, emax, inclination, distance, lambdas)
  *         cdef CalculationArguments* calc
  *         if eps is None:             # <<<<<<<<<<<<<<
@@ -8352,7 +8351,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "freddi.pyx":392
+    /* "freddi.pyx":396
  *         cdef CalculationArguments* calc
  *         if eps is None:
  *             calc = new CalculationArguments(time, tau, Nx, gridscale)             # <<<<<<<<<<<<<<
@@ -8363,11 +8362,11 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
       __pyx_t_13 = new CalculationArguments(__pyx_v_time, __pyx_v_tau, __pyx_v_Nx, __pyx_v_gridscale);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(1, 392, __pyx_L1_error)
+      __PYX_ERR(1, 396, __pyx_L1_error)
     }
     __pyx_v_calc = __pyx_t_13;
 
-    /* "freddi.pyx":391
+    /* "freddi.pyx":395
  *         cdef FluxArguments* flux = new FluxArguments(colourfactor, emin, emax, inclination, distance, lambdas)
  *         cdef CalculationArguments* calc
  *         if eps is None:             # <<<<<<<<<<<<<<
@@ -8377,7 +8376,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
     goto __pyx_L13;
   }
 
-  /* "freddi.pyx":394
+  /* "freddi.pyx":398
  *             calc = new CalculationArguments(time, tau, Nx, gridscale)
  *         else:
  *             calc = new CalculationArguments(time, tau, Nx, gridscale, eps)             # <<<<<<<<<<<<<<
@@ -8385,18 +8384,18 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  * 
  */
   /*else*/ {
-    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_eps); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 394, __pyx_L1_error)
+    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_eps); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 398, __pyx_L1_error)
     try {
       __pyx_t_13 = new CalculationArguments(__pyx_v_time, __pyx_v_tau, __pyx_v_Nx, __pyx_v_gridscale, __pyx_t_3);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(1, 394, __pyx_L1_error)
+      __PYX_ERR(1, 398, __pyx_L1_error)
     }
     __pyx_v_calc = __pyx_t_13;
   }
   __pyx_L13:;
 
-  /* "freddi.pyx":395
+  /* "freddi.pyx":399
  *         else:
  *             calc = new CalculationArguments(time, tau, Nx, gridscale, eps)
  *         self.args = new FreddiArguments(general, basic, disk, irr, flux, calc)             # <<<<<<<<<<<<<<
@@ -8405,7 +8404,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
  */
   __pyx_v_self->args = new FreddiArguments(__pyx_v_general, __pyx_v_basic, __pyx_v_disk, __pyx_v_irr, __pyx_v_flux, __pyx_v_calc);
 
-  /* "freddi.pyx":397
+  /* "freddi.pyx":401
  *         self.args = new FreddiArguments(general, basic, disk, irr, flux, calc)
  * 
  *         self.evolution = new FreddiEvolution(dereference(self.args))             # <<<<<<<<<<<<<<
@@ -8416,11 +8415,11 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
     __pyx_t_14 = new FreddiEvolution((*__pyx_v_self->args));
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(1, 397, __pyx_L1_error)
+    __PYX_ERR(1, 401, __pyx_L1_error)
   }
   __pyx_v_self->evolution = __pyx_t_14;
 
-  /* "freddi.pyx":348
+  /* "freddi.pyx":352
  *     cdef FreddiEvolution* evolution
  * 
  *     def __cinit__(             # <<<<<<<<<<<<<<
@@ -8444,7 +8443,7 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
   return __pyx_r;
 }
 
-/* "freddi.pyx":399
+/* "freddi.pyx":403
  *         self.evolution = new FreddiEvolution(dereference(self.args))
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -8467,7 +8466,7 @@ static void __pyx_pf_6freddi_6Freddi_2__dealloc__(struct __pyx_obj_6freddi_Fredd
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "freddi.pyx":400
+  /* "freddi.pyx":404
  * 
  *     def __dealloc__(self):
  *         del self.args             # <<<<<<<<<<<<<<
@@ -8476,16 +8475,16 @@ static void __pyx_pf_6freddi_6Freddi_2__dealloc__(struct __pyx_obj_6freddi_Fredd
  */
   delete __pyx_v_self->args;
 
-  /* "freddi.pyx":401
+  /* "freddi.pyx":405
  *     def __dealloc__(self):
  *         del self.args
  *         del self.evolution             # <<<<<<<<<<<<<<
  * 
- *     @property
+ *     @classmethod
  */
   delete __pyx_v_self->evolution;
 
-  /* "freddi.pyx":399
+  /* "freddi.pyx":403
  *         self.evolution = new FreddiEvolution(dereference(self.args))
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -8497,7 +8496,321 @@ static void __pyx_pf_6freddi_6Freddi_2__dealloc__(struct __pyx_obj_6freddi_Fredd
   __Pyx_RefNannyFinishContext();
 }
 
-/* "freddi.pyx":404
+/* "freddi.pyx":408
+ * 
+ *     @classmethod
+ *     def alt(cls, **kwargs):             # <<<<<<<<<<<<<<
+ *         """Alternative Freddi constructor accepting astropy Quantity and str
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_6freddi_6Freddi_5alt(PyObject *__pyx_v_cls, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_6freddi_6Freddi_4alt[] = "Alternative Freddi constructor accepting astropy Quantity and str\n\n        All physical values can be passed as `astropy.units.Quantity`, and all\n        string values can be passed as `str`. Needs `astropy` module to run\n\n        Parameters\n        ----------\n        **kwargs :\n            `Freddi` arguments\n\n        Returns\n        -------\n        Freddi\n\n        ";
+static PyObject *__pyx_pw_6freddi_6Freddi_5alt(PyObject *__pyx_v_cls, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_kwargs = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("alt (wrapper)", 0);
+  if (unlikely(PyTuple_GET_SIZE(__pyx_args) > 0)) {
+    __Pyx_RaiseArgtupleInvalid("alt", 1, 0, 0, PyTuple_GET_SIZE(__pyx_args)); return NULL;}
+  if (__pyx_kwds && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "alt", 1))) return NULL;
+  __pyx_v_kwargs = (__pyx_kwds) ? PyDict_Copy(__pyx_kwds) : PyDict_New(); if (unlikely(!__pyx_v_kwargs)) return NULL;
+  __Pyx_GOTREF(__pyx_v_kwargs);
+  __pyx_r = __pyx_pf_6freddi_6Freddi_4alt(((PyTypeObject*)__pyx_v_cls), __pyx_v_kwargs);
+
+  /* function exit code */
+  __Pyx_XDECREF(__pyx_v_kwargs);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_6freddi_6Freddi_4alt(PyTypeObject *__pyx_v_cls, PyObject *__pyx_v_kwargs) {
+  PyObject *__pyx_v_Quantity = NULL;
+  PyObject *__pyx_v_item = NULL;
+  PyObject *__pyx_v_value = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  Py_ssize_t __pyx_t_3;
+  PyObject *(*__pyx_t_4)(PyObject *);
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *(*__pyx_t_8)(PyObject *);
+  int __pyx_t_9;
+  int __pyx_t_10;
+  __Pyx_RefNannySetupContext("alt", 0);
+
+  /* "freddi.pyx":424
+ * 
+ *         """
+ *         from astropy.units import Quantity             # <<<<<<<<<<<<<<
+ * 
+ *         for item, value in kwargs.items():
+ */
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 424, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_n_s_Quantity);
+  __Pyx_GIVEREF(__pyx_n_s_Quantity);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_Quantity);
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_astropy_units, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 424, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_Quantity); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 424, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_t_1);
+  __pyx_v_Quantity = __pyx_t_1;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "freddi.pyx":426
+ *         from astropy.units import Quantity
+ * 
+ *         for item, value in kwargs.items():             # <<<<<<<<<<<<<<
+ *             if isinstance(value, Quantity):
+ *                 kwargs[item] = value.cgs.value
+ */
+  __pyx_t_2 = __Pyx_PyDict_Items(__pyx_v_kwargs); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 426, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
+    __pyx_t_1 = __pyx_t_2; __Pyx_INCREF(__pyx_t_1); __pyx_t_3 = 0;
+    __pyx_t_4 = NULL;
+  } else {
+    __pyx_t_3 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 426, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_4 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 426, __pyx_L1_error)
+  }
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  for (;;) {
+    if (likely(!__pyx_t_4)) {
+      if (likely(PyList_CheckExact(__pyx_t_1))) {
+        if (__pyx_t_3 >= PyList_GET_SIZE(__pyx_t_1)) break;
+        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(1, 426, __pyx_L1_error)
+        #else
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 426, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        #endif
+      } else {
+        if (__pyx_t_3 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
+        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(1, 426, __pyx_L1_error)
+        #else
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 426, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        #endif
+      }
+    } else {
+      __pyx_t_2 = __pyx_t_4(__pyx_t_1);
+      if (unlikely(!__pyx_t_2)) {
+        PyObject* exc_type = PyErr_Occurred();
+        if (exc_type) {
+          if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+          else __PYX_ERR(1, 426, __pyx_L1_error)
+        }
+        break;
+      }
+      __Pyx_GOTREF(__pyx_t_2);
+    }
+    if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
+      PyObject* sequence = __pyx_t_2;
+      Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+      if (unlikely(size != 2)) {
+        if (size > 2) __Pyx_RaiseTooManyValuesError(2);
+        else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+        __PYX_ERR(1, 426, __pyx_L1_error)
+      }
+      #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+      if (likely(PyTuple_CheckExact(sequence))) {
+        __pyx_t_5 = PyTuple_GET_ITEM(sequence, 0); 
+        __pyx_t_6 = PyTuple_GET_ITEM(sequence, 1); 
+      } else {
+        __pyx_t_5 = PyList_GET_ITEM(sequence, 0); 
+        __pyx_t_6 = PyList_GET_ITEM(sequence, 1); 
+      }
+      __Pyx_INCREF(__pyx_t_5);
+      __Pyx_INCREF(__pyx_t_6);
+      #else
+      __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 426, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 426, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
+      #endif
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    } else {
+      Py_ssize_t index = -1;
+      __pyx_t_7 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 426, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_8 = Py_TYPE(__pyx_t_7)->tp_iternext;
+      index = 0; __pyx_t_5 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_5)) goto __pyx_L5_unpacking_failed;
+      __Pyx_GOTREF(__pyx_t_5);
+      index = 1; __pyx_t_6 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_6)) goto __pyx_L5_unpacking_failed;
+      __Pyx_GOTREF(__pyx_t_6);
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(1, 426, __pyx_L1_error)
+      __pyx_t_8 = NULL;
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      goto __pyx_L6_unpacking_done;
+      __pyx_L5_unpacking_failed:;
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __pyx_t_8 = NULL;
+      if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+      __PYX_ERR(1, 426, __pyx_L1_error)
+      __pyx_L6_unpacking_done:;
+    }
+    __Pyx_XDECREF_SET(__pyx_v_item, __pyx_t_5);
+    __pyx_t_5 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_value, __pyx_t_6);
+    __pyx_t_6 = 0;
+
+    /* "freddi.pyx":427
+ * 
+ *         for item, value in kwargs.items():
+ *             if isinstance(value, Quantity):             # <<<<<<<<<<<<<<
+ *                 kwargs[item] = value.cgs.value
+ *                 continue
+ */
+    __pyx_t_9 = PyObject_IsInstance(__pyx_v_value, __pyx_v_Quantity); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(1, 427, __pyx_L1_error)
+    __pyx_t_10 = (__pyx_t_9 != 0);
+    if (__pyx_t_10) {
+
+      /* "freddi.pyx":428
+ *         for item, value in kwargs.items():
+ *             if isinstance(value, Quantity):
+ *                 kwargs[item] = value.cgs.value             # <<<<<<<<<<<<<<
+ *                 continue
+ *             if isinstance(value, str):
+ */
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_value, __pyx_n_s_cgs); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 428, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_value); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 428, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      if (unlikely(PyDict_SetItem(__pyx_v_kwargs, __pyx_v_item, __pyx_t_6) < 0)) __PYX_ERR(1, 428, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+      /* "freddi.pyx":429
+ *             if isinstance(value, Quantity):
+ *                 kwargs[item] = value.cgs.value
+ *                 continue             # <<<<<<<<<<<<<<
+ *             if isinstance(value, str):
+ *                 kwargs[item] = value.encode()
+ */
+      goto __pyx_L3_continue;
+
+      /* "freddi.pyx":427
+ * 
+ *         for item, value in kwargs.items():
+ *             if isinstance(value, Quantity):             # <<<<<<<<<<<<<<
+ *                 kwargs[item] = value.cgs.value
+ *                 continue
+ */
+    }
+
+    /* "freddi.pyx":430
+ *                 kwargs[item] = value.cgs.value
+ *                 continue
+ *             if isinstance(value, str):             # <<<<<<<<<<<<<<
+ *                 kwargs[item] = value.encode()
+ *         return cls(**kwargs)
+ */
+    __pyx_t_10 = PyString_Check(__pyx_v_value); 
+    __pyx_t_9 = (__pyx_t_10 != 0);
+    if (__pyx_t_9) {
+
+      /* "freddi.pyx":431
+ *                 continue
+ *             if isinstance(value, str):
+ *                 kwargs[item] = value.encode()             # <<<<<<<<<<<<<<
+ *         return cls(**kwargs)
+ * 
+ */
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_value, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 431, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_5 = NULL;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+        __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_2);
+        if (likely(__pyx_t_5)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+          __Pyx_INCREF(__pyx_t_5);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_2, function);
+        }
+      }
+      if (__pyx_t_5) {
+        __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 431, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      } else {
+        __pyx_t_6 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 431, __pyx_L1_error)
+      }
+      __Pyx_GOTREF(__pyx_t_6);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      if (unlikely(PyDict_SetItem(__pyx_v_kwargs, __pyx_v_item, __pyx_t_6) < 0)) __PYX_ERR(1, 431, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+      /* "freddi.pyx":430
+ *                 kwargs[item] = value.cgs.value
+ *                 continue
+ *             if isinstance(value, str):             # <<<<<<<<<<<<<<
+ *                 kwargs[item] = value.encode()
+ *         return cls(**kwargs)
+ */
+    }
+
+    /* "freddi.pyx":426
+ *         from astropy.units import Quantity
+ * 
+ *         for item, value in kwargs.items():             # <<<<<<<<<<<<<<
+ *             if isinstance(value, Quantity):
+ *                 kwargs[item] = value.cgs.value
+ */
+    __pyx_L3_continue:;
+  }
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "freddi.pyx":432
+ *             if isinstance(value, str):
+ *                 kwargs[item] = value.encode()
+ *         return cls(**kwargs)             # <<<<<<<<<<<<<<
+ * 
+ *     @property
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_v_cls), __pyx_empty_tuple, __pyx_v_kwargs); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 432, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "freddi.pyx":408
+ * 
+ *     @classmethod
+ *     def alt(cls, **kwargs):             # <<<<<<<<<<<<<<
+ *         """Alternative Freddi constructor accepting astropy Quantity and str
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_AddTraceback("freddi.Freddi.alt", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_Quantity);
+  __Pyx_XDECREF(__pyx_v_item);
+  __Pyx_XDECREF(__pyx_v_value);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "freddi.pyx":435
  * 
  *     @property
  *     def time(self) -> double:             # <<<<<<<<<<<<<<
@@ -8524,7 +8837,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_4time___get__(struct __pyx_obj_6freddi
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "freddi.pyx":405
+  /* "freddi.pyx":436
  *     @property
  *     def time(self) -> double:
  *         return self.args.calc.get().time             # <<<<<<<<<<<<<<
@@ -8532,13 +8845,13 @@ static PyObject *__pyx_pf_6freddi_6Freddi_4time___get__(struct __pyx_obj_6freddi
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->args->calc.get()->time); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 405, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->args->calc.get()->time); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 436, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "freddi.pyx":404
+  /* "freddi.pyx":435
  * 
  *     @property
  *     def time(self) -> double:             # <<<<<<<<<<<<<<
@@ -8557,7 +8870,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_4time___get__(struct __pyx_obj_6freddi
   return __pyx_r;
 }
 
-/* "freddi.pyx":408
+/* "freddi.pyx":439
  * 
  *     @property
  *     def lambdas(self) -> np.ndarray:             # <<<<<<<<<<<<<<
@@ -8593,7 +8906,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
   struct __pyx_array_obj *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "freddi.pyx":409
+  /* "freddi.pyx":440
  *     @property
  *     def lambdas(self) -> np.ndarray:
  *         cdef const double* data = self.args.flux.get().lambdas.data()             # <<<<<<<<<<<<<<
@@ -8602,7 +8915,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
  */
   __pyx_v_data = __pyx_v_self->args->flux.get()->lambdas.data();
 
-  /* "freddi.pyx":410
+  /* "freddi.pyx":441
  *     def lambdas(self) -> np.ndarray:
  *         cdef const double* data = self.args.flux.get().lambdas.data()
  *         cdef size_t size = self.args.flux.get().lambdas.size()             # <<<<<<<<<<<<<<
@@ -8611,7 +8924,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
  */
   __pyx_v_size = __pyx_v_self->args->flux.get()->lambdas.size();
 
-  /* "freddi.pyx":411
+  /* "freddi.pyx":442
  *         cdef const double* data = self.args.flux.get().lambdas.data()
  *         cdef size_t size = self.args.flux.get().lambdas.size()
  *         if size == (<size_t> 0):             # <<<<<<<<<<<<<<
@@ -8621,7 +8934,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
   __pyx_t_1 = ((__pyx_v_size == ((size_t)0)) != 0);
   if (__pyx_t_1) {
 
-    /* "freddi.pyx":412
+    /* "freddi.pyx":443
  *         cdef size_t size = self.args.flux.get().lambdas.size()
  *         if size == (<size_t> 0):
  *             return np.array([], dtype=np.float)             # <<<<<<<<<<<<<<
@@ -8629,28 +8942,28 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
  *         arr.flags.writeable = False
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 412, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 443, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 412, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 443, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 412, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 443, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 412, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 443, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 412, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 443, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 412, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 443, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_float); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 412, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_float); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 443, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(1, 412, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(1, 443, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 412, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 443, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -8659,7 +8972,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
     __pyx_t_6 = 0;
     goto __pyx_L0;
 
-    /* "freddi.pyx":411
+    /* "freddi.pyx":442
  *         cdef const double* data = self.args.flux.get().lambdas.data()
  *         cdef size_t size = self.args.flux.get().lambdas.size()
  *         if size == (<size_t> 0):             # <<<<<<<<<<<<<<
@@ -8668,29 +8981,29 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
  */
   }
 
-  /* "freddi.pyx":413
+  /* "freddi.pyx":444
  *         if size == (<size_t> 0):
  *             return np.array([], dtype=np.float)
  *         arr = np.asarray(<const double[:size]> data)             # <<<<<<<<<<<<<<
  *         arr.flags.writeable = False
  *         return arr
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 413, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 444, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_asarray); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 413, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_asarray); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 444, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (!__pyx_v_data) {
     PyErr_SetString(PyExc_ValueError,"Cannot create cython.array from NULL pointer");
-    __PYX_ERR(1, 413, __pyx_L1_error)
+    __PYX_ERR(1, 444, __pyx_L1_error)
   }
   __pyx_t_3 = __pyx_format_from_typeinfo(&__Pyx_TypeInfo_double__const__);
   __pyx_t_2 = Py_BuildValue((char*) "("  __PYX_BUILD_PY_SSIZE_T  ")", ((Py_ssize_t)__pyx_v_size));
-  if (unlikely(!__pyx_t_3 || !__pyx_t_2 || !PyBytes_AsString(__pyx_t_3))) __PYX_ERR(1, 413, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3 || !__pyx_t_2 || !PyBytes_AsString(__pyx_t_3))) __PYX_ERR(1, 444, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_7 = __pyx_array_new(__pyx_t_2, sizeof(double const ), PyBytes_AS_STRING(__pyx_t_3), (char *) "c", (char *) __pyx_v_data);
-  if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 413, __pyx_L1_error)
+  if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 444, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -8705,14 +9018,14 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_t_4, ((PyObject *)__pyx_t_7)); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 413, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_t_4, ((PyObject *)__pyx_t_7)); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 444, __pyx_L1_error)
     __Pyx_DECREF(((PyObject *)__pyx_t_7)); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_6);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_4)) {
       PyObject *__pyx_temp[2] = {__pyx_t_3, ((PyObject *)__pyx_t_7)};
-      __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 413, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 444, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(((PyObject *)__pyx_t_7)); __pyx_t_7 = 0;
@@ -8721,20 +9034,20 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
       PyObject *__pyx_temp[2] = {__pyx_t_3, ((PyObject *)__pyx_t_7)};
-      __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 413, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 444, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(((PyObject *)__pyx_t_7)); __pyx_t_7 = 0;
     } else
     #endif
     {
-      __pyx_t_2 = PyTuple_New(1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 413, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 444, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3); __pyx_t_3 = NULL;
       __Pyx_GIVEREF(((PyObject *)__pyx_t_7));
       PyTuple_SET_ITEM(__pyx_t_2, 0+1, ((PyObject *)__pyx_t_7));
       __pyx_t_7 = 0;
-      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 413, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 444, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     }
@@ -8743,19 +9056,19 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
   __pyx_v_arr = __pyx_t_6;
   __pyx_t_6 = 0;
 
-  /* "freddi.pyx":414
+  /* "freddi.pyx":445
  *             return np.array([], dtype=np.float)
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False             # <<<<<<<<<<<<<<
  *         return arr
  * 
  */
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_arr, __pyx_n_s_flags); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 414, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_arr, __pyx_n_s_flags); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 445, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_t_6, __pyx_n_s_writeable, Py_False) < 0) __PYX_ERR(1, 414, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_t_6, __pyx_n_s_writeable, Py_False) < 0) __PYX_ERR(1, 445, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "freddi.pyx":415
+  /* "freddi.pyx":446
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False
  *         return arr             # <<<<<<<<<<<<<<
@@ -8767,7 +9080,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
   __pyx_r = __pyx_v_arr;
   goto __pyx_L0;
 
-  /* "freddi.pyx":408
+  /* "freddi.pyx":439
  * 
  *     @property
  *     def lambdas(self) -> np.ndarray:             # <<<<<<<<<<<<<<
@@ -8792,7 +9105,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7lambdas___get__(struct __pyx_obj_6fre
   return __pyx_r;
 }
 
-/* "freddi.pyx":418
+/* "freddi.pyx":449
  * 
  *     @property
  *     def Nt(self) -> int:             # <<<<<<<<<<<<<<
@@ -8819,7 +9132,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_2Nt___get__(struct __pyx_obj_6freddi_F
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "freddi.pyx":419
+  /* "freddi.pyx":450
  *     @property
  *     def Nt(self) -> int:
  *         return self.evolution.Nt             # <<<<<<<<<<<<<<
@@ -8827,13 +9140,13 @@ static PyObject *__pyx_pf_6freddi_6Freddi_2Nt___get__(struct __pyx_obj_6freddi_F
  *     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_self->evolution->Nt); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 419, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_self->evolution->Nt); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 450, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "freddi.pyx":418
+  /* "freddi.pyx":449
  * 
  *     @property
  *     def Nt(self) -> int:             # <<<<<<<<<<<<<<
@@ -8852,7 +9165,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_2Nt___get__(struct __pyx_obj_6freddi_F
   return __pyx_r;
 }
 
-/* "freddi.pyx":421
+/* "freddi.pyx":452
  *         return self.evolution.Nt
  * 
  *     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):             # <<<<<<<<<<<<<<
@@ -8884,7 +9197,7 @@ static void __pyx_f_6freddi_6Freddi_change_SelfIrradiationArguments(struct __pyx
     }
   }
 
-  /* "freddi.pyx":422
+  /* "freddi.pyx":453
  * 
  *     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):
  *         cdef double c_Cirr = self.args.irr.get().Cirr if Cirr is None else Cirr             # <<<<<<<<<<<<<<
@@ -8895,12 +9208,12 @@ static void __pyx_f_6freddi_6Freddi_change_SelfIrradiationArguments(struct __pyx
   if ((__pyx_t_2 != 0)) {
     __pyx_t_1 = __pyx_v_self->args->irr.get()->Cirr;
   } else {
-    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_Cirr); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 422, __pyx_L1_error)
+    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_Cirr); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 453, __pyx_L1_error)
     __pyx_t_1 = __pyx_t_3;
   }
   __pyx_v_c_Cirr = __pyx_t_1;
 
-  /* "freddi.pyx":423
+  /* "freddi.pyx":454
  *     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):
  *         cdef double c_Cirr = self.args.irr.get().Cirr if Cirr is None else Cirr
  *         cdef string c_irrfactortype = self.args.irr.get().irrfactortype if irrfactortype is None else irrfactortype             # <<<<<<<<<<<<<<
@@ -8909,18 +9222,18 @@ static void __pyx_f_6freddi_6Freddi_change_SelfIrradiationArguments(struct __pyx
  */
   __pyx_t_2 = (__pyx_v_irrfactortype == Py_None);
   if ((__pyx_t_2 != 0)) {
-    __pyx_t_5 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_self->args->irr.get()->irrfactortype); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 423, __pyx_L1_error)
+    __pyx_t_5 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_self->args->irr.get()->irrfactortype); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 454, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __pyx_convert_string_from_py_std__in_string(__pyx_t_5); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 423, __pyx_L1_error)
+    __pyx_t_6 = __pyx_convert_string_from_py_std__in_string(__pyx_t_5); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 454, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_4 = __pyx_t_6;
   } else {
-    __pyx_t_6 = __pyx_convert_string_from_py_std__in_string(__pyx_v_irrfactortype); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 423, __pyx_L1_error)
+    __pyx_t_6 = __pyx_convert_string_from_py_std__in_string(__pyx_v_irrfactortype); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 454, __pyx_L1_error)
     __pyx_t_4 = __pyx_t_6;
   }
   __pyx_v_c_irrfactortype = __pyx_t_4;
 
-  /* "freddi.pyx":424
+  /* "freddi.pyx":455
  *         cdef double c_Cirr = self.args.irr.get().Cirr if Cirr is None else Cirr
  *         cdef string c_irrfactortype = self.args.irr.get().irrfactortype if irrfactortype is None else irrfactortype
  *         cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(c_Cirr, c_irrfactortype)             # <<<<<<<<<<<<<<
@@ -8931,11 +9244,11 @@ static void __pyx_f_6freddi_6Freddi_change_SelfIrradiationArguments(struct __pyx
     __pyx_t_7 = new SelfIrradiationArguments(__pyx_v_c_Cirr, __pyx_v_c_irrfactortype);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(1, 424, __pyx_L1_error)
+    __PYX_ERR(1, 455, __pyx_L1_error)
   }
   __pyx_v_irr = __pyx_t_7;
 
-  /* "freddi.pyx":425
+  /* "freddi.pyx":456
  *         cdef string c_irrfactortype = self.args.irr.get().irrfactortype if irrfactortype is None else irrfactortype
  *         cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(c_Cirr, c_irrfactortype)
  *         self.args.irr.reset(irr)             # <<<<<<<<<<<<<<
@@ -8944,7 +9257,7 @@ static void __pyx_f_6freddi_6Freddi_change_SelfIrradiationArguments(struct __pyx
  */
   __pyx_v_self->args->irr.reset(__pyx_v_irr);
 
-  /* "freddi.pyx":421
+  /* "freddi.pyx":452
  *         return self.evolution.Nt
  * 
  *     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):             # <<<<<<<<<<<<<<
@@ -8961,7 +9274,7 @@ static void __pyx_f_6freddi_6Freddi_change_SelfIrradiationArguments(struct __pyx
   __Pyx_RefNannyFinishContext();
 }
 
-/* "freddi.pyx":428
+/* "freddi.pyx":459
  * 
  *     @property
  *     def Cirr(self) -> double:             # <<<<<<<<<<<<<<
@@ -8988,7 +9301,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_4Cirr___get__(struct __pyx_obj_6freddi
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "freddi.pyx":429
+  /* "freddi.pyx":460
  *     @property
  *     def Cirr(self) -> double:
  *         return self.args.irr.get().Cirr             # <<<<<<<<<<<<<<
@@ -8996,13 +9309,13 @@ static PyObject *__pyx_pf_6freddi_6Freddi_4Cirr___get__(struct __pyx_obj_6freddi
  *     @Cirr.setter
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->args->irr.get()->Cirr); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 429, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->args->irr.get()->Cirr); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 460, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "freddi.pyx":428
+  /* "freddi.pyx":459
  * 
  *     @property
  *     def Cirr(self) -> double:             # <<<<<<<<<<<<<<
@@ -9021,7 +9334,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_4Cirr___get__(struct __pyx_obj_6freddi
   return __pyx_r;
 }
 
-/* "freddi.pyx":432
+/* "freddi.pyx":463
  * 
  *     @Cirr.setter
  *     def Cirr(self, val: double) -> None:             # <<<<<<<<<<<<<<
@@ -9037,7 +9350,7 @@ static int __pyx_pw_6freddi_6Freddi_4Cirr_3__set__(PyObject *__pyx_v_self, PyObj
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
   assert(__pyx_arg_val); {
-    __pyx_v_val = __pyx_PyFloat_AsDouble(__pyx_arg_val); if (unlikely((__pyx_v_val == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 432, __pyx_L3_error)
+    __pyx_v_val = __pyx_PyFloat_AsDouble(__pyx_arg_val); if (unlikely((__pyx_v_val == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 463, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9059,21 +9372,21 @@ static int __pyx_pf_6freddi_6Freddi_4Cirr_2__set__(struct __pyx_obj_6freddi_Fred
   struct __pyx_opt_args_6freddi_6Freddi_change_SelfIrradiationArguments __pyx_t_2;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "freddi.pyx":433
+  /* "freddi.pyx":464
  *     @Cirr.setter
  *     def Cirr(self, val: double) -> None:
  *         self.change_SelfIrradiationArguments(Cirr=val)             # <<<<<<<<<<<<<<
  * 
  *     cdef State get_state(self):
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_val); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 433, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_val); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 464, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.Cirr = __pyx_t_1;
   ((struct __pyx_vtabstruct_6freddi_Freddi *)__pyx_v_self->__pyx_vtab)->change_SelfIrradiationArguments(__pyx_v_self, &__pyx_t_2); 
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "freddi.pyx":432
+  /* "freddi.pyx":463
  * 
  *     @Cirr.setter
  *     def Cirr(self, val: double) -> None:             # <<<<<<<<<<<<<<
@@ -9093,7 +9406,7 @@ static int __pyx_pf_6freddi_6Freddi_4Cirr_2__set__(struct __pyx_obj_6freddi_Fred
   return __pyx_r;
 }
 
-/* "freddi.pyx":435
+/* "freddi.pyx":466
  *         self.change_SelfIrradiationArguments(Cirr=val)
  * 
  *     cdef State get_state(self):             # <<<<<<<<<<<<<<
@@ -9107,7 +9420,7 @@ static struct __pyx_obj_6freddi_State *__pyx_f_6freddi_6Freddi_get_state(struct 
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("get_state", 0);
 
-  /* "freddi.pyx":436
+  /* "freddi.pyx":467
  * 
  *     cdef State get_state(self):
  *         return state_from_cpp(self.evolution.get_state())             # <<<<<<<<<<<<<<
@@ -9115,13 +9428,13 @@ static struct __pyx_obj_6freddi_State *__pyx_f_6freddi_6Freddi_get_state(struct 
  *     def __iter__(self):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_1 = ((PyObject *)__pyx_f_6freddi_state_from_cpp(__pyx_v_self->evolution->get_state())); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 436, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_6freddi_state_from_cpp(__pyx_v_self->evolution->get_state())); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = ((struct __pyx_obj_6freddi_State *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "freddi.pyx":435
+  /* "freddi.pyx":466
  *         self.change_SelfIrradiationArguments(Cirr=val)
  * 
  *     cdef State get_state(self):             # <<<<<<<<<<<<<<
@@ -9139,9 +9452,9 @@ static struct __pyx_obj_6freddi_State *__pyx_f_6freddi_6Freddi_get_state(struct 
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static PyObject *__pyx_gb_6freddi_6Freddi_6generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+static PyObject *__pyx_gb_6freddi_6Freddi_8generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "freddi.pyx":438
+/* "freddi.pyx":469
  *         return state_from_cpp(self.evolution.get_state())
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -9150,23 +9463,23 @@ static PyObject *__pyx_gb_6freddi_6Freddi_6generator(__pyx_CoroutineObject *__py
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6freddi_6Freddi_5__iter__(PyObject *__pyx_v_self); /*proto*/
-static char __pyx_doc_6freddi_6Freddi_4__iter__[] = "Iterate disk over time\n\n        The first yielded object is for initial distribution\n\n        Yields\n        ------\n        State\n            `State` disk radial structure object\n\n        ";
+static PyObject *__pyx_pw_6freddi_6Freddi_7__iter__(PyObject *__pyx_v_self); /*proto*/
+static char __pyx_doc_6freddi_6Freddi_6__iter__[] = "Iterate disk over time\n\n        The first yielded object is for initial distribution\n\n        Yields\n        ------\n        State\n            `State` disk radial structure object\n\n        ";
 #if CYTHON_COMPILING_IN_CPYTHON
-struct wrapperbase __pyx_wrapperbase_6freddi_6Freddi_4__iter__;
+struct wrapperbase __pyx_wrapperbase_6freddi_6Freddi_6__iter__;
 #endif
-static PyObject *__pyx_pw_6freddi_6Freddi_5__iter__(PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_6freddi_6Freddi_7__iter__(PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__iter__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_6freddi_6Freddi_4__iter__(((struct __pyx_obj_6freddi_Freddi *)__pyx_v_self));
+  __pyx_r = __pyx_pf_6freddi_6Freddi_6__iter__(((struct __pyx_obj_6freddi_Freddi *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6freddi_6Freddi_4__iter__(struct __pyx_obj_6freddi_Freddi *__pyx_v_self) {
+static PyObject *__pyx_pf_6freddi_6Freddi_6__iter__(struct __pyx_obj_6freddi_Freddi *__pyx_v_self) {
   struct __pyx_obj_6freddi___pyx_scope_struct____iter__ *__pyx_cur_scope;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -9175,7 +9488,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_4__iter__(struct __pyx_obj_6freddi_Fre
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_6freddi___pyx_scope_struct____iter__ *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(1, 438, __pyx_L1_error)
+    __PYX_ERR(1, 469, __pyx_L1_error)
   } else {
     __Pyx_GOTREF(__pyx_cur_scope);
   }
@@ -9183,7 +9496,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_4__iter__(struct __pyx_obj_6freddi_Fre
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_6freddi_6Freddi_6generator, NULL, (PyObject *) __pyx_cur_scope, __pyx_n_s_iter, __pyx_n_s_Freddi___iter, __pyx_n_s_freddi); if (unlikely(!gen)) __PYX_ERR(1, 438, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_6freddi_6Freddi_8generator, NULL, (PyObject *) __pyx_cur_scope, __pyx_n_s_iter, __pyx_n_s_Freddi___iter, __pyx_n_s_freddi); if (unlikely(!gen)) __PYX_ERR(1, 469, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -9199,7 +9512,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_4__iter__(struct __pyx_obj_6freddi_Fre
   return __pyx_r;
 }
 
-static PyObject *__pyx_gb_6freddi_6Freddi_6generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+static PyObject *__pyx_gb_6freddi_6Freddi_8generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
 {
   struct __pyx_obj_6freddi___pyx_scope_struct____iter__ *__pyx_cur_scope = ((struct __pyx_obj_6freddi___pyx_scope_struct____iter__ *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
@@ -9218,22 +9531,22 @@ static PyObject *__pyx_gb_6freddi_6Freddi_6generator(__pyx_CoroutineObject *__py
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 438, __pyx_L1_error)
+  if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 469, __pyx_L1_error)
 
-  /* "freddi.pyx":449
+  /* "freddi.pyx":480
  * 
  *         """
  *         state = self.get_state()             # <<<<<<<<<<<<<<
  *         yield state
  *         while state.t <= self.time:
  */
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_6freddi_Freddi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_state(__pyx_cur_scope->__pyx_v_self)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 449, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_6freddi_Freddi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_state(__pyx_cur_scope->__pyx_v_self)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 480, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_state = ((struct __pyx_obj_6freddi_State *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "freddi.pyx":450
+  /* "freddi.pyx":481
  *         """
  *         state = self.get_state()
  *         yield state             # <<<<<<<<<<<<<<
@@ -9249,9 +9562,9 @@ static PyObject *__pyx_gb_6freddi_6Freddi_6generator(__pyx_CoroutineObject *__py
   __pyx_generator->resume_label = 1;
   return __pyx_r;
   __pyx_L4_resume_from_yield:;
-  if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 450, __pyx_L1_error)
+  if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 481, __pyx_L1_error)
 
-  /* "freddi.pyx":451
+  /* "freddi.pyx":482
  *         state = self.get_state()
  *         yield state
  *         while state.t <= self.time:             # <<<<<<<<<<<<<<
@@ -9259,18 +9572,18 @@ static PyObject *__pyx_gb_6freddi_6Freddi_6generator(__pyx_CoroutineObject *__py
  *             state = self.get_state()
  */
   while (1) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_cur_scope->__pyx_v_state), __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 451, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_cur_scope->__pyx_v_state), __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 482, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_cur_scope->__pyx_v_self), __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 451, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_cur_scope->__pyx_v_self), __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 482, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_2, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 451, __pyx_L1_error)
+    __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_2, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 482, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(1, 451, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(1, 482, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (!__pyx_t_4) break;
 
-    /* "freddi.pyx":452
+    /* "freddi.pyx":483
  *         yield state
  *         while state.t <= self.time:
  *             self.evolution.step()             # <<<<<<<<<<<<<<
@@ -9281,24 +9594,24 @@ static PyObject *__pyx_gb_6freddi_6Freddi_6generator(__pyx_CoroutineObject *__py
       __pyx_cur_scope->__pyx_v_self->evolution->step();
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(1, 452, __pyx_L1_error)
+      __PYX_ERR(1, 483, __pyx_L1_error)
     }
 
-    /* "freddi.pyx":453
+    /* "freddi.pyx":484
  *         while state.t <= self.time:
  *             self.evolution.step()
  *             state = self.get_state()             # <<<<<<<<<<<<<<
  *             yield state
  * 
  */
-    __pyx_t_3 = ((PyObject *)((struct __pyx_vtabstruct_6freddi_Freddi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_state(__pyx_cur_scope->__pyx_v_self)); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 453, __pyx_L1_error)
+    __pyx_t_3 = ((PyObject *)((struct __pyx_vtabstruct_6freddi_Freddi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_state(__pyx_cur_scope->__pyx_v_self)); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 484, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GOTREF(((PyObject *)__pyx_cur_scope->__pyx_v_state));
     __Pyx_DECREF_SET(__pyx_cur_scope->__pyx_v_state, ((struct __pyx_obj_6freddi_State *)__pyx_t_3));
     __Pyx_GIVEREF(__pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "freddi.pyx":454
+    /* "freddi.pyx":485
  *             self.evolution.step()
  *             state = self.get_state()
  *             yield state             # <<<<<<<<<<<<<<
@@ -9314,11 +9627,11 @@ static PyObject *__pyx_gb_6freddi_6Freddi_6generator(__pyx_CoroutineObject *__py
     __pyx_generator->resume_label = 2;
     return __pyx_r;
     __pyx_L7_resume_from_yield:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 454, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 485, __pyx_L1_error)
   }
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "freddi.pyx":438
+  /* "freddi.pyx":469
  *         return state_from_cpp(self.evolution.get_state())
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -9343,7 +9656,7 @@ static PyObject *__pyx_gb_6freddi_6Freddi_6generator(__pyx_CoroutineObject *__py
   return __pyx_r;
 }
 
-/* "freddi.pyx":456
+/* "freddi.pyx":487
  *             yield state
  * 
  *     def evolve(self):             # <<<<<<<<<<<<<<
@@ -9352,40 +9665,38 @@ static PyObject *__pyx_gb_6freddi_6Freddi_6generator(__pyx_CoroutineObject *__py
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6freddi_6Freddi_8evolve(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_6freddi_6Freddi_7evolve[] = "Calculate disk evolution\n\n        Returns\n        -------\n        EvolutionResults\n\n        ";
-static PyObject *__pyx_pw_6freddi_6Freddi_8evolve(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_6freddi_6Freddi_10evolve(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_6freddi_6Freddi_9evolve[] = "Calculate disk evolution\n\n        Returns\n        -------\n        EvolutionResults\n\n        ";
+static PyObject *__pyx_pw_6freddi_6Freddi_10evolve(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("evolve (wrapper)", 0);
-  __pyx_r = __pyx_pf_6freddi_6Freddi_7evolve(((struct __pyx_obj_6freddi_Freddi *)__pyx_v_self));
+  __pyx_r = __pyx_pf_6freddi_6Freddi_9evolve(((struct __pyx_obj_6freddi_Freddi *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6freddi_6Freddi_7evolve(struct __pyx_obj_6freddi_Freddi *__pyx_v_self) {
+static PyObject *__pyx_pf_6freddi_6Freddi_9evolve(struct __pyx_obj_6freddi_Freddi *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("evolve", 0);
 
-  /* "freddi.pyx":464
+  /* "freddi.pyx":495
  * 
  *         """
  *         return EvolutionResults(self)             # <<<<<<<<<<<<<<
- * 
- * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_6freddi_EvolutionResults), ((PyObject *)__pyx_v_self)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 464, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_6freddi_EvolutionResults), ((PyObject *)__pyx_v_self)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 495, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "freddi.pyx":456
+  /* "freddi.pyx":487
  *             yield state
  * 
  *     def evolve(self):             # <<<<<<<<<<<<<<
@@ -9411,19 +9722,19 @@ static PyObject *__pyx_pf_6freddi_6Freddi_7evolve(struct __pyx_obj_6freddi_Fredd
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6freddi_6Freddi_10__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_6freddi_6Freddi_10__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_6freddi_6Freddi_12__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_6freddi_6Freddi_12__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_6freddi_6Freddi_9__reduce_cython__(((struct __pyx_obj_6freddi_Freddi *)__pyx_v_self));
+  __pyx_r = __pyx_pf_6freddi_6Freddi_11__reduce_cython__(((struct __pyx_obj_6freddi_Freddi *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6freddi_6Freddi_9__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_Freddi *__pyx_v_self) {
+static PyObject *__pyx_pf_6freddi_6Freddi_11__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_Freddi *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9465,19 +9776,19 @@ static PyObject *__pyx_pf_6freddi_6Freddi_9__reduce_cython__(CYTHON_UNUSED struc
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6freddi_6Freddi_12__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static PyObject *__pyx_pw_6freddi_6Freddi_12__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_6freddi_6Freddi_14__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static PyObject *__pyx_pw_6freddi_6Freddi_14__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_6freddi_6Freddi_11__setstate_cython__(((struct __pyx_obj_6freddi_Freddi *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_6freddi_6Freddi_13__setstate_cython__(((struct __pyx_obj_6freddi_Freddi *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6freddi_6Freddi_11__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_Freddi *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_6freddi_6Freddi_13__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_Freddi *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9507,318 +9818,6 @@ static PyObject *__pyx_pf_6freddi_6Freddi_11__setstate_cython__(CYTHON_UNUSED st
   __Pyx_AddTraceback("freddi.Freddi.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "freddi.pyx":467
- * 
- * 
- * def get_freddi(**kwargs) -> Freddi:             # <<<<<<<<<<<<<<
- *     """Alternative Freddi constructor accepting astropy Quantity and str
- * 
- */
-
-/* Python wrapper */
-static struct __pyx_obj_6freddi_Freddi *__pyx_pw_6freddi_1get_freddi(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6freddi_get_freddi[] = "Alternative Freddi constructor accepting astropy Quantity and str\n\n    All physical values can be passed as `astropy.units.Quantity`, and all\n    string values can be passed as `str`. Needs `astropy` module to run\n\n    Parameters\n    ----------\n    **kwargs:\n        `Freddi` arguments\n\n    Returns\n    -------\n    Freddi\n\n    ";
-static PyMethodDef __pyx_mdef_6freddi_1get_freddi = {"get_freddi", (PyCFunction)__pyx_pw_6freddi_1get_freddi, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6freddi_get_freddi};
-static struct __pyx_obj_6freddi_Freddi *__pyx_pw_6freddi_1get_freddi(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyObject *__pyx_v_kwargs = 0;
-  struct __pyx_obj_6freddi_Freddi *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_freddi (wrapper)", 0);
-  if (unlikely(PyTuple_GET_SIZE(__pyx_args) > 0)) {
-    __Pyx_RaiseArgtupleInvalid("get_freddi", 1, 0, 0, PyTuple_GET_SIZE(__pyx_args)); return NULL;}
-  if (__pyx_kwds && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "get_freddi", 1))) return NULL;
-  __pyx_v_kwargs = (__pyx_kwds) ? PyDict_Copy(__pyx_kwds) : PyDict_New(); if (unlikely(!__pyx_v_kwargs)) return NULL;
-  __Pyx_GOTREF(__pyx_v_kwargs);
-  __pyx_r = __pyx_pf_6freddi_get_freddi(__pyx_self, __pyx_v_kwargs);
-
-  /* function exit code */
-  __Pyx_XDECREF(__pyx_v_kwargs);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static struct __pyx_obj_6freddi_Freddi *__pyx_pf_6freddi_get_freddi(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_kwargs) {
-  PyObject *__pyx_v_Quantity = NULL;
-  PyObject *__pyx_v_item = NULL;
-  PyObject *__pyx_v_value = NULL;
-  struct __pyx_obj_6freddi_Freddi *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  Py_ssize_t __pyx_t_3;
-  PyObject *(*__pyx_t_4)(PyObject *);
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *(*__pyx_t_8)(PyObject *);
-  int __pyx_t_9;
-  int __pyx_t_10;
-  __Pyx_RefNannySetupContext("get_freddi", 0);
-
-  /* "freddi.pyx":483
- * 
- *     """
- *     from astropy.units import Quantity             # <<<<<<<<<<<<<<
- * 
- *     for item, value in kwargs.items():
- */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 483, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_n_s_Quantity);
-  __Pyx_GIVEREF(__pyx_n_s_Quantity);
-  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_Quantity);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_astropy_units, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 483, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_Quantity); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 483, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_t_1);
-  __pyx_v_Quantity = __pyx_t_1;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-  /* "freddi.pyx":485
- *     from astropy.units import Quantity
- * 
- *     for item, value in kwargs.items():             # <<<<<<<<<<<<<<
- *         if isinstance(value, Quantity):
- *             kwargs[item] = value.cgs.value
- */
-  __pyx_t_2 = __Pyx_PyDict_Items(__pyx_v_kwargs); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 485, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
-    __pyx_t_1 = __pyx_t_2; __Pyx_INCREF(__pyx_t_1); __pyx_t_3 = 0;
-    __pyx_t_4 = NULL;
-  } else {
-    __pyx_t_3 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 485, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 485, __pyx_L1_error)
-  }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  for (;;) {
-    if (likely(!__pyx_t_4)) {
-      if (likely(PyList_CheckExact(__pyx_t_1))) {
-        if (__pyx_t_3 >= PyList_GET_SIZE(__pyx_t_1)) break;
-        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(1, 485, __pyx_L1_error)
-        #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 485, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_2);
-        #endif
-      } else {
-        if (__pyx_t_3 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
-        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(1, 485, __pyx_L1_error)
-        #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 485, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_2);
-        #endif
-      }
-    } else {
-      __pyx_t_2 = __pyx_t_4(__pyx_t_1);
-      if (unlikely(!__pyx_t_2)) {
-        PyObject* exc_type = PyErr_Occurred();
-        if (exc_type) {
-          if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(1, 485, __pyx_L1_error)
-        }
-        break;
-      }
-      __Pyx_GOTREF(__pyx_t_2);
-    }
-    if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
-      PyObject* sequence = __pyx_t_2;
-      Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-      if (unlikely(size != 2)) {
-        if (size > 2) __Pyx_RaiseTooManyValuesError(2);
-        else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(1, 485, __pyx_L1_error)
-      }
-      #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-      if (likely(PyTuple_CheckExact(sequence))) {
-        __pyx_t_5 = PyTuple_GET_ITEM(sequence, 0); 
-        __pyx_t_6 = PyTuple_GET_ITEM(sequence, 1); 
-      } else {
-        __pyx_t_5 = PyList_GET_ITEM(sequence, 0); 
-        __pyx_t_6 = PyList_GET_ITEM(sequence, 1); 
-      }
-      __Pyx_INCREF(__pyx_t_5);
-      __Pyx_INCREF(__pyx_t_6);
-      #else
-      __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 485, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 485, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      #endif
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    } else {
-      Py_ssize_t index = -1;
-      __pyx_t_7 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 485, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_8 = Py_TYPE(__pyx_t_7)->tp_iternext;
-      index = 0; __pyx_t_5 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_5)) goto __pyx_L5_unpacking_failed;
-      __Pyx_GOTREF(__pyx_t_5);
-      index = 1; __pyx_t_6 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_6)) goto __pyx_L5_unpacking_failed;
-      __Pyx_GOTREF(__pyx_t_6);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(1, 485, __pyx_L1_error)
-      __pyx_t_8 = NULL;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      goto __pyx_L6_unpacking_done;
-      __pyx_L5_unpacking_failed:;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_8 = NULL;
-      if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(1, 485, __pyx_L1_error)
-      __pyx_L6_unpacking_done:;
-    }
-    __Pyx_XDECREF_SET(__pyx_v_item, __pyx_t_5);
-    __pyx_t_5 = 0;
-    __Pyx_XDECREF_SET(__pyx_v_value, __pyx_t_6);
-    __pyx_t_6 = 0;
-
-    /* "freddi.pyx":486
- * 
- *     for item, value in kwargs.items():
- *         if isinstance(value, Quantity):             # <<<<<<<<<<<<<<
- *             kwargs[item] = value.cgs.value
- *             continue
- */
-    __pyx_t_9 = PyObject_IsInstance(__pyx_v_value, __pyx_v_Quantity); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(1, 486, __pyx_L1_error)
-    __pyx_t_10 = (__pyx_t_9 != 0);
-    if (__pyx_t_10) {
-
-      /* "freddi.pyx":487
- *     for item, value in kwargs.items():
- *         if isinstance(value, Quantity):
- *             kwargs[item] = value.cgs.value             # <<<<<<<<<<<<<<
- *             continue
- *         if isinstance(value, str):
- */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_value, __pyx_n_s_cgs); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 487, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_value); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 487, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(PyDict_SetItem(__pyx_v_kwargs, __pyx_v_item, __pyx_t_6) < 0)) __PYX_ERR(1, 487, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-
-      /* "freddi.pyx":488
- *         if isinstance(value, Quantity):
- *             kwargs[item] = value.cgs.value
- *             continue             # <<<<<<<<<<<<<<
- *         if isinstance(value, str):
- *             kwargs[item] = value.encode()
- */
-      goto __pyx_L3_continue;
-
-      /* "freddi.pyx":486
- * 
- *     for item, value in kwargs.items():
- *         if isinstance(value, Quantity):             # <<<<<<<<<<<<<<
- *             kwargs[item] = value.cgs.value
- *             continue
- */
-    }
-
-    /* "freddi.pyx":489
- *             kwargs[item] = value.cgs.value
- *             continue
- *         if isinstance(value, str):             # <<<<<<<<<<<<<<
- *             kwargs[item] = value.encode()
- *     return Freddi(**kwargs)
- */
-    __pyx_t_10 = PyString_Check(__pyx_v_value); 
-    __pyx_t_9 = (__pyx_t_10 != 0);
-    if (__pyx_t_9) {
-
-      /* "freddi.pyx":490
- *             continue
- *         if isinstance(value, str):
- *             kwargs[item] = value.encode()             # <<<<<<<<<<<<<<
- *     return Freddi(**kwargs)
- */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_value, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 490, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_5 = NULL;
-      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-        __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_2);
-        if (likely(__pyx_t_5)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-          __Pyx_INCREF(__pyx_t_5);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_2, function);
-        }
-      }
-      if (__pyx_t_5) {
-        __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 490, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      } else {
-        __pyx_t_6 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 490, __pyx_L1_error)
-      }
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(PyDict_SetItem(__pyx_v_kwargs, __pyx_v_item, __pyx_t_6) < 0)) __PYX_ERR(1, 490, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-
-      /* "freddi.pyx":489
- *             kwargs[item] = value.cgs.value
- *             continue
- *         if isinstance(value, str):             # <<<<<<<<<<<<<<
- *             kwargs[item] = value.encode()
- *     return Freddi(**kwargs)
- */
-    }
-
-    /* "freddi.pyx":485
- *     from astropy.units import Quantity
- * 
- *     for item, value in kwargs.items():             # <<<<<<<<<<<<<<
- *         if isinstance(value, Quantity):
- *             kwargs[item] = value.cgs.value
- */
-    __pyx_L3_continue:;
-  }
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "freddi.pyx":491
- *         if isinstance(value, str):
- *             kwargs[item] = value.encode()
- *     return Freddi(**kwargs)             # <<<<<<<<<<<<<<
- */
-  __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_6freddi_Freddi), __pyx_empty_tuple, __pyx_v_kwargs); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 491, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_r = ((struct __pyx_obj_6freddi_Freddi *)__pyx_t_1);
-  __pyx_t_1 = 0;
-  goto __pyx_L0;
-
-  /* "freddi.pyx":467
- * 
- * 
- * def get_freddi(**kwargs) -> Freddi:             # <<<<<<<<<<<<<<
- *     """Alternative Freddi constructor accepting astropy Quantity and str
- * 
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_AddTraceback("freddi.get_freddi", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_Quantity);
-  __Pyx_XDECREF(__pyx_v_item);
-  __Pyx_XDECREF(__pyx_v_value);
-  __Pyx_XGIVEREF((PyObject *)__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -26390,9 +26389,10 @@ static int __pyx_setprop_6freddi_6Freddi_Cirr(PyObject *o, PyObject *v, CYTHON_U
 }
 
 static PyMethodDef __pyx_methods_6freddi_Freddi[] = {
-  {"evolve", (PyCFunction)__pyx_pw_6freddi_6Freddi_8evolve, METH_NOARGS, __pyx_doc_6freddi_6Freddi_7evolve},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_6freddi_6Freddi_10__reduce_cython__, METH_NOARGS, 0},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_6freddi_6Freddi_12__setstate_cython__, METH_O, 0},
+  {"alt", (PyCFunction)__pyx_pw_6freddi_6Freddi_5alt, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6freddi_6Freddi_4alt},
+  {"evolve", (PyCFunction)__pyx_pw_6freddi_6Freddi_10evolve, METH_NOARGS, __pyx_doc_6freddi_6Freddi_9evolve},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_6freddi_6Freddi_12__reduce_cython__, METH_NOARGS, 0},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_6freddi_6Freddi_14__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
 };
 
@@ -26430,12 +26430,12 @@ static PyTypeObject __pyx_type_6freddi_Freddi = {
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE, /*tp_flags*/
-  "Accretion disk evolution modeller\n\n    This object is iterable, it yields `State` object on each iteration step\n\n    All parameters are keyword-only, all physical values are in CGS units.\n    See detailed description of parameters in documentation\n\n    Parameters\n    ----------\n    alpha : float, optional\n    Mx : float, optional\n    kerr : float, optional\n    Mopt : float, optional\n    period : float, optional\n    rin : float or None, optional\n    rout : float or None, optional\n    opacity : bytes, optional\n        Should be `b'Kramers'` or `b'OPAL'`\n    boundcond : bytes, optional\n        Should be `b'Teff'` or `b'Tirr'`\n    Mdotout: float, optional\n    Thot : float, optional\n    initialcond : bytes, optional\n        Should be `b'powerF'`, `b'powerSigma'`, `b'sinusF'`, `b'gaussF'` or\n        `b'quasistat'`\n    FO : float, optional\n    Mdisk0 : float, optional\n    Mdot0 : float, optional\n    powerorder : float, optional\n    gaussmu : float, optional\n    gausssigma : float, optional\n    Cirr : float, optional\n    irrfactortype : bytes, optional\n        Should be `b'const'` or `b'square'`\n    colourfactor : float, optional\n    emin : float, optional\n    emax : float, optional\n    inclination : float, optional\n        In degrees\n    distance : float, optional\n    lambda : list of float, optional\n    time : float, optional\n    tau : float, optional\n    Nx : int, optional\n    gridscale : bytes, optional\n        Should be `b'log'` or `b'linear'`\n\n    Attributes\n    ----------\n    time : float\n        Specified time\n    lambdas : numpy.ndarray\n        Specified lambdas, in cm\n    Nt : int\n        Number of evolutions steps. The number of time moments where disk\n        structure will be obtained is more by one\n\n    Methods\n    -------\n    evolve() : EvolutionResults\n        Calculate disk evolution\n\n    ", /*tp_doc*/
+  "Accretion disk evolution modeller\n\n    This object is iterable, it yields `State` object on each iteration step\n\n    All parameters are keyword-only, all physical values are in CGS units.\n    See detailed description of parameters in documentation\n\n    Parameters\n    ----------\n    alpha : float, optional\n    Mx : float, optional\n    kerr : float, optional\n    Mopt : float, optional\n    period : float, optional\n    rin : float or None, optional\n    rout : float or None, optional\n    opacity : bytes, optional\n        Should be `b'Kramers'` or `b'OPAL'`\n    boundcond : bytes, optional\n        Should be `b'Teff'` or `b'Tirr'`\n    Mdotout: float, optional\n    Thot : float, optional\n    initialcond : bytes, optional\n        Should be `b'powerF'`, `b'powerSigma'`, `b'sinusF'`, `b'gaussF'` or\n        `b'quasistat'`\n    FO : float, optional\n    Mdisk0 : float, optional\n    Mdot0 : float, optional\n    powerorder : float, optional\n    gaussmu : float, optional\n    gausssigma : float, optional\n    Cirr : float, optional\n    irrfactortype : bytes, optional\n        Should be `b'const'` or `b'square'`\n    colourfactor : float, optional\n    emin : float, optional\n    emax : float, optional\n    inclination : float, optional\n        In degrees\n    distance : float, optional\n    lambda : list of float, optional\n    time : float, optional\n    tau : float, optional\n    Nx : int, optional\n    gridscale : bytes, optional\n        Should be `b'log'` or `b'linear'`\n\n    Attributes\n    ----------\n    time : float\n        Specified time\n    lambdas : numpy.ndarray\n        Specified lambdas, in cm\n    Nt : int\n        Number of evolutions steps. The number of time moments where disk\n        structure will be obtained is more by one\n    Cirr : float\n        Irradiation factor. Can be changed via assignment operator\n\n    Methods\n    -------\n    evolve() : EvolutionResults\n        Calculate disk evolution\n    alt(**kwargs) : Freddi""\n        Alternative Freddi constructor accepting astropy Quantity and str\n\n    ", /*tp_doc*/
   0, /*tp_traverse*/
   0, /*tp_clear*/
   0, /*tp_richcompare*/
   0, /*tp_weaklistoffset*/
-  __pyx_pw_6freddi_6Freddi_5__iter__, /*tp_iter*/
+  __pyx_pw_6freddi_6Freddi_7__iter__, /*tp_iter*/
   0, /*tp_iternext*/
   __pyx_methods_6freddi_Freddi, /*tp_methods*/
   0, /*tp_members*/
@@ -27317,6 +27317,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u__69, __pyx_k__69, sizeof(__pyx_k__69), 0, 1, 0, 0},
   {&__pyx_n_s_allocate_buffer, __pyx_k_allocate_buffer, sizeof(__pyx_k_allocate_buffer), 0, 0, 1, 1},
   {&__pyx_n_s_alpha, __pyx_k_alpha, sizeof(__pyx_k_alpha), 0, 0, 1, 1},
+  {&__pyx_n_s_alt, __pyx_k_alt, sizeof(__pyx_k_alt), 0, 0, 1, 1},
   {&__pyx_n_s_args, __pyx_k_args, sizeof(__pyx_k_args), 0, 0, 1, 1},
   {&__pyx_n_s_array, __pyx_k_array, sizeof(__pyx_k_array), 0, 0, 1, 1},
   {&__pyx_n_s_asarray, __pyx_k_asarray, sizeof(__pyx_k_asarray), 0, 0, 1, 1},
@@ -27333,7 +27334,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_colourfactor, __pyx_k_colourfactor, sizeof(__pyx_k_colourfactor), 0, 0, 1, 1},
   {&__pyx_kp_s_contiguous_and_direct, __pyx_k_contiguous_and_direct, sizeof(__pyx_k_contiguous_and_direct), 0, 0, 1, 0},
   {&__pyx_kp_s_contiguous_and_indirect, __pyx_k_contiguous_and_indirect, sizeof(__pyx_k_contiguous_and_indirect), 0, 0, 1, 0},
-  {&__pyx_kp_s_cython_freddi_pyx, __pyx_k_cython_freddi_pyx, sizeof(__pyx_k_cython_freddi_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
   {&__pyx_n_s_distance, __pyx_k_distance, sizeof(__pyx_k_distance), 0, 0, 1, 1},
   {&__pyx_n_s_dtype, __pyx_k_dtype, sizeof(__pyx_k_dtype), 0, 0, 1, 1},
@@ -27355,7 +27355,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_full, __pyx_k_full, sizeof(__pyx_k_full), 0, 0, 1, 1},
   {&__pyx_n_s_gaussmu, __pyx_k_gaussmu, sizeof(__pyx_k_gaussmu), 0, 0, 1, 1},
   {&__pyx_n_s_gausssigma, __pyx_k_gausssigma, sizeof(__pyx_k_gausssigma), 0, 0, 1, 1},
-  {&__pyx_n_s_get_freddi, __pyx_k_get_freddi, sizeof(__pyx_k_get_freddi), 0, 0, 1, 1},
   {&__pyx_n_s_getstate, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
   {&__pyx_kp_s_got_differing_extents_in_dimensi, __pyx_k_got_differing_extents_in_dimensi, sizeof(__pyx_k_got_differing_extents_in_dimensi), 0, 0, 1, 0},
   {&__pyx_n_s_gridscale, __pyx_k_gridscale, sizeof(__pyx_k_gridscale), 0, 0, 1, 1},
@@ -27364,14 +27363,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_inclination, __pyx_k_inclination, sizeof(__pyx_k_inclination), 0, 0, 1, 1},
   {&__pyx_n_s_initialcond, __pyx_k_initialcond, sizeof(__pyx_k_initialcond), 0, 0, 1, 1},
   {&__pyx_n_s_irrfactortype, __pyx_k_irrfactortype, sizeof(__pyx_k_irrfactortype), 0, 0, 1, 1},
-  {&__pyx_n_s_item, __pyx_k_item, sizeof(__pyx_k_item), 0, 0, 1, 1},
   {&__pyx_n_s_items, __pyx_k_items, sizeof(__pyx_k_items), 0, 0, 1, 1},
   {&__pyx_n_s_itemsize, __pyx_k_itemsize, sizeof(__pyx_k_itemsize), 0, 0, 1, 1},
   {&__pyx_kp_s_itemsize_0_for_cython_array, __pyx_k_itemsize_0_for_cython_array, sizeof(__pyx_k_itemsize_0_for_cython_array), 0, 0, 1, 0},
   {&__pyx_n_s_iter, __pyx_k_iter, sizeof(__pyx_k_iter), 0, 0, 1, 1},
   {&__pyx_n_s_join, __pyx_k_join, sizeof(__pyx_k_join), 0, 0, 1, 1},
   {&__pyx_n_s_kerr, __pyx_k_kerr, sizeof(__pyx_k_kerr), 0, 0, 1, 1},
-  {&__pyx_n_s_kwargs, __pyx_k_kwargs, sizeof(__pyx_k_kwargs), 0, 0, 1, 1},
   {&__pyx_n_s_lambdas, __pyx_k_lambdas, sizeof(__pyx_k_lambdas), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_memview, __pyx_k_memview, sizeof(__pyx_k_memview), 0, 0, 1, 1},
@@ -27861,18 +27858,6 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__65);
   __Pyx_GIVEREF(__pyx_tuple__65);
 
-  /* "freddi.pyx":467
- * 
- * 
- * def get_freddi(**kwargs) -> Freddi:             # <<<<<<<<<<<<<<
- *     """Alternative Freddi constructor accepting astropy Quantity and str
- * 
- */
-  __pyx_tuple__70 = PyTuple_Pack(4, __pyx_n_s_kwargs, __pyx_n_s_Quantity, __pyx_n_s_item, __pyx_n_s_value); if (unlikely(!__pyx_tuple__70)) __PYX_ERR(1, 467, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__70);
-  __Pyx_GIVEREF(__pyx_tuple__70);
-  __pyx_codeobj__71 = (PyObject*)__Pyx_PyCode_New(0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__70, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_freddi_pyx, __pyx_n_s_get_freddi, 467, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__71)) __PYX_ERR(1, 467, __pyx_L1_error)
-
   /* "View.MemoryView":285
  *         return self.name
  * 
@@ -27880,9 +27865,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_tuple__72 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__72)) __PYX_ERR(0, 285, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__72);
-  __Pyx_GIVEREF(__pyx_tuple__72);
+  __pyx_tuple__70 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__70)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__70);
+  __Pyx_GIVEREF(__pyx_tuple__70);
 
   /* "View.MemoryView":286
  * 
@@ -27891,9 +27876,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_tuple__73 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__73)) __PYX_ERR(0, 286, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__73);
-  __Pyx_GIVEREF(__pyx_tuple__73);
+  __pyx_tuple__71 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__71)) __PYX_ERR(0, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__71);
+  __Pyx_GIVEREF(__pyx_tuple__71);
 
   /* "View.MemoryView":287
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -27902,9 +27887,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__74 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__74)) __PYX_ERR(0, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__74);
-  __Pyx_GIVEREF(__pyx_tuple__74);
+  __pyx_tuple__72 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__72)) __PYX_ERR(0, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__72);
+  __Pyx_GIVEREF(__pyx_tuple__72);
 
   /* "View.MemoryView":290
  * 
@@ -27913,9 +27898,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_tuple__75 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__75)) __PYX_ERR(0, 290, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__75);
-  __Pyx_GIVEREF(__pyx_tuple__75);
+  __pyx_tuple__73 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__73)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__73);
+  __Pyx_GIVEREF(__pyx_tuple__73);
 
   /* "View.MemoryView":291
  * 
@@ -27924,19 +27909,19 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__76 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__76)) __PYX_ERR(0, 291, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__76);
-  __Pyx_GIVEREF(__pyx_tuple__76);
+  __pyx_tuple__74 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__74)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__74);
+  __Pyx_GIVEREF(__pyx_tuple__74);
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_Enum(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     if __pyx_checksum != 0xb068931:
  *         from pickle import PickleError as __pyx_PickleError
  */
-  __pyx_tuple__77 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__77)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__77);
-  __Pyx_GIVEREF(__pyx_tuple__77);
-  __pyx_codeobj__78 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__77, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__78)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_tuple__75 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__75)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__75);
+  __Pyx_GIVEREF(__pyx_tuple__75);
+  __pyx_codeobj__76 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__75, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__76)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -28023,9 +28008,9 @@ static int __Pyx_modinit_type_init_code(void) {
   {
     PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_6freddi_Freddi, "__iter__"); if (unlikely(!wrapper)) __PYX_ERR(1, 280, __pyx_L1_error)
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
-      __pyx_wrapperbase_6freddi_6Freddi_4__iter__ = *((PyWrapperDescrObject *)wrapper)->d_base;
-      __pyx_wrapperbase_6freddi_6Freddi_4__iter__.doc = __pyx_doc_6freddi_6Freddi_4__iter__;
-      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_6freddi_6Freddi_4__iter__;
+      __pyx_wrapperbase_6freddi_6Freddi_6__iter__ = *((PyWrapperDescrObject *)wrapper)->d_base;
+      __pyx_wrapperbase_6freddi_6Freddi_6__iter__.doc = __pyx_doc_6freddi_6Freddi_6__iter__;
+      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_6freddi_6Freddi_6__iter__;
     }
   }
   #endif
@@ -28033,7 +28018,7 @@ static int __Pyx_modinit_type_init_code(void) {
   if (PyObject_SetAttrString(__pyx_m, "Freddi", (PyObject *)&__pyx_type_6freddi_Freddi) < 0) __PYX_ERR(1, 280, __pyx_L1_error)
   if (__Pyx_setup_reduce((PyObject*)&__pyx_type_6freddi_Freddi) < 0) __PYX_ERR(1, 280, __pyx_L1_error)
   __pyx_ptype_6freddi_Freddi = &__pyx_type_6freddi_Freddi;
-  if (PyType_Ready(&__pyx_type_6freddi___pyx_scope_struct____iter__) < 0) __PYX_ERR(1, 438, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_6freddi___pyx_scope_struct____iter__) < 0) __PYX_ERR(1, 469, __pyx_L1_error)
   __pyx_type_6freddi___pyx_scope_struct____iter__.tp_print = 0;
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_6freddi___pyx_scope_struct____iter__.tp_dictoffset && __pyx_type_6freddi___pyx_scope_struct____iter__.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_6freddi___pyx_scope_struct____iter__.tp_getattro = __Pyx_PyObject_GenericGetAttrNoDict;
@@ -28205,7 +28190,8 @@ static int __pyx_pymod_exec_freddi(PyObject *__pyx_pyinit_module)
   PyObject *__pyx_t_1 = NULL;
   int __pyx_t_2;
   std::vector<double>  __pyx_t_3;
-  static PyThread_type_lock __pyx_t_4[8];
+  PyObject *__pyx_t_4 = NULL;
+  static PyThread_type_lock __pyx_t_5[8];
   __Pyx_RefNannyDeclarations
   #if CYTHON_PEP489_MULTI_PHASE_INIT
   if (__pyx_m && __pyx_m == __pyx_pyinit_module) return 0;
@@ -28325,7 +28311,7 @@ if (!__Pyx_RefNanny) {
  */
   __pyx_t_2 = __pyx_f_5numpy_import_array(); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(1, 6, __pyx_L1_error)
 
-  /* "freddi.pyx":350
+  /* "freddi.pyx":354
  *     def __cinit__(
  *         self, *, bint cgs=True,
  *         double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt, double period=default_period, rin=None, rout=None,             # <<<<<<<<<<<<<<
@@ -28338,7 +28324,7 @@ if (!__Pyx_RefNanny) {
   __pyx_k__10 = BasicDiskBinaryArguments::default_Mopt;
   __pyx_k__11 = BasicDiskBinaryArguments::default_period;
 
-  /* "freddi.pyx":351
+  /* "freddi.pyx":355
  *         self, *, bint cgs=True,
  *         double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt, double period=default_period, rin=None, rout=None,
  *         string opacity=default_opacity, double Mdotout=default_Mdotout, string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond, double F0=default_F0, double powerorder=default_powerorder, double gaussmu=default_gaussmu, double gausssigma=default_gausssigma, Mdisk0=None, Mdot0=None,             # <<<<<<<<<<<<<<
@@ -28355,7 +28341,7 @@ if (!__Pyx_RefNanny) {
   __pyx_k__19 = DiskStructureArguments::default_gaussmu;
   __pyx_k__20 = DiskStructureArguments::default_gausssigma;
 
-  /* "freddi.pyx":352
+  /* "freddi.pyx":356
  *         double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt, double period=default_period, rin=None, rout=None,
  *         string opacity=default_opacity, double Mdotout=default_Mdotout, string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond, double F0=default_F0, double powerorder=default_powerorder, double gaussmu=default_gaussmu, double gausssigma=default_gausssigma, Mdisk0=None, Mdot0=None,
  *         double Cirr=default_Cirr, string irrfactortype=default_irrfactortype,             # <<<<<<<<<<<<<<
@@ -28365,7 +28351,7 @@ if (!__Pyx_RefNanny) {
   __pyx_k__21 = SelfIrradiationArguments::default_Cirr;
   __pyx_k__22 = SelfIrradiationArguments::default_irrfactortype;
 
-  /* "freddi.pyx":353
+  /* "freddi.pyx":357
  *         string opacity=default_opacity, double Mdotout=default_Mdotout, string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond, double F0=default_F0, double powerorder=default_powerorder, double gaussmu=default_gaussmu, double gausssigma=default_gausssigma, Mdisk0=None, Mdot0=None,
  *         double Cirr=default_Cirr, string irrfactortype=default_irrfactortype,
  *         double colourfactor=default_colourfactor, double emin=default_emin, double emax=default_emax, double inclination=default_inclination, double distance=default_distance, vector[double] lambdas=[],             # <<<<<<<<<<<<<<
@@ -28377,13 +28363,13 @@ if (!__Pyx_RefNanny) {
   __pyx_k__25 = FluxArguments::default_emax;
   __pyx_k__26 = FluxArguments::default_inclination;
   __pyx_k__27 = FluxArguments::default_distance;
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 353, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 357, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __pyx_convert_vector_from_py_double(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 353, __pyx_L1_error)
+  __pyx_t_3 = __pyx_convert_vector_from_py_double(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 357, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_k__28 = __pyx_t_3;
 
-  /* "freddi.pyx":354
+  /* "freddi.pyx":358
  *         double Cirr=default_Cirr, string irrfactortype=default_irrfactortype,
  *         double colourfactor=default_colourfactor, double emin=default_emin, double emax=default_emax, double inclination=default_inclination, double distance=default_distance, vector[double] lambdas=[],
  *         double time=default_time, double tau=default_tau, unsigned int Nx=default_Nx, string gridscale=default_gridscale, eps=None             # <<<<<<<<<<<<<<
@@ -28395,27 +28381,39 @@ if (!__Pyx_RefNanny) {
   __pyx_k__31 = CalculationArguments::default_Nx;
   __pyx_k__32 = CalculationArguments::default_gridscale;
 
-  /* "freddi.pyx":467
+  /* "freddi.pyx":408
  * 
- * 
- * def get_freddi(**kwargs) -> Freddi:             # <<<<<<<<<<<<<<
- *     """Alternative Freddi constructor accepting astropy Quantity and str
+ *     @classmethod
+ *     def alt(cls, **kwargs):             # <<<<<<<<<<<<<<
+ *         """Alternative Freddi constructor accepting astropy Quantity and str
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6freddi_1get_freddi, NULL, __pyx_n_s_freddi); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 467, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_6freddi_Freddi, __pyx_n_s_alt); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 408, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_freddi, __pyx_t_1) < 0) __PYX_ERR(1, 467, __pyx_L1_error)
+
+  /* "freddi.pyx":407
+ *         del self.evolution
+ * 
+ *     @classmethod             # <<<<<<<<<<<<<<
+ *     def alt(cls, **kwargs):
+ *         """Alternative Freddi constructor accepting astropy Quantity and str
+ */
+  __pyx_t_4 = __Pyx_Method_ClassMethod(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 407, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_6freddi_Freddi->tp_dict, __pyx_n_s_alt, __pyx_t_4) < 0) __PYX_ERR(1, 408, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  PyType_Modified(__pyx_ptype_6freddi_Freddi);
 
   /* "freddi.pyx":1
  * # distutils: language = c++             # <<<<<<<<<<<<<<
  * 
  * from cython.operator cimport dereference
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_1) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_4) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "View.MemoryView":208
  *         info.obj = self
@@ -28424,10 +28422,10 @@ if (!__Pyx_RefNanny) {
  * 
  *     def __dealloc__(array self):
  */
-  __pyx_t_1 = __pyx_capsule_create(((void *)(&__pyx_array_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem((PyObject *)__pyx_array_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_1) < 0) __PYX_ERR(0, 208, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_4 = __pyx_capsule_create(((void *)(&__pyx_array_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 208, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem((PyObject *)__pyx_array_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_4) < 0) __PYX_ERR(0, 208, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   PyType_Modified(__pyx_array_type);
 
   /* "View.MemoryView":285
@@ -28437,12 +28435,12 @@ if (!__Pyx_RefNanny) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__72, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__70, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __Pyx_XGOTREF(generic);
-  __Pyx_DECREF_SET(generic, __pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(generic, __pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_4);
+  __pyx_t_4 = 0;
 
   /* "View.MemoryView":286
  * 
@@ -28451,12 +28449,12 @@ if (!__Pyx_RefNanny) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__73, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 286, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__71, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __Pyx_XGOTREF(strided);
-  __Pyx_DECREF_SET(strided, __pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(strided, __pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_4);
+  __pyx_t_4 = 0;
 
   /* "View.MemoryView":287
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -28465,12 +28463,12 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__74, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__72, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __Pyx_XGOTREF(indirect);
-  __Pyx_DECREF_SET(indirect, __pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(indirect, __pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_4);
+  __pyx_t_4 = 0;
 
   /* "View.MemoryView":290
  * 
@@ -28479,12 +28477,12 @@ if (!__Pyx_RefNanny) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__75, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__73, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __Pyx_XGOTREF(contiguous);
-  __Pyx_DECREF_SET(contiguous, __pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(contiguous, __pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_4);
+  __pyx_t_4 = 0;
 
   /* "View.MemoryView":291
  * 
@@ -28493,12 +28491,12 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__76, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__74, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __Pyx_XGOTREF(indirect_contiguous);
-  __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_4);
+  __pyx_t_4 = 0;
 
   /* "View.MemoryView":315
  * 
@@ -28516,15 +28514,15 @@ if (!__Pyx_RefNanny) {
  *     PyThread_allocate_lock(),
  *     PyThread_allocate_lock(),
  */
-  __pyx_t_4[0] = PyThread_allocate_lock();
-  __pyx_t_4[1] = PyThread_allocate_lock();
-  __pyx_t_4[2] = PyThread_allocate_lock();
-  __pyx_t_4[3] = PyThread_allocate_lock();
-  __pyx_t_4[4] = PyThread_allocate_lock();
-  __pyx_t_4[5] = PyThread_allocate_lock();
-  __pyx_t_4[6] = PyThread_allocate_lock();
-  __pyx_t_4[7] = PyThread_allocate_lock();
-  memcpy(&(__pyx_memoryview_thread_locks[0]), __pyx_t_4, sizeof(__pyx_memoryview_thread_locks[0]) * (8));
+  __pyx_t_5[0] = PyThread_allocate_lock();
+  __pyx_t_5[1] = PyThread_allocate_lock();
+  __pyx_t_5[2] = PyThread_allocate_lock();
+  __pyx_t_5[3] = PyThread_allocate_lock();
+  __pyx_t_5[4] = PyThread_allocate_lock();
+  __pyx_t_5[5] = PyThread_allocate_lock();
+  __pyx_t_5[6] = PyThread_allocate_lock();
+  __pyx_t_5[7] = PyThread_allocate_lock();
+  memcpy(&(__pyx_memoryview_thread_locks[0]), __pyx_t_5, sizeof(__pyx_memoryview_thread_locks[0]) * (8));
 
   /* "View.MemoryView":544
  *         info.obj = self
@@ -28533,10 +28531,10 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __pyx_capsule_create(((void *)(&__pyx_memoryview_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 544, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem((PyObject *)__pyx_memoryview_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_1) < 0) __PYX_ERR(0, 544, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_4 = __pyx_capsule_create(((void *)(&__pyx_memoryview_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 544, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem((PyObject *)__pyx_memoryview_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_4) < 0) __PYX_ERR(0, 544, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   PyType_Modified(__pyx_memoryview_type);
 
   /* "View.MemoryView":990
@@ -28546,10 +28544,10 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __pyx_capsule_create(((void *)(&__pyx_memoryview_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 990, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem((PyObject *)__pyx_memoryviewslice_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_1) < 0) __PYX_ERR(0, 990, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_4 = __pyx_capsule_create(((void *)(&__pyx_memoryview_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 990, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem((PyObject *)__pyx_memoryviewslice_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_4) < 0) __PYX_ERR(0, 990, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   PyType_Modified(__pyx_memoryviewslice_type);
 
   /* "(tree fragment)":1
@@ -28557,10 +28555,10 @@ if (!__Pyx_RefNanny) {
  *     if __pyx_checksum != 0xb068931:
  *         from pickle import PickleError as __pyx_PickleError
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_15View_dot_MemoryView_1__pyx_unpickle_Enum, NULL, __pyx_n_s_View_MemoryView); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_Enum, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_4 = PyCFunction_NewEx(&__pyx_mdef_15View_dot_MemoryView_1__pyx_unpickle_Enum, NULL, __pyx_n_s_View_MemoryView); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_Enum, __pyx_t_4) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "BufferFormatFromTypeInfo":1459
  * 
@@ -28575,6 +28573,7 @@ if (!__Pyx_RefNanny) {
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_4);
   if (__pyx_m) {
     if (__pyx_d) {
       __Pyx_AddTraceback("init freddi", 0, __pyx_lineno, __pyx_filename);
@@ -29574,48 +29573,6 @@ bad:
     return -1;
 }
 
-/* WriteUnraisableException */
-        static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,
-                                  CYTHON_UNUSED int lineno, CYTHON_UNUSED const char *filename,
-                                  int full_traceback, CYTHON_UNUSED int nogil) {
-    PyObject *old_exc, *old_val, *old_tb;
-    PyObject *ctx;
-    __Pyx_PyThreadState_declare
-#ifdef WITH_THREAD
-    PyGILState_STATE state;
-    if (nogil)
-        state = PyGILState_Ensure();
-#ifdef _MSC_VER
-    else state = (PyGILState_STATE)-1;
-#endif
-#endif
-    __Pyx_PyThreadState_assign
-    __Pyx_ErrFetch(&old_exc, &old_val, &old_tb);
-    if (full_traceback) {
-        Py_XINCREF(old_exc);
-        Py_XINCREF(old_val);
-        Py_XINCREF(old_tb);
-        __Pyx_ErrRestore(old_exc, old_val, old_tb);
-        PyErr_PrintEx(1);
-    }
-    #if PY_MAJOR_VERSION < 3
-    ctx = PyString_FromString(name);
-    #else
-    ctx = PyUnicode_FromString(name);
-    #endif
-    __Pyx_ErrRestore(old_exc, old_val, old_tb);
-    if (!ctx) {
-        PyErr_WriteUnraisable(Py_None);
-    } else {
-        PyErr_WriteUnraisable(ctx);
-        Py_DECREF(ctx);
-    }
-#ifdef WITH_THREAD
-    if (nogil)
-        PyGILState_Release(state);
-#endif
-}
-
 /* KeywordStringCheck */
         static int __Pyx_CheckKeywordStrings(
     PyObject *kwdict,
@@ -29840,6 +29797,48 @@ bad:
         return __Pyx_IterFinish();
     }
     return 0;
+}
+
+/* WriteUnraisableException */
+        static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,
+                                  CYTHON_UNUSED int lineno, CYTHON_UNUSED const char *filename,
+                                  int full_traceback, CYTHON_UNUSED int nogil) {
+    PyObject *old_exc, *old_val, *old_tb;
+    PyObject *ctx;
+    __Pyx_PyThreadState_declare
+#ifdef WITH_THREAD
+    PyGILState_STATE state;
+    if (nogil)
+        state = PyGILState_Ensure();
+#ifdef _MSC_VER
+    else state = (PyGILState_STATE)-1;
+#endif
+#endif
+    __Pyx_PyThreadState_assign
+    __Pyx_ErrFetch(&old_exc, &old_val, &old_tb);
+    if (full_traceback) {
+        Py_XINCREF(old_exc);
+        Py_XINCREF(old_val);
+        Py_XINCREF(old_tb);
+        __Pyx_ErrRestore(old_exc, old_val, old_tb);
+        PyErr_PrintEx(1);
+    }
+    #if PY_MAJOR_VERSION < 3
+    ctx = PyString_FromString(name);
+    #else
+    ctx = PyUnicode_FromString(name);
+    #endif
+    __Pyx_ErrRestore(old_exc, old_val, old_tb);
+    if (!ctx) {
+        PyErr_WriteUnraisable(Py_None);
+    } else {
+        PyErr_WriteUnraisable(ctx);
+        Py_DECREF(ctx);
+    }
+#ifdef WITH_THREAD
+    if (nogil)
+        PyGILState_Release(state);
+#endif
 }
 
 /* DictGetItem */
@@ -30741,8 +30740,71 @@ bad:
     return -1;
 }
 
+/* ClassMethod */
+          static PyObject* __Pyx_Method_ClassMethod(PyObject *method) {
+#if CYTHON_COMPILING_IN_PYPY && PYPY_VERSION_NUM <= 0x05080000
+    if (PyObject_TypeCheck(method, &PyWrapperDescr_Type)) {
+        return PyClassMethod_New(method);
+    }
+#else
+#if CYTHON_COMPILING_IN_PYSTON || CYTHON_COMPILING_IN_PYPY
+    if (PyMethodDescr_Check(method)) {
+#else
+    static PyTypeObject *methoddescr_type = NULL;
+    if (methoddescr_type == NULL) {
+       PyObject *meth = PyObject_GetAttrString((PyObject*)&PyList_Type, "append");
+       if (!meth) return NULL;
+       methoddescr_type = Py_TYPE(meth);
+       Py_DECREF(meth);
+    }
+    if (__Pyx_TypeCheck(method, methoddescr_type)) {
+#endif
+        PyMethodDescrObject *descr = (PyMethodDescrObject *)method;
+        #if PY_VERSION_HEX < 0x03020000
+        PyTypeObject *d_type = descr->d_type;
+        #else
+        PyTypeObject *d_type = descr->d_common.d_type;
+        #endif
+        return PyDescr_NewClassMethod(d_type, descr->d_method);
+    }
+#endif
+    else if (PyMethod_Check(method)) {
+        return PyClassMethod_New(PyMethod_GET_FUNCTION(method));
+    }
+    else if (PyCFunction_Check(method)) {
+        return PyClassMethod_New(method);
+    }
+#ifdef __Pyx_CyFunction_USED
+    else if (__Pyx_TypeCheck(method, __pyx_CyFunctionType)) {
+        return PyClassMethod_New(method);
+    }
+#endif
+    PyErr_SetString(PyExc_TypeError,
+                   "Class-level classmethod() can only be called on "
+                   "a method_descriptor or instance method.");
+    return NULL;
+}
+
+/* GetNameInClass */
+            static PyObject *__Pyx_GetGlobalNameAfterAttributeLookup(PyObject *name) {
+    __Pyx_PyThreadState_declare
+    __Pyx_PyThreadState_assign
+    if (unlikely(!__Pyx_PyErr_ExceptionMatches(PyExc_AttributeError)))
+        return NULL;
+    __Pyx_PyErr_Clear();
+    return __Pyx_GetModuleGlobalName(name);
+}
+static PyObject *__Pyx_GetNameInClass(PyObject *nmspace, PyObject *name) {
+    PyObject *result;
+    result = __Pyx_PyObject_GetAttrStr(nmspace, name);
+    if (!result) {
+        result = __Pyx_GetGlobalNameAfterAttributeLookup(name);
+    }
+    return result;
+}
+
 /* CLineInTraceback */
-          #ifndef CYTHON_CLINE_IN_TRACEBACK
+            #ifndef CYTHON_CLINE_IN_TRACEBACK
 static int __Pyx_CLineForTraceback(CYTHON_UNUSED PyThreadState *tstate, int c_line) {
     PyObject *use_cline;
     PyObject *ptype, *pvalue, *ptraceback;
@@ -30782,7 +30844,7 @@ static int __Pyx_CLineForTraceback(CYTHON_UNUSED PyThreadState *tstate, int c_li
 #endif
 
 /* CodeObjectCache */
-          static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {
+            static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {
     int start = 0, mid = 0, end = count - 1;
     if (end >= 0 && code_line > entries[end].code_line) {
         return count;
@@ -30862,7 +30924,7 @@ static void __pyx_insert_code_object(int code_line, PyCodeObject* code_object) {
 }
 
 /* AddTraceback */
-          #include "compile.h"
+            #include "compile.h"
 #include "frameobject.h"
 #include "traceback.h"
 static PyCodeObject* __Pyx_CreateCodeObjectForTraceback(
@@ -30970,8 +31032,8 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
 #endif
 
 
-          /* MemviewSliceIsContig */
-          static int
+            /* MemviewSliceIsContig */
+            static int
 __pyx_memviewslice_is_contig(const __Pyx_memviewslice mvs, char order, int ndim)
 {
     int i, index, step, start;
@@ -30993,7 +31055,7 @@ __pyx_memviewslice_is_contig(const __Pyx_memviewslice mvs, char order, int ndim)
 }
 
 /* OverlappingSlices */
-          static void
+            static void
 __pyx_get_array_memory_extents(__Pyx_memviewslice *slice,
                                void **out_start, void **out_end,
                                int ndim, size_t itemsize)
@@ -31029,7 +31091,7 @@ __pyx_slices_overlap(__Pyx_memviewslice *slice1,
 }
 
 /* Capsule */
-          static CYTHON_INLINE PyObject *
+            static CYTHON_INLINE PyObject *
 __pyx_capsule_create(void *p, CYTHON_UNUSED const char *sig)
 {
     PyObject *cobj;
@@ -31042,7 +31104,7 @@ __pyx_capsule_create(void *p, CYTHON_UNUSED const char *sig)
 }
 
 /* CIntFromPyVerify */
-          #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
+            #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
     __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
 #define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
     __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
@@ -31064,7 +31126,7 @@ __pyx_capsule_create(void *p, CYTHON_UNUSED const char *sig)
     }
 
 /* CIntToPy */
-          static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_int(unsigned int value) {
+            static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_int(unsigned int value) {
     const unsigned int neg_one = (unsigned int) -1, const_zero = (unsigned int) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -31095,12 +31157,12 @@ __pyx_capsule_create(void *p, CYTHON_UNUSED const char *sig)
 }
 
 /* MemviewDtypeToObject */
-          static CYTHON_INLINE PyObject *__pyx_memview_get_double__const__(const char *itemp) {
+            static CYTHON_INLINE PyObject *__pyx_memview_get_double__const__(const char *itemp) {
     return (PyObject *) PyFloat_FromDouble(*(double const  *) itemp);
 }
 
 /* MemviewObjectToObject */
-          static PyObject *__pyx_memview_get_object(const char *itemp) {
+            static PyObject *__pyx_memview_get_object(const char *itemp) {
     PyObject *result = *(PyObject **) itemp;
     Py_INCREF(result);
     return result;
@@ -31113,7 +31175,7 @@ static int __pyx_memview_set_object(const char *itemp, PyObject *obj) {
 }
 
 /* Declarations */
-          #if CYTHON_CCOMPLEX
+            #if CYTHON_CCOMPLEX
   #ifdef __cplusplus
     static CYTHON_INLINE __pyx_t_float_complex __pyx_t_float_complex_from_parts(float x, float y) {
       return ::std::complex< float >(x, y);
@@ -31133,7 +31195,7 @@ static int __pyx_memview_set_object(const char *itemp, PyObject *obj) {
 #endif
 
 /* Arithmetic */
-          #if CYTHON_CCOMPLEX
+            #if CYTHON_CCOMPLEX
 #else
     static CYTHON_INLINE int __Pyx_c_eq_float(__pyx_t_float_complex a, __pyx_t_float_complex b) {
        return (a.real == b.real) && (a.imag == b.imag);
@@ -31268,7 +31330,7 @@ static int __pyx_memview_set_object(const char *itemp, PyObject *obj) {
 #endif
 
 /* Declarations */
-          #if CYTHON_CCOMPLEX
+            #if CYTHON_CCOMPLEX
   #ifdef __cplusplus
     static CYTHON_INLINE __pyx_t_double_complex __pyx_t_double_complex_from_parts(double x, double y) {
       return ::std::complex< double >(x, y);
@@ -31288,7 +31350,7 @@ static int __pyx_memview_set_object(const char *itemp, PyObject *obj) {
 #endif
 
 /* Arithmetic */
-          #if CYTHON_CCOMPLEX
+            #if CYTHON_CCOMPLEX
 #else
     static CYTHON_INLINE int __Pyx_c_eq_double(__pyx_t_double_complex a, __pyx_t_double_complex b) {
        return (a.real == b.real) && (a.imag == b.imag);
@@ -31423,7 +31485,7 @@ static int __pyx_memview_set_object(const char *itemp, PyObject *obj) {
 #endif
 
 /* CIntToPy */
-          static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
+            static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
     const int neg_one = (int) -1, const_zero = (int) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -31454,7 +31516,7 @@ static int __pyx_memview_set_object(const char *itemp, PyObject *obj) {
 }
 
 /* CIntToPy */
-          static CYTHON_INLINE PyObject* __Pyx_PyInt_From_enum__NPY_TYPES(enum NPY_TYPES value) {
+            static CYTHON_INLINE PyObject* __Pyx_PyInt_From_enum__NPY_TYPES(enum NPY_TYPES value) {
     const enum NPY_TYPES neg_one = (enum NPY_TYPES) -1, const_zero = (enum NPY_TYPES) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -31485,7 +31547,7 @@ static int __pyx_memview_set_object(const char *itemp, PyObject *obj) {
 }
 
 /* MemviewSliceCopyTemplate */
-          static __Pyx_memviewslice
+            static __Pyx_memviewslice
 __pyx_memoryview_copy_new_contig(const __Pyx_memviewslice *from_mvs,
                                  const char *mode, int ndim,
                                  size_t sizeof_dtype, int contig_flag,
@@ -31552,7 +31614,7 @@ no_fail:
 }
 
 /* TypeInfoToFormat */
-          static struct __pyx_typeinfo_string __Pyx_TypeInfoToFormat(__Pyx_TypeInfo *type) {
+            static struct __pyx_typeinfo_string __Pyx_TypeInfoToFormat(__Pyx_TypeInfo *type) {
     struct __pyx_typeinfo_string result = { {0} };
     char *buf = (char *) result.string;
     size_t size = type->size;
@@ -31596,7 +31658,7 @@ no_fail:
 }
 
 /* CIntFromPy */
-          static CYTHON_INLINE unsigned int __Pyx_PyInt_As_unsigned_int(PyObject *x) {
+            static CYTHON_INLINE unsigned int __Pyx_PyInt_As_unsigned_int(PyObject *x) {
     const unsigned int neg_one = (unsigned int) -1, const_zero = (unsigned int) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -31785,7 +31847,7 @@ raise_neg_overflow:
 }
 
 /* CIntFromPy */
-          static CYTHON_INLINE size_t __Pyx_PyInt_As_size_t(PyObject *x) {
+            static CYTHON_INLINE size_t __Pyx_PyInt_As_size_t(PyObject *x) {
     const size_t neg_one = (size_t) -1, const_zero = (size_t) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -31974,7 +32036,7 @@ raise_neg_overflow:
 }
 
 /* CIntFromPy */
-          static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *x) {
+            static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *x) {
     const long neg_one = (long) -1, const_zero = (long) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -32163,7 +32225,7 @@ raise_neg_overflow:
 }
 
 /* CIntFromPy */
-          static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
+            static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
     const int neg_one = (int) -1, const_zero = (int) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -32352,7 +32414,7 @@ raise_neg_overflow:
 }
 
 /* CIntToPy */
-          static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
+            static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
     const long neg_one = (long) -1, const_zero = (long) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -32383,7 +32445,7 @@ raise_neg_overflow:
 }
 
 /* CIntFromPy */
-          static CYTHON_INLINE char __Pyx_PyInt_As_char(PyObject *x) {
+            static CYTHON_INLINE char __Pyx_PyInt_As_char(PyObject *x) {
     const char neg_one = (char) -1, const_zero = (char) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -32572,7 +32634,7 @@ raise_neg_overflow:
 }
 
 /* IsLittleEndian */
-          static CYTHON_INLINE int __Pyx_Is_Little_Endian(void)
+            static CYTHON_INLINE int __Pyx_Is_Little_Endian(void)
 {
   union {
     uint32_t u32;
@@ -32583,7 +32645,7 @@ raise_neg_overflow:
 }
 
 /* BufferFormatCheck */
-          static void __Pyx_BufFmt_Init(__Pyx_BufFmt_Context* ctx,
+            static void __Pyx_BufFmt_Init(__Pyx_BufFmt_Context* ctx,
                               __Pyx_BufFmt_StackElem* stack,
                               __Pyx_TypeInfo* type) {
   stack[0].field = &ctx->root;
@@ -33085,7 +33147,7 @@ static const char* __Pyx_BufFmt_CheckString(__Pyx_BufFmt_Context* ctx, const cha
 }
 
 /* TypeInfoCompare */
-            static int
+              static int
 __pyx_typeinfo_cmp(__Pyx_TypeInfo *a, __Pyx_TypeInfo *b)
 {
     int i;
@@ -33126,7 +33188,7 @@ __pyx_typeinfo_cmp(__Pyx_TypeInfo *a, __Pyx_TypeInfo *b)
 }
 
 /* MemviewSliceValidateAndInit */
-            static int
+              static int
 __pyx_check_strides(Py_buffer *buf, int dim, int ndim, int spec)
 {
     if (buf->shape[dim] <= 1)
@@ -33308,7 +33370,7 @@ no_fail:
 }
 
 /* ObjectToMemviewSlice */
-            static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_object(PyObject *obj, int writable_flag) {
+              static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_object(PyObject *obj, int writable_flag) {
     __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
     __Pyx_BufFmt_StackElem stack[1];
     int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
@@ -33331,7 +33393,7 @@ __pyx_fail:
 }
 
 /* FetchCommonType */
-            static PyTypeObject* __Pyx_FetchCommonType(PyTypeObject* type) {
+              static PyTypeObject* __Pyx_FetchCommonType(PyTypeObject* type) {
     PyObject* fake_module;
     PyTypeObject* cached_type = NULL;
     fake_module = PyImport_AddModule((char*) "_cython_" CYTHON_ABI);
@@ -33370,7 +33432,7 @@ bad:
 }
 
 /* PyObjectCallMethod1 */
-            static PyObject* __Pyx__PyObject_CallMethod1(PyObject* method, PyObject* arg) {
+              static PyObject* __Pyx__PyObject_CallMethod1(PyObject* method, PyObject* arg) {
     PyObject *result = NULL;
 #if CYTHON_UNPACK_METHODS
     if (likely(PyMethod_Check(method))) {
@@ -33421,7 +33483,7 @@ static PyObject* __Pyx_PyObject_CallMethod1(PyObject* obj, PyObject* method_name
 }
 
 /* CoroutineBase */
-            #include <structmember.h>
+              #include <structmember.h>
 #include <frameobject.h>
 #define __Pyx_Coroutine_Undelegate(gen) Py_CLEAR((gen)->yieldfrom)
 static int __Pyx_PyGen__FetchStopIterationValue(CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject **pvalue) {
@@ -34133,7 +34195,7 @@ static __pyx_CoroutineObject *__Pyx__Coroutine_NewInit(
 }
 
 /* PatchModuleWithCoroutine */
-                static PyObject* __Pyx_Coroutine_patch_module(PyObject* module, const char* py_code) {
+                  static PyObject* __Pyx_Coroutine_patch_module(PyObject* module, const char* py_code) {
 #if defined(__Pyx_Generator_USED) || defined(__Pyx_Coroutine_USED)
     int result;
     PyObject *globals, *result_obj;
@@ -34173,7 +34235,7 @@ ignore:
 }
 
 /* PatchGeneratorABC */
-                #ifndef CYTHON_REGISTER_ABCS
+                  #ifndef CYTHON_REGISTER_ABCS
 #define CYTHON_REGISTER_ABCS 1
 #endif
 #if defined(__Pyx_Generator_USED) || defined(__Pyx_Coroutine_USED)
@@ -34230,7 +34292,7 @@ static int __Pyx_patch_abc(void) {
 }
 
 /* Generator */
-                static PyMethodDef __pyx_Generator_methods[] = {
+                  static PyMethodDef __pyx_Generator_methods[] = {
     {"send", (PyCFunction) __Pyx_Coroutine_Send, METH_O,
      (char*) PyDoc_STR("send(arg) -> send 'arg' into generator,\nreturn next yielded value or raise StopIteration.")},
     {"throw", (PyCFunction) __Pyx_Coroutine_Throw, METH_VARARGS,
@@ -34322,7 +34384,7 @@ static int __pyx_Generator_init(void) {
 }
 
 /* CheckBinaryVersion */
-                static int __Pyx_check_binary_version(void) {
+                  static int __Pyx_check_binary_version(void) {
     char ctversion[4], rtversion[4];
     PyOS_snprintf(ctversion, 4, "%d.%d", PY_MAJOR_VERSION, PY_MINOR_VERSION);
     PyOS_snprintf(rtversion, 4, "%s", Py_GetVersion());
@@ -34338,7 +34400,7 @@ static int __pyx_Generator_init(void) {
 }
 
 /* ModuleImport */
-                #ifndef __PYX_HAVE_RT_ImportModule
+                  #ifndef __PYX_HAVE_RT_ImportModule
 #define __PYX_HAVE_RT_ImportModule
 static PyObject *__Pyx_ImportModule(const char *name) {
     PyObject *py_name = 0;
@@ -34356,7 +34418,7 @@ bad:
 #endif
 
 /* TypeImport */
-                #ifndef __PYX_HAVE_RT_ImportType
+                  #ifndef __PYX_HAVE_RT_ImportType
 #define __PYX_HAVE_RT_ImportType
 static PyTypeObject *__Pyx_ImportType(const char *module_name, const char *class_name,
     size_t size, int strict)
@@ -34421,7 +34483,7 @@ bad:
 #endif
 
 /* InitStrings */
-                static int __Pyx_InitStrings(__Pyx_StringTabEntry *t) {
+                  static int __Pyx_InitStrings(__Pyx_StringTabEntry *t) {
     while (t->p) {
         #if PY_MAJOR_VERSION < 3
         if (t->is_unicode) {

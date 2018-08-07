@@ -334,11 +334,15 @@ cdef class Freddi:
     Nt : int
         Number of evolutions steps. The number of time moments where disk
         structure will be obtained is more by one
+    Cirr : float
+        Irradiation factor. Can be changed via assignment operator
 
     Methods
     -------
     evolve() : EvolutionResults
         Calculate disk evolution
+    alt(**kwargs) : Freddi
+        Alternative Freddi constructor accepting astropy Quantity and str
 
     """
 
@@ -399,6 +403,33 @@ cdef class Freddi:
     def __dealloc__(self):
         del self.args
         del self.evolution
+
+    @classmethod
+    def alt(cls, **kwargs):
+        """Alternative Freddi constructor accepting astropy Quantity and str
+
+        All physical values can be passed as `astropy.units.Quantity`, and all
+        string values can be passed as `str`. Needs `astropy` module to run
+
+        Parameters
+        ----------
+        **kwargs :
+            `Freddi` arguments
+
+        Returns
+        -------
+        Freddi
+
+        """
+        from astropy.units import Quantity
+
+        for item, value in kwargs.items():
+            if isinstance(value, Quantity):
+                kwargs[item] = value.cgs.value
+                continue
+            if isinstance(value, str):
+                kwargs[item] = value.encode()
+        return cls(**kwargs)
 
     @property
     def time(self) -> double:
@@ -462,30 +493,3 @@ cdef class Freddi:
 
         """
         return EvolutionResults(self)
-
-
-def get_freddi(**kwargs) -> Freddi:
-    """Alternative Freddi constructor accepting astropy Quantity and str
-
-    All physical values can be passed as `astropy.units.Quantity`, and all
-    string values can be passed as `str`. Needs `astropy` module to run
-
-    Parameters
-    ----------
-    **kwargs:
-        `Freddi` arguments
-
-    Returns
-    -------
-    Freddi
-
-    """
-    from astropy.units import Quantity
-
-    for item, value in kwargs.items():
-        if isinstance(value, Quantity):
-            kwargs[item] = value.cgs.value
-            continue
-        if isinstance(value, str):
-            kwargs[item] = value.encode()
-    return Freddi(**kwargs)
