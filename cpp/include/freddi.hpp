@@ -36,8 +36,8 @@ private:
 	const double xi_pow_minus_7_2;
 	const double P_acc = 0.002;
 	const double R_cor;
-	double mu_magn;
-	double R_dead;
+	double mu_magn = 0;
+	double R_dead = 0;
 private:
 	std::unique_ptr<FreddiState> state_;
 private:
