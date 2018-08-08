@@ -30,7 +30,7 @@ public:
 // TODO: move to arguments
 private:
 	const double X_R = 1.;
-	const double F_dead = 4e31;
+	const double F_dead = 0;  // 4e31;
 	const double k_t = 1. / 3.;
 	const double xi = 0.7;
 	const double xi_pow_minus_7_2;
