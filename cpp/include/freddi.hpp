@@ -4,6 +4,8 @@
 #include <functional>  // bind, function
 #include <vector>
 
+#include <boost/optional.hpp>
+
 #include "arguments.hpp"
 #include "spectrum.hpp"
 
@@ -27,8 +29,7 @@ public:
 private:
 	std::unique_ptr<FreddiState> state_;
 private:
-	FreddiState initializeState();
-	void calculateRadialStructure();
+	FreddiState initializeState() const;
 	void truncateOuterRadius();
 protected:
 	vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;
@@ -38,7 +39,7 @@ public:
 	void step(double tau);
 	inline void step() { return step(args->calc->tau); }
 	std::vector<FreddiState> evolve();
-	inline const FreddiState& get_state() const { return *state_; }
+	inline FreddiState& get_state() { return *state_; }
 };
 
 
@@ -48,62 +49,61 @@ private:
 	const FreddiEvolution* freddi;
 public:
 	FreddiState(const FreddiEvolution* freddi);
+	FreddiState(const FreddiState&, double tau);
 	FreddiState(const FreddiState&) = default;
 	FreddiState(FreddiState&&) = default;
 	FreddiState& operator=(const FreddiState&) = default;
 	FreddiState& operator=(FreddiState&&) = delete;
 	friend FreddiEvolution;
 private:
-	double Mdot_in = 0;
-	double Mdot_out = 0;
-	double Lx;
-	double t = 0;
-	size_t i_t = 0;
-	size_t Nx;
-	vecd h;
-	vecd R;
-	vecd F;
-	vecd W;
-	vecd Tph;
-	vecd Tph_vis;
-	vecd Tph_X;
-	vecd Tirr;
-	vecd Cirr;
-	vecd Sigma;
-	vecd Height;
+	double Mdot_out_ = 0;
+	double t_ = 0;
+	size_t i_t_ = 0;
+	size_t Nx_;
+	vecd h_, R_;
+	vecd F_;
 public:
-	inline double get_Mdot_in() const { return Mdot_in; }
-	inline double get_Mdot_out() const { return Mdot_out; }
-	inline double get_Lx() const { return Lx; }
-	inline double get_t() const { return t; }
-	inline size_t get_i_t() const { return i_t; };
-	inline size_t get_Nx() const { return Nx; }
-	inline const vecd& get_h() const { return h; }
-	inline const vecd& get_R() const { return R; }
-	inline const vecd& get_F() const { return F; }
-	inline const vecd& get_W() const { return W; }
-	inline const vecd& get_Tph() const { return Tph; }
-	inline const vecd& get_Tph_vis() const { return Tph_vis; }
-	inline const vecd& get_Tirr() const { return Tirr; }
-	inline const vecd& get_Cirr() const { return Cirr; }
-	inline const vecd& get_Sigma() const { return Sigma; }
-	inline const vecd& get_Height() const { return Height; }
-	inline const double magnitude(double lambda, double F0) const {
-		return -2.5 * log10( I_lambda(R, Tph, lambda) * freddi->cosiOverD2 / F0 );
-	}
-	inline double flux(double lambda) const {
-		return I_lambda(R, Tph, lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * freddi->cosiOverD2;
-	}
-	inline double mU() const { return magnitude(lambdaU, irr0U); }
-	inline double mB() const { return magnitude(lambdaB, irr0B); }
-	inline double mV() const { return magnitude(lambdaV, irr0V); }
-	inline double mR() const { return magnitude(lambdaR, irr0R); }
-	inline double mI() const { return magnitude(lambdaI, irr0I); }
-	inline double mJ() const { return magnitude(lambdaJ, irr0J); }
-	double integrate(const vecd& values) const;
-	inline double Mdisk() const { return integrate(Sigma); }
+	inline double Mdot_in() const { return (F()[1] - F()[0]) / (h()[1] - h()[0]); }
+	inline double Mdot_out() const { return Mdot_out_; }
+	inline const vecd& h() const { return h_; }
+	inline const vecd& R() const { return R_; }
+	inline const vecd& F() const { return F_; }
+	inline double t() const { return t_; }
+	inline size_t i_t() const { return i_t_; };
+	inline size_t Nx() const { return Nx_; }
 private:
-	void increase_t(double tau);
+	boost::optional<double> Mdisk_;
+	boost::optional<double> Lx_;
+	boost::optional<double> mU_, mB_, mV_, mR_, mI_, mJ_;
+	boost::optional<vecd> W_, Tph_, Qx_, Tph_vis_, Tph_X_, Tirr_, Cirr_, Sigma_, Height_;
+private:
+	double lazy_magnitude(boost::optional<double>& m, double lambda, double F0);
+	double lazy_integrate(boost::optional<double>& x, const vecd& values);
+	const vecd& Tph_X();
+	const vecd& Qx();
+public:
+	double Lx();
+	const vecd& W();
+	const vecd& Sigma();
+	const vecd& Tph();
+	const vecd& Tph_vis();
+	const vecd& Tirr();
+	const vecd& Cirr();
+	const vecd& Height();
+	inline double magnitude(double lambda, double F0) {
+		return -2.5 * log10( I_lambda(R(), Tph(), lambda) * freddi->cosiOverD2 / F0 );
+	}
+	inline double flux(double lambda) {
+		return I_lambda(R(), Tph(), lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * freddi->cosiOverD2;
+	}
+	inline double mU() { return lazy_magnitude(mU_, lambdaU, irr0U); }
+	inline double mB() { return lazy_magnitude(mB_, lambdaB, irr0B); }
+	inline double mV() { return lazy_magnitude(mV_, lambdaV, irr0V); }
+	inline double mR() { return lazy_magnitude(mR_, lambdaR, irr0R); }
+	inline double mI() { return lazy_magnitude(mI_, lambdaI, irr0I); }
+	inline double mJ() { return lazy_magnitude(mJ_, lambdaJ, irr0J); }
+	double integrate(const vecd& values) const;
+	inline double Mdisk() { return lazy_integrate(Mdisk_, Sigma()); }
 };
 
 #endif //FREDDI_FREDDI_HPP
