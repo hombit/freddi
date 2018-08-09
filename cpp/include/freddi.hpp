@@ -29,7 +29,6 @@ public:
 private:
 	std::unique_ptr<FreddiState> state_;
 private:
-	FreddiState initializeState() const;
 	void truncateOuterRadius();
 protected:
 	vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;

@@ -22,58 +22,7 @@ FreddiEvolution::FreddiEvolution(const FreddiArguments &args_):
 		cosiOverD2(std::cos(args_.flux->inclination / 180 * M_PI) / (args_.flux->distance * args_.flux->distance)),
 		oprel(args_.disk->oprel.get()),
 		wunc(std::bind(&FreddiEvolution::wunction, this, _1, _2, _3, _4)),
-		state_(new FreddiState(initializeState())) {}
-
-FreddiState FreddiEvolution::initializeState() const {
-	FreddiState state(this);
-
-	state.Mdot_out_ = args->disk->Mdotout;
-
-	const double h_in = args->basic->h(args->basic->rin);
-	const double h_out = args->basic->h(args->basic->rout);
-
-	for (int i = 0; i < state.Nx_; ++i) {
-		if (args->calc->gridscale == "log") {
-			state.h_[i] = h_in * pow(h_out / h_in, i / (state.Nx_ - 1.));
-		} else if (args->calc->gridscale == "linear") {
-			state.h_[i] = h_in + (h_out - h_in) * i / (state.Nx_ - 1.);
-		} else {
-			throw std::logic_error("Wrong gridscale");
-		}
-		state.R_[i] = state.h_[i] * state.h_[i] / GM;
-	}
-
-	if (args->disk->initialcond == "power" or args->disk->initialcond == "powerF") {
-		for (size_t i = 0; i < state.Nx_; ++i) {
-			state.F_[i] = args->disk->F0 * pow((state.h_[i] - h_in) / (h_out - h_in), args->disk->powerorder);
-		}
-	} else if (args->disk->initialcond == "powerSigma") {
-		for (size_t i = 0; i < state.Nx_; ++i) {
-			const double Sigma_to_Sigmaout = pow((state.h_[i] - h_in) / (h_out - h_in), args->disk->powerorder);
-			state.F_[i] = args->disk->F0 * pow(state.h_[i] / h_out, (3. - oprel->n) / (1. - oprel->m)) *
-						 pow(Sigma_to_Sigmaout, 1. / (1. - oprel->m));
-		}
-	} else if (args->disk->initialcond == "sinusF" || args->disk->initialcond == "sinus") {
-		for (size_t i = 0; i < state.Nx_; ++i){
-			state.F_[i] = args->disk->F0 * sin((state.h_[i] - h_in) / (h_out - h_in) * M_PI_2);
-		}
-	} else if (args->disk->initialcond == "quasistat") {
-		for (size_t i = 0; i < state.Nx_; ++i) {
-			const double xi_LS2000 = state.h_[i] / h_out;
-			state.F_[i] = args->disk->F0 * oprel->f_F(xi_LS2000) * (1. - h_in / state.h_[i]) / (1. - h_in / h_out);
-		}
-	} else if (args->disk->initialcond == "gaussF") {
-		for (int i = 0; i < state.Nx_; ++i) {
-			const double xi = (state.h_[i] - h_in) / (h_out - h_in);
-			state.F_[i] = args->disk->F0 * exp(-(xi - args->disk->gaussmu) * (xi - args->disk->gaussmu) /
-										(2. * args->disk->gausssigma * args->disk->gausssigma));
-		}
-	} else {
-		throw std::logic_error("Wrong initialcond");
-	}
-
-	return state;
-}
+		state_(new FreddiState(this)) {}
 
 
 void FreddiEvolution::step(const double tau) {
@@ -157,7 +106,54 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 		Nx_(freddi->args->calc->Nx),
 		h_(Nx_),
 		R_(Nx_),
-		F_(Nx_) {}
+		F_(Nx_),
+		Mdot_out_(freddi->args->disk->Mdotout) {
+	const auto args = freddi->args;
+	const auto oprel = freddi->oprel;
+
+	const double h_in = args->basic->h(args->basic->rin);
+	const double h_out = args->basic->h(args->basic->rout);
+
+	for (int i = 0; i < Nx_; ++i) {
+		if (args->calc->gridscale == "log") {
+			h_[i] = h_in * pow(h_out / h_in, i / (Nx_ - 1.));
+		} else if (args->calc->gridscale == "linear") {
+			h_[i] = h_in + (h_out - h_in) * i / (Nx_ - 1.);
+		} else {
+			throw std::logic_error("Wrong gridscale");
+		}
+		R_[i] = h_[i] * h_[i] / freddi->GM;
+	}
+
+	if (args->disk->initialcond == "power" or args->disk->initialcond == "powerF") {
+		for (size_t i = 0; i < Nx_; ++i) {
+			F_[i] = args->disk->F0 * pow((h_[i] - h_in) / (h_out - h_in), args->disk->powerorder);
+		}
+	} else if (args->disk->initialcond == "powerSigma") {
+		for (size_t i = 0; i < Nx_; ++i) {
+			const double Sigma_to_Sigmaout = pow((h_[i] - h_in) / (h_out - h_in), args->disk->powerorder);
+			F_[i] = args->disk->F0 * pow(h_[i] / h_out, (3. - oprel->n) / (1. - oprel->m)) *
+						  pow(Sigma_to_Sigmaout, 1. / (1. - oprel->m));
+		}
+	} else if (args->disk->initialcond == "sinusF" || args->disk->initialcond == "sinus") {
+		for (size_t i = 0; i < Nx_; ++i){
+			F_[i] = args->disk->F0 * sin((h_[i] - h_in) / (h_out - h_in) * M_PI_2);
+		}
+	} else if (args->disk->initialcond == "quasistat") {
+		for (size_t i = 0; i < Nx_; ++i) {
+			const double xi_LS2000 = h_[i] / h_out;
+			F_[i] = args->disk->F0 * oprel->f_F(xi_LS2000) * (1. - h_in / h_[i]) / (1. - h_in / h_out);
+		}
+	} else if (args->disk->initialcond == "gaussF") {
+		for (int i = 0; i < Nx_; ++i) {
+			const double xi = (h_[i] - h_in) / (h_out - h_in);
+			F_[i] = args->disk->F0 * exp(-(xi - args->disk->gaussmu) * (xi - args->disk->gaussmu) /
+											   (2. * args->disk->gausssigma * args->disk->gausssigma));
+		}
+	} else {
+		throw std::logic_error("Wrong initialcond");
+	}
+}
 
 
 FreddiState::FreddiState(const FreddiState& other, const double tau):
