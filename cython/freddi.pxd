@@ -6,22 +6,22 @@ from libcpp.vector cimport vector
 cdef extern from 'freddi.hpp':
     cdef cppclass FreddiState:
         FreddiState(const FreddiState&)
-        double get_Mdot_in()
-        double get_Mdot_out()
-        double get_Lx()
-        double get_t()
-        size_t get_i_t()
-        unsigned int get_Nx()
-        const vector[double]& get_h() 
-        const vector[double]& get_R() 
-        const vector[double]& get_F() 
-        const vector[double]& get_W() 
-        const vector[double]& get_Tph() 
-        const vector[double]& get_Tph_vis() 
-        const vector[double]& get_Tirr()
-        const vector[double]& get_Cirr() 
-        const vector[double]& get_Sigma() 
-        const vector[double]& get_Height() 
+        double Mdot_in()
+        double Mdot_out()
+        double Lx()
+        double t()
+        size_t i_t()
+        size_t Nx()
+        const vector[double]& h()
+        const vector[double]& R()
+        const vector[double]& F()
+        const vector[double]& W()
+        const vector[double]& Tph()
+        const vector[double]& Tph_vis()
+        const vector[double]& Tirr()
+        const vector[double]& Cirr()
+        const vector[double]& Sigma()
+        const vector[double]& Height()
         double flux(double)
         double mU() 
         double mB() 
@@ -35,7 +35,7 @@ cdef extern from 'freddi.hpp':
         void step() except +
         void step(double) except +
         vector[FreddiState] evolve() except +
-        const FreddiState& get_state()
+        FreddiState& state()
         size_t Nt
 
 

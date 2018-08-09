@@ -1281,7 +1281,7 @@ struct __pyx_obj_6freddi_Freddi {
 
 
 /* "freddi.pyx":469
- *         return state_from_cpp(self.evolution.get_state())
+ *         return state_from_cpp(self.evolution.state())
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
  *         """Iterate disk over time
@@ -2048,9 +2048,6 @@ static int __pyx_slices_overlap(__Pyx_memviewslice *slice1,
 
 /* Capsule.proto */
 static CYTHON_INLINE PyObject *__pyx_capsule_create(void *p, const char *sig);
-
-/* CIntToPy.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_int(unsigned int value);
 
 /* MemviewDtypeToObject.proto */
 static CYTHON_INLINE PyObject *__pyx_memview_get_double__const__(const char *itemp);
@@ -3061,7 +3058,7 @@ static void __pyx_pf_6freddi_5State___dealloc__(struct __pyx_obj_6freddi_State *
  * 
  *     @property
  *     def Mdot_in(self) -> double:             # <<<<<<<<<<<<<<
- *        return self.cpp_state.get_Mdot_in()
+ *        return self.cpp_state.Mdot_in()
  * 
  */
 
@@ -3087,12 +3084,12 @@ static PyObject *__pyx_pf_6freddi_5State_7Mdot_in___get__(struct __pyx_obj_6fred
   /* "freddi.pyx":27
  *     @property
  *     def Mdot_in(self) -> double:
- *        return self.cpp_state.get_Mdot_in()             # <<<<<<<<<<<<<<
+ *        return self.cpp_state.Mdot_in()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_Mdot_in()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 27, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->Mdot_in()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3102,7 +3099,7 @@ static PyObject *__pyx_pf_6freddi_5State_7Mdot_in___get__(struct __pyx_obj_6fred
  * 
  *     @property
  *     def Mdot_in(self) -> double:             # <<<<<<<<<<<<<<
- *        return self.cpp_state.get_Mdot_in()
+ *        return self.cpp_state.Mdot_in()
  * 
  */
 
@@ -3181,7 +3178,7 @@ static PyObject *__pyx_pf_6freddi_5State_4Mdot___get__(struct __pyx_obj_6freddi_
  * 
  *     @property
  *     def Mdot_out(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Mdot_out()
+ *         return self.cpp_state.Mdot_out()
  * 
  */
 
@@ -3207,12 +3204,12 @@ static PyObject *__pyx_pf_6freddi_5State_8Mdot_out___get__(struct __pyx_obj_6fre
   /* "freddi.pyx":35
  *     @property
  *     def Mdot_out(self) -> double:
- *         return self.cpp_state.get_Mdot_out()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.Mdot_out()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_Mdot_out()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 35, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->Mdot_out()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3222,7 +3219,7 @@ static PyObject *__pyx_pf_6freddi_5State_8Mdot_out___get__(struct __pyx_obj_6fre
  * 
  *     @property
  *     def Mdot_out(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Mdot_out()
+ *         return self.cpp_state.Mdot_out()
  * 
  */
 
@@ -3241,7 +3238,7 @@ static PyObject *__pyx_pf_6freddi_5State_8Mdot_out___get__(struct __pyx_obj_6fre
  * 
  *     @property
  *     def Lx(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Lx()
+ *         return self.cpp_state.Lx()
  * 
  */
 
@@ -3267,12 +3264,12 @@ static PyObject *__pyx_pf_6freddi_5State_2Lx___get__(struct __pyx_obj_6freddi_St
   /* "freddi.pyx":39
  *     @property
  *     def Lx(self) -> double:
- *         return self.cpp_state.get_Lx()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.Lx()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_Lx()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 39, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->Lx()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3282,7 +3279,7 @@ static PyObject *__pyx_pf_6freddi_5State_2Lx___get__(struct __pyx_obj_6freddi_St
  * 
  *     @property
  *     def Lx(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Lx()
+ *         return self.cpp_state.Lx()
  * 
  */
 
@@ -3301,7 +3298,7 @@ static PyObject *__pyx_pf_6freddi_5State_2Lx___get__(struct __pyx_obj_6freddi_St
  * 
  *     @property
  *     def t(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_t()
+ *         return self.cpp_state.t()
  * 
  */
 
@@ -3327,12 +3324,12 @@ static PyObject *__pyx_pf_6freddi_5State_1t___get__(struct __pyx_obj_6freddi_Sta
   /* "freddi.pyx":43
  *     @property
  *     def t(self) -> double:
- *         return self.cpp_state.get_t()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.t()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->get_t()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 43, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->t()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3342,7 +3339,7 @@ static PyObject *__pyx_pf_6freddi_5State_1t___get__(struct __pyx_obj_6freddi_Sta
  * 
  *     @property
  *     def t(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_t()
+ *         return self.cpp_state.t()
  * 
  */
 
@@ -3361,7 +3358,7 @@ static PyObject *__pyx_pf_6freddi_5State_1t___get__(struct __pyx_obj_6freddi_Sta
  * 
  *     @property
  *     def i_t(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_i_t()
+ *         return self.cpp_state.i_t()
  * 
  */
 
@@ -3387,12 +3384,12 @@ static PyObject *__pyx_pf_6freddi_5State_3i_t___get__(struct __pyx_obj_6freddi_S
   /* "freddi.pyx":47
  *     @property
  *     def i_t(self) -> int:
- *         return self.cpp_state.get_i_t()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.i_t()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_self->cpp_state->get_i_t()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 47, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_self->cpp_state->i_t()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 47, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3402,7 +3399,7 @@ static PyObject *__pyx_pf_6freddi_5State_3i_t___get__(struct __pyx_obj_6freddi_S
  * 
  *     @property
  *     def i_t(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_i_t()
+ *         return self.cpp_state.i_t()
  * 
  */
 
@@ -3421,7 +3418,7 @@ static PyObject *__pyx_pf_6freddi_5State_3i_t___get__(struct __pyx_obj_6freddi_S
  * 
  *     @property
  *     def Nx(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Nx()
+ *         return self.cpp_state.Nx()
  * 
  */
 
@@ -3447,12 +3444,12 @@ static PyObject *__pyx_pf_6freddi_5State_2Nx___get__(struct __pyx_obj_6freddi_St
   /* "freddi.pyx":51
  *     @property
  *     def Nx(self) -> int:
- *         return self.cpp_state.get_Nx()             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.Nx()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_unsigned_int(__pyx_v_self->cpp_state->get_Nx()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 51, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_self->cpp_state->Nx()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3462,7 +3459,7 @@ static PyObject *__pyx_pf_6freddi_5State_2Nx___get__(struct __pyx_obj_6freddi_St
  * 
  *     @property
  *     def Nx(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Nx()
+ *         return self.cpp_state.Nx()
  * 
  */
 
@@ -3481,8 +3478,8 @@ static PyObject *__pyx_pf_6freddi_5State_2Nx___get__(struct __pyx_obj_6freddi_St
  * 
  *     @property
  *     def h(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_h().data()
- *         cdef size_t size = self.cpp_state.get_h().size()
+ *         cdef const double* data = self.cpp_state.h().data()
+ *         cdef size_t size = self.cpp_state.h().size()
  */
 
 /* Python wrapper */
@@ -3514,24 +3511,24 @@ static PyObject *__pyx_pf_6freddi_5State_1h___get__(struct __pyx_obj_6freddi_Sta
   /* "freddi.pyx":55
  *     @property
  *     def h(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_h().data()             # <<<<<<<<<<<<<<
- *         cdef size_t size = self.cpp_state.get_h().size()
+ *         cdef const double* data = self.cpp_state.h().data()             # <<<<<<<<<<<<<<
+ *         cdef size_t size = self.cpp_state.h().size()
  *         arr = np.asarray(<const double[:size]> data)
  */
-  __pyx_v_data = __pyx_v_self->cpp_state->get_h().data();
+  __pyx_v_data = __pyx_v_self->cpp_state->h().data();
 
   /* "freddi.pyx":56
  *     def h(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_h().data()
- *         cdef size_t size = self.cpp_state.get_h().size()             # <<<<<<<<<<<<<<
+ *         cdef const double* data = self.cpp_state.h().data()
+ *         cdef size_t size = self.cpp_state.h().size()             # <<<<<<<<<<<<<<
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False
  */
-  __pyx_v_size = __pyx_v_self->cpp_state->get_h().size();
+  __pyx_v_size = __pyx_v_self->cpp_state->h().size();
 
   /* "freddi.pyx":57
- *         cdef const double* data = self.cpp_state.get_h().data()
- *         cdef size_t size = self.cpp_state.get_h().size()
+ *         cdef const double* data = self.cpp_state.h().data()
+ *         cdef size_t size = self.cpp_state.h().size()
  *         arr = np.asarray(<const double[:size]> data)             # <<<<<<<<<<<<<<
  *         arr.flags.writeable = False
  *         return arr
@@ -3605,7 +3602,7 @@ static PyObject *__pyx_pf_6freddi_5State_1h___get__(struct __pyx_obj_6freddi_Sta
   __pyx_t_1 = 0;
 
   /* "freddi.pyx":58
- *         cdef size_t size = self.cpp_state.get_h().size()
+ *         cdef size_t size = self.cpp_state.h().size()
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False             # <<<<<<<<<<<<<<
  *         return arr
@@ -3632,8 +3629,8 @@ static PyObject *__pyx_pf_6freddi_5State_1h___get__(struct __pyx_obj_6freddi_Sta
  * 
  *     @property
  *     def h(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_h().data()
- *         cdef size_t size = self.cpp_state.get_h().size()
+ *         cdef const double* data = self.cpp_state.h().data()
+ *         cdef size_t size = self.cpp_state.h().size()
  */
 
   /* function exit code */
@@ -3656,8 +3653,8 @@ static PyObject *__pyx_pf_6freddi_5State_1h___get__(struct __pyx_obj_6freddi_Sta
  * 
  *     @property
  *     def R(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_R().data()
- *         cdef size_t size = self.cpp_state.get_R().size()
+ *         cdef const double* data = self.cpp_state.R().data()
+ *         cdef size_t size = self.cpp_state.R().size()
  */
 
 /* Python wrapper */
@@ -3689,24 +3686,24 @@ static PyObject *__pyx_pf_6freddi_5State_1R___get__(struct __pyx_obj_6freddi_Sta
   /* "freddi.pyx":63
  *     @property
  *     def R(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_R().data()             # <<<<<<<<<<<<<<
- *         cdef size_t size = self.cpp_state.get_R().size()
+ *         cdef const double* data = self.cpp_state.R().data()             # <<<<<<<<<<<<<<
+ *         cdef size_t size = self.cpp_state.R().size()
  *         arr = np.asarray(<const double[:size]> data)
  */
-  __pyx_v_data = __pyx_v_self->cpp_state->get_R().data();
+  __pyx_v_data = __pyx_v_self->cpp_state->R().data();
 
   /* "freddi.pyx":64
  *     def R(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_R().data()
- *         cdef size_t size = self.cpp_state.get_R().size()             # <<<<<<<<<<<<<<
+ *         cdef const double* data = self.cpp_state.R().data()
+ *         cdef size_t size = self.cpp_state.R().size()             # <<<<<<<<<<<<<<
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False
  */
-  __pyx_v_size = __pyx_v_self->cpp_state->get_R().size();
+  __pyx_v_size = __pyx_v_self->cpp_state->R().size();
 
   /* "freddi.pyx":65
- *         cdef const double* data = self.cpp_state.get_R().data()
- *         cdef size_t size = self.cpp_state.get_R().size()
+ *         cdef const double* data = self.cpp_state.R().data()
+ *         cdef size_t size = self.cpp_state.R().size()
  *         arr = np.asarray(<const double[:size]> data)             # <<<<<<<<<<<<<<
  *         arr.flags.writeable = False
  *         return arr
@@ -3780,7 +3777,7 @@ static PyObject *__pyx_pf_6freddi_5State_1R___get__(struct __pyx_obj_6freddi_Sta
   __pyx_t_1 = 0;
 
   /* "freddi.pyx":66
- *         cdef size_t size = self.cpp_state.get_R().size()
+ *         cdef size_t size = self.cpp_state.R().size()
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False             # <<<<<<<<<<<<<<
  *         return arr
@@ -3807,8 +3804,8 @@ static PyObject *__pyx_pf_6freddi_5State_1R___get__(struct __pyx_obj_6freddi_Sta
  * 
  *     @property
  *     def R(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_R().data()
- *         cdef size_t size = self.cpp_state.get_R().size()
+ *         cdef const double* data = self.cpp_state.R().data()
+ *         cdef size_t size = self.cpp_state.R().size()
  */
 
   /* function exit code */
@@ -3831,8 +3828,8 @@ static PyObject *__pyx_pf_6freddi_5State_1R___get__(struct __pyx_obj_6freddi_Sta
  * 
  *     @property
  *     def F(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_F().data()
- *         cdef size_t size = self.cpp_state.get_F().size()
+ *         cdef const double* data = self.cpp_state.F().data()
+ *         cdef size_t size = self.cpp_state.F().size()
  */
 
 /* Python wrapper */
@@ -3864,24 +3861,24 @@ static PyObject *__pyx_pf_6freddi_5State_1F___get__(struct __pyx_obj_6freddi_Sta
   /* "freddi.pyx":71
  *     @property
  *     def F(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_F().data()             # <<<<<<<<<<<<<<
- *         cdef size_t size = self.cpp_state.get_F().size()
+ *         cdef const double* data = self.cpp_state.F().data()             # <<<<<<<<<<<<<<
+ *         cdef size_t size = self.cpp_state.F().size()
  *         arr = np.asarray(<const double[:size]> data)
  */
-  __pyx_v_data = __pyx_v_self->cpp_state->get_F().data();
+  __pyx_v_data = __pyx_v_self->cpp_state->F().data();
 
   /* "freddi.pyx":72
  *     def F(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_F().data()
- *         cdef size_t size = self.cpp_state.get_F().size()             # <<<<<<<<<<<<<<
+ *         cdef const double* data = self.cpp_state.F().data()
+ *         cdef size_t size = self.cpp_state.F().size()             # <<<<<<<<<<<<<<
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False
  */
-  __pyx_v_size = __pyx_v_self->cpp_state->get_F().size();
+  __pyx_v_size = __pyx_v_self->cpp_state->F().size();
 
   /* "freddi.pyx":73
- *         cdef const double* data = self.cpp_state.get_F().data()
- *         cdef size_t size = self.cpp_state.get_F().size()
+ *         cdef const double* data = self.cpp_state.F().data()
+ *         cdef size_t size = self.cpp_state.F().size()
  *         arr = np.asarray(<const double[:size]> data)             # <<<<<<<<<<<<<<
  *         arr.flags.writeable = False
  *         return arr
@@ -3955,7 +3952,7 @@ static PyObject *__pyx_pf_6freddi_5State_1F___get__(struct __pyx_obj_6freddi_Sta
   __pyx_t_1 = 0;
 
   /* "freddi.pyx":74
- *         cdef size_t size = self.cpp_state.get_F().size()
+ *         cdef size_t size = self.cpp_state.F().size()
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False             # <<<<<<<<<<<<<<
  *         return arr
@@ -3982,8 +3979,8 @@ static PyObject *__pyx_pf_6freddi_5State_1F___get__(struct __pyx_obj_6freddi_Sta
  * 
  *     @property
  *     def F(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_F().data()
- *         cdef size_t size = self.cpp_state.get_F().size()
+ *         cdef const double* data = self.cpp_state.F().data()
+ *         cdef size_t size = self.cpp_state.F().size()
  */
 
   /* function exit code */
@@ -4006,8 +4003,8 @@ static PyObject *__pyx_pf_6freddi_5State_1F___get__(struct __pyx_obj_6freddi_Sta
  * 
  *     @property
  *     def W(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_W().data()
- *         cdef size_t size = self.cpp_state.get_W().size()
+ *         cdef const double* data = self.cpp_state.W().data()
+ *         cdef size_t size = self.cpp_state.W().size()
  */
 
 /* Python wrapper */
@@ -4039,24 +4036,24 @@ static PyObject *__pyx_pf_6freddi_5State_1W___get__(struct __pyx_obj_6freddi_Sta
   /* "freddi.pyx":79
  *     @property
  *     def W(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_W().data()             # <<<<<<<<<<<<<<
- *         cdef size_t size = self.cpp_state.get_W().size()
+ *         cdef const double* data = self.cpp_state.W().data()             # <<<<<<<<<<<<<<
+ *         cdef size_t size = self.cpp_state.W().size()
  *         arr = np.asarray(<const double[:size]> data)
  */
-  __pyx_v_data = __pyx_v_self->cpp_state->get_W().data();
+  __pyx_v_data = __pyx_v_self->cpp_state->W().data();
 
   /* "freddi.pyx":80
  *     def W(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_W().data()
- *         cdef size_t size = self.cpp_state.get_W().size()             # <<<<<<<<<<<<<<
+ *         cdef const double* data = self.cpp_state.W().data()
+ *         cdef size_t size = self.cpp_state.W().size()             # <<<<<<<<<<<<<<
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False
  */
-  __pyx_v_size = __pyx_v_self->cpp_state->get_W().size();
+  __pyx_v_size = __pyx_v_self->cpp_state->W().size();
 
   /* "freddi.pyx":81
- *         cdef const double* data = self.cpp_state.get_W().data()
- *         cdef size_t size = self.cpp_state.get_W().size()
+ *         cdef const double* data = self.cpp_state.W().data()
+ *         cdef size_t size = self.cpp_state.W().size()
  *         arr = np.asarray(<const double[:size]> data)             # <<<<<<<<<<<<<<
  *         arr.flags.writeable = False
  *         return arr
@@ -4130,7 +4127,7 @@ static PyObject *__pyx_pf_6freddi_5State_1W___get__(struct __pyx_obj_6freddi_Sta
   __pyx_t_1 = 0;
 
   /* "freddi.pyx":82
- *         cdef size_t size = self.cpp_state.get_W().size()
+ *         cdef size_t size = self.cpp_state.W().size()
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False             # <<<<<<<<<<<<<<
  *         return arr
@@ -4157,8 +4154,8 @@ static PyObject *__pyx_pf_6freddi_5State_1W___get__(struct __pyx_obj_6freddi_Sta
  * 
  *     @property
  *     def W(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_W().data()
- *         cdef size_t size = self.cpp_state.get_W().size()
+ *         cdef const double* data = self.cpp_state.W().data()
+ *         cdef size_t size = self.cpp_state.W().size()
  */
 
   /* function exit code */
@@ -4181,8 +4178,8 @@ static PyObject *__pyx_pf_6freddi_5State_1W___get__(struct __pyx_obj_6freddi_Sta
  * 
  *     @property
  *     def Tph(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Tph().data()
- *         cdef size_t size = self.cpp_state.get_Tph().size()
+ *         cdef const double* data = self.cpp_state.Tph().data()
+ *         cdef size_t size = self.cpp_state.Tph().size()
  */
 
 /* Python wrapper */
@@ -4214,24 +4211,24 @@ static PyObject *__pyx_pf_6freddi_5State_3Tph___get__(struct __pyx_obj_6freddi_S
   /* "freddi.pyx":87
  *     @property
  *     def Tph(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Tph().data()             # <<<<<<<<<<<<<<
- *         cdef size_t size = self.cpp_state.get_Tph().size()
+ *         cdef const double* data = self.cpp_state.Tph().data()             # <<<<<<<<<<<<<<
+ *         cdef size_t size = self.cpp_state.Tph().size()
  *         arr = np.asarray(<const double[:size]> data)
  */
-  __pyx_v_data = __pyx_v_self->cpp_state->get_Tph().data();
+  __pyx_v_data = __pyx_v_self->cpp_state->Tph().data();
 
   /* "freddi.pyx":88
  *     def Tph(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Tph().data()
- *         cdef size_t size = self.cpp_state.get_Tph().size()             # <<<<<<<<<<<<<<
+ *         cdef const double* data = self.cpp_state.Tph().data()
+ *         cdef size_t size = self.cpp_state.Tph().size()             # <<<<<<<<<<<<<<
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False
  */
-  __pyx_v_size = __pyx_v_self->cpp_state->get_Tph().size();
+  __pyx_v_size = __pyx_v_self->cpp_state->Tph().size();
 
   /* "freddi.pyx":89
- *         cdef const double* data = self.cpp_state.get_Tph().data()
- *         cdef size_t size = self.cpp_state.get_Tph().size()
+ *         cdef const double* data = self.cpp_state.Tph().data()
+ *         cdef size_t size = self.cpp_state.Tph().size()
  *         arr = np.asarray(<const double[:size]> data)             # <<<<<<<<<<<<<<
  *         arr.flags.writeable = False
  *         return arr
@@ -4305,7 +4302,7 @@ static PyObject *__pyx_pf_6freddi_5State_3Tph___get__(struct __pyx_obj_6freddi_S
   __pyx_t_1 = 0;
 
   /* "freddi.pyx":90
- *         cdef size_t size = self.cpp_state.get_Tph().size()
+ *         cdef size_t size = self.cpp_state.Tph().size()
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False             # <<<<<<<<<<<<<<
  *         return arr
@@ -4332,8 +4329,8 @@ static PyObject *__pyx_pf_6freddi_5State_3Tph___get__(struct __pyx_obj_6freddi_S
  * 
  *     @property
  *     def Tph(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Tph().data()
- *         cdef size_t size = self.cpp_state.get_Tph().size()
+ *         cdef const double* data = self.cpp_state.Tph().data()
+ *         cdef size_t size = self.cpp_state.Tph().size()
  */
 
   /* function exit code */
@@ -4356,8 +4353,8 @@ static PyObject *__pyx_pf_6freddi_5State_3Tph___get__(struct __pyx_obj_6freddi_S
  * 
  *     @property
  *     def Tph_vis(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Tph_vis().data()
- *         cdef size_t size = self.cpp_state.get_Tph_vis().size()
+ *         cdef const double* data = self.cpp_state.Tph_vis().data()
+ *         cdef size_t size = self.cpp_state.Tph_vis().size()
  */
 
 /* Python wrapper */
@@ -4389,24 +4386,24 @@ static PyObject *__pyx_pf_6freddi_5State_7Tph_vis___get__(struct __pyx_obj_6fred
   /* "freddi.pyx":95
  *     @property
  *     def Tph_vis(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Tph_vis().data()             # <<<<<<<<<<<<<<
- *         cdef size_t size = self.cpp_state.get_Tph_vis().size()
+ *         cdef const double* data = self.cpp_state.Tph_vis().data()             # <<<<<<<<<<<<<<
+ *         cdef size_t size = self.cpp_state.Tph_vis().size()
  *         arr = np.asarray(<const double[:size]> data)
  */
-  __pyx_v_data = __pyx_v_self->cpp_state->get_Tph_vis().data();
+  __pyx_v_data = __pyx_v_self->cpp_state->Tph_vis().data();
 
   /* "freddi.pyx":96
  *     def Tph_vis(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Tph_vis().data()
- *         cdef size_t size = self.cpp_state.get_Tph_vis().size()             # <<<<<<<<<<<<<<
+ *         cdef const double* data = self.cpp_state.Tph_vis().data()
+ *         cdef size_t size = self.cpp_state.Tph_vis().size()             # <<<<<<<<<<<<<<
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False
  */
-  __pyx_v_size = __pyx_v_self->cpp_state->get_Tph_vis().size();
+  __pyx_v_size = __pyx_v_self->cpp_state->Tph_vis().size();
 
   /* "freddi.pyx":97
- *         cdef const double* data = self.cpp_state.get_Tph_vis().data()
- *         cdef size_t size = self.cpp_state.get_Tph_vis().size()
+ *         cdef const double* data = self.cpp_state.Tph_vis().data()
+ *         cdef size_t size = self.cpp_state.Tph_vis().size()
  *         arr = np.asarray(<const double[:size]> data)             # <<<<<<<<<<<<<<
  *         arr.flags.writeable = False
  *         return arr
@@ -4480,7 +4477,7 @@ static PyObject *__pyx_pf_6freddi_5State_7Tph_vis___get__(struct __pyx_obj_6fred
   __pyx_t_1 = 0;
 
   /* "freddi.pyx":98
- *         cdef size_t size = self.cpp_state.get_Tph_vis().size()
+ *         cdef size_t size = self.cpp_state.Tph_vis().size()
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False             # <<<<<<<<<<<<<<
  *         return arr
@@ -4507,8 +4504,8 @@ static PyObject *__pyx_pf_6freddi_5State_7Tph_vis___get__(struct __pyx_obj_6fred
  * 
  *     @property
  *     def Tph_vis(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Tph_vis().data()
- *         cdef size_t size = self.cpp_state.get_Tph_vis().size()
+ *         cdef const double* data = self.cpp_state.Tph_vis().data()
+ *         cdef size_t size = self.cpp_state.Tph_vis().size()
  */
 
   /* function exit code */
@@ -4531,8 +4528,8 @@ static PyObject *__pyx_pf_6freddi_5State_7Tph_vis___get__(struct __pyx_obj_6fred
  * 
  *     @property
  *     def Tirr(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Tirr().data()
- *         cdef size_t size = self.cpp_state.get_Tirr().size()
+ *         cdef const double* data = self.cpp_state.Tirr().data()
+ *         cdef size_t size = self.cpp_state.Tirr().size()
  */
 
 /* Python wrapper */
@@ -4564,24 +4561,24 @@ static PyObject *__pyx_pf_6freddi_5State_4Tirr___get__(struct __pyx_obj_6freddi_
   /* "freddi.pyx":103
  *     @property
  *     def Tirr(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Tirr().data()             # <<<<<<<<<<<<<<
- *         cdef size_t size = self.cpp_state.get_Tirr().size()
+ *         cdef const double* data = self.cpp_state.Tirr().data()             # <<<<<<<<<<<<<<
+ *         cdef size_t size = self.cpp_state.Tirr().size()
  *         arr = np.asarray(<const double[:size]> data)
  */
-  __pyx_v_data = __pyx_v_self->cpp_state->get_Tirr().data();
+  __pyx_v_data = __pyx_v_self->cpp_state->Tirr().data();
 
   /* "freddi.pyx":104
  *     def Tirr(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Tirr().data()
- *         cdef size_t size = self.cpp_state.get_Tirr().size()             # <<<<<<<<<<<<<<
+ *         cdef const double* data = self.cpp_state.Tirr().data()
+ *         cdef size_t size = self.cpp_state.Tirr().size()             # <<<<<<<<<<<<<<
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False
  */
-  __pyx_v_size = __pyx_v_self->cpp_state->get_Tirr().size();
+  __pyx_v_size = __pyx_v_self->cpp_state->Tirr().size();
 
   /* "freddi.pyx":105
- *         cdef const double* data = self.cpp_state.get_Tirr().data()
- *         cdef size_t size = self.cpp_state.get_Tirr().size()
+ *         cdef const double* data = self.cpp_state.Tirr().data()
+ *         cdef size_t size = self.cpp_state.Tirr().size()
  *         arr = np.asarray(<const double[:size]> data)             # <<<<<<<<<<<<<<
  *         arr.flags.writeable = False
  *         return arr
@@ -4655,7 +4652,7 @@ static PyObject *__pyx_pf_6freddi_5State_4Tirr___get__(struct __pyx_obj_6freddi_
   __pyx_t_1 = 0;
 
   /* "freddi.pyx":106
- *         cdef size_t size = self.cpp_state.get_Tirr().size()
+ *         cdef size_t size = self.cpp_state.Tirr().size()
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False             # <<<<<<<<<<<<<<
  *         return arr
@@ -4682,8 +4679,8 @@ static PyObject *__pyx_pf_6freddi_5State_4Tirr___get__(struct __pyx_obj_6freddi_
  * 
  *     @property
  *     def Tirr(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Tirr().data()
- *         cdef size_t size = self.cpp_state.get_Tirr().size()
+ *         cdef const double* data = self.cpp_state.Tirr().data()
+ *         cdef size_t size = self.cpp_state.Tirr().size()
  */
 
   /* function exit code */
@@ -4706,8 +4703,8 @@ static PyObject *__pyx_pf_6freddi_5State_4Tirr___get__(struct __pyx_obj_6freddi_
  * 
  *     @property
  *     def Cirr(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Cirr().data()
- *         cdef size_t size = self.cpp_state.get_Cirr().size()
+ *         cdef const double* data = self.cpp_state.Cirr().data()
+ *         cdef size_t size = self.cpp_state.Cirr().size()
  */
 
 /* Python wrapper */
@@ -4739,24 +4736,24 @@ static PyObject *__pyx_pf_6freddi_5State_4Cirr___get__(struct __pyx_obj_6freddi_
   /* "freddi.pyx":111
  *     @property
  *     def Cirr(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Cirr().data()             # <<<<<<<<<<<<<<
- *         cdef size_t size = self.cpp_state.get_Cirr().size()
+ *         cdef const double* data = self.cpp_state.Cirr().data()             # <<<<<<<<<<<<<<
+ *         cdef size_t size = self.cpp_state.Cirr().size()
  *         arr = np.asarray(<const double[:size]> data)
  */
-  __pyx_v_data = __pyx_v_self->cpp_state->get_Cirr().data();
+  __pyx_v_data = __pyx_v_self->cpp_state->Cirr().data();
 
   /* "freddi.pyx":112
  *     def Cirr(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Cirr().data()
- *         cdef size_t size = self.cpp_state.get_Cirr().size()             # <<<<<<<<<<<<<<
+ *         cdef const double* data = self.cpp_state.Cirr().data()
+ *         cdef size_t size = self.cpp_state.Cirr().size()             # <<<<<<<<<<<<<<
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False
  */
-  __pyx_v_size = __pyx_v_self->cpp_state->get_Cirr().size();
+  __pyx_v_size = __pyx_v_self->cpp_state->Cirr().size();
 
   /* "freddi.pyx":113
- *         cdef const double* data = self.cpp_state.get_Cirr().data()
- *         cdef size_t size = self.cpp_state.get_Cirr().size()
+ *         cdef const double* data = self.cpp_state.Cirr().data()
+ *         cdef size_t size = self.cpp_state.Cirr().size()
  *         arr = np.asarray(<const double[:size]> data)             # <<<<<<<<<<<<<<
  *         arr.flags.writeable = False
  *         return arr
@@ -4830,7 +4827,7 @@ static PyObject *__pyx_pf_6freddi_5State_4Cirr___get__(struct __pyx_obj_6freddi_
   __pyx_t_1 = 0;
 
   /* "freddi.pyx":114
- *         cdef size_t size = self.cpp_state.get_Cirr().size()
+ *         cdef size_t size = self.cpp_state.Cirr().size()
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False             # <<<<<<<<<<<<<<
  *         return arr
@@ -4857,8 +4854,8 @@ static PyObject *__pyx_pf_6freddi_5State_4Cirr___get__(struct __pyx_obj_6freddi_
  * 
  *     @property
  *     def Cirr(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Cirr().data()
- *         cdef size_t size = self.cpp_state.get_Cirr().size()
+ *         cdef const double* data = self.cpp_state.Cirr().data()
+ *         cdef size_t size = self.cpp_state.Cirr().size()
  */
 
   /* function exit code */
@@ -4881,8 +4878,8 @@ static PyObject *__pyx_pf_6freddi_5State_4Cirr___get__(struct __pyx_obj_6freddi_
  * 
  *     @property
  *     def Sigma(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Sigma().data()
- *         cdef size_t size = self.cpp_state.get_Sigma().size()
+ *         cdef const double* data = self.cpp_state.Sigma().data()
+ *         cdef size_t size = self.cpp_state.Sigma().size()
  */
 
 /* Python wrapper */
@@ -4914,24 +4911,24 @@ static PyObject *__pyx_pf_6freddi_5State_5Sigma___get__(struct __pyx_obj_6freddi
   /* "freddi.pyx":119
  *     @property
  *     def Sigma(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Sigma().data()             # <<<<<<<<<<<<<<
- *         cdef size_t size = self.cpp_state.get_Sigma().size()
+ *         cdef const double* data = self.cpp_state.Sigma().data()             # <<<<<<<<<<<<<<
+ *         cdef size_t size = self.cpp_state.Sigma().size()
  *         arr = np.asarray(<const double[:size]> data)
  */
-  __pyx_v_data = __pyx_v_self->cpp_state->get_Sigma().data();
+  __pyx_v_data = __pyx_v_self->cpp_state->Sigma().data();
 
   /* "freddi.pyx":120
  *     def Sigma(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Sigma().data()
- *         cdef size_t size = self.cpp_state.get_Sigma().size()             # <<<<<<<<<<<<<<
+ *         cdef const double* data = self.cpp_state.Sigma().data()
+ *         cdef size_t size = self.cpp_state.Sigma().size()             # <<<<<<<<<<<<<<
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False
  */
-  __pyx_v_size = __pyx_v_self->cpp_state->get_Sigma().size();
+  __pyx_v_size = __pyx_v_self->cpp_state->Sigma().size();
 
   /* "freddi.pyx":121
- *         cdef const double* data = self.cpp_state.get_Sigma().data()
- *         cdef size_t size = self.cpp_state.get_Sigma().size()
+ *         cdef const double* data = self.cpp_state.Sigma().data()
+ *         cdef size_t size = self.cpp_state.Sigma().size()
  *         arr = np.asarray(<const double[:size]> data)             # <<<<<<<<<<<<<<
  *         arr.flags.writeable = False
  *         return arr
@@ -5005,7 +5002,7 @@ static PyObject *__pyx_pf_6freddi_5State_5Sigma___get__(struct __pyx_obj_6freddi
   __pyx_t_1 = 0;
 
   /* "freddi.pyx":122
- *         cdef size_t size = self.cpp_state.get_Sigma().size()
+ *         cdef size_t size = self.cpp_state.Sigma().size()
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False             # <<<<<<<<<<<<<<
  *         return arr
@@ -5032,8 +5029,8 @@ static PyObject *__pyx_pf_6freddi_5State_5Sigma___get__(struct __pyx_obj_6freddi
  * 
  *     @property
  *     def Sigma(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Sigma().data()
- *         cdef size_t size = self.cpp_state.get_Sigma().size()
+ *         cdef const double* data = self.cpp_state.Sigma().data()
+ *         cdef size_t size = self.cpp_state.Sigma().size()
  */
 
   /* function exit code */
@@ -5056,8 +5053,8 @@ static PyObject *__pyx_pf_6freddi_5State_5Sigma___get__(struct __pyx_obj_6freddi
  * 
  *     @property
  *     def Height(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Height().data()
- *         cdef size_t size = self.cpp_state.get_Height().size()
+ *         cdef const double* data = self.cpp_state.Height().data()
+ *         cdef size_t size = self.cpp_state.Height().size()
  */
 
 /* Python wrapper */
@@ -5089,24 +5086,24 @@ static PyObject *__pyx_pf_6freddi_5State_6Height___get__(struct __pyx_obj_6fredd
   /* "freddi.pyx":127
  *     @property
  *     def Height(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Height().data()             # <<<<<<<<<<<<<<
- *         cdef size_t size = self.cpp_state.get_Height().size()
+ *         cdef const double* data = self.cpp_state.Height().data()             # <<<<<<<<<<<<<<
+ *         cdef size_t size = self.cpp_state.Height().size()
  *         arr = np.asarray(<const double[:size]> data)
  */
-  __pyx_v_data = __pyx_v_self->cpp_state->get_Height().data();
+  __pyx_v_data = __pyx_v_self->cpp_state->Height().data();
 
   /* "freddi.pyx":128
  *     def Height(self) -> np.ndarray[np.float]:
- *         cdef const double* data = self.cpp_state.get_Height().data()
- *         cdef size_t size = self.cpp_state.get_Height().size()             # <<<<<<<<<<<<<<
+ *         cdef const double* data = self.cpp_state.Height().data()
+ *         cdef size_t size = self.cpp_state.Height().size()             # <<<<<<<<<<<<<<
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False
  */
-  __pyx_v_size = __pyx_v_self->cpp_state->get_Height().size();
+  __pyx_v_size = __pyx_v_self->cpp_state->Height().size();
 
   /* "freddi.pyx":129
- *         cdef const double* data = self.cpp_state.get_Height().data()
- *         cdef size_t size = self.cpp_state.get_Height().size()
+ *         cdef const double* data = self.cpp_state.Height().data()
+ *         cdef size_t size = self.cpp_state.Height().size()
  *         arr = np.asarray(<const double[:size]> data)             # <<<<<<<<<<<<<<
  *         arr.flags.writeable = False
  *         return arr
@@ -5180,7 +5177,7 @@ static PyObject *__pyx_pf_6freddi_5State_6Height___get__(struct __pyx_obj_6fredd
   __pyx_t_1 = 0;
 
   /* "freddi.pyx":130
- *         cdef size_t size = self.cpp_state.get_Height().size()
+ *         cdef size_t size = self.cpp_state.Height().size()
  *         arr = np.asarray(<const double[:size]> data)
  *         arr.flags.writeable = False             # <<<<<<<<<<<<<<
  *         return arr
@@ -5207,8 +5204,8 @@ static PyObject *__pyx_pf_6freddi_5State_6Height___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def Height(self) -> np.ndarray[np.float]:             # <<<<<<<<<<<<<<
- *         cdef const double* data = self.cpp_state.get_Height().data()
- *         cdef size_t size = self.cpp_state.get_Height().size()
+ *         cdef const double* data = self.cpp_state.Height().data()
+ *         cdef size_t size = self.cpp_state.Height().size()
  */
 
   /* function exit code */
@@ -5231,7 +5228,7 @@ static PyObject *__pyx_pf_6freddi_5State_6Height___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_h(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_h()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.h().back()
  * 
  */
 
@@ -5257,12 +5254,12 @@ static PyObject *__pyx_pf_6freddi_5State_6last_h___get__(struct __pyx_obj_6fredd
   /* "freddi.pyx":135
  *     @property
  *     def last_h(self) -> double:
- *         return self.cpp_state.get_h()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.h().back()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_h()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 135, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->h().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 135, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5272,7 +5269,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_h___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_h(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_h()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.h().back()
  * 
  */
 
@@ -5291,7 +5288,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_h___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_R(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_R()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.R().back()
  * 
  */
 
@@ -5317,12 +5314,12 @@ static PyObject *__pyx_pf_6freddi_5State_6last_R___get__(struct __pyx_obj_6fredd
   /* "freddi.pyx":139
  *     @property
  *     def last_R(self) -> double:
- *         return self.cpp_state.get_R()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.R().back()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_R()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 139, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->R().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 139, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5332,7 +5329,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_R___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_R(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_R()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.R().back()
  * 
  */
 
@@ -5351,7 +5348,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_R___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_F(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_F()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.F().back()
  * 
  */
 
@@ -5377,12 +5374,12 @@ static PyObject *__pyx_pf_6freddi_5State_6last_F___get__(struct __pyx_obj_6fredd
   /* "freddi.pyx":143
  *     @property
  *     def last_F(self) -> double:
- *         return self.cpp_state.get_F()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.F().back()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_F()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 143, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->F().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5392,7 +5389,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_F___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_F(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_F()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.F().back()
  * 
  */
 
@@ -5411,7 +5408,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_F___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_W(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_W()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.W().back()
  * 
  */
 
@@ -5437,12 +5434,12 @@ static PyObject *__pyx_pf_6freddi_5State_6last_W___get__(struct __pyx_obj_6fredd
   /* "freddi.pyx":147
  *     @property
  *     def last_W(self) -> double:
- *         return self.cpp_state.get_W()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.W().back()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_W()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 147, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->W().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5452,7 +5449,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_W___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_W(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_W()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.W().back()
  * 
  */
 
@@ -5471,7 +5468,7 @@ static PyObject *__pyx_pf_6freddi_5State_6last_W___get__(struct __pyx_obj_6fredd
  * 
  *     @property
  *     def last_Tph(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tph()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Tph().back()
  * 
  */
 
@@ -5497,12 +5494,12 @@ static PyObject *__pyx_pf_6freddi_5State_8last_Tph___get__(struct __pyx_obj_6fre
   /* "freddi.pyx":151
  *     @property
  *     def last_Tph(self) -> double:
- *         return self.cpp_state.get_Tph()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.Tph().back()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Tph()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 151, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->Tph().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 151, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5512,7 +5509,7 @@ static PyObject *__pyx_pf_6freddi_5State_8last_Tph___get__(struct __pyx_obj_6fre
  * 
  *     @property
  *     def last_Tph(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tph()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Tph().back()
  * 
  */
 
@@ -5531,7 +5528,7 @@ static PyObject *__pyx_pf_6freddi_5State_8last_Tph___get__(struct __pyx_obj_6fre
  * 
  *     @property
  *     def last_Tph_vis(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tph_vis()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Tph_vis().back()
  * 
  */
 
@@ -5557,12 +5554,12 @@ static PyObject *__pyx_pf_6freddi_5State_12last_Tph_vis___get__(struct __pyx_obj
   /* "freddi.pyx":155
  *     @property
  *     def last_Tph_vis(self) -> double:
- *         return self.cpp_state.get_Tph_vis()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.Tph_vis().back()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Tph_vis()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 155, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->Tph_vis().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5572,7 +5569,7 @@ static PyObject *__pyx_pf_6freddi_5State_12last_Tph_vis___get__(struct __pyx_obj
  * 
  *     @property
  *     def last_Tph_vis(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tph_vis()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Tph_vis().back()
  * 
  */
 
@@ -5591,7 +5588,7 @@ static PyObject *__pyx_pf_6freddi_5State_12last_Tph_vis___get__(struct __pyx_obj
  * 
  *     @property
  *     def last_Tirr(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tirr()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Tirr().back()
  * 
  */
 
@@ -5617,12 +5614,12 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Tirr___get__(struct __pyx_obj_6fr
   /* "freddi.pyx":159
  *     @property
  *     def last_Tirr(self) -> double:
- *         return self.cpp_state.get_Tirr()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.Tirr().back()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Tirr()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 159, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->Tirr().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5632,7 +5629,7 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Tirr___get__(struct __pyx_obj_6fr
  * 
  *     @property
  *     def last_Tirr(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Tirr()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Tirr().back()
  * 
  */
 
@@ -5651,7 +5648,7 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Tirr___get__(struct __pyx_obj_6fr
  * 
  *     @property
  *     def last_Cirr(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Cirr()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Cirr().back()
  * 
  */
 
@@ -5677,12 +5674,12 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Cirr___get__(struct __pyx_obj_6fr
   /* "freddi.pyx":163
  *     @property
  *     def last_Cirr(self) -> double:
- *         return self.cpp_state.get_Cirr()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.Cirr().back()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Cirr()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 163, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->Cirr().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5692,7 +5689,7 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Cirr___get__(struct __pyx_obj_6fr
  * 
  *     @property
  *     def last_Cirr(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Cirr()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Cirr().back()
  * 
  */
 
@@ -5711,7 +5708,7 @@ static PyObject *__pyx_pf_6freddi_5State_9last_Cirr___get__(struct __pyx_obj_6fr
  * 
  *     @property
  *     def last_Sigma(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Sigma()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Sigma().back()
  * 
  */
 
@@ -5737,12 +5734,12 @@ static PyObject *__pyx_pf_6freddi_5State_10last_Sigma___get__(struct __pyx_obj_6
   /* "freddi.pyx":167
  *     @property
  *     def last_Sigma(self) -> double:
- *         return self.cpp_state.get_Sigma()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.Sigma().back()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Sigma()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 167, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->Sigma().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5752,7 +5749,7 @@ static PyObject *__pyx_pf_6freddi_5State_10last_Sigma___get__(struct __pyx_obj_6
  * 
  *     @property
  *     def last_Sigma(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Sigma()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Sigma().back()
  * 
  */
 
@@ -5771,7 +5768,7 @@ static PyObject *__pyx_pf_6freddi_5State_10last_Sigma___get__(struct __pyx_obj_6
  * 
  *     @property
  *     def last_Height(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Height()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Height().back()
  * 
  */
 
@@ -5797,12 +5794,12 @@ static PyObject *__pyx_pf_6freddi_5State_11last_Height___get__(struct __pyx_obj_
   /* "freddi.pyx":171
  *     @property
  *     def last_Height(self) -> double:
- *         return self.cpp_state.get_Height()[self.cpp_state.get_Nx()-1]             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.Height().back()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_self->cpp_state->get_Height()[(__pyx_v_self->cpp_state->get_Nx() - 1)])); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 171, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->cpp_state->Height().back()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 171, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5812,7 +5809,7 @@ static PyObject *__pyx_pf_6freddi_5State_11last_Height___get__(struct __pyx_obj_
  * 
  *     @property
  *     def last_Height(self) -> double:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.get_Height()[self.cpp_state.get_Nx()-1]
+ *         return self.cpp_state.Height().back()
  * 
  */
 
@@ -9410,7 +9407,7 @@ static int __pyx_pf_6freddi_6Freddi_4Cirr_2__set__(struct __pyx_obj_6freddi_Fred
  *         self.change_SelfIrradiationArguments(Cirr=val)
  * 
  *     cdef State get_state(self):             # <<<<<<<<<<<<<<
- *         return state_from_cpp(self.evolution.get_state())
+ *         return state_from_cpp(self.evolution.state())
  * 
  */
 
@@ -9423,12 +9420,12 @@ static struct __pyx_obj_6freddi_State *__pyx_f_6freddi_6Freddi_get_state(struct 
   /* "freddi.pyx":467
  * 
  *     cdef State get_state(self):
- *         return state_from_cpp(self.evolution.get_state())             # <<<<<<<<<<<<<<
+ *         return state_from_cpp(self.evolution.state())             # <<<<<<<<<<<<<<
  * 
  *     def __iter__(self):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_1 = ((PyObject *)__pyx_f_6freddi_state_from_cpp(__pyx_v_self->evolution->get_state())); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 467, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_6freddi_state_from_cpp(__pyx_v_self->evolution->state())); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = ((struct __pyx_obj_6freddi_State *)__pyx_t_1);
   __pyx_t_1 = 0;
@@ -9438,7 +9435,7 @@ static struct __pyx_obj_6freddi_State *__pyx_f_6freddi_6Freddi_get_state(struct 
  *         self.change_SelfIrradiationArguments(Cirr=val)
  * 
  *     cdef State get_state(self):             # <<<<<<<<<<<<<<
- *         return state_from_cpp(self.evolution.get_state())
+ *         return state_from_cpp(self.evolution.state())
  * 
  */
 
@@ -9455,7 +9452,7 @@ static struct __pyx_obj_6freddi_State *__pyx_f_6freddi_6Freddi_get_state(struct 
 static PyObject *__pyx_gb_6freddi_6Freddi_8generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
 /* "freddi.pyx":469
- *         return state_from_cpp(self.evolution.get_state())
+ *         return state_from_cpp(self.evolution.state())
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
  *         """Iterate disk over time
@@ -9632,7 +9629,7 @@ static PyObject *__pyx_gb_6freddi_6Freddi_8generator(__pyx_CoroutineObject *__py
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
   /* "freddi.pyx":469
- *         return state_from_cpp(self.evolution.get_state())
+ *         return state_from_cpp(self.evolution.state())
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
  *         """Iterate disk over time
@@ -26430,7 +26427,7 @@ static PyTypeObject __pyx_type_6freddi_Freddi = {
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE, /*tp_flags*/
-  "Accretion disk evolution modeller\n\n    This object is iterable, it yields `State` object on each iteration step\n\n    All parameters are keyword-only, all physical values are in CGS units.\n    See detailed description of parameters in documentation\n\n    Parameters\n    ----------\n    alpha : float, optional\n    Mx : float, optional\n    kerr : float, optional\n    Mopt : float, optional\n    period : float, optional\n    rin : float or None, optional\n    rout : float or None, optional\n    opacity : bytes, optional\n        Should be `b'Kramers'` or `b'OPAL'`\n    boundcond : bytes, optional\n        Should be `b'Teff'` or `b'Tirr'`\n    Mdotout: float, optional\n    Thot : float, optional\n    initialcond : bytes, optional\n        Should be `b'powerF'`, `b'powerSigma'`, `b'sinusF'`, `b'gaussF'` or\n        `b'quasistat'`\n    FO : float, optional\n    Mdisk0 : float, optional\n    Mdot0 : float, optional\n    powerorder : float, optional\n    gaussmu : float, optional\n    gausssigma : float, optional\n    Cirr : float, optional\n    irrfactortype : bytes, optional\n        Should be `b'const'` or `b'square'`\n    colourfactor : float, optional\n    emin : float, optional\n    emax : float, optional\n    inclination : float, optional\n        In degrees\n    distance : float, optional\n    lambda : list of float, optional\n    time : float, optional\n    tau : float, optional\n    Nx : int, optional\n    gridscale : bytes, optional\n        Should be `b'log'` or `b'linear'`\n\n    Attributes\n    ----------\n    time : float\n        Specified time\n    lambdas : numpy.ndarray\n        Specified lambdas, in cm\n    Nt : int\n        Number of evolutions steps. The number of time moments where disk\n        structure will be obtained is more by one\n    Cirr : float\n        Irradiation factor. Can be changed via assignment operator\n\n    Methods\n    -------\n    evolve() : EvolutionResults\n        Calculate disk evolution\n    alt(**kwargs) : Freddi""\n        Alternative Freddi constructor accepting astropy Quantity and str\n\n    ", /*tp_doc*/
+  "Accretion disk evolution modeller\n\n    This object is iterable, it yields `State` object on each iteration step\n\n    All parameters are keyword-only, all physical values are in CGS units.\n    See detailed description of parameters in documentation\n\n    Parameters\n    ----------\n    alpha : float, optional\n    Mx : float, optional\n    kerr : float, optional\n    Mopt : float, optional\n    period : float, optional\n    rin : float or None, optional\n    rout : float or None, optional\n    opacity : bytes, optional\n        Should be `b'Kramers'` or `b'OPAL'`\n    boundcond : bytes, optional\n        Should be `b'Teff'` or `b'Tirr'`\n    Mdotout: float, optional\n    Thot : float, optional\n    initialcond : bytes, optional\n        Should be `b'powerF'`, `b'powerSigma'`, `b'sinusF'`, `b'gaussF'` or\n        `b'quasistat'`\n    FO : float, optional\n    Mdisk0 : float, optional\n    Mdot0 : float, optional\n    powerorder : float, optional\n    gaussmu : float, optional\n    gausssigma : float, optional\n    Cirr : float, optional\n    irrfactortype : bytes, optional\n        Should be `b'const'` or `b'square'`\n    colourfactor : float, optional\n    emin : float, optional\n    emax : float, optional\n    inclination : float, optional\n        In degrees\n    distance : float, optional\n    lambda : list of float, optional\n    time : float, optional\n    tau : float, optional\n    Nx : int, optional\n    gridscale : bytes, optional\n        Should be `b'log'` or `b'linear'`\n\n    Attributes\n    ----------\n    time : float\n        Specified time\n    lambdas : numpy.ndarray\n        Specified lambdas, in cm\n    Nt : int\n        Number of evolutions steps. The number of time moments where disk\n        structure will be obtained is larger by unity\n    Cirr : float\n        Irradiation factor. Can be changed via assignment operator\n\n    Methods\n    -------\n    evolve() : EvolutionResults\n        Calculate disk evolution\n    alt(**kwargs) : Fredd""i\n        Alternative Freddi constructor accepting astropy Quantity and str\n\n    ", /*tp_doc*/
   0, /*tp_traverse*/
   0, /*tp_clear*/
   0, /*tp_richcompare*/
@@ -31124,37 +31121,6 @@ __pyx_capsule_create(void *p, CYTHON_UNUSED const char *sig)
         }\
         return (target_type) value;\
     }
-
-/* CIntToPy */
-            static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_int(unsigned int value) {
-    const unsigned int neg_one = (unsigned int) -1, const_zero = (unsigned int) 0;
-    const int is_unsigned = neg_one > const_zero;
-    if (is_unsigned) {
-        if (sizeof(unsigned int) < sizeof(long)) {
-            return PyInt_FromLong((long) value);
-        } else if (sizeof(unsigned int) <= sizeof(unsigned long)) {
-            return PyLong_FromUnsignedLong((unsigned long) value);
-#ifdef HAVE_LONG_LONG
-        } else if (sizeof(unsigned int) <= sizeof(unsigned PY_LONG_LONG)) {
-            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
-#endif
-        }
-    } else {
-        if (sizeof(unsigned int) <= sizeof(long)) {
-            return PyInt_FromLong((long) value);
-#ifdef HAVE_LONG_LONG
-        } else if (sizeof(unsigned int) <= sizeof(PY_LONG_LONG)) {
-            return PyLong_FromLongLong((PY_LONG_LONG) value);
-#endif
-        }
-    }
-    {
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        unsigned char *bytes = (unsigned char *)&value;
-        return _PyLong_FromByteArray(bytes, sizeof(unsigned int),
-                                     little, !is_unsigned);
-    }
-}
 
 /* MemviewDtypeToObject */
             static CYTHON_INLINE PyObject *__pyx_memview_get_double__const__(const char *itemp) {

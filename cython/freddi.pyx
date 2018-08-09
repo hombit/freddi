@@ -24,7 +24,7 @@ cdef class State:
 
     @property
     def Mdot_in(self) -> double:
-       return self.cpp_state.get_Mdot_in()
+       return self.cpp_state.Mdot_in()
 
     @property
     def Mdot(self) -> double:
@@ -32,143 +32,143 @@ cdef class State:
 
     @property
     def Mdot_out(self) -> double:
-        return self.cpp_state.get_Mdot_out()
+        return self.cpp_state.Mdot_out()
 
     @property
     def Lx(self) -> double:
-        return self.cpp_state.get_Lx()
+        return self.cpp_state.Lx()
         
     @property
     def t(self) -> double:
-        return self.cpp_state.get_t()
+        return self.cpp_state.t()
 
     @property
     def i_t(self) -> int:
-        return self.cpp_state.get_i_t()
+        return self.cpp_state.i_t()
 
     @property
     def Nx(self) -> int:
-        return self.cpp_state.get_Nx()
+        return self.cpp_state.Nx()
 
     @property
     def h(self) -> np.ndarray[np.float]:
-        cdef const double* data = self.cpp_state.get_h().data()
-        cdef size_t size = self.cpp_state.get_h().size()
+        cdef const double* data = self.cpp_state.h().data()
+        cdef size_t size = self.cpp_state.h().size()
         arr = np.asarray(<const double[:size]> data)
         arr.flags.writeable = False
         return arr
 
     @property
     def R(self) -> np.ndarray[np.float]:
-        cdef const double* data = self.cpp_state.get_R().data()
-        cdef size_t size = self.cpp_state.get_R().size()
+        cdef const double* data = self.cpp_state.R().data()
+        cdef size_t size = self.cpp_state.R().size()
         arr = np.asarray(<const double[:size]> data)
         arr.flags.writeable = False
         return arr
 
     @property
     def F(self) -> np.ndarray[np.float]:
-        cdef const double* data = self.cpp_state.get_F().data()
-        cdef size_t size = self.cpp_state.get_F().size()
+        cdef const double* data = self.cpp_state.F().data()
+        cdef size_t size = self.cpp_state.F().size()
         arr = np.asarray(<const double[:size]> data)
         arr.flags.writeable = False
         return arr
 
     @property
     def W(self) -> np.ndarray[np.float]:
-        cdef const double* data = self.cpp_state.get_W().data()
-        cdef size_t size = self.cpp_state.get_W().size()
+        cdef const double* data = self.cpp_state.W().data()
+        cdef size_t size = self.cpp_state.W().size()
         arr = np.asarray(<const double[:size]> data)
         arr.flags.writeable = False
         return arr
 
     @property
     def Tph(self) -> np.ndarray[np.float]:
-        cdef const double* data = self.cpp_state.get_Tph().data()
-        cdef size_t size = self.cpp_state.get_Tph().size()
+        cdef const double* data = self.cpp_state.Tph().data()
+        cdef size_t size = self.cpp_state.Tph().size()
         arr = np.asarray(<const double[:size]> data)
         arr.flags.writeable = False
         return arr
 
     @property
     def Tph_vis(self) -> np.ndarray[np.float]:
-        cdef const double* data = self.cpp_state.get_Tph_vis().data()
-        cdef size_t size = self.cpp_state.get_Tph_vis().size()
+        cdef const double* data = self.cpp_state.Tph_vis().data()
+        cdef size_t size = self.cpp_state.Tph_vis().size()
         arr = np.asarray(<const double[:size]> data)
         arr.flags.writeable = False
         return arr
 
     @property
     def Tirr(self) -> np.ndarray[np.float]:
-        cdef const double* data = self.cpp_state.get_Tirr().data()
-        cdef size_t size = self.cpp_state.get_Tirr().size()
+        cdef const double* data = self.cpp_state.Tirr().data()
+        cdef size_t size = self.cpp_state.Tirr().size()
         arr = np.asarray(<const double[:size]> data)
         arr.flags.writeable = False
         return arr
 
     @property
     def Cirr(self) -> np.ndarray[np.float]:
-        cdef const double* data = self.cpp_state.get_Cirr().data()
-        cdef size_t size = self.cpp_state.get_Cirr().size()
+        cdef const double* data = self.cpp_state.Cirr().data()
+        cdef size_t size = self.cpp_state.Cirr().size()
         arr = np.asarray(<const double[:size]> data)
         arr.flags.writeable = False
         return arr
 
     @property
     def Sigma(self) -> np.ndarray[np.float]:
-        cdef const double* data = self.cpp_state.get_Sigma().data()
-        cdef size_t size = self.cpp_state.get_Sigma().size()
+        cdef const double* data = self.cpp_state.Sigma().data()
+        cdef size_t size = self.cpp_state.Sigma().size()
         arr = np.asarray(<const double[:size]> data)
         arr.flags.writeable = False
         return arr
 
     @property
     def Height(self) -> np.ndarray[np.float]:
-        cdef const double* data = self.cpp_state.get_Height().data()
-        cdef size_t size = self.cpp_state.get_Height().size()
+        cdef const double* data = self.cpp_state.Height().data()
+        cdef size_t size = self.cpp_state.Height().size()
         arr = np.asarray(<const double[:size]> data)
         arr.flags.writeable = False
         return arr
 
     @property
     def last_h(self) -> double:
-        return self.cpp_state.get_h()[self.cpp_state.get_Nx()-1]
+        return self.cpp_state.h().back()
 
     @property
     def last_R(self) -> double:
-        return self.cpp_state.get_R()[self.cpp_state.get_Nx()-1]
+        return self.cpp_state.R().back()
 
     @property
     def last_F(self) -> double:
-        return self.cpp_state.get_F()[self.cpp_state.get_Nx()-1]
+        return self.cpp_state.F().back()
 
     @property
     def last_W(self) -> double:
-        return self.cpp_state.get_W()[self.cpp_state.get_Nx()-1]
+        return self.cpp_state.W().back()
 
     @property
     def last_Tph(self) -> double:
-        return self.cpp_state.get_Tph()[self.cpp_state.get_Nx()-1]
+        return self.cpp_state.Tph().back()
 
     @property
     def last_Tph_vis(self) -> double:
-        return self.cpp_state.get_Tph_vis()[self.cpp_state.get_Nx()-1]
+        return self.cpp_state.Tph_vis().back()
 
     @property
     def last_Tirr(self) -> double:
-        return self.cpp_state.get_Tirr()[self.cpp_state.get_Nx()-1]
+        return self.cpp_state.Tirr().back()
 
     @property
     def last_Cirr(self) -> double:
-        return self.cpp_state.get_Cirr()[self.cpp_state.get_Nx()-1]
+        return self.cpp_state.Cirr().back()
 
     @property
     def last_Sigma(self) -> double:
-        return self.cpp_state.get_Sigma()[self.cpp_state.get_Nx()-1]
+        return self.cpp_state.Sigma().back()
 
     @property
     def last_Height(self) -> double:
-        return self.cpp_state.get_Height()[self.cpp_state.get_Nx()-1]
+        return self.cpp_state.Height().back()
 
     @property
     def mU(self) -> double:
@@ -333,7 +333,7 @@ cdef class Freddi:
         Specified lambdas, in cm
     Nt : int
         Number of evolutions steps. The number of time moments where disk
-        structure will be obtained is more by one
+        structure will be obtained is larger by unity
     Cirr : float
         Irradiation factor. Can be changed via assignment operator
 
@@ -464,7 +464,7 @@ cdef class Freddi:
         self.change_SelfIrradiationArguments(Cirr=val)
 
     cdef State get_state(self):
-        return state_from_cpp(self.evolution.get_state())
+        return state_from_cpp(self.evolution.state())
 
     def __iter__(self):
         """Iterate disk over time
