@@ -39,7 +39,7 @@ public:
 	void step(double tau);
 	inline void step() { return step(args->calc->tau); }
 	std::vector<FreddiState> evolve();
-	inline FreddiState& get_state() { return *state_; }
+	inline FreddiState& state() { return *state_; }
 };
 
 
