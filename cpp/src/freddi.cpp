@@ -26,11 +26,9 @@ FreddiEvolution::FreddiEvolution(const FreddiArguments &args_):
 
 
 void FreddiEvolution::step(const double tau) {
-	state_.reset(new FreddiState(*state_, tau));
-
-	nonlenear_diffusion_nonuniform_1_2(args->calc->tau, args->calc->eps, 0., state_->Mdot_out(), wunc, state_->h(), state_->F_);
 	Mdot_in_prev = state_->Mdot_in();
-
+	state_.reset(new FreddiState(*state_, tau));
+	nonlenear_diffusion_nonuniform_1_2(args->calc->tau, args->calc->eps, 0., state_->Mdot_out(), wunc, state_->h(), state_->F_);
 	truncateOuterRadius();
 }
 
