@@ -1,6 +1,7 @@
 # distutils: language = c++
 
 from cython.operator cimport dereference
+from libc cimport math
 
 import numpy as np
 cimport numpy as cnp; cnp.import_array()
@@ -298,7 +299,8 @@ cdef class Freddi:
         Should be `b'Kramers'` or `b'OPAL'`
     boundcond : bytes, optional
         Should be `b'Teff'` or `b'Tirr'`
-    Mdotout: float, optional
+    Fdead : float, optional
+    Mdotout : float, optional
     Thot : float, optional
     initialcond : bytes, optional
         Should be `b'powerF'`, `b'powerSigma'`, `b'sinusF'`, `b'gaussF'` or
@@ -329,6 +331,10 @@ cdef class Freddi:
     ----------
     time : float
         Specified time
+    distance : float
+        Specified distance
+    cosi : flaot
+        Cosinus of specified inclination
     lambdas : numpy.ndarray
         Specified lambdas, in cm
     Nt : int
@@ -353,10 +359,10 @@ cdef class Freddi:
         self, *, bint cgs=True,
         double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt,
             double period=default_period, rin=None, rout=None,
-        string opacity=default_opacity, double Mdotout=default_Mdotout, string boundcond=default_boundcond,
-            double Thot=default_Thot, string initialcond=default_initialcond, double F0=default_F0,
-            double powerorder=default_powerorder, double gaussmu=default_gaussmu, double gausssigma=default_gausssigma,
-            Mdisk0=None, Mdot0=None,
+        string opacity=default_opacity, double Fdead=default_Fdead, double Mdotout=default_Mdotout,
+            string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond,
+            double F0=default_F0, double powerorder=default_powerorder, double gaussmu=default_gaussmu,
+            double gausssigma=default_gausssigma, Mdisk0=None, Mdot0=None,
         double Cirr=default_Cirr, string irrfactortype=default_irrfactortype,
         double colourfactor=default_colourfactor, double emin=default_emin, double emax=default_emax,
             double inclination=default_inclination, double distance=default_distance, vector[double] lambdas=[],
@@ -395,8 +401,8 @@ cdef class Freddi:
         if Mdot0 is None:
             Mdot0 = -1.0
         cdef DiskStructureArguments* disk = new DiskStructureArguments(
-            dereference(basic), opacity, Mdotout, boundcond, Thot, initialcond, F0, powerorder, gaussmu, gausssigma,
-            is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0
+            dereference(basic), opacity, Fdead, Mdotout, boundcond, Thot, initialcond, F0, powerorder,
+            gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0
         )
         cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(Cirr, irrfactortype)
         cdef FluxArguments* flux = new FluxArguments(colourfactor, emin, emax, inclination, distance, lambdas)
@@ -445,6 +451,14 @@ cdef class Freddi:
         return self.args.calc.get().time
 
     @property
+    def distance(self) -> double:
+        return self.args.flux.get().distance
+
+    @property
+    def cosi(self) -> double:
+        return math.cos(self.args.flux.get().inclination / (<double> 180.) * math.M_PI)
+
+    @property
     def lambdas(self) -> np.ndarray:
         cdef const double* data = self.args.flux.get().lambdas.data()
         cdef size_t size = self.args.flux.get().lambdas.size()
@@ -472,7 +486,38 @@ cdef class Freddi:
     def Cirr(self, val: double) -> None:
         self.change_SelfIrradiationArguments(Cirr=val)
 
-    cdef State get_state(self):
+    cdef void change_DiskStructureArguments(self, opacity=None, Fdead=None, Mdotout=None, boundcond=None, Thot=None):
+            cdef string c_opacity = self.args.disk.get().opacity if opacity is None else opacity
+            cdef double c_Fdead = self.args.disk.get().Fdead if Fdead is None else Fdead
+            cdef double c_Mdotout = self.args.disk.get().Mdotout if Mdotout is None else Mdotout
+            cdef string c_boundcond = self.args.disk.get().boundcond if boundcond is None else boundcond
+            cdef double c_Thot = self.args.disk.get().Thot if Thot is None else Thot
+            cdef DiskStructureArguments* disk = new DiskStructureArguments(
+                dereference(self.args.basic.get()),
+                c_opacity, c_Fdead, c_Mdotout, c_boundcond, c_Thot,
+                self.args.disk.get().initialcond, self.args.disk.get().F0, self.args.disk.get().powerorder,
+                self.args.disk.get().gaussmu, self.args.disk.get().gausssigma,
+                True, True, self.args.disk.get().Mdisk0, self.args.disk.get().Mdot0
+            )
+            self.args.disk.reset(disk)
+
+    @property
+    def boundcond(self) -> bytes:
+        return self.args.disk.get().boundcond
+
+    @boundcond.setter
+    def boundcond(self, val: bytes) -> None:
+        self.change_DiskStructureArguments(opacity=None, Fdead=None, Mdotout=None, boundcond=val)
+
+    @property
+    def Thot(self) -> double:
+        return self.args.disk.get().Thot
+
+    @Thot.setter
+    def Thot(self, val: double) -> None:
+        self.change_DiskStructureArguments(opacity=None, Fdead=None, Mdotout=None, boundcond=None, Thot=val)
+
+    cpdef State get_state(self):
         return state_from_cpp(self.evolution.state())
 
     def __iter__(self):

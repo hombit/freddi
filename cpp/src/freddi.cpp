@@ -13,6 +13,7 @@
 
 using namespace std::placeholders;
 
+
 FreddiEvolution::FreddiEvolution(const FreddiArguments &args_):
 		Nt(static_cast<size_t>(std::round(args_.calc->time / args_.calc->tau))),
 		args(&args_),
@@ -30,9 +31,13 @@ FreddiEvolution::FreddiEvolution(const FreddiArguments &args_):
 void FreddiEvolution::step(const double tau) {
 	Mdot_in_prev = state_->Mdot_in();
 	state_.reset(new FreddiState(*state_, tau));
-	nonlenear_diffusion_nonuniform_1_2(args->calc->tau, args->calc->eps, state_->F_in(), state_->Mdot_out(), wunc, state_->h(), state_->F_);
-	truncateOuterRadius();
 	truncateInnerRadius();
+	nonlenear_diffusion_nonuniform_1_2(
+			args->calc->tau, args->calc->eps,
+			state_->F_in(), state_->Mdot_out(), wunc,
+			state_->h(), state_->F_
+			);
+	truncateOuterRadius();
 }
 
 
@@ -48,7 +53,6 @@ std::vector<FreddiState> FreddiEvolution::evolve() {
 
 
 void FreddiEvolution::truncateOuterRadius() {
-	auto ii = state_->Nx_;
 //		if (bound_cond_type == "MdotOut"){
 //			Mdot_out = - kMdot_out * Mdot_in;
 //			do{
@@ -61,20 +65,19 @@ void FreddiEvolution::truncateOuterRadius() {
 //				 Equation from Menou et al. 1999. Factor 4 is from their fig 8 and connected to point where Mdot = 0.
 //			} while( Sigma.at(ii) <  4 * Sigma_hot_disk(R[ii]) );
 //		} else
+	if (state_->Mdot_in() > Mdot_in_prev) {
+		return;
+	}
+
+	auto ii = state_->Nx_;
 	if (args->disk->boundcond == "Teff") {
-		do{
+		do {
 			ii--;
 		} while( state_->Tph().at(ii) < args->disk->Thot );
 	} else if (args->disk->boundcond == "Tirr") {
-		if ( state_->Mdot_in() >= Mdot_in_prev && (args->disk->initialcond == "power" || args->disk->initialcond == "sinusgauss") ){
-			do{
-				ii--;
-			} while( state_->Tph().at(ii) < args->disk->Thot );
-		} else{
-			do{
-				ii--;
-			} while( state_->Tirr().at(ii) < args->disk->Thot );
-		}
+		do {
+			ii--;
+		} while( state_->Tirr().at(ii) < args->disk->Thot );
 	} else{
 		throw std::logic_error("Wrong boundcond");
 	}
@@ -83,20 +86,23 @@ void FreddiEvolution::truncateOuterRadius() {
 		state_->Nx_ = ii+1;
 		// F.at(Nx-2) = F.at(Nx-1) - Mdot_out / (2.*M_PI) * (h.at(Nx-1) - h.at(Nx-2));
 		state_->h_.resize(state_->Nx_);
+		state_->R_.resize(state_->Nx_);
+		state_->F_.resize(state_->Nx_);
 	}
 }
 
+
 void FreddiEvolution::truncateInnerRadius() {
-	if (F_dead <= 0.) {
+	if (args->disk->Fdead <= 0.) {
 		return;
 	}
-	if ( state_->Mdot_in() < Mdot_in_prev ) {
+	if ( state_->Mdot_in() > Mdot_in_prev ) {
 		return;
 	}
 	if ( Mdot_in_prev > Mdot_peak ) {
 		Mdot_peak = Mdot_in_prev;
 		mu_magn = std::sqrt(Mdot_peak * std::sqrt(GM) * std::pow(X_R * args->basic->rin, 3.5));
-		R_dead = std::cbrt(mu_magn*mu_magn / F_dead);
+		R_dead = std::cbrt(mu_magn*mu_magn / args->disk->Fdead);
 	}
 
 	double R_m = X_R * args->basic->rin * std::pow(Mdot_peak / state_->Mdot_in(), 2./7.);
@@ -112,12 +118,13 @@ void FreddiEvolution::truncateInnerRadius() {
 	}
 	R_m = state_->R().at(ii);
 
+	/*
 	double F_m;
 	if (R_m < R_cor) {
 		const double n_ws = 1 - k_t * xi_pow_minus_7_2 * std::pow(R_m / R_cor, 3);
 		F_m = (1 - n_ws) * state_->Mdot_in() * std::sqrt(GM * R_m);
 	} else {
-		F_m = F_dead;
+		F_m = args->disk->Fdead;
 	}
 	const double new_F_in = F_m + state_->Mdot_in() * (std::sqrt(GM * args->basic->rin) - std::sqrt(GM * R_m));
 	if (new_F_in < 0) {
@@ -125,20 +132,17 @@ void FreddiEvolution::truncateInnerRadius() {
 	}
 
 	state_->F_in_ = new_F_in;
+	*/
+
+	state_->F_in_ = state_->F_[0] = args->disk->Fdead;
 	if (ii > 0) {
 		state_->Nx_ -= ii;
 		state_->h_.erase(state_->h_.begin(), state_->h_.begin() + ii);
 		state_->R_.erase(state_->R_.begin(), state_->R_.begin() + ii);
 		state_->F_.erase(state_->F_.begin(), state_->F_.begin() + ii);
-		state_->W_->erase(state_->W_->begin(), state_->W_->begin() + ii);
-		state_->Tph_->erase(state_->Tph_->begin(), state_->Tph_->begin() + ii);
-		state_->Tph_vis_->erase(state_->Tph_vis_->begin(), state_->Tph_vis_->begin() + ii);
-		state_->Tph_X_->erase(state_->Tph_X_->begin(), state_->Tph_X_->begin() + ii);
-		state_->Tirr_->erase(state_->Tirr_->begin(), state_->Tirr_->begin() + ii);
-		state_->Cirr_->erase(state_->Cirr_->begin(), state_->Cirr_->begin() + ii);
-		state_->Sigma_->erase(state_->Sigma_->begin(), state_->Sigma_->begin() + ii);
 	}
 }
+
 
 vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t first, size_t last) const {
 	vecd W(last + 1, 0.);
@@ -169,7 +173,7 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 	const double h_in = args->basic->h(args->basic->rin);
 	const double h_out = args->basic->h(args->basic->rout);
 
-	for (int i = 0; i < Nx_; ++i) {
+	for (size_t i = 0; i < Nx_; ++i) {
 		if (args->calc->gridscale == "log") {
 			h_[i] = h_in * pow(h_out / h_in, i / (Nx_ - 1.));
 		} else if (args->calc->gridscale == "linear") {
@@ -200,7 +204,7 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 			F_[i] = args->disk->F0 * oprel->f_F(xi_LS2000) * (1. - h_in / h_[i]) / (1. - h_in / h_out);
 		}
 	} else if (args->disk->initialcond == "gaussF") {
-		for (int i = 0; i < Nx_; ++i) {
+		for (size_t i = 0; i < Nx_; ++i) {
 			const double xi = (h_[i] - h_in) / (h_out - h_in);
 			F_[i] = args->disk->F0 * exp(-(xi - args->disk->gaussmu) * (xi - args->disk->gaussmu) /
 											   (2. * args->disk->gausssigma * args->disk->gausssigma));
@@ -356,9 +360,11 @@ const vecd& FreddiState::Tph_vis() {
 const vecd& FreddiState::Tph_X() {
 	if (!Tph_X_) {
 		vecd x(Nx_);
-		for (size_t i = 0; i < Nx_; i++) {
+		x[0] = 0;
+		for (size_t i = 1; i < Nx_; i++) {
 			x[i] = (freddi->args->flux->colourfactor
-					* T_GR(R()[i], freddi->args->basic->kerr, freddi->args->basic->Mx, Mdot_in(), R().front()));
+					* T_GR(R()[i], freddi->args->basic->kerr, freddi->args->basic->Mx, F()[i]
+					/ (h()[i] - h()[0]), R()[0]));
 		}
 		Tph_X_ = std::move(x);
 	}

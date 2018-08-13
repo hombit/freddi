@@ -76,6 +76,7 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 		DiskStructureArguments(
 				bdb_args,
 				vm["opacity"].as<std::string>(),
+				0,  // Fdead
 				vm["Mdotout"].as<double>(),
 				vm["boundcond"].as<std::string>(),
 				vm["Thot"].as<double>(),

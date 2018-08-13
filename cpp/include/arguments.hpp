@@ -111,6 +111,7 @@ public:
 class DiskStructureArguments {
 public:
 	constexpr static const char default_opacity[] = "Kramers";
+	constexpr static const double default_Fdead = 0.;
 	constexpr static const double default_Mdotout = 0.;
 	constexpr static const char default_boundcond[] = "Teff";
 	constexpr static const double default_Thot = 0.;
@@ -123,6 +124,7 @@ public:
 	constexpr static const double mu = 0.62;
 public:
 	const std::string opacity;
+	const double Fdead;
 	const double Mdotout;
 	const std::string boundcond;
 	const double Thot;
@@ -142,7 +144,7 @@ public:
 	DiskStructureArguments(
 			const BasicDiskBinaryArguments &bdb_args,
 			const std::string& opacity,
-			double Mdotout,
+			double Fdead, double Mdotout,
 			const std::string& boundcond, double Thot,
 			const std::string& initialcond, double F0,
 			double powerorder, double gaussmu, double gausssigma,
