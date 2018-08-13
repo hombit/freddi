@@ -15,7 +15,7 @@ class FreddiState;
 
 class FreddiEvolution {
 	typedef std::vector<double> vecd;
-private:
+protected:
 	double Mdot_in_prev;
 	double Mdot_peak = -INFINITY;
 public:
@@ -27,30 +27,38 @@ public:
 	const OpacityRelated* oprel;
 	std::function<vecd (const vecd&, const vecd&, size_t, size_t)> wunc;
 	const FreddiArguments* args;
-// TODO: move to arguments
+protected:
+	std::unique_ptr<FreddiState> state_;
+	void truncateOuterRadius();
+protected:
+	vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;
+	double Sigma_hot_disk(double r) const;
+	inline void set_Mdot_in_prev(double Mdot_in) { Mdot_in_prev = Mdot_in; }
+	void set_Mdot_in_prev();
+public:
+	FreddiEvolution(const FreddiArguments& args);
+	virtual void step(double tau);
+	inline void step() { return step(args->calc->tau); }
+	std::vector<FreddiState> evolve();
+	inline FreddiState& state() { return *state_; }
+};
+
+
+class FreddiNeutronStarEvolution: public FreddiEvolution {
 private:
 	const double X_R = 1.;
 	const double k_t = 1. / 3.;
 	const double xi = 0.7;
 	const double xi_pow_minus_7_2;
-	const double P_acc = 0.002;
+	const double P_acc = 0.002;  // TODO: Move to arguments
 	const double R_cor;
 	double mu_magn = 0;
 	double R_dead = 0;
 private:
-	std::unique_ptr<FreddiState> state_;
-private:
-	void truncateOuterRadius();
 	void truncateInnerRadius();
-protected:
-	vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;
-	double Sigma_hot_disk(double r) const;
 public:
-	FreddiEvolution(const FreddiArguments& args);
-	void step(double tau);
-	inline void step() { return step(args->calc->tau); }
-	std::vector<FreddiState> evolve();
-	inline FreddiState& state() { return *state_; }
+	FreddiNeutronStarEvolution(const FreddiArguments& args);
+	virtual void step(double tau) override;
 };
 
 
@@ -66,6 +74,7 @@ public:
 	FreddiState& operator=(const FreddiState&) = default;
 	FreddiState& operator=(FreddiState&&) = delete;
 	friend FreddiEvolution;
+	friend FreddiNeutronStarEvolution;
 private:
 	double Mdot_out_ = 0;
 	double F_in_ = 0;

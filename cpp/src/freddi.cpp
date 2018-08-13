@@ -23,15 +23,17 @@ FreddiEvolution::FreddiEvolution(const FreddiArguments &args_):
 		cosiOverD2(std::cos(args_.flux->inclination / 180 * M_PI) / (args_.flux->distance * args_.flux->distance)),
 		oprel(args_.disk->oprel.get()),
 		wunc(std::bind(&FreddiEvolution::wunction, this, _1, _2, _3, _4)),
-		state_(new FreddiState(this)),
-		xi_pow_minus_7_2(std::pow(xi, -3.5)),
-		R_cor(std::cbrt(GM * P_acc*P_acc / (4 * M_PI*M_PI))) {}
+		state_(new FreddiState(this)) {}
+
+
+void FreddiEvolution::set_Mdot_in_prev() {
+	set_Mdot_in_prev(state_->Mdot_in());
+}
 
 
 void FreddiEvolution::step(const double tau) {
-	Mdot_in_prev = state_->Mdot_in();
+	set_Mdot_in_prev();
 	state_.reset(new FreddiState(*state_, tau));
-	truncateInnerRadius();
 	nonlenear_diffusion_nonuniform_1_2(
 			args->calc->tau, args->calc->eps,
 			state_->F_in(), state_->Mdot_out(), wunc,
@@ -92,7 +94,42 @@ void FreddiEvolution::truncateOuterRadius() {
 }
 
 
-void FreddiEvolution::truncateInnerRadius() {
+vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t first, size_t last) const {
+	vecd W(last + 1, 0.);
+	for ( size_t i = first; i <= last; ++i ){
+		W[i] = pow(F[i], 1. - oprel->m) * pow(h[i], oprel->n) / (1. - oprel->m) / oprel->D;
+	}
+	return W;
+};
+
+
+// Equation from Lasota, Dubus, Kruk A&A 2008, Menou et al. 1999. Sigma_cr is from their fig 8 and connected to point where Mdot is minimal.
+double FreddiEvolution::Sigma_hot_disk(double r) const {
+	return 39.9 * pow(args->basic->alpha/0.1, -0.80) * pow(r/1e10, 1.11) * pow(args->basic->Mx/GSL_CONST_CGSM_SOLAR_MASS, -0.37);
+};
+
+
+
+FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiArguments &args):
+		FreddiEvolution(args),
+		xi_pow_minus_7_2(std::pow(xi, -3.5)),
+		R_cor(std::cbrt(GM * P_acc*P_acc / (4 * M_PI*M_PI))) {}
+
+
+void FreddiNeutronStarEvolution::step(double tau) {
+	set_Mdot_in_prev();
+	state_.reset(new FreddiState(*state_, tau));
+	truncateInnerRadius();
+	nonlenear_diffusion_nonuniform_1_2(
+			args->calc->tau, args->calc->eps,
+			state_->F_in(), state_->Mdot_out(), wunc,
+			state_->h(), state_->F_
+	);
+	truncateOuterRadius();
+}
+
+
+void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	if (args->disk->Fdead <= 0.) {
 		return;
 	}
@@ -142,21 +179,6 @@ void FreddiEvolution::truncateInnerRadius() {
 		state_->F_.erase(state_->F_.begin(), state_->F_.begin() + ii);
 	}
 }
-
-
-vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t first, size_t last) const {
-	vecd W(last + 1, 0.);
-	for ( size_t i = first; i <= last; ++i ){
-		W[i] = pow(F[i], 1. - oprel->m) * pow(h[i], oprel->n) / (1. - oprel->m) / oprel->D;
-	}
-	return W;
-};
-
-
-// Equation from Lasota, Dubus, Kruk A&A 2008, Menou et al. 1999. Sigma_cr is from their fig 8 and connected to point where Mdot is minimal.
-double FreddiEvolution::Sigma_hot_disk(double r) const {
-	return 39.9 * pow(args->basic->alpha/0.1, -0.80) * pow(r/1e10, 1.11) * pow(args->basic->Mx/GSL_CONST_CGSM_SOLAR_MASS, -0.37);
-};
 
 
 

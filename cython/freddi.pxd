@@ -37,6 +37,8 @@ cdef extern from 'freddi.hpp':
         vector[FreddiState] evolve() except +
         FreddiState& state()
         size_t Nt
+    cdef cppclass FreddiNeutronStarEvolution:
+        FreddiNeutronStarEvolution(const FreddiArguments&) except +
 
 
 cdef extern from 'arguments.hpp':

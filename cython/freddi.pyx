@@ -356,7 +356,7 @@ cdef class Freddi:
     cdef FreddiEvolution* evolution
 
     def __cinit__(
-        self, *, bint cgs=True,
+        self, *, bint cgs=True, bytes type=b'Normal',
         double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt,
             double period=default_period, rin=None, rout=None,
         string opacity=default_opacity, double Fdead=default_Fdead, double Mdotout=default_Mdotout,
@@ -413,7 +413,12 @@ cdef class Freddi:
             calc = new CalculationArguments(time, tau, Nx, gridscale, eps)
         self.args = new FreddiArguments(general, basic, disk, irr, flux, calc)
 
-        self.evolution = new FreddiEvolution(dereference(self.args))
+        if type == b'Normal':
+            self.evolution = new FreddiEvolution(dereference(self.args))
+        elif type == b'NeutronStar':
+            self.evolution = <FreddiEvolution *> new FreddiNeutronStarEvolution(dereference(self.args))
+        else:
+            raise ValueError("Supported type values are 'Normal' and 'NeutronStar'")
 
     def __dealloc__(self):
         del self.args
