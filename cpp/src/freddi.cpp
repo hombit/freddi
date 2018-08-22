@@ -155,23 +155,15 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	}
 	R_m = state_->R().at(ii);
 
-	/*
-	double F_m;
+	double new_F_in;
 	if (R_m < R_cor) {
 		const double n_ws = 1 - k_t * xi_pow_minus_7_2 * std::pow(R_m / R_cor, 3);
-		F_m = (1 - n_ws) * state_->Mdot_in() * std::sqrt(GM * R_m);
+		new_F_in = (1 - n_ws) * state_->Mdot_in() * std::sqrt(GM * R_m);
 	} else {
-		F_m = args->disk->Fdead;
+		new_F_in = args->disk->Fdead * std::pow(R_dead / R_m, 3);
 	}
-	const double new_F_in = F_m + state_->Mdot_in() * (std::sqrt(GM * args->basic->rin) - std::sqrt(GM * R_m));
-	if (new_F_in < 0) {
-		throw std::runtime_error("Viscous torque cannot be negative");
-	}
+	state_->F_in_ = state_->F_[0] = new_F_in;
 
-	state_->F_in_ = new_F_in;
-	*/
-
-	state_->F_in_ = state_->F_[0] = args->disk->Fdead;
 	if (ii > 0) {
 		state_->Nx_ -= ii;
 		state_->h_.erase(state_->h_.begin(), state_->h_.begin() + ii);
