@@ -28,4 +28,17 @@ void nonlenear_diffusion_nonuniform_1_2 (double tau,
 									 	);
 
 
+void nonlenear_diffusion_nonuniform_wind_1_2 (
+		double tau,
+		double eps, // relative error for w
+		double left_bounder_cond, // y(left_border,Time+tau) = left_bounder_cond
+		double right_bounder_cond, // \frac{y(right_border,Time+tau)}{dx} = right_bounder_cond
+		const vecd &A,
+		const vecd &B,
+		std::function<vecd (const vecd &, const vecd &, size_t, size_t)> wunc, // first argument is array of x_i, second — array of y(x_i,t); return value — array of w(x_i,y_i)
+		const vecd &x, // array with (non)uniform grid
+		vecd &y// array with initial condition and for results
+);
+
+
 #endif // _NONLINEAR_DIFFUSION_HPP
