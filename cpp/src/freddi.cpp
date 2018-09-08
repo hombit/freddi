@@ -34,9 +34,11 @@ void FreddiEvolution::set_Mdot_in_prev() {
 void FreddiEvolution::step(const double tau) {
 	set_Mdot_in_prev();
 	state_.reset(new FreddiState(*state_, tau));
-	nonlenear_diffusion_nonuniform_1_2(
+	const vecd A(state_->Nx(), 0.0), B(state_->Nx(), 0.0);
+	nonlinear_diffusion_nonuniform_wind_1_2(
 			args->calc->tau, args->calc->eps,
-			state_->F_in(), state_->Mdot_out(), wunc,
+			state_->F_in(), state_->Mdot_out(),
+			A, B, wunc,
 			state_->h(), state_->F_
 			);
 	truncateOuterRadius();
@@ -375,11 +377,9 @@ const vecd& FreddiState::Tph_vis() {
 const vecd& FreddiState::Tph_X() {
 	if (!Tph_X_) {
 		vecd x(Nx_);
-		x[0] = 0;
-		for (size_t i = 1; i < Nx_; i++) {
+		for (size_t i = 0; i < Nx_; i++) {
 			x[i] = (freddi->args->flux->colourfactor
-					* T_GR(R()[i], freddi->args->basic->kerr, freddi->args->basic->Mx, F()[i]
-					/ (h()[i] - h()[0]), R()[0]));
+					* T_GR(R()[i], freddi->args->basic->kerr, freddi->args->basic->Mx, Mdot_in(), R().front()));
 		}
 		Tph_X_ = std::move(x);
 	}
