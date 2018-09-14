@@ -235,7 +235,7 @@ cdef class EvolutionResults:
     cdef vector[FreddiState] cpp_states
     cdef object[:] states
 
-    def __cinit__(self, Freddi freddi):
+    def __cinit__(self, _BasicFreddi freddi):
         self.cpp_states = freddi.evolution.evolve()
         self.states = np.empty(<Py_ssize_t> self.cpp_states.size(), dtype=object)
         cdef Py_ssize_t i

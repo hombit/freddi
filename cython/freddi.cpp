@@ -2930,7 +2930,7 @@ static PyObject *__pyx_pf_6freddi_5State_5Mdisk___get__(struct __pyx_obj_6freddi
 static PyObject *__pyx_pf_6freddi_5State_2flux(struct __pyx_obj_6freddi_State *__pyx_v_self, PyObject *__pyx_v_lmbd); /* proto */
 static PyObject *__pyx_pf_6freddi_5State_4__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_State *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_5State_6__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_State *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
-static int __pyx_pf_6freddi_16EvolutionResults___cinit__(struct __pyx_obj_6freddi_EvolutionResults *__pyx_v_self, struct __pyx_obj_6freddi_Freddi *__pyx_v_freddi); /* proto */
+static int __pyx_pf_6freddi_16EvolutionResults___cinit__(struct __pyx_obj_6freddi_EvolutionResults *__pyx_v_self, struct __pyx_obj_6freddi__BasicFreddi *__pyx_v_freddi); /* proto */
 static PyObject *__pyx_pf_6freddi_16EvolutionResults_2flux(struct __pyx_obj_6freddi_EvolutionResults *__pyx_v_self, PyObject *__pyx_v_lmbd); /* proto */
 static PyObject *__pyx_pf_6freddi_16EvolutionResults_4__getattr__(struct __pyx_obj_6freddi_EvolutionResults *__pyx_v_self, PyObject *__pyx_v_attr); /* proto */
 static PyObject *__pyx_pf_6freddi_16EvolutionResults_6__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_EvolutionResults *__pyx_v_self); /* proto */
@@ -6775,7 +6775,7 @@ static struct __pyx_obj_6freddi_State *__pyx_f_6freddi_state_from_cpp(FreddiStat
 /* "freddi.pyx":238
  *     cdef object[:] states
  * 
- *     def __cinit__(self, Freddi freddi):             # <<<<<<<<<<<<<<
+ *     def __cinit__(self, _BasicFreddi freddi):             # <<<<<<<<<<<<<<
  *         self.cpp_states = freddi.evolution.evolve()
  *         self.states = np.empty(<Py_ssize_t> self.cpp_states.size(), dtype=object)
  */
@@ -6783,7 +6783,7 @@ static struct __pyx_obj_6freddi_State *__pyx_f_6freddi_state_from_cpp(FreddiStat
 /* Python wrapper */
 static int __pyx_pw_6freddi_16EvolutionResults_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static int __pyx_pw_6freddi_16EvolutionResults_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  struct __pyx_obj_6freddi_Freddi *__pyx_v_freddi = 0;
+  struct __pyx_obj_6freddi__BasicFreddi *__pyx_v_freddi = 0;
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__ (wrapper)", 0);
@@ -6813,7 +6813,7 @@ static int __pyx_pw_6freddi_16EvolutionResults_1__cinit__(PyObject *__pyx_v_self
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
     }
-    __pyx_v_freddi = ((struct __pyx_obj_6freddi_Freddi *)values[0]);
+    __pyx_v_freddi = ((struct __pyx_obj_6freddi__BasicFreddi *)values[0]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
@@ -6823,7 +6823,7 @@ static int __pyx_pw_6freddi_16EvolutionResults_1__cinit__(PyObject *__pyx_v_self
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_freddi), __pyx_ptype_6freddi_Freddi, 1, "freddi", 0))) __PYX_ERR(1, 238, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_freddi), __pyx_ptype_6freddi__BasicFreddi, 1, "freddi", 0))) __PYX_ERR(1, 238, __pyx_L1_error)
   __pyx_r = __pyx_pf_6freddi_16EvolutionResults___cinit__(((struct __pyx_obj_6freddi_EvolutionResults *)__pyx_v_self), __pyx_v_freddi);
 
   /* function exit code */
@@ -6835,7 +6835,7 @@ static int __pyx_pw_6freddi_16EvolutionResults_1__cinit__(PyObject *__pyx_v_self
   return __pyx_r;
 }
 
-static int __pyx_pf_6freddi_16EvolutionResults___cinit__(struct __pyx_obj_6freddi_EvolutionResults *__pyx_v_self, struct __pyx_obj_6freddi_Freddi *__pyx_v_freddi) {
+static int __pyx_pf_6freddi_16EvolutionResults___cinit__(struct __pyx_obj_6freddi_EvolutionResults *__pyx_v_self, struct __pyx_obj_6freddi__BasicFreddi *__pyx_v_freddi) {
   Py_ssize_t __pyx_v_i;
   int __pyx_r;
   __Pyx_RefNannyDeclarations
@@ -6855,13 +6855,13 @@ static int __pyx_pf_6freddi_16EvolutionResults___cinit__(struct __pyx_obj_6fredd
 
   /* "freddi.pyx":239
  * 
- *     def __cinit__(self, Freddi freddi):
+ *     def __cinit__(self, _BasicFreddi freddi):
  *         self.cpp_states = freddi.evolution.evolve()             # <<<<<<<<<<<<<<
  *         self.states = np.empty(<Py_ssize_t> self.cpp_states.size(), dtype=object)
  *         cdef Py_ssize_t i
  */
   try {
-    __pyx_t_1 = __pyx_v_freddi->__pyx_base.evolution->evolve();
+    __pyx_t_1 = __pyx_v_freddi->evolution->evolve();
   } catch(...) {
     __Pyx_CppExn2PyErr();
     __PYX_ERR(1, 239, __pyx_L1_error)
@@ -6869,7 +6869,7 @@ static int __pyx_pf_6freddi_16EvolutionResults___cinit__(struct __pyx_obj_6fredd
   __pyx_v_self->cpp_states = __pyx_t_1;
 
   /* "freddi.pyx":240
- *     def __cinit__(self, Freddi freddi):
+ *     def __cinit__(self, _BasicFreddi freddi):
  *         self.cpp_states = freddi.evolution.evolve()
  *         self.states = np.empty(<Py_ssize_t> self.cpp_states.size(), dtype=object)             # <<<<<<<<<<<<<<
  *         cdef Py_ssize_t i
@@ -6952,7 +6952,7 @@ static int __pyx_pf_6freddi_16EvolutionResults___cinit__(struct __pyx_obj_6fredd
   /* "freddi.pyx":238
  *     cdef object[:] states
  * 
- *     def __cinit__(self, Freddi freddi):             # <<<<<<<<<<<<<<
+ *     def __cinit__(self, _BasicFreddi freddi):             # <<<<<<<<<<<<<<
  *         self.cpp_states = freddi.evolution.evolve()
  *         self.states = np.empty(<Py_ssize_t> self.cpp_states.size(), dtype=object)
  */
