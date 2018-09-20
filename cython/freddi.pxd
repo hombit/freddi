@@ -45,9 +45,9 @@ cdef extern from 'arguments.hpp':
     cdef cppclass GeneralArguments:
         GeneralArguments(const string&, const string&, bint)
     cdef cppclass BasicDiskBinaryArguments:
-        BasicDiskBinaryArguments(double, double, double, double, double, double, double) except +
+        BasicDiskBinaryArguments(double, double, double, double, double, double, double, double) except +
         BasicDiskBinaryArguments(BasicDiskBinaryArguments&&)
-        const double alpha, Mx, kerr, Mopt, period, rin, rout
+        const double alpha, Mx, kerr, accfreq, Mopt, period, rin, rout
     cdef cppclass DiskStructureArguments:
         DiskStructureArguments(const BasicDiskBinaryArguments&, const string&, double, double, const string&, double, const string&, double, double, double, double, bint, bint, double, double) except +
         const string opacity, boundcond, initialcond
@@ -77,12 +77,13 @@ cdef extern from 'arguments.hpp':
 
 
 cdef extern from 'arguments.hpp' namespace 'BasicDiskBinaryArguments':
-    cdef BasicDiskBinaryArguments constructWithoutRinRout(double, double, double, double, double)
-    cdef BasicDiskBinaryArguments constructWithoutRin(double, double, double, double, double, double)
-    cdef BasicDiskBinaryArguments constructWithoutRout(double, double, double, double, double, double)
+    cdef BasicDiskBinaryArguments constructWithoutRinRout(double, double, double, double, double, double)
+    cdef BasicDiskBinaryArguments constructWithoutRin(double, double, double, double, double, double, double)
+    cdef BasicDiskBinaryArguments constructWithoutRout(double, double, double, double, double, double, double)
     cdef const double default_alpha
     cdef const double default_Mx
     cdef const double default_kerr
+    cdef const double default_accfreq
     cdef const double default_Mopt
     cdef const double default_period
 

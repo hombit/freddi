@@ -284,7 +284,7 @@ cdef class _BasicFreddi:
 
     def __cinit__(
         self, *, bint cgs=True, bytes type=b'Normal',
-        double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt,
+        double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double accfreq=default_accfreq, double Mopt=default_Mopt,
             double period=default_period, rin=None, rout=None,
         string opacity=default_opacity, double Fdead=default_Fdead, double Mdotout=default_Mdotout,
             string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond,
@@ -314,13 +314,13 @@ cdef class _BasicFreddi:
         cdef GeneralArguments* general = new GeneralArguments(b'', b'', False)
         cdef BasicDiskBinaryArguments* basic
         if rin is None and rout is None:
-            basic = new BasicDiskBinaryArguments(constructWithoutRinRout(alpha, Mx, kerr, Mopt, period))
+            basic = new BasicDiskBinaryArguments(constructWithoutRinRout(alpha, Mx, kerr, accfreq, Mopt, period))
         elif rin is None:
-            basic = new BasicDiskBinaryArguments(constructWithoutRin(alpha, Mx, kerr, Mopt, period, rout))
+            basic = new BasicDiskBinaryArguments(constructWithoutRin(alpha, Mx, kerr, accfreq, Mopt, period, rout))
         elif rout is None:
-            basic = new BasicDiskBinaryArguments(constructWithoutRout(alpha, Mx, kerr, Mopt, period, rin))
+            basic = new BasicDiskBinaryArguments(constructWithoutRout(alpha, Mx, kerr, accfreq, Mopt, period, rin))
         else:
-            basic = new BasicDiskBinaryArguments(alpha, Mx, kerr, Mopt, period, rin, rout)
+            basic = new BasicDiskBinaryArguments(alpha, Mx, kerr, accfreq, Mopt, period, rin, rout)
         cdef bint is_Mdisk0_specified = Mdisk0 is not None
         if Mdisk0 is None:
             Mdisk0 = -1.0
