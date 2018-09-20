@@ -27,7 +27,7 @@ double max_dif_rel(const vecd &A, const vecd &B, size_t first, size_t last){
 
 
 
-// \frac{dw}{dt}=\frac{d^2y}{dx^2} + A\frac{dy}{dx} + By, y=y(x,t) — ?, w = w (x,y)
+// \frac{dw}{dt}=\frac{d^2y}{dx^2} + A\frac{dy}{dx} + By + C, y=y(x,t) — ?, w = w (x,y)
 
 void nonlinear_diffusion_nonuniform_wind_1_2 (
 		const double tau,
@@ -36,6 +36,7 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 		const double right_bounder_cond, // \frac{y(right_border,Time+tau)}{dx} = right_bounder_cond
 		const vecd &A,
 		const vecd &B,
+		const vecd &C,
 		const std::function<vecd (const vecd &, const vecd &, size_t, size_t)>& wunc, // first argument is array of x_i, second — array of y(x_i,t); return value — array of w(x_i,y_i)
 		const vecd &x, // array with (non)uniform grid
 		vecd &y// array with initial condition and for results
@@ -51,7 +52,7 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 	}
 	frac[N - 1] = (x[N - 1] - x[N - 2]) * (x[N - 1] - x[N - 2]) * 0.5 / tau;
 	for (size_t i = 1; i < N; ++i) {
-		f[i] = frac[i] * W[i];
+		f[i] = frac[i] * (W[i] + tau * C[i]);
 		K_1[i] = frac[i] * W[i] / y[i];
 	}
 

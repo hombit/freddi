@@ -49,8 +49,8 @@ cdef extern from 'arguments.hpp':
         BasicDiskBinaryArguments(BasicDiskBinaryArguments&&)
         const double alpha, Mx, kerr, Mopt, period, rin, rout
     cdef cppclass DiskStructureArguments:
-        DiskStructureArguments(const BasicDiskBinaryArguments&, const string&, double, const string&, double, const string&, double, double, double, double, bint, bint, double, double) except +
-        const string opacity, boundcond, initialcond
+        DiskStructureArguments(const BasicDiskBinaryArguments&, const string&, double, const string&, double, const string&, double, double, double, double, bint, bint, double, double, const string&) except +
+        const string opacity, boundcond, initialcond, wind
         const double Mdotout, Thot, F0, powerorder, gaussmu, gausssigma, Mdisk0, Mdot0
     cdef cppclass SelfIrradiationArguments:
         SelfIrradiationArguments(double, const string&) except +
@@ -104,6 +104,7 @@ cdef extern from 'arguments.hpp' namespace 'DiskStructureArguments':
     cdef const double default_powerorder
     cdef const double default_gaussmu
     cdef const double default_gausssigma
+    cdef const char* default_wind
 
 
 cdef extern from 'arguments.hpp' namespace 'SelfIrradiationArguments':

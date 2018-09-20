@@ -41,6 +41,7 @@ constexpr const double DiskStructureArguments::default_powerorder;
 constexpr const double DiskStructureArguments::default_gaussmu;
 constexpr const double DiskStructureArguments::default_gausssigma;
 constexpr const double DiskStructureArguments::mu;
+constexpr const char DiskStructureArguments::default_wind[];
 
 DiskStructureArguments::DiskStructureArguments(
 	const BasicDiskBinaryArguments &bdb_args,
@@ -51,7 +52,8 @@ DiskStructureArguments::DiskStructureArguments(
 	const double F0,
 	const double powerorder, const double gaussmu, const double gausssigma,
 	const bool is_Mdisk0_specified, const bool is_Mdot0_specified,
-	const double Mdisk0, const double Mdot0):
+	const double Mdisk0, const double Mdot0,
+	const std::string& wind):
 		opacity(opacity),
 		oprel(new OpacityRelated(opacity, bdb_args.Mx, bdb_args.alpha, mu)),
 		Mdotout(Mdotout),
@@ -61,6 +63,7 @@ DiskStructureArguments::DiskStructureArguments(
 		powerorder(powerorder),
 		gaussmu(gaussmu),
 		gausssigma(gausssigma),
+		wind(wind),
 		is_Mdisk0_specified(is_Mdisk0_specified),
 		is_Mdot0_specified(is_Mdot0_specified),
 		Mdisk0(Mdisk0),

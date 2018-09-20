@@ -34,13 +34,12 @@ void FreddiEvolution::set_Mdot_in_prev() {
 void FreddiEvolution::step(const double tau) {
 	set_Mdot_in_prev();
 	state_.reset(new FreddiState(*state_, tau));
-	const vecd A(state_->Nx(), 0.0), B(state_->Nx(), 0.0);
 	nonlinear_diffusion_nonuniform_wind_1_2(
 			args->calc->tau, args->calc->eps,
 			state_->F_in(), state_->Mdot_out(),
-			A, B, wunc,
-			state_->h(), state_->F_
-			);
+			state_->windA_, state_->windB_, state_->windC_,
+			wunc,
+			state_->h(), state_->F_);
 	truncateOuterRadius();
 }
 
@@ -126,9 +125,11 @@ void FreddiNeutronStarEvolution::step(double tau) {
 	set_Mdot_in_prev();
 	state_.reset(new FreddiState(*state_, tau));
 	truncateInnerRadius();
-	nonlenear_diffusion_nonuniform_1_2(
+	nonlinear_diffusion_nonuniform_wind_1_2(
 			args->calc->tau, args->calc->eps,
-			state_->F_in(), state_->Mdot_out(), wunc,
+			state_->F_in(), state_->Mdot_out(),
+			state_->windA_, state_->windB_, state_->windC_,
+			wunc,
 			state_->h(), state_->F_
 	);
 	truncateOuterRadius();
@@ -183,6 +184,9 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 		h_(Nx_),
 		R_(Nx_),
 		F_(Nx_),
+		windA_(Nx_, 0.),
+		windB_(Nx_, 0.),
+		windC_(Nx_, 0.),
 		Mdot_out_(freddi->args->disk->Mdotout) {
 	const auto args = freddi->args;
 	const auto oprel = freddi->oprel;
@@ -203,17 +207,17 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 
 	if (args->disk->initialcond == "power" or args->disk->initialcond == "powerF") {
 		for (size_t i = 0; i < Nx_; ++i) {
-			F_[i] = args->disk->F0 * pow((h_[i] - h_in) / (h_out - h_in), args->disk->powerorder);
+			F_[i] = args->disk->F0 * std::pow((h_[i] - h_in) / (h_out - h_in), args->disk->powerorder);
 		}
 	} else if (args->disk->initialcond == "powerSigma") {
 		for (size_t i = 0; i < Nx_; ++i) {
-			const double Sigma_to_Sigmaout = pow((h_[i] - h_in) / (h_out - h_in), args->disk->powerorder);
-			F_[i] = args->disk->F0 * pow(h_[i] / h_out, (3. - oprel->n) / (1. - oprel->m)) *
-						  pow(Sigma_to_Sigmaout, 1. / (1. - oprel->m));
+			const double Sigma_to_Sigmaout = std::pow((h_[i] - h_in) / (h_out - h_in), args->disk->powerorder);
+			F_[i] = args->disk->F0 * std::pow(h_[i] / h_out, (3. - oprel->n) / (1. - oprel->m)) *
+					std::pow(Sigma_to_Sigmaout, 1. / (1. - oprel->m));
 		}
 	} else if (args->disk->initialcond == "sinusF" || args->disk->initialcond == "sinus") {
-		for (size_t i = 0; i < Nx_; ++i){
-			F_[i] = args->disk->F0 * sin((h_[i] - h_in) / (h_out - h_in) * M_PI_2);
+		for (size_t i = 0; i < Nx_; ++i) {
+			F_[i] = args->disk->F0 * std::sin((h_[i] - h_in) / (h_out - h_in) * M_PI_2);
 		}
 	} else if (args->disk->initialcond == "quasistat") {
 		for (size_t i = 0; i < Nx_; ++i) {
@@ -224,10 +228,22 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 		for (size_t i = 0; i < Nx_; ++i) {
 			const double xi = (h_[i] - h_in) / (h_out - h_in);
 			F_[i] = args->disk->F0 * exp(-(xi - args->disk->gaussmu) * (xi - args->disk->gaussmu) /
-											   (2. * args->disk->gausssigma * args->disk->gausssigma));
+										 (2. * args->disk->gausssigma * args->disk->gausssigma));
 		}
 	} else {
 		throw std::logic_error("Wrong initialcond");
+	}
+
+	if (args->disk->wind == "no") {
+		// Nothing to do here
+	} else if (args->disk->wind == "SS73C") {
+		const double L_edd = 4. * M_PI * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION * freddi->GM;
+		const double M_crit = L_edd / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * freddi->eta);
+		for (size_t i = 0; i < Nx_; ++i) {
+			windC_[i] = - M_crit / (2 * M_PI * R_.front() * R_[i]);
+		}
+	} else {
+		throw std::logic_error("Wrong wind");
 	}
 }
 
@@ -240,7 +256,8 @@ FreddiState::FreddiState(const FreddiState& other, const double tau):
 		F_(other.F_),
 		t_(other.t_ + tau),
 		i_t_(other.i_t_ + 1),
-		Mdot_out_(other.Mdot_out_) {}
+		Mdot_out_(other.Mdot_out_),
+		windA_(other.windA_), windB_(other.windB_), windC_(other.windC_) {}
 
 
 double FreddiState::integrate(const vecd& values) const {

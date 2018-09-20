@@ -1,5 +1,6 @@
 import unittest
 
+import numpy as np
 from numpy.testing import assert_allclose
 
 from freddi import Freddi
@@ -16,6 +17,24 @@ class ShakuraSunyaevSubctriticalTestCase(unittest.TestCase):
             pass
         h = state.h
         assert_allclose(state.F, Mdot * (h - h[0]))
+
+
+class ShakuraSunyaevSupercriticalTestCase(unittest.TestCase):
+    def test(self):
+        Mx = 2e34
+        GM = 6.673e-8 * Mx
+        c = 2.99792458e10
+        Rin = 6 * 6.673e-8 * Mx / c**2
+        Rout = 100 * Rin
+        Ledd = 4. * np.pi * 1.67262158e-24 * c / 6.65245893699e-2 * GM
+        eta = 1 - np.sqrt(8 / 9)
+        Mcrit = Ledd / (c**2 * eta)
+        fr = Freddi(wind=b'SS73C', Mx=Mx, Mdot0=Mcrit, Mdotout=Mcrit*Rout/Rin, initialcond=b'sinusF', time=10000*DAY, tau=1*DAY, rout=Rout)
+        for state in fr:
+            pass
+        h = state.h
+        F = Mcrit / Rin / (3 * GM) * (h**3 - h[0]**3)
+        assert_allclose(state.F, F)
 
 
 class LipunovaShakuraTestCase(unittest.TestCase):

@@ -362,6 +362,7 @@ cdef class _BasicFreddi:
             string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond,
             double F0=default_F0, double powerorder=default_powerorder, double gaussmu=default_gaussmu,
             double gausssigma=default_gausssigma, Mdisk0=None, Mdot0=None,
+            string wind=default_wind,
         double Cirr=default_Cirr, string irrfactortype=default_irrfactortype,
         double colourfactor=default_colourfactor, double emin=default_emin, double emax=default_emax,
             double inclination=default_inclination, double distance=default_distance, vector[double] lambdas=[],
@@ -402,7 +403,7 @@ cdef class _BasicFreddi:
             Mdot0 = -1.0
         cdef DiskStructureArguments* disk = new DiskStructureArguments(
             dereference(basic), opacity, Mdotout, boundcond, Thot, initialcond, F0, powerorder,
-            gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0
+            gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0, wind,
         )
         cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(Cirr, irrfactortype)
         cdef FluxArguments* flux = new FluxArguments(colourfactor, emin, emax, inclination, distance, lambdas)
@@ -416,7 +417,6 @@ cdef class _BasicFreddi:
     def __dealloc__(self):
         del self.args
         del self.evolution
-
 
     @classmethod
     def alt(cls, **kwargs):
@@ -495,7 +495,7 @@ cdef class _BasicFreddi:
                 c_opacity, c_Mdotout, c_boundcond, c_Thot,
                 self.args.disk.get().initialcond, self.args.disk.get().F0, self.args.disk.get().powerorder,
                 self.args.disk.get().gaussmu, self.args.disk.get().gausssigma,
-                True, True, self.args.disk.get().Mdisk0, self.args.disk.get().Mdot0
+                True, True, self.args.disk.get().Mdisk0, self.args.disk.get().Mdot0, self.args.disk.get().wind
             )
             self.args.disk.reset(disk)
 

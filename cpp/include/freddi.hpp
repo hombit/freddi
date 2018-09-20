@@ -83,6 +83,7 @@ private:
 	size_t Nx_;
 	vecd h_, R_;
 	vecd F_;
+	vecd windA_, windB_, windC_;
 public:
 	inline double Mdot_in() const { return (F()[1] - F()[0]) / (h()[1] - h()[0]); }
 	inline double Mdot_out() const { return Mdot_out_; }

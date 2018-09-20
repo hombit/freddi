@@ -119,6 +119,7 @@ public:
 	constexpr static const double default_powerorder = 6.;
 	constexpr static const double default_gaussmu = 1.;
 	constexpr static const double default_gausssigma = 0.25;
+	constexpr static const char default_wind[] = "no";
 public:
 	constexpr static const double mu = 0.62;
 public:
@@ -130,6 +131,7 @@ public:
 	const double powerorder;
 	const double gaussmu;
 	const double gausssigma;
+	const std::string wind;
 	const double Mdisk0;
 	const double Mdot0;
 	const bool is_Mdisk0_specified;
@@ -147,7 +149,8 @@ public:
 			const std::string& initialcond, double F0,
 			double powerorder, double gaussmu, double gausssigma,
 			bool is_Mdisk0_specified, bool is_Mdot0_specified,
-			double Mdisk0, double Mdot0);
+			double Mdisk0, double Mdot0,
+			const std::string& wind);
 };
 
 

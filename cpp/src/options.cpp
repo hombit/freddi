@@ -86,7 +86,8 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 				(vm.count("Mdisk0") > 0),
 				(vm.count("Mdot0") > 0),
 				Mdisk0Initializer(vm),
-				Mdot0Initializer(vm)) {}
+				Mdot0Initializer(vm),
+				"no") {}  // wind
 
 double DiskStructureOptions::Mdisk0Initializer(const po::variables_map& vm) {
 	if (vm.count("Mdisk0") > 0) {
