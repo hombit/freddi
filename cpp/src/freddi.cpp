@@ -113,7 +113,7 @@ double FreddiEvolution::Sigma_hot_disk(double r) const {
 FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiArguments &args):
 		FreddiEvolution(args),
 		xi_pow_minus_7_2(std::pow(xi, -3.5)),
-		R_cor(std::cbrt(GM * P_acc*P_acc / (4 * M_PI*M_PI))) {}
+		R_cor(std::cbrt(GM / (4 * M_PI*M_PI * args.basic->accfreq*args.basic->accfreq))) {}
 
 
 void FreddiNeutronStarEvolution::step(double tau) {

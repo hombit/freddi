@@ -15,6 +15,7 @@ constexpr const char GeneralArguments::default_dir[];
 constexpr const double BasicDiskBinaryArguments::default_alpha;
 constexpr const double BasicDiskBinaryArguments::default_Mx;
 constexpr const double BasicDiskBinaryArguments::default_kerr;
+constexpr const double BasicDiskBinaryArguments::default_accfreq;
 constexpr const double BasicDiskBinaryArguments::default_Mopt;
 constexpr const double BasicDiskBinaryArguments::default_period;
 

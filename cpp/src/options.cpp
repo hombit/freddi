@@ -29,6 +29,7 @@ BasicDiskBinaryOptions::BasicDiskBinaryOptions(const po::variables_map &vm):
 				vm["alpha"].as<double>(),
 				sunToGram(vm["Mx"].as<double>()),
 				vm["kerr"].as<double>(),
+				0.,  // accfreq
 				sunToGram(vm["Mopt"].as<double>()),
 				dayToS(vm["period"].as<double>()),
 				rinInitializer(vm),
@@ -63,6 +64,7 @@ po::options_description BasicDiskBinaryOptions::description() {
 			( "alpha,a", po::value<double>()->default_value(default_alpha), "Alpha parameter of Shakura-Sunyaev model" )
 			( "Mx,M", po::value<double>()->default_value(gramToSun(default_Mx)), "Mass of the central object, in the units of solar masses" )
 			( "kerr", po::value<double>()->default_value(default_kerr), "Dimensionless Kerr parameter of the black hole" )
+			( "accfreq", po::value<double>()->default_value(default_accfreq), "Accretor rotation frequency, in units of Hz. This parameter is not linked to --kerr, agree them yourself" )
 			( "Mopt",	po::value<double>()->default_value(gramToSun(default_Mopt)), "Mass of the optical star, in units of solar masses" )
 			( "period,P", po::value<double>()->default_value(sToDay(default_period)), "Orbital period of the binary system, in units of days" )
 			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the Schwarzschild radius of the central object 2GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )

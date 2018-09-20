@@ -45,13 +45,13 @@ public:
 
 
 class FreddiNeutronStarEvolution: public FreddiEvolution {
-private:
+public:
 	const double X_R = 1.;
 	const double k_t = 1. / 3.;
 	const double xi = 0.7;
 	const double xi_pow_minus_7_2;
-	const double P_acc = 0.002;  // TODO: Move to arguments
 	const double R_cor;
+private:
 	double mu_magn = 0;
 	double R_dead = 0;
 private:

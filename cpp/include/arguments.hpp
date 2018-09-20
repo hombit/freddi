@@ -57,12 +57,14 @@ public:
 	constexpr static const double default_alpha = 0.25;
 	constexpr static const double default_Mx = sunToGram(5.);
 	constexpr static const double default_kerr = 0.;
+	constexpr static const double default_accfreq = 0.;
 	constexpr static const double default_Mopt = sunToGram(0.5);
 	constexpr static const double default_period = dayToS(0.25);
 public:
 	const double alpha;
 	const double Mx;
 	const double kerr;
+	const double accfreq;
 	const double Mopt;
 	const double period;
 	const double rin;
@@ -70,12 +72,12 @@ public:
 public:
 	BasicDiskBinaryArguments(
 			double alpha,
-			double Mx, double kerr,
+			double Mx, double kerr, double accfreq,
 			double Mopt, double period,
 			double rin, double rout
 	):
 			alpha(alpha),
-			Mx(Mx), kerr(kerr),
+			Mx(Mx), kerr(kerr), accfreq(accfreq),
 			Mopt(Mopt), period(period),
 			rin(rin), rout(rout) {}
 	BasicDiskBinaryArguments(BasicDiskBinaryArguments&&) = default;
@@ -84,23 +86,23 @@ public:
 		return 0.8 * rocheLobeVolumeRadius(Mx, Mopt, period);
 	}
 	static inline BasicDiskBinaryArguments constructWithoutRinRout(const double alpha,
-																   const double Mx, const double kerr,
+																   const double Mx, const double kerr, const double accfreq,
 																   const double Mopt, const double period) {
-		return {alpha, Mx, kerr, Mopt, period,
+		return {alpha, Mx, kerr, accfreq, Mopt, period,
 				rinFromMxKerr(Mx, kerr), routFromMxMoptPeriod(Mx, Mopt, period)};
 	}
 	static inline BasicDiskBinaryArguments constructWithoutRin(const double alpha,
-															   const double Mx, const double kerr,
+															   const double Mx, const double kerr, const double accfreq,
 															   const double Mopt, const double period,
 															   const double rout) {
-		return {alpha, Mx, kerr, Mopt, period,
+		return {alpha, Mx, kerr, accfreq, Mopt, period,
 				rinFromMxKerr(Mx, kerr), rout};
 	}
 	static inline BasicDiskBinaryArguments constructWithoutRout(const double alpha,
-															    const double Mx, const double kerr,
+															    const double Mx, const double kerr, const double accfreq,
 															    const double Mopt, const double period,
 															    const double rin) {
-		return {alpha, Mx, kerr, Mopt, period,
+		return {alpha, Mx, kerr, accfreq, Mopt, period,
 				rin, routFromMxMoptPeriod(Mx, Mopt, period)};
 	}
 	inline double h(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx * r); }
