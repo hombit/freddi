@@ -240,7 +240,7 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 		const double L_edd = 4. * M_PI * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION * freddi->GM;
 		const double M_crit = L_edd / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * freddi->eta);
 		for (size_t i = 0; i < Nx_; ++i) {
-			windC_[i] = - M_crit / (2 * M_PI * R_.front() * R_[i]);
+			windC_[i] = - M_crit / (2 * M_PI * R_.front() * R_[i]) * 4*M_PI * h_[i]*h_[i]*h_[i] / (freddi->GM*freddi->GM);
 		}
 	} else {
 		throw std::logic_error("Wrong wind");
