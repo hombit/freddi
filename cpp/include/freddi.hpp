@@ -91,6 +91,9 @@ public:
 	inline const vecd& h() const { return h_; }
 	inline const vecd& R() const { return R_; }
 	inline const vecd& F() const { return F_; }
+	inline const vecd& windA() const { return windA_; }
+	inline const vecd& windB() const { return windB_; }
+	inline const vecd& windC() const { return windC_; }
 	inline double t() const { return t_; }
 	inline size_t i_t() const { return i_t_; };
 	inline size_t Nx() const { return Nx_; }

@@ -18,23 +18,26 @@ class ShakuraSunyaevSubctriticalTestCase(unittest.TestCase):
         h = state.h
         assert_allclose(state.F, Mdot * (h - h[0]))
 
+class StationaryWindCTestCase(unittest.TestCase):
+    _k_hw = 0.5
+    _k_C0 = 3.0
 
-class ShakuraSunyaevSupercriticalTestCase(unittest.TestCase):
     def test(self):
-        Mx = 2e34
-        GM = 6.673e-8 * Mx
-        c = 2.99792458e10
-        Rin = 6 * 6.673e-8 * Mx / c**2
-        Rout = 100 * Rin
-        Ledd = 4. * np.pi * 1.67262158e-24 * c / 6.65245893699e-2 * GM
-        eta = 1 - np.sqrt(8 / 9)
-        Mcrit = Ledd / (c**2 * eta)
-        fr = Freddi(wind=b'SS73C', Mx=Mx, Mdot0=Mcrit, Mdotout=Mcrit*Rout/Rin, initialcond=b'sinusF', time=10000*DAY, tau=1*DAY, rout=Rout)
+        Mdot = 1e18
+        fr = Freddi(wind=b'__testC__', Mdotout=Mdot, initialcond=b'sinusF', Mdot0=Mdot,
+                    time=10000*DAY, tau=10*DAY, gridscale=b'linear')
         for state in fr:
             pass
         h = state.h
-        F = Mcrit / Rin / (3 * GM) * (h**3 - h[0]**3)
-        assert_allclose(state.F, F)
+        h_w = self._k_hw * h[-1]
+        C0 = self._k_C0 * Mdot / (h[-1] - h[0])
+        F = (Mdot - C0 / 2 * (h[-1] - h_w)) * (h - h[0])
+        i = h >= h_w
+        F[i] += C0 / 2 * (
+            -((h[-1] - h_w) / (2 * np.pi))**2 * (1 - np.cos(2*np.pi * (h[i] - h_w) / (h[-1] - h_w)))
+            + (h[i] - h_w)**2 / 2
+        )
+        assert_allclose(state.F, F, rtol=1e-5)
 
 
 class LipunovaShakuraTestCase(unittest.TestCase):
