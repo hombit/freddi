@@ -18,6 +18,23 @@ class ShakuraSunyaevSubctriticalTestCase(unittest.TestCase):
         h = state.h
         assert_allclose(state.F, Mdot * (h - h[0]))
 
+
+class StationaryWindBTestCase(unittest.TestCase):
+    _k_B0 = 16.0
+
+    def test(self):
+        Mdot = 1e18
+        fr = Freddi(wind=b'__testB__', Mdotout=Mdot, initialcond=b'sinusF', Mdot0=Mdot,
+                    time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
+        for state in fr:
+            pass
+        h = state.h
+        F = (Mdot / np.sqrt(self._k_B0) * (h[-1] - h[0])
+             / np.sinh(np.sqrt(self._k_B0))
+             * np.sinh((h - h[0]) / (h[-1] - h[0]) * np.sqrt(self._k_B0)))
+        assert_allclose(state.F, F, rtol=1e-3)
+
+
 class StationaryWindCTestCase(unittest.TestCase):
     _k_hw = 0.5
     _k_C0 = 3.0

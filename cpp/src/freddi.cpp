@@ -244,12 +244,17 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 			windC_[i] = -M_crit / (2 * M_PI * R_.front() * R_[i]) * 4 * M_PI * h_[i] * h_[i] * h_[i] /
 						(freddi->GM * freddi->GM);
 		} */
+	} else if (args->disk->wind == "__testB__") {
+		const double kB = 16.0;
+		const double B0 = -kB / ((h_out - h_in) * (h_out - h_in));
+		for (size_t i = 0; i < Nx_; ++i) {
+			windB_[i] = B0;
+		}
 	} else if (args->disk->wind == "__testC__") {
-		const double C0 = 3 * args->disk->Mdotout / (h_out - h_in);
+		const double kC = 3.0;
+		const double C0 = kC * args->disk->Mdotout / (h_out - h_in);
 		const double h_wind_min = h_out / 2;
 		for (size_t i = 0; i < Nx_; ++i) {
-//			windA_[i] = 0;
-//			windB_[i] = 0;
 			if (h_[i] > h_wind_min) {
 				windC_[i] = C0 * 0.5 * (std::cos(2. * M_PI * (h_[i] - h_wind_min) / (h_out - h_wind_min)) - 1);
 			}
