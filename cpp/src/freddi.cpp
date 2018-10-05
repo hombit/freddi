@@ -98,7 +98,7 @@ void FreddiEvolution::truncateOuterRadius() {
 vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t first, size_t last) const {
 	vecd W(last + 1, 0.);
 	for ( size_t i = first; i <= last; ++i ){
-		W[i] = pow(F[i], 1. - oprel->m) * pow(h[i], oprel->n) / (1. - oprel->m) / oprel->D;
+		W[i] = pow(std::abs(F[i]), 1. - oprel->m) * pow(h[i], oprel->n) / (1. - oprel->m) / oprel->D;
 	}
 	return W;
 };
@@ -236,14 +236,14 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 
 	if (args->disk->wind == "no") {
 		// Nothing to do here
-/*	} else if (args->disk->wind == "SS73C") {
+	} else if (args->disk->wind == "SS73C") {
 		const double L_edd = 4. * M_PI * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT /
 							 GSL_CONST_CGSM_THOMSON_CROSS_SECTION * freddi->GM;
 		const double M_crit = L_edd / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * freddi->eta);
 		for (size_t i = 0; i < Nx_; ++i) {
-			windC_[i] = -M_crit / (2 * M_PI * R_.front() * R_[i]) * 4 * M_PI * h_[i] * h_[i] * h_[i] /
+			windC_[i] = -M_crit / (2 * M_PI * R_.front() * R_[i]) * (4 * M_PI * h_[i] * h_[i] * h_[i]) /
 						(freddi->GM * freddi->GM);
-		} */
+		}
 	} else if (args->disk->wind == "Cambier2013") { // Cambier & Smith 1303.6218
 		const double kC = 3;
 		const double m_ch0 = -kC * args->disk->Mdot0 / (M_PI * R_.back()*R_.back());  // dM / dA
