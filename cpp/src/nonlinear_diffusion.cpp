@@ -46,15 +46,24 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 	vecd K_0(N), K_1(N), frac(N), a(N), b(N), c0(N), f(N);
 	for (size_t i = 1; i < N - 1; ++i) {
 		a[i] = (x[i + 1] - x[i]) / (x[i + 1] - x[i - 1]) * (2.0 - A[i] * (x[i + 1] - x[i]));
-		b[i] = (x[i] - x[i - 1]) / (x[i + 1] - x[i - 1]) * (2.0 - A[i] * (x[i] - x[i - 1]));
+		b[i] = (x[i] - x[i - 1]) / (x[i + 1] - x[i - 1]) * (2.0 + A[i] * (x[i] - x[i - 1]));
 		c0[i] = 2.0 - A[i] * (x[i + 1] - 2 * x[i] + x[i - 1]) - B[i] * (x[i + 1] - x[i]) * (x[i] - x[i - 1]);
 		frac[i] = (x[i + 1] - x[i]) * (x[i] - x[i - 1]) / tau;
 	}
+	a[N - 1] = 1 - 0.5 * A[N - 1] * (x[N - 1] - x[N - 2]);
+	c0[N - 1] = a[N - 1] - 0.5 * B[N - 1] * (x[N - 1] - x[N - 2]) * (x[N - 1] - x[N - 2]);
 	frac[N - 1] = (x[N - 1] - x[N - 2]) * (x[N - 1] - x[N - 2]) * 0.5 / tau;
 	for (size_t i = 1; i < N; ++i) {
 		f[i] = frac[i] * (W[i] + tau * C[i]);
-		K_1[i] = frac[i] * W[i] / y[i];
 	}
+	for (size_t i = 1; i < N - 1; ++i) {
+//		K_1[i] = (f[i] + a[i] * y[i - 1] - c0[i] * y[i] + b[i] * y[i + 1]) / y[i];
+//		K_1[i] = frac[i] * W[i] / y[i];
+		K_1[i] = f[i] / y[i];
+	}
+//	K_1[N - 1] = (f[N - 1] + a[N - 1] * y[N - 2] - c0[N - 1] * y[N - 1] + right_bounder_cond * (x[N - 1] - x[N - 2])) / y[N - 1];
+//	K_1[N - 1] = (f[N - 1]) / y[N - 1];
+	 K_1[N - 1] = frac[N - 1] * W[N - 1] / y[N - 1];
 
 	vecd alpha(N), beta(N);
 	double c;
@@ -67,8 +76,8 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 			alpha[i + 1] = b[i] / (c - alpha[i] * a[i]);
 			beta[i + 1] = (beta[i] * a[i] + f[i]) / (c - alpha[i] * a[i]);
 		}
-		y[N - 1] = ((x[N - 1] - x[N - 2]) * right_bounder_cond + f[N - 1] + beta[N - 1]) /
-				   (1. + K_1[N - 1] - alpha[N - 1]);
+		y[N - 1] = ((x[N - 1] - x[N - 2]) * right_bounder_cond + f[N - 1] + beta[N - 1] * a[N - 1]) /
+				   (c0[N - 1] + K_1[N - 1] - alpha[N - 1] * a[N - 1]);
 		for (size_t i = N - 2; i > 0; --i) {
 			y[i] = alpha[i + 1] * y[i + 1] + beta[i + 1];
 		}

@@ -41,7 +41,7 @@ matrix:
           packages:
             - libboost-all-dev
       install:
-        - pip install numpy
+        - pip install numpy scipy
         - python setup.py install
       script:
         - python -c "import freddi"
@@ -59,7 +59,7 @@ matrix:
           packages:
             - libboost-all-dev
       install:
-        - pip install numpy
+        - pip install numpy scipy
         - python setup.py install
       script:
         - python -c "import freddi"
@@ -77,7 +77,7 @@ matrix:
           packages:
             - libboost-all-dev
       install:
-        - pip install numpy
+        - pip install numpy scipy
         - python setup.py install
       script:
         - python -c "import freddi"
@@ -91,7 +91,7 @@ matrix:
         - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.6.6/python-3.6.6-macosx10.9.pkg
         - sudo installer -pkg /tmp/Python.pkg -target /
       install:
-        - pip3 install numpy
+        - pip3 install numpy scipy
         - python3 setup.py install
       script:
         - python3 -c "import freddi"
@@ -106,7 +106,7 @@ matrix:
         - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.7.0/python-3.7.0-macosx10.9.pkg
         - sudo installer -pkg /tmp/Python.pkg -target /
       install:
-        - pip3 install numpy
+        - pip3 install numpy scipy
         - python3 setup.py install
       script:
         - python3 -c "import freddi"

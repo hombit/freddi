@@ -239,9 +239,9 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 	} else if (args->disk->wind == "SS73C") {
 		const double L_edd = 4. * M_PI * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT /
 							 GSL_CONST_CGSM_THOMSON_CROSS_SECTION * freddi->GM;
-		const double M_crit = L_edd / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * freddi->eta);
+		const double Mdot_crit = L_edd / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * freddi->eta);
 		for (size_t i = 0; i < Nx_; ++i) {
-			windC_[i] = -M_crit / (2 * M_PI * R_.front() * R_[i]) * (4 * M_PI * h_[i] * h_[i] * h_[i]) /
+			windC_[i] = -Mdot_crit / (2 * M_PI * R_.front() * R_[i]) * (4 * M_PI * h_[i] * h_[i] * h_[i]) /
 						(freddi->GM * freddi->GM);
 		}
 	} else if (args->disk->wind == "Cambier2013") { // Cambier & Smith 1303.6218
@@ -249,8 +249,8 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 		const double m_ch0 = -kC * args->disk->Mdot0 / (M_PI * R_.back()*R_.back());  // dM / dA
 		const double L_edd = 4. * M_PI * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT /
 							 GSL_CONST_CGSM_THOMSON_CROSS_SECTION * freddi->GM;
-		const double M_crit = L_edd / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * freddi->eta);
-		const double eta = 0.025 * 33 * args->disk->Mdot0 / M_crit;
+		const double Mdot_crit = L_edd / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * freddi->eta);
+		const double eta = 0.025 * 33 * args->disk->Mdot0 / Mdot_crit;
 		const double R_iC = 1. * R_.back();
 		for (size_t i = 0; i < Nx_; ++i) {
 			const double xi = R_[i] / R_iC;
@@ -258,6 +258,12 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 			windC_[i] = C0 * std::pow((1 + std::pow(0.125 * eta / xi, 2))
 					    / (1 + 1. / (std::pow(eta, 8) * std::pow(1 + 262 * xi * xi, 2))), 1. / 6.)
 						* std::exp(-std::pow(1 - 1. / std::sqrt(1 + 0.25 / (xi * xi)), 2) / (2 * xi));
+		}
+	} else if (args->disk->wind == "__testA__") {
+		const double kA = 10;
+		const double A0 = -kA / ((h_out - h_in) * (h_out - h_in));
+		for (size_t i = 0; i < Nx_; ++i) {
+			windA_[i] = A0 * (h_[i] - h_in);
 		}
 	} else if (args->disk->wind == "__testB__") {
 		const double kB = 16.0;
