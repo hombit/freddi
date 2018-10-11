@@ -17,5 +17,5 @@ RUN pip install numpy
 
 COPY --from=builder /dist /dist
 
-RUN wheel install /dist/*.whl
+RUN pip install /dist/*.whl
 
