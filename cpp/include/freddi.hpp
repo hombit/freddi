@@ -17,7 +17,6 @@ class FreddiEvolution {
 	typedef std::vector<double> vecd;
 protected:
 	double Mdot_in_prev;
-	double Mdot_peak = -INFINITY;
 public:
 	const size_t Nt;
 	const double GM;
@@ -46,15 +45,14 @@ public:
 
 class FreddiNeutronStarEvolution: public FreddiEvolution {
 public:
-	const double X_R = 1.;
 	const double k_t = 1. / 3.;
 	const double xi = 0.7;
-	const double xi_pow_minus_7_2;
+	const double R_m_min;
+	const double mu_magn;
+	const double R_dead;
 	const double R_cor;
+	const double xi_pow_minus_7_2;
 	const NeutronStarArguments* args_ns;
-private:
-	double mu_magn = 0;
-	double R_dead = 0;
 private:
 	void truncateInnerRadius();
 public:

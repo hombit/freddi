@@ -114,6 +114,9 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 		FreddiEvolution(args),
 		args_ns(args.ns.get()),
 		xi_pow_minus_7_2(std::pow(xi, -3.5)),
+		R_m_min(std::max(args.ns->Rx, args.basic->rin)),
+		mu_magn(0.5 * args.ns->Bx * args.ns->Rx*args.ns->Rx*args.ns->Rx),
+		R_dead(std::cbrt(mu_magn*mu_magn / args.ns->Fdead)),
 		R_cor(std::cbrt(GM / (4 * M_PI*M_PI * args.ns->freqx*args.ns->freqx))) {}
 
 
@@ -137,13 +140,10 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	if ( state_->Mdot_in() > Mdot_in_prev ) {
 		return;
 	}
-	if ( Mdot_in_prev > Mdot_peak ) {
-		Mdot_peak = Mdot_in_prev;
-		mu_magn = std::sqrt(Mdot_peak * std::sqrt(GM) * std::pow(X_R * args->basic->rin, 3.5));
-		R_dead = std::cbrt(mu_magn*mu_magn / args_ns->Fdead);
-	}
 
-	double R_m = X_R * args->basic->rin * std::pow(Mdot_peak / state_->Mdot_in(), 2./7.);
+	const double R_alfven = args_ns->epsilonAlfven *
+			std::pow(mu_magn*mu_magn*mu_magn*mu_magn / (state_->Mdot_in()*state_->Mdot_in() * GM), 1./7.);
+	double R_m = std::max(R_m_min, R_alfven);
 	R_m = std::min(R_m, R_dead);
 	size_t ii;
 	for (ii = 0; ii < state_->Nx() - 1; ii++) {

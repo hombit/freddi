@@ -279,6 +279,78 @@ cdef class EvolutionResults:
 
 
 cdef class _BasicFreddi:
+    """Accretion disk evolution modeller
+
+    This object is iterable, it yields `State` object on each iteration step
+
+    All parameters are keyword-only, all physical values are in CGS units.
+    See detailed description of parameters in documentation
+
+    Parameters
+    ----------
+    alpha : float, optional
+    Mx : float, optional
+    kerr : float, optional
+    Mopt : float, optional
+    period : float, optional
+    rin : float or None, optional
+    rout : float or None, optional
+    opacity : bytes, optional
+        Should be `b'Kramers'` or `b'OPAL'`
+    boundcond : bytes, optional
+        Should be `b'Teff'` or `b'Tirr'`
+    Mdotout : float, optional
+    Thot : float, optional
+    initialcond : bytes, optional
+        Should be `b'powerF'`, `b'powerSigma'`, `b'sinusF'`, `b'gaussF'` or
+        `b'quasistat'`
+    FO : float, optional
+    Mdisk0 : float, optional
+    Mdot0 : float, optional
+    powerorder : float, optional
+    gaussmu : float, optional
+    gausssigma : float, optional
+    Cirr : float, optional
+    irrfactortype : bytes, optional
+        Should be `b'const'` or `b'square'`
+    colourfactor : float, optional
+    emin : float, optional
+    emax : float, optional
+    inclination : float, optional
+        In degrees
+    distance : float, optional
+    lambda : list of float, optional
+    time : float, optional
+    tau : float, optional
+    Nx : int, optional
+    gridscale : bytes, optional
+        Should be `b'log'` or `b'linear'`{add_args}
+
+    Attributes
+    ----------
+    time : float
+        Specified time
+    distance : float
+        Specified distance
+    cosi : flaot
+        Cosinus of specified inclination
+    lambdas : numpy.ndarray
+        Specified lambdas, in cm
+    Nt : int
+        Number of evolutions steps. The number of time moments where disk
+        structure will be obtained is larger by unity
+    Cirr : float
+        Irradiation factor. Can be changed via assignment operator
+
+    Methods
+    -------
+    evolve() : EvolutionResults
+        Calculate disk evolution
+    alt(**kwargs) : Freddi
+        Alternative Freddi constructor accepting astropy Quantity and str
+
+    """
+
     cdef FreddiArguments* args
     cdef FreddiEvolution* evolution
 
@@ -476,83 +548,19 @@ cdef class _BasicFreddi:
 
 
 cdef class Freddi(_BasicFreddi):
-    """Accretion disk evolution modeller
-
-    This object is iterable, it yields `State` object on each iteration step
-
-    All parameters are keyword-only, all physical values are in CGS units.
-    See detailed description of parameters in documentation
-
-    Parameters
-    ----------
-    alpha : float, optional
-    Mx : float, optional
-    kerr : float, optional
-    Mopt : float, optional
-    period : float, optional
-    rin : float or None, optional
-    rout : float or None, optional
-    opacity : bytes, optional
-        Should be `b'Kramers'` or `b'OPAL'`
-    boundcond : bytes, optional
-        Should be `b'Teff'` or `b'Tirr'`
-    Mdotout : float, optional
-    Thot : float, optional
-    initialcond : bytes, optional
-        Should be `b'powerF'`, `b'powerSigma'`, `b'sinusF'`, `b'gaussF'` or
-        `b'quasistat'`
-    FO : float, optional
-    Mdisk0 : float, optional
-    Mdot0 : float, optional
-    powerorder : float, optional
-    gaussmu : float, optional
-    gausssigma : float, optional
-    Cirr : float, optional
-    irrfactortype : bytes, optional
-        Should be `b'const'` or `b'square'`
-    colourfactor : float, optional
-    emin : float, optional
-    emax : float, optional
-    inclination : float, optional
-        In degrees
-    distance : float, optional
-    lambda : list of float, optional
-    time : float, optional
-    tau : float, optional
-    Nx : int, optional
-    gridscale : bytes, optional
-        Should be `b'log'` or `b'linear'`
-
-    Attributes
-    ----------
-    time : float
-        Specified time
-    distance : float
-        Specified distance
-    cosi : flaot
-        Cosinus of specified inclination
-    lambdas : numpy.ndarray
-        Specified lambdas, in cm
-    Nt : int
-        Number of evolutions steps. The number of time moments where disk
-        structure will be obtained is larger by unity
-    Cirr : float
-        Irradiation factor. Can be changed via assignment operator
-
-    Methods
-    -------
-    evolve() : EvolutionResults
-        Calculate disk evolution
-    alt(**kwargs) : Freddi
-        Alternative Freddi constructor accepting astropy Quantity and str
-
-    """
+    __doc__ = _BasicFreddi.__doc__.format(add_args='')
 
     def __cinit__(self, **kwargs):
         self.evolution = new FreddiEvolution(dereference(self.args))
 
 
 cdef class FreddiNeutronStar(_BasicFreddi):
+    __doc__ = _BasicFreddi.__doc__.format(add_args="""
+    Rx : float, optional
+    freqx : float, optional
+    Bx : float, optional
+    epsilonAlfven : float, optional""")
+
     def __cinit__(
         self, *,
         double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double Fdead=default_Fdead,
