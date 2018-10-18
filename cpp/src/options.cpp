@@ -214,12 +214,12 @@ po::options_description CalculationOptions::description() {
 
 
 FreddiOptions::FreddiOptions(const po::variables_map& vm) {
-		general.reset(new GeneralOptions(vm));
-		basic.reset(new BasicDiskBinaryOptions(vm));
-		disk.reset(new DiskStructureOptions(vm, *basic));
-		irr.reset(new SelfIrradiationOptions(vm, *disk));
-		flux.reset(new FluxOptions(vm));
-		calc.reset(new CalculationOptions(vm));
+	general.reset(new GeneralOptions(vm));
+	basic.reset(new BasicDiskBinaryOptions(vm));
+	disk.reset(new DiskStructureOptions(vm, *basic));
+	irr.reset(new SelfIrradiationOptions(vm, *disk));
+	flux.reset(new FluxOptions(vm));
+	calc.reset(new CalculationOptions(vm));
 }
 
 po::options_description FreddiOptions::description() {
@@ -246,10 +246,10 @@ po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star");
 	od.add_options()
 			( "Rx", po::value<double>()->default_value(default_Rx), "Accretor radius, cm" )
-			( "accfreq", po::value<double>()->default_value(default_freqx), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
+			( "freqx", po::value<double>()->default_value(default_freqx), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
 			( "Bx", po::value<double>()->default_value(default_Bx), "Accretor magnetic induction, G" )
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Factor in Alfven radius formula" )
-			( "Fdead", po::value<double>()->default_value(default_Fdead), "Minimum viscous torque on inner disk boundary" )
+			( "Fdead", po::value<double>()->default_value(default_Fdead), "Minimum viscous torque on inner disk boundary, dyn*cm" )
 			;
 	return od;
 }

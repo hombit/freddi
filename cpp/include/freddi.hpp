@@ -57,6 +57,7 @@ private:
 	void truncateInnerRadius();
 public:
 	FreddiNeutronStarEvolution(const FreddiNeutronStarArguments& args);
+	using FreddiEvolution::step;
 	virtual void step(double tau) override;
 };
 

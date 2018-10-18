@@ -20,6 +20,7 @@ FROM alpine
 LABEL maintainer="Konstantin Malanchev <malanchev@sai.msu.ru>"
 
 COPY --from=builder /usr/local/bin/freddi /bin/freddi
+COPY --from=builder /usr/local/bin/freddi-ns /bin/freddi-ns
 
 VOLUME /data
 WORKDIR /

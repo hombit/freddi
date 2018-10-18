@@ -90,7 +90,7 @@ po::variables_map parseOptions(int ac, char* av[]) {
 	const std::string config_filename = "freddi.ini";
 	const char* home = getenv("HOME");
 	const std::array<const std::string, 4> path_config_file = {".", home, INSTALLPATHPREFIX"/etc", "/etc"};
-	auto desc = FreddiOptions::description();
+	auto desc = Options::description();
 	po::variables_map vm;
 	po::store( po::parse_command_line(ac, av, desc), vm );
 	for (const auto &path : path_config_file){

@@ -18,6 +18,7 @@ matrix:
         - sudo make install VERBOSE=1
       script:
         - freddi
+        - freddi-ns
     - name: "C++ on MacOS"
       os: osx
       language: cpp
@@ -28,6 +29,7 @@ matrix:
         - make VERBOSE=1
       script:
         - ./freddi
+        - ./freddi-ns
     - name: "Python 3.5 on Linux"
       os: linux
       dist: xenial
@@ -121,6 +123,7 @@ matrix:
         - docker build -f Dockerfile -t freddi:exe-travis .
       script:
         - docker run --rm -t freddi:exe-travis
+        - docker run --rm -t --entrypoint="/bin/freddi-ns" freddi:exe-travis
     - name: "Python Wheel in Docker"
       os: linux
       language: generic
@@ -130,4 +133,3 @@ matrix:
         - docker build -f Dockerfile.python -t freddi:python-travis .
       script:
         - docker run --rm -t freddi:python-travis python -c "import freddi"
-
