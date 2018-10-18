@@ -110,10 +110,11 @@ double FreddiEvolution::Sigma_hot_disk(double r) const {
 
 
 
-FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiArguments &args):
+FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarArguments &args):
 		FreddiEvolution(args),
+		args_ns(args.ns.get()),
 		xi_pow_minus_7_2(std::pow(xi, -3.5)),
-		R_cor(std::cbrt(GM / (4 * M_PI*M_PI * args.basic->accfreq*args.basic->accfreq))) {}
+		R_cor(std::cbrt(GM / (4 * M_PI*M_PI * args.ns->freqx*args.ns->freqx))) {}
 
 
 void FreddiNeutronStarEvolution::step(double tau) {
@@ -130,7 +131,7 @@ void FreddiNeutronStarEvolution::step(double tau) {
 
 
 void FreddiNeutronStarEvolution::truncateInnerRadius() {
-	if (args->disk->Fdead <= 0.) {
+	if (args_ns->Fdead <= 0.) {
 		return;
 	}
 	if ( state_->Mdot_in() > Mdot_in_prev ) {
@@ -139,7 +140,7 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	if ( Mdot_in_prev > Mdot_peak ) {
 		Mdot_peak = Mdot_in_prev;
 		mu_magn = std::sqrt(Mdot_peak * std::sqrt(GM) * std::pow(X_R * args->basic->rin, 3.5));
-		R_dead = std::cbrt(mu_magn*mu_magn / args->disk->Fdead);
+		R_dead = std::cbrt(mu_magn*mu_magn / args_ns->Fdead);
 	}
 
 	double R_m = X_R * args->basic->rin * std::pow(Mdot_peak / state_->Mdot_in(), 2./7.);
@@ -160,7 +161,7 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 		const double n_ws = 1 - k_t * xi_pow_minus_7_2 * std::pow(R_m / R_cor, 3);
 		new_F_in = (1 - n_ws) * state_->Mdot_in() * std::sqrt(GM * R_m);
 	} else {
-		new_F_in = args->disk->Fdead * std::pow(R_dead / R_m, 3);
+		new_F_in = args_ns->Fdead * std::pow(R_dead / R_m, 3);
 	}
 	state_->F_in_ = state_->F_[0] = new_F_in;
 

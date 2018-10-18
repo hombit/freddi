@@ -6,6 +6,7 @@
 #define INSTALLPATHPREFIX ""
 #endif  // INSTALLPATHPREFIX
 
+#include <fstream>
 #include <boost/program_options.hpp>
 
 #include "arguments.hpp"
@@ -70,7 +71,34 @@ public:
 };
 
 
-po::variables_map parseOptions(int ac, char* av[]);
+class NeutronStarOptions: public NeutronStarArguments {
+public:
+	NeutronStarOptions(const po::variables_map& vm);
+	static po::options_description description();
+};
 
+
+class FreddiNeutronStarOptions: public FreddiNeutronStarArguments {
+public:
+	FreddiNeutronStarOptions(const po::variables_map& vm);
+	static po::options_description description();
+};
+
+
+template <typename Options>
+po::variables_map parseOptions(int ac, char* av[]) {
+	const std::string config_filename = "freddi.ini";
+	const char* home = getenv("HOME");
+	const std::array<const std::string, 4> path_config_file = {".", home, INSTALLPATHPREFIX"/etc", "/etc"};
+	auto desc = FreddiOptions::description();
+	po::variables_map vm;
+	po::store( po::parse_command_line(ac, av, desc), vm );
+	for (const auto &path : path_config_file){
+		std::ifstream config(path + "/" + config_filename);
+		po::store( po::parse_config_file(config, desc), vm );
+	}
+	po::notify(vm);
+	return vm;
+}
 
 #endif //FREDDI_OPTIONS_HPP

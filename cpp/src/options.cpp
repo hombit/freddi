@@ -1,5 +1,4 @@
 #include <algorithm>  // transform
-#include <fstream>
 
 #include "options.hpp"
 
@@ -29,7 +28,6 @@ BasicDiskBinaryOptions::BasicDiskBinaryOptions(const po::variables_map &vm):
 				vm["alpha"].as<double>(),
 				sunToGram(vm["Mx"].as<double>()),
 				vm["kerr"].as<double>(),
-				0.,  // accfreq
 				sunToGram(vm["Mopt"].as<double>()),
 				dayToS(vm["period"].as<double>()),
 				rinInitializer(vm),
@@ -64,7 +62,6 @@ po::options_description BasicDiskBinaryOptions::description() {
 			( "alpha,a", po::value<double>()->default_value(default_alpha), "Alpha parameter of Shakura-Sunyaev model" )
 			( "Mx,M", po::value<double>()->default_value(gramToSun(default_Mx)), "Mass of the central object, in the units of solar masses" )
 			( "kerr", po::value<double>()->default_value(default_kerr), "Dimensionless Kerr parameter of the black hole" )
-			// ( "accfreq", po::value<double>()->default_value(default_accfreq), "Accretor rotation frequency, in units of Hz. This parameter is not linked to --kerr, agree them yourself" )
 			( "Mopt",	po::value<double>()->default_value(gramToSun(default_Mopt)), "Mass of the optical star, in units of solar masses" )
 			( "period,P", po::value<double>()->default_value(sToDay(default_period)), "Orbital period of the binary system, in units of days" )
 			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the Schwarzschild radius of the central object 2GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
@@ -78,7 +75,6 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 		DiskStructureArguments(
 				bdb_args,
 				vm["opacity"].as<std::string>(),
-				0,  // Fdead
 				vm["Mdotout"].as<double>(),
 				vm["boundcond"].as<std::string>(),
 				vm["Thot"].as<double>(),
@@ -227,7 +223,7 @@ FreddiOptions::FreddiOptions(const po::variables_map& vm) {
 }
 
 po::options_description FreddiOptions::description() {
-	po::options_description desc("Freddi - numerical calculation of accretion disk evolutio");
+	po::options_description desc("Freddi: numerical calculation of accretion disk evolution");
 	desc.add(GeneralOptions::description());
 	desc.add(BasicDiskBinaryOptions::description());
 	desc.add(DiskStructureOptions::description());
@@ -238,17 +234,46 @@ po::options_description FreddiOptions::description() {
 }
 
 
-po::variables_map parseOptions(int ac, char* av[]) {
-	const std::string config_filename = "freddi.ini";
-	const char* home = getenv("HOME");
-	const std::array<const std::string, 4> path_config_file = {".", home, INSTALLPATHPREFIX"/etc", "/etc"};
-	auto desc = FreddiOptions::description();
-	po::variables_map vm;
-	po::store( po::parse_command_line(ac, av, desc), vm );
-	for (const auto &path : path_config_file){
-		std::ifstream config(path + "/" + config_filename);
-		po::store( po::parse_config_file(config, desc), vm );
-	}
-	po::notify(vm);
-	return vm;
+NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
+		NeutronStarArguments(
+				vm["Rx"].as<double>(),
+				vm["freqx"].as<double>(),
+				vm["Bx"].as<double>(),
+				vm["epsilonAlfven"].as<double>(),
+				vm["Fdead"].as<double>()) {}
+
+po::options_description NeutronStarOptions::description() {
+	po::options_description od("Parameters of accreting neutron star");
+	od.add_options()
+			( "Rx", po::value<double>()->default_value(default_Rx), "Accretor radius, cm" )
+			( "accfreq", po::value<double>()->default_value(default_freqx), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
+			( "Bx", po::value<double>()->default_value(default_Bx), "Accretor magnetic induction, G" )
+			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Factor in Alfven radius formula" )
+			( "Fdead", po::value<double>()->default_value(default_Fdead), "Minimum viscous torque on inner disk boundary" )
+			;
+	return od;
 }
+
+
+FreddiNeutronStarOptions::FreddiNeutronStarOptions(const po::variables_map &vm) {
+	general.reset(new GeneralOptions(vm));
+	basic.reset(new BasicDiskBinaryOptions(vm));
+	disk.reset(new DiskStructureOptions(vm, *basic));
+	irr.reset(new SelfIrradiationOptions(vm, *disk));
+	flux.reset(new FluxOptions(vm));
+	calc.reset(new CalculationOptions(vm));
+	ns.reset(new NeutronStarOptions(vm));
+}
+
+po::options_description FreddiNeutronStarOptions::description() {
+	po::options_description desc("Freddi NS: numerical calculation of accretion disk evolution");
+	desc.add(GeneralOptions::description());
+	desc.add(BasicDiskBinaryOptions::description());
+	desc.add(DiskStructureOptions::description());
+	desc.add(NeutronStarOptions::description());
+	desc.add(SelfIrradiationOptions::description());
+	desc.add(FluxOptions::description());
+	desc.add(CalculationOptions::description());
+	return desc;
+}
+

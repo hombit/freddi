@@ -38,20 +38,20 @@ cdef extern from 'freddi.hpp':
         FreddiState& state()
         size_t Nt
     cdef cppclass FreddiNeutronStarEvolution:
-        FreddiNeutronStarEvolution(const FreddiArguments&) except +
+        FreddiNeutronStarEvolution(const FreddiNeutronStarArguments&) except +
 
 
 cdef extern from 'arguments.hpp':
     cdef cppclass GeneralArguments:
         GeneralArguments(const string&, const string&, bint)
     cdef cppclass BasicDiskBinaryArguments:
-        BasicDiskBinaryArguments(double, double, double, double, double, double, double, double) except +
+        BasicDiskBinaryArguments(double, double, double, double, double, double, double) except +
         BasicDiskBinaryArguments(BasicDiskBinaryArguments&&)
-        const double alpha, Mx, kerr, accfreq, Mopt, period, rin, rout
+        const double alpha, Mx, kerr, Mopt, period, rin, rout
     cdef cppclass DiskStructureArguments:
-        DiskStructureArguments(const BasicDiskBinaryArguments&, const string&, double, double, const string&, double, const string&, double, double, double, double, bint, bint, double, double) except +
+        DiskStructureArguments(const BasicDiskBinaryArguments&, const string&, double, const string&, double, const string&, double, double, double, double, bint, bint, double, double) except +
         const string opacity, boundcond, initialcond
-        const double Fdead, Mdotout, Thot, F0, powerorder, gaussmu, gausssigma, Mdisk0, Mdot0
+        const double Mdotout, Thot, F0, powerorder, gaussmu, gausssigma, Mdisk0, Mdot0
     cdef cppclass SelfIrradiationArguments:
         SelfIrradiationArguments(double, const string&) except +
         const double Cirr
@@ -74,12 +74,18 @@ cdef extern from 'arguments.hpp':
         shared_ptr[SelfIrradiationArguments] irr
         shared_ptr[FluxArguments] flux
         shared_ptr[CalculationArguments] calc
+    cdef cppclass NeutronStarArguments:
+        NeutronStarArguments(double, double, double, double, double)
+        const double Rx, freqx, Bx, epsilonAlfven, Fdead
+    cdef cppclass FreddiNeutronStarArguments:
+        FreddiNeutronStarArguments(const FreddiArguments& freddi_args, NeutronStarArguments* ns)
+        shared_ptr[NeutronStarArguments] ns
 
 
 cdef extern from 'arguments.hpp' namespace 'BasicDiskBinaryArguments':
-    cdef BasicDiskBinaryArguments constructWithoutRinRout(double, double, double, double, double, double)
-    cdef BasicDiskBinaryArguments constructWithoutRin(double, double, double, double, double, double, double)
-    cdef BasicDiskBinaryArguments constructWithoutRout(double, double, double, double, double, double, double)
+    cdef BasicDiskBinaryArguments constructWithoutRinRout(double, double, double, double, double)
+    cdef BasicDiskBinaryArguments constructWithoutRin(double, double, double, double, double, double)
+    cdef BasicDiskBinaryArguments constructWithoutRout(double, double, double, double, double, double)
     cdef const double default_alpha
     cdef const double default_Mx
     cdef const double default_kerr
@@ -90,7 +96,6 @@ cdef extern from 'arguments.hpp' namespace 'BasicDiskBinaryArguments':
 
 cdef extern from 'arguments.hpp' namespace 'DiskStructureArguments':
     cdef const char* default_opacity
-    cdef const double default_Fdead
     cdef const double default_Mdotout
     cdef const char* default_boundcond
     cdef const double default_Thot
@@ -119,6 +124,10 @@ cdef extern from 'arguments.hpp' namespace 'CalculationArguments':
     cdef const double default_tau
     cdef const unsigned int default_Nx
     cdef const char* default_gridscale
+
+
+cdef extern from 'arguments.hpp' namespace 'NeutronStarArguments':
+    cdef const double default_Rx, default_freqx, default_Bx, default_epsilonAlfven, default_Fdead
 
 
 cdef extern from 'unit_transformation.hpp':

@@ -51,13 +51,14 @@ public:
 	const double xi = 0.7;
 	const double xi_pow_minus_7_2;
 	const double R_cor;
+	const NeutronStarArguments* args_ns;
 private:
 	double mu_magn = 0;
 	double R_dead = 0;
 private:
 	void truncateInnerRadius();
 public:
-	FreddiNeutronStarEvolution(const FreddiArguments& args);
+	FreddiNeutronStarEvolution(const FreddiNeutronStarArguments& args);
 	virtual void step(double tau) override;
 };
 

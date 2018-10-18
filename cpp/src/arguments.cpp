@@ -15,7 +15,6 @@ constexpr const char GeneralArguments::default_dir[];
 constexpr const double BasicDiskBinaryArguments::default_alpha;
 constexpr const double BasicDiskBinaryArguments::default_Mx;
 constexpr const double BasicDiskBinaryArguments::default_kerr;
-constexpr const double BasicDiskBinaryArguments::default_accfreq;
 constexpr const double BasicDiskBinaryArguments::default_Mopt;
 constexpr const double BasicDiskBinaryArguments::default_period;
 
@@ -33,7 +32,6 @@ double BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(const double MxToMopt) { /
 }
 
 constexpr const char DiskStructureArguments::default_opacity[];
-constexpr const double DiskStructureArguments::default_Fdead;
 constexpr const double DiskStructureArguments::default_Mdotout;
 constexpr const char DiskStructureArguments::default_initialcond[];
 constexpr const double DiskStructureArguments::default_Thot;
@@ -47,7 +45,7 @@ constexpr const double DiskStructureArguments::mu;
 DiskStructureArguments::DiskStructureArguments(
 	const BasicDiskBinaryArguments &bdb_args,
 	const std::string &opacity,
-	const double Fdead, const double Mdotout,
+	const double Mdotout,
 	const std::string &boundcond, const double Thot,
 	const std::string &initialcond,
 	const double F0,
@@ -56,7 +54,6 @@ DiskStructureArguments::DiskStructureArguments(
 	const double Mdisk0, const double Mdot0):
 		opacity(opacity),
 		oprel(new OpacityRelated(opacity, bdb_args.Mx, bdb_args.alpha, mu)),
-		Fdead(Fdead),
 		Mdotout(Mdotout),
 		boundcond(boundcond),
 		Thot(Thot),
@@ -213,3 +210,10 @@ constexpr const double CalculationArguments::default_time;
 constexpr const double CalculationArguments::default_tau;
 constexpr const unsigned int CalculationArguments::default_Nx;
 constexpr const char CalculationArguments::default_gridscale[];
+
+
+constexpr const double NeutronStarArguments::default_Rx;
+constexpr const double NeutronStarArguments::default_freqx;
+constexpr const double NeutronStarArguments::default_Bx;
+constexpr const double NeutronStarArguments::default_epsilonAlfven;
+constexpr const double NeutronStarArguments::default_Fdead;

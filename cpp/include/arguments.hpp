@@ -57,14 +57,12 @@ public:
 	constexpr static const double default_alpha = 0.25;
 	constexpr static const double default_Mx = sunToGram(5.);
 	constexpr static const double default_kerr = 0.;
-	constexpr static const double default_accfreq = 0.;
 	constexpr static const double default_Mopt = sunToGram(0.5);
 	constexpr static const double default_period = dayToS(0.25);
 public:
 	const double alpha;
 	const double Mx;
 	const double kerr;
-	const double accfreq;
 	const double Mopt;
 	const double period;
 	const double rin;
@@ -72,12 +70,12 @@ public:
 public:
 	BasicDiskBinaryArguments(
 			double alpha,
-			double Mx, double kerr, double accfreq,
+			double Mx, double kerr,
 			double Mopt, double period,
 			double rin, double rout
 	):
 			alpha(alpha),
-			Mx(Mx), kerr(kerr), accfreq(accfreq),
+			Mx(Mx), kerr(kerr),
 			Mopt(Mopt), period(period),
 			rin(rin), rout(rout) {}
 	BasicDiskBinaryArguments(BasicDiskBinaryArguments&&) = default;
@@ -86,23 +84,23 @@ public:
 		return 0.8 * rocheLobeVolumeRadius(Mx, Mopt, period);
 	}
 	static inline BasicDiskBinaryArguments constructWithoutRinRout(const double alpha,
-																   const double Mx, const double kerr, const double accfreq,
+																   const double Mx, const double kerr,
 																   const double Mopt, const double period) {
-		return {alpha, Mx, kerr, accfreq, Mopt, period,
+		return {alpha, Mx, kerr, Mopt, period,
 				rinFromMxKerr(Mx, kerr), routFromMxMoptPeriod(Mx, Mopt, period)};
 	}
 	static inline BasicDiskBinaryArguments constructWithoutRin(const double alpha,
-															   const double Mx, const double kerr, const double accfreq,
+															   const double Mx, const double kerr,
 															   const double Mopt, const double period,
 															   const double rout) {
-		return {alpha, Mx, kerr, accfreq, Mopt, period,
+		return {alpha, Mx, kerr, Mopt, period,
 				rinFromMxKerr(Mx, kerr), rout};
 	}
 	static inline BasicDiskBinaryArguments constructWithoutRout(const double alpha,
-															    const double Mx, const double kerr, const double accfreq,
+															    const double Mx, const double kerr,
 															    const double Mopt, const double period,
 															    const double rin) {
-		return {alpha, Mx, kerr, accfreq, Mopt, period,
+		return {alpha, Mx, kerr, Mopt, period,
 				rin, routFromMxMoptPeriod(Mx, Mopt, period)};
 	}
 	inline double h(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx * r); }
@@ -113,7 +111,6 @@ public:
 class DiskStructureArguments {
 public:
 	constexpr static const char default_opacity[] = "Kramers";
-	constexpr static const double default_Fdead = 0.;
 	constexpr static const double default_Mdotout = 0.;
 	constexpr static const char default_boundcond[] = "Teff";
 	constexpr static const double default_Thot = 0.;
@@ -126,7 +123,6 @@ public:
 	constexpr static const double mu = 0.62;
 public:
 	const std::string opacity;
-	const double Fdead;
 	const double Mdotout;
 	const std::string boundcond;
 	const double Thot;
@@ -146,7 +142,7 @@ public:
 	DiskStructureArguments(
 			const BasicDiskBinaryArguments &bdb_args,
 			const std::string& opacity,
-			double Fdead, double Mdotout,
+			double Mdotout,
 			const std::string& boundcond, double Thot,
 			const std::string& initialcond, double F0,
 			double powerorder, double gaussmu, double gausssigma,
@@ -233,6 +229,44 @@ public:
 			FluxArguments* flux,
 			CalculationArguments* calc):
 			general(general), basic(basic), disk(disk), irr(irr), flux(flux), calc(calc) {}
+};
+
+
+class NeutronStarArguments {
+public:
+	constexpr static const double default_Rx = 1e6;
+	constexpr static const double default_freqx = 0.;
+	constexpr static const double default_Bx = 0.;
+	constexpr static const double default_epsilonAlfven = 1.;
+	constexpr static const double default_Fdead = 0.;
+public:
+	const double Rx;
+	const double freqx;
+	const double Bx;
+	const double epsilonAlfven;
+	const double Fdead;
+public:
+	NeutronStarArguments(double Rx, double freqx, double Bx, double epsilonAlfven, double Fdead):
+			Rx(Rx), freqx(freqx), Bx(Bx), epsilonAlfven(epsilonAlfven), Fdead(Fdead) {}
+};
+
+
+class FreddiNeutronStarArguments: public FreddiArguments {
+public:
+	std::shared_ptr<NeutronStarArguments> ns;
+public:
+	FreddiNeutronStarArguments() = default;
+	FreddiNeutronStarArguments(const FreddiArguments& freddi_args, NeutronStarArguments* ns):
+			FreddiArguments(freddi_args), ns(ns) {}
+	FreddiNeutronStarArguments(
+			GeneralArguments* general,
+			BasicDiskBinaryArguments* basic,
+			DiskStructureArguments* disk,
+			SelfIrradiationArguments* irr,
+			FluxArguments* flux,
+			CalculationArguments* calc,
+			NeutronStarArguments* ns):
+			FreddiArguments(general, basic, disk, irr, flux, calc), ns(ns) {}
 };
 
 

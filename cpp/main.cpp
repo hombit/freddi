@@ -8,7 +8,7 @@ using namespace std;
 
 
 int main(int ac, char *av[]) {
-	auto vm = parseOptions(ac, av);
+	auto vm = parseOptions<FreddiOptions>(ac, av);
 	if (vm.count("help") > 0) {
 		cout << FreddiOptions::description() << endl;
 		return 0;

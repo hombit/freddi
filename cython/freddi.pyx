@@ -284,9 +284,9 @@ cdef class _BasicFreddi:
 
     def __cinit__(
         self, *, bint cgs=True, bytes type=b'Normal',
-        double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double accfreq=default_accfreq, double Mopt=default_Mopt,
+        double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt,
             double period=default_period, rin=None, rout=None,
-        string opacity=default_opacity, double Fdead=default_Fdead, double Mdotout=default_Mdotout,
+        string opacity=default_opacity, double Mdotout=default_Mdotout,
             string boundcond=default_boundcond, double Thot=default_Thot, string initialcond=default_initialcond,
             double F0=default_F0, double powerorder=default_powerorder, double gaussmu=default_gaussmu,
             double gausssigma=default_gausssigma, Mdisk0=None, Mdot0=None,
@@ -294,7 +294,8 @@ cdef class _BasicFreddi:
         double colourfactor=default_colourfactor, double emin=default_emin, double emax=default_emax,
             double inclination=default_inclination, double distance=default_distance, vector[double] lambdas=[],
         double time=default_time, double tau=default_tau, unsigned int Nx=default_Nx,
-            string gridscale=default_gridscale, eps=None
+            string gridscale=default_gridscale, eps=None,
+        **kwargs,
     ):
         if not cgs:
             Mx = sunToGram(Mx)
@@ -314,13 +315,13 @@ cdef class _BasicFreddi:
         cdef GeneralArguments* general = new GeneralArguments(b'', b'', False)
         cdef BasicDiskBinaryArguments* basic
         if rin is None and rout is None:
-            basic = new BasicDiskBinaryArguments(constructWithoutRinRout(alpha, Mx, kerr, accfreq, Mopt, period))
+            basic = new BasicDiskBinaryArguments(constructWithoutRinRout(alpha, Mx, kerr, Mopt, period))
         elif rin is None:
-            basic = new BasicDiskBinaryArguments(constructWithoutRin(alpha, Mx, kerr, accfreq, Mopt, period, rout))
+            basic = new BasicDiskBinaryArguments(constructWithoutRin(alpha, Mx, kerr, Mopt, period, rout))
         elif rout is None:
-            basic = new BasicDiskBinaryArguments(constructWithoutRout(alpha, Mx, kerr, accfreq, Mopt, period, rin))
+            basic = new BasicDiskBinaryArguments(constructWithoutRout(alpha, Mx, kerr, Mopt, period, rin))
         else:
-            basic = new BasicDiskBinaryArguments(alpha, Mx, kerr, accfreq, Mopt, period, rin, rout)
+            basic = new BasicDiskBinaryArguments(alpha, Mx, kerr, Mopt, period, rin, rout)
         cdef bint is_Mdisk0_specified = Mdisk0 is not None
         if Mdisk0 is None:
             Mdisk0 = -1.0
@@ -328,7 +329,7 @@ cdef class _BasicFreddi:
         if Mdot0 is None:
             Mdot0 = -1.0
         cdef DiskStructureArguments* disk = new DiskStructureArguments(
-            dereference(basic), opacity, Fdead, Mdotout, boundcond, Thot, initialcond, F0, powerorder,
+            dereference(basic), opacity, Mdotout, boundcond, Thot, initialcond, F0, powerorder,
             gaussmu, gausssigma, is_Mdisk0_specified, is_Mdot0_specified, Mdisk0, Mdot0
         )
         cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(Cirr, irrfactortype)
@@ -412,15 +413,14 @@ cdef class _BasicFreddi:
     def Cirr(self, val: double) -> None:
         self.change_SelfIrradiationArguments(Cirr=val)
 
-    cdef void change_DiskStructureArguments(self, opacity=None, Fdead=None, Mdotout=None, boundcond=None, Thot=None):
+    cdef void change_DiskStructureArguments(self, opacity=None, Mdotout=None, boundcond=None, Thot=None):
             cdef string c_opacity = self.args.disk.get().opacity if opacity is None else opacity
-            cdef double c_Fdead = self.args.disk.get().Fdead if Fdead is None else Fdead
             cdef double c_Mdotout = self.args.disk.get().Mdotout if Mdotout is None else Mdotout
             cdef string c_boundcond = self.args.disk.get().boundcond if boundcond is None else boundcond
             cdef double c_Thot = self.args.disk.get().Thot if Thot is None else Thot
             cdef DiskStructureArguments* disk = new DiskStructureArguments(
                 dereference(self.args.basic.get()),
-                c_opacity, c_Fdead, c_Mdotout, c_boundcond, c_Thot,
+                c_opacity, c_Mdotout, c_boundcond, c_Thot,
                 self.args.disk.get().initialcond, self.args.disk.get().F0, self.args.disk.get().powerorder,
                 self.args.disk.get().gaussmu, self.args.disk.get().gausssigma,
                 True, True, self.args.disk.get().Mdisk0, self.args.disk.get().Mdot0
@@ -433,7 +433,7 @@ cdef class _BasicFreddi:
 
     @boundcond.setter
     def boundcond(self, val: bytes) -> None:
-        self.change_DiskStructureArguments(opacity=None, Fdead=None, Mdotout=None, boundcond=val)
+        self.change_DiskStructureArguments(opacity=None, Mdotout=None, boundcond=val)
 
     @property
     def Thot(self) -> double:
@@ -441,7 +441,7 @@ cdef class _BasicFreddi:
 
     @Thot.setter
     def Thot(self, val: double) -> None:
-        self.change_DiskStructureArguments(opacity=None, Fdead=None, Mdotout=None, boundcond=None, Thot=val)
+        self.change_DiskStructureArguments(opacity=None, Mdotout=None, boundcond=None, Thot=val)
 
     cpdef State get_state(self):
         return state_from_cpp(self.evolution.state())
@@ -553,6 +553,12 @@ cdef class Freddi(_BasicFreddi):
 
 
 cdef class FreddiNeutronStar(_BasicFreddi):
-    def __cinit__(self, **kwargs):
-        self.evolution = <FreddiEvolution*> new FreddiNeutronStarEvolution(dereference(self.args))
-
+    def __cinit__(
+        self, *,
+        double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double Fdead=default_Fdead,
+        **kwargs,
+    ):
+        cdef NeutronStarArguments* ns = new NeutronStarArguments(Rx, freqx, Bx, epsilonAlfven, Fdead)
+        cdef FreddiNeutronStarArguments* ns_args = new FreddiNeutronStarArguments(dereference(self.args), ns)
+        self.args = <FreddiArguments*> ns_args
+        self.evolution = <FreddiEvolution*> new FreddiNeutronStarEvolution(dereference(ns_args))
