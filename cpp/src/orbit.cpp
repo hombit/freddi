@@ -6,8 +6,8 @@ namespace disk_orbit {
 double r_out_func(const double Mx, const double Mopt, const double P) {
 	const double semiAxis = cbrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * (Mx + Mopt) * P * P / (4. * M_PI * M_PI));
 	const double q = cbrt(Mx / Mopt);
-	const double roche = semiAxis * 0.49 * q * q / (0.6 * q * q + log(1. +
-																	  q)); // Volume radius of Roche lobe, approximation from Eggleton, P. P. 1983, ApJ, 268, 368
+	// Volume radius of Roche lobe, approximation from Eggleton, P. P. 1983, ApJ, 268, 368
+	const double roche = semiAxis * 0.49 * q * q / (0.6 * q * q + log(1. + q));
 	return 0.8 * roche;
 }
 
@@ -26,4 +26,4 @@ double efficiency_of_accretion(const double kerr) {
 	return 1. - sqrt(1. - 2. / 3. / r_ISCO(kerr));
 }
 
-} // disk_orbin
+} // disk_orbit
