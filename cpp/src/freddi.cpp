@@ -128,7 +128,7 @@ void FreddiNeutronStarEvolution::step(double tau) {
 	nonlinear_diffusion_nonuniform_wind_1_2(
 			args->calc->tau, args->calc->eps,
 			state_->F_in(), state_->Mdot_out(),
-			state_->windA_, state_->windB_, state_->windC_,
+			state_->windA(), state_->windB(), state_->windC(),
 			wunc,
 			state_->h(), state_->F_
 	);
@@ -432,9 +432,11 @@ const vecd& FreddiState::Tph_vis() {
 const vecd& FreddiState::Tph_X() {
 	if (!Tph_X_) {
 		vecd x(Nx_);
-		for (size_t i = 0; i < Nx_; i++) {
+		x[0] = 0;
+		for (size_t i = 1; i < Nx_; i++) {
 			x[i] = (freddi->args->flux->colourfactor
-					* T_GR(R()[i], freddi->args->basic->kerr, freddi->args->basic->Mx, Mdot_in(), R().front()));
+					* T_GR(R()[i], freddi->args->basic->kerr, freddi->args->basic->Mx, F()[i]
+					/ (h()[i] - h()[0]), R()[0]));
 		}
 		Tph_X_ = std::move(x);
 	}
