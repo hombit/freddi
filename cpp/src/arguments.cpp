@@ -19,13 +19,6 @@ constexpr const double BasicDiskBinaryArguments::default_Mopt;
 constexpr const double BasicDiskBinaryArguments::default_period;
 
 
-double BlackHoleFunctions::rISCORg(const double kerr) {  // From «Black Hole Accretion Disks», A.44 (p. 530)
-	const double Z1 = 1. + std::cbrt((1. - kerr * kerr)) * (std::cbrt((1. + kerr)) + std::cbrt((1. - kerr)));
-	const double Z2 = std::sqrt(3. * kerr * kerr + Z1 * Z1);
-	return 3. + Z2 - std::sqrt((3. - Z1) * (3. + Z1 + 2. * Z2));
-}
-
-
 double BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(const double MxToMopt) { // Eggleton, P. P. 1983, ApJ, 268, 368
 	const double q = std::cbrt(MxToMopt);
 	return 0.49 * q * q / (0.6 * q * q + std::log(1. + q));

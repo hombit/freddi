@@ -18,7 +18,7 @@ FreddiEvolution::FreddiEvolution(const FreddiArguments &args_):
 		Nt(static_cast<size_t>(std::round(args_.calc->time / args_.calc->tau))),
 		args(&args_),
 		GM(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * args_.basic->Mx),
-		eta(disk_orbit::efficiency_of_accretion(args_.basic->kerr)),
+		eta(efficiency_of_accretion(args_.basic->kerr)),
 		cosi(std::cos(args_.flux->inclination / 180 * M_PI)),
 		cosiOverD2(std::cos(args_.flux->inclination / 180 * M_PI) / (args_.flux->distance * args_.flux->distance)),
 		oprel(args_.disk->oprel.get()),

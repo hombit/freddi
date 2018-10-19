@@ -31,9 +31,7 @@ public:
 
 class BlackHoleFunctions {
 public:
-	static double rISCORg(double kerr);
 	static inline double rISCO(const double Mx, const double kerr) { return rgToCm(rISCORg(kerr), Mx); }
-	static inline double accretionEfficiency(const double kerr) { return 1. - std::sqrt(1. - 2. / 3. / rISCORg(kerr)); }
 };
 
 
