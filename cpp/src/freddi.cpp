@@ -188,9 +188,14 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 		windB_(Nx_, 0.),
 		windC_(Nx_, 0.),
 		Mdot_out_(freddi->args->disk->Mdotout) {
-	const auto args = freddi->args;
-	const auto oprel = freddi->oprel;
+	initializeGrid();
+	initializeF();
+	initializeWind();
+}
 
+
+void FreddiState::initializeGrid() {
+	const auto args = freddi->args;
 	const double h_in = args->basic->h(args->basic->rin);
 	const double h_out = args->basic->h(args->basic->rout);
 
@@ -204,6 +209,15 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 		}
 		R_[i] = h_[i] * h_[i] / freddi->GM;
 	}
+}
+
+
+void FreddiState::initializeF() {
+	const auto args = freddi->args;
+	const auto oprel = freddi->oprel;
+
+	const double h_in = args->basic->h(args->basic->rin);
+	const double h_out = args->basic->h(args->basic->rout);
 
 	if (args->disk->initialcond == "power" or args->disk->initialcond == "powerF") {
 		for (size_t i = 0; i < Nx_; ++i) {
@@ -233,6 +247,14 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 	} else {
 		throw std::logic_error("Wrong initialcond");
 	}
+}
+
+
+void FreddiState::initializeWind() {
+	const auto args = freddi->args;
+
+	const double h_in = args->basic->h(args->basic->rin);
+	const double h_out = args->basic->h(args->basic->rout);
 
 	if (args->disk->wind == "no") {
 		// Nothing to do here
@@ -256,7 +278,7 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 			const double xi = R_[i] / R_iC;
 			const double C0 = m_ch0 * (4 * M_PI * h_[i]*h_[i]*h_[i]) / (freddi->GM*freddi->GM);
 			windC_[i] = C0 * std::pow((1 + std::pow(0.125 * eta / xi, 2))
-					    / (1 + 1. / (std::pow(eta, 8) * std::pow(1 + 262 * xi * xi, 2))), 1. / 6.)
+									  / (1 + 1. / (std::pow(eta, 8) * std::pow(1 + 262 * xi * xi, 2))), 1. / 6.)
 						* std::exp(-std::pow(1 - 1. / std::sqrt(1 + 0.25 / (xi * xi)), 2) / (2 * xi));
 		}
 	} else if (args->disk->wind == "__testA__") {

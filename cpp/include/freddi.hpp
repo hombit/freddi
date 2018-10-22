@@ -66,8 +66,13 @@ class FreddiState {
 	typedef std::vector<double> vecd;
 private:
 	const FreddiEvolution* freddi;
+protected:
+	void initializeGrid();
+	void initializeF();
+	void initializeWind();
 public:
-	FreddiState(const FreddiEvolution* freddi);
+	explicit FreddiState(const FreddiEvolution* freddi);
+	explicit FreddiState(const FreddiNeutronStarEvolution* freddi);
 	FreddiState(const FreddiState&, double tau);
 	FreddiState(const FreddiState&) = default;
 	FreddiState(FreddiState&&) = default;
