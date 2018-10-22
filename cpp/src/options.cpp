@@ -248,7 +248,7 @@ po::options_description NeutronStarOptions::description() {
 	od.add_options()
 			( "Rx", po::value<double>()->default_value(default_Rx), "Accretor radius, cm" )
 			( "freqx", po::value<double>()->default_value(default_freqx), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
-			( "Bx", po::value<double>()->default_value(default_Bx), "Accretor magnetic induction, G" )
+			( "Bx", po::value<double>()->default_value(default_Bx), "Accretor polar magnetic induction, G" )
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Factor in Alfven radius formula" )
 			( "Fdead", po::value<double>()->default_value(default_Fdead), "Minimum viscous torque on inner disk boundary, dyn*cm" )
 			;
