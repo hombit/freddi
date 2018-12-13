@@ -29,6 +29,7 @@ public:
 protected:
 	std::unique_ptr<FreddiState> state_;
 	void truncateOuterRadius();
+	void updateWind();
 protected:
 	vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;
 	double Sigma_hot_disk(double r) const;

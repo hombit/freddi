@@ -33,6 +33,7 @@ void FreddiEvolution::set_Mdot_in_prev() {
 
 void FreddiEvolution::step(const double tau) {
 	set_Mdot_in_prev();
+	updateWind();
 	state_.reset(new FreddiState(*state_, tau));
 	nonlinear_diffusion_nonuniform_wind_1_2(
 			args->calc->tau, args->calc->eps,
@@ -52,6 +53,22 @@ std::vector<FreddiState> FreddiEvolution::evolve() {
 		states.push_back(*state_);
 	}
 	return states;
+}
+
+
+void FreddiEvolution::updateWind() {
+	if (args->disk->wind == "__testC_q0_Shields1986__") {
+		const double kC = 1;
+		const double r_dimless_wind_min = 0.9;
+		const double h_wind_min = std::sqrt(r_dimless_wind_min) * state_->h_.back();
+		for (size_t i = 0; i < state_->Nx_; ++i) {
+			if (state_->h_[i] > h_wind_min) {
+				state_->windC_[i] = -0.5/M_PI * kC * state_->Mdot_in()
+						/ (std::log(1 / r_dimless_wind_min) * state_->R_[i] * state_->R_[i])
+						* (4 * M_PI * state_->h_[i]*state_->h_[i]*state_->h_[i]) / (GM*GM);
+			}
+		}
+	}
 }
 
 
@@ -302,6 +319,8 @@ void FreddiState::initializeWind() {
 				windC_[i] = C0 * 0.5 * (std::cos(2. * M_PI * (h_[i] - h_wind_min) / (h_out - h_wind_min)) - 1);
 			}
 		}
+	} else if (args->disk->wind == "__testC_q0_Shields1986__") {
+		// To be set in updateWind()
 	} else {
 		throw std::logic_error("Wrong wind");
 	}

@@ -196,3 +196,28 @@ class LipunovaShakuraTestCase(unittest.TestCase):
         a = (1.400, -0.425, 0.025)
         kl = (11. / 3., 19. / 3.)
         self.check_freddi(opacity, a, kl)
+
+
+class ShieldPowerLawWindTestCase(unittest.TestCase):
+    """Shield et al. 1986, IVb), eq. 4.2"""
+
+    _k_C = 1
+    _r_wind = 0.9
+
+    def test_stationary_OPAL_q0(self):
+        Mx = 2e34
+        GM = 6.673e-8 * Mx
+        Mdotout = 1e18
+        rout = 1e11
+        Mdotin = Mdotout / (1 + self._k_C)
+        fr = Freddi(wind=b'__testC_q0_Shields1986__', F0=Mdotin*np.sqrt(GM*rout), Mdotout=Mdotout, rout=rout, Mx=Mx,
+                    initialcond=b'powerF', powerorder=1,
+                    time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
+        for state in fr:
+            pass
+        h = state.h
+        h_w = h[-1] * np.sqrt(self._r_wind)
+        F = Mdotin * (h - h[0])
+        i = h > h_w
+        F[i] += self._k_C * Mdotin * (h[i] * np.log(h[i] / h_w) - (h[i] - h_w)) / np.log(h[-1] / h_w)
+        assert_allclose(state.F, F, rtol=1e-3)

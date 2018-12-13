@@ -332,6 +332,8 @@ cdef class _BasicFreddi:
         Specified time
     distance : float
         Specified distance
+    alpha : float
+        Shakura-Sunyaev turbulent parameter
     cosi : flaot
         Cosinus of specified inclination
     lambdas : numpy.ndarray
@@ -452,6 +454,10 @@ cdef class _BasicFreddi:
     @property
     def distance(self) -> double:
         return self.args.flux.get().distance
+
+    @property
+    def alpha(self) -> double:
+        return self.args.basic.get().alpha
 
     @property
     def cosi(self) -> double:
