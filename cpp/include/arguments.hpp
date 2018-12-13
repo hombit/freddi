@@ -133,6 +133,7 @@ public:
 	const double gaussmu;
 	const double gausssigma;
 	const std::string wind;
+	const std::vector<double> windparams;
 	const double Mdisk0;
 	const double Mdot0;
 	const bool is_Mdisk0_specified;
@@ -151,7 +152,7 @@ public:
 			double powerorder, double gaussmu, double gausssigma,
 			bool is_Mdisk0_specified, bool is_Mdot0_specified,
 			double Mdisk0, double Mdot0,
-			const std::string& wind);
+			const std::string& wind, const std::vector<double>& windparams);
 };
 
 
