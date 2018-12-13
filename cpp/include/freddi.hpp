@@ -101,6 +101,7 @@ private:
 
 	class __testA__Wind: public BasicWind {
 	private:
+		// windparams
 		const double kA;
 	public:
 		__testA__Wind(const FreddiState* state);
@@ -109,6 +110,7 @@ private:
 
 	class __testB__Wind: public BasicWind {
 	private:
+		// windparams
 		const double kB;
 	public:
 		__testB__Wind(const FreddiState* state);
@@ -117,6 +119,7 @@ private:
 
 	class __testC__Wind: public BasicWind {
 	private:
+		// windparams
 		const double kC;
 	public:
 		__testC__Wind(const FreddiState* state);
@@ -125,6 +128,7 @@ private:
 
 	class __testC_q0_Shields1986__: public BasicWind {
 	private:
+		// windparams
 		const double kC;
 		const double R_windmin2out;
 	public:
@@ -137,7 +141,6 @@ private:
 protected:
 	void initializeGrid();
 	void initializeF();
-	void initializeWind();
 public:
 	explicit FreddiState(const FreddiEvolution* freddi);
 	explicit FreddiState(const FreddiNeutronStarEvolution* freddi);

@@ -187,7 +187,6 @@ FreddiState::FreddiState(const FreddiEvolution* freddi):
 		Mdot_out_(freddi->args->disk->Mdotout) {
 	initializeGrid();
 	initializeF();
-	initializeWind();
 }
 
 
