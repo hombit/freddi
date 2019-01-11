@@ -88,7 +88,7 @@ matrix:
       os: osx
       language: c++
       before_install:
-        - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.6.6/python-3.6.6-macosx10.9.pkg
+        - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg
         - sudo installer -pkg /tmp/Python.pkg -target /
       install:
         - pip3 install numpy scipy
@@ -103,7 +103,7 @@ matrix:
       os: osx
       language: c++
       before_install:
-        - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.7.0/python-3.7.0-macosx10.9.pkg
+        - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.7.2/python-3.7.2-macosx10.9.pkg
         - sudo installer -pkg /tmp/Python.pkg -target /
       install:
         - pip3 install numpy scipy
@@ -114,6 +114,28 @@ matrix:
       before_deploy:
         - pip3 install wheel
         - python3 setup.py bdist_wheel
+    - name: "PyPy 3.5 on Linux"
+      os: linux
+      dist: xenial
+      sudo: true
+      language: python
+      python: "pypy3.5"
+      addons:
+        apt:
+          packages:
+            - libopenblas-dev
+            - liblapack-dev
+            - libboost-all-dev
+      cache:
+        - pip
+      install:
+        - pip install numpy scipy
+        - python setup.py install
+      script:
+        - python -c "import freddi"
+        - python setup.py test
+      before_deploy:
+        - python setup.py bdist_wheel
     - name: "C++ in Docker"
       os: linux
       language: generic
