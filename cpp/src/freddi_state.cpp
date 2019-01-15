@@ -1,4 +1,4 @@
-#include "freddi.hpp"
+#include "freddi_state.hpp"
 
 #include <cmath>
 #include <exception>
@@ -101,7 +101,7 @@ void FreddiState::initializeF() {
 }
 
 
-void FreddiState::before_step(double tau) {
+void FreddiState::step(double tau) {
 	set_Mdot_in_prev();
 	invalidate_disk_optional_structure();
 	i_t_ ++;

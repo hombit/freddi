@@ -3,7 +3,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 
-cdef extern from 'freddi.hpp':
+cdef extern from 'freddi_state.hpp':
     cdef cppclass FreddiState:
         FreddiState(const FreddiState&)
         size_t Nt
@@ -31,6 +31,8 @@ cdef extern from 'freddi.hpp':
         double mI() 
         double mJ() 
         double Mdisk()
+
+cdef extern from 'freddi_evolution.hpp':
     cdef cppclass FreddiEvolution:
         FreddiEvolution(const FreddiArguments&) except +
         void step() except +

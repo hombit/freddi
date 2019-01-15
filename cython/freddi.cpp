@@ -7,7 +7,8 @@
             "/usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/arrayobject.h",
             "/usr/local/lib/python3.7/site-packages/numpy/core/include/numpy/ufuncobject.h",
             "cpp/include/arguments.hpp",
-            "cpp/include/freddi.hpp",
+            "cpp/include/freddi_evolution.hpp",
+            "cpp/include/freddi_state.hpp",
             "cpp/include/unit_transformation.hpp"
         ],
         "extra_compile_args": [
@@ -618,7 +619,8 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include <string.h>
 #include <string>
 #include <vector>
-#include "freddi.hpp"
+#include "freddi_state.hpp"
+#include "freddi_evolution.hpp"
 #include "arguments.hpp"
 #include "unit_transformation.hpp"
 #include <math.h>

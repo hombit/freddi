@@ -1,5 +1,5 @@
-#ifndef FREDDI_FREDDI_HPP
-#define FREDDI_FREDDI_HPP
+#ifndef FREDDI_FREDDI_STATE_HPP
+#define FREDDI_FREDDI_STATE_HPP
 
 #include <functional>  // bind, function
 #include <vector>
@@ -8,10 +8,6 @@
 
 #include "arguments.hpp"
 #include "spectrum.hpp"
-
-
-class FreddiEvolution;
-class FreddiNeutronStarEvolution;
 
 
 class FreddiState {
@@ -104,9 +100,7 @@ public:
 	FreddiState(const FreddiArguments& args, wunc_t wunc);
 	FreddiState(const FreddiState&) = default;
 	FreddiState& operator=(const FreddiState&) = default;
-	void before_step(double tau);
-	friend FreddiEvolution;
-	friend FreddiNeutronStarEvolution;
+	virtual void step(double tau);
 public:
 	const size_t Nt;
 	const double GM;
@@ -116,7 +110,7 @@ public:
 	const OpacityRelated oprel;
 	wunc_t wunc;
 	const FreddiArguments args;
-private:
+protected:
 	double Mdot_out_ = 0;
 	double Mdot_in_prev_ = -INFINITY;
 	double F_in_ = 0;
@@ -135,14 +129,14 @@ public:
 	inline double t() const { return t_; }
 	inline size_t i_t() const { return i_t_; };
 	inline size_t Nx() const { return Nx_; }
-private:
+protected:
 	inline double Mdot_in_prev() const { return Mdot_in_prev_; }
 	inline void set_Mdot_in_prev(double Mdot_in) { Mdot_in_prev_ = Mdot_in; }
 	inline void set_Mdot_in_prev() { set_Mdot_in_prev(Mdot_in()); }
-private:
+protected:
 	DiskOptionalStructure disk_str_;
 	std::shared_ptr<BasicWind> wind_;
-private:
+protected:
 	inline void invalidate_disk_optional_structure() { disk_str_ = DiskOptionalStructure(); };
 	double lazy_magnitude(boost::optional<double>& m, double lambda, double F0);
 	double lazy_integrate(boost::optional<double>& x, const vecd& values);
@@ -173,38 +167,4 @@ public:
 	inline double Mdisk() { return lazy_integrate(disk_str_.Mdisk_, Sigma()); }
 };
 
-
-class FreddiEvolution {
-	typedef std::vector<double> vecd;
-protected:
-	FreddiState state_;
-	virtual void truncateOuterRadius();
-	virtual void truncateInnerRadius() {}
-protected:
-	virtual vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;
-public:
-	FreddiEvolution(const FreddiArguments& args);
-	virtual void step(double tau);
-	inline void step() { return step(state_.args.calc->tau); }
-	inline const FreddiState& state() { return state_; }
-};
-
-
-class FreddiNeutronStarEvolution: public FreddiEvolution {
-public:
-	const double k_t = 1. / 3.;
-	const double xi = 0.7;
-	const double R_m_min;
-	const double mu_magn;
-	const double R_dead;
-	const double R_cor;
-	const double xi_pow_minus_7_2;
-	const NeutronStarArguments* args_ns;
-protected:
-	virtual void truncateInnerRadius() override;
-public:
-	FreddiNeutronStarEvolution(const FreddiNeutronStarArguments& args);
-};
-
-
-#endif //FREDDI_FREDDI_HPP
+#endif //FREDDI_FREDDI_STATE_HPP

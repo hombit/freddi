@@ -6,7 +6,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "freddi.hpp"
+#include "freddi_evolution.hpp"
 
 
 class FstreamWithPath: public std::ofstream {
