@@ -20,6 +20,7 @@ FreddiEvolution::FreddiEvolution(const FreddiArguments &args):
 
 void FreddiEvolution::step(const double tau) {
 	state_.before_step(tau);
+	truncateInnerRadius();
 	nonlinear_diffusion_nonuniform_wind_1_2(
 			state_.args.calc->tau, state_.args.calc->eps,
 			state_.F_in(), state_.Mdot_out(),
@@ -76,19 +77,6 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 		mu_magn(0.5 * args.ns->Bx * args.ns->Rx*args.ns->Rx*args.ns->Rx),
 		R_dead(std::cbrt(mu_magn*mu_magn / args.ns->Fdead)),
 		R_cor(std::cbrt(state_.GM / (4 * M_PI*M_PI * args.ns->freqx*args.ns->freqx))) {}
-
-
-void FreddiNeutronStarEvolution::step(double tau) {
-	state_.before_step(tau);
-	truncateInnerRadius();
-	nonlinear_diffusion_nonuniform_wind_1_2(
-			state_.args.calc->tau, state_.args.calc->eps,
-			state_.F_in(), state_.Mdot_out(),
-			state_.wind_->A(), state_.wind_->B(), state_.wind_->C(),
-			state_.wunc,
-			state_.h(), state_.F_);
-	truncateOuterRadius();
-}
 
 
 void FreddiNeutronStarEvolution::truncateInnerRadius() {

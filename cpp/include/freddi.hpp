@@ -179,6 +179,7 @@ class FreddiEvolution {
 protected:
 	FreddiState state_;
 	virtual void truncateOuterRadius();
+	virtual void truncateInnerRadius() {}
 protected:
 	virtual vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;
 public:
@@ -199,12 +200,10 @@ public:
 	const double R_cor;
 	const double xi_pow_minus_7_2;
 	const NeutronStarArguments* args_ns;
-private:
-	void truncateInnerRadius();
+protected:
+	virtual void truncateInnerRadius() override;
 public:
 	FreddiNeutronStarEvolution(const FreddiNeutronStarArguments& args);
-	using FreddiEvolution::step;
-	virtual void step(double tau) override;
 };
 
 
