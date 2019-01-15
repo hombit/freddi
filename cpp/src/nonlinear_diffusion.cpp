@@ -1,5 +1,5 @@
 #include "nonlinear_diffusion.hpp"
-
+#include <iostream>
 
 
 double mean_square_rel(const vecd &A, const vecd &B, size_t first, size_t last){

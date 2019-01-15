@@ -12,7 +12,6 @@
 
 
 class FreddiEvolution: public FreddiState {
-	typedef std::vector<double> vecd;
 protected:
 	virtual void truncateOuterRadius();
 	virtual void truncateInnerRadius() {}
@@ -35,10 +34,15 @@ public:
 	const double R_dead;
 	const double R_cor;
 	const double xi_pow_minus_7_2;
+	const double inverse_beta;
 	const NeutronStarArguments* args_ns;
+private:
+	vecd magnetic_windC;
+public:
+	using FreddiEvolution::step;
 protected:
 	virtual void truncateInnerRadius() override;
-	using FreddiEvolution::step;
+	virtual const vecd windC() const override;
 public:
 	FreddiNeutronStarEvolution(const FreddiNeutronStarArguments& args);
 };

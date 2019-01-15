@@ -24,7 +24,7 @@ void FreddiEvolution::step(const double tau) {
 	nonlinear_diffusion_nonuniform_wind_1_2(
 			args.calc->tau, args.calc->eps,
 			F_in(), Mdot_out(),
-			wind_->A(), wind_->B(), wind_->C(),
+			windA(), windB(), windC(),
 			wunc,
 			h(), F_);
 	truncateOuterRadius();
@@ -76,7 +76,20 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 		R_m_min(std::max(args.ns->Rx, args.basic->rin)),
 		mu_magn(0.5 * args.ns->Bx * args.ns->Rx*args.ns->Rx*args.ns->Rx),
 		R_dead(std::cbrt(mu_magn*mu_magn / args.ns->Fdead)),
-		R_cor(std::cbrt(GM / (4 * M_PI*M_PI * args.ns->freqx*args.ns->freqx))) {}
+		R_cor(std::cbrt(GM / (4 * M_PI*M_PI * args.ns->freqx*args.ns->freqx))),
+		inverse_beta(args.ns->inversebeta) {
+	magnetic_windC = vecd(Nx());
+	const double C0 = inverse_beta * 2*mu_magn*mu_magn / GM;
+	for (size_t i = 0; i < Nx_; i++) {
+		double brackets;
+		if (R_[i] < R_cor) {
+			brackets = -7. + 4. * std::pow(R_[i] / R_cor, 1.5);
+		} else {
+			brackets = 7. - 10. * std::pow(R_cor / R_[i], 1.5);
+		}
+		magnetic_windC[i] += C0 / (R_[i]*R_[i]*R_[i]*R_[i]) * brackets;
+	}
+}
 
 
 void FreddiNeutronStarEvolution::truncateInnerRadius() {
@@ -117,4 +130,12 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 		R_.erase(R_.begin(), R_.begin() + ii);
 		F_.erase(F_.begin(), F_.begin() + ii);
 	}
+}
+
+const vecd FreddiNeutronStarEvolution::windC() const {
+	auto C = FreddiEvolution::windC();
+	for (size_t i = 0; i < C.size(); i++) {
+		C[i] += magnetic_windC[i];
+	}
+	return C;
 }

@@ -241,7 +241,8 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 				vm["freqx"].as<double>(),
 				vm["Bx"].as<double>(),
 				vm["epsilonAlfven"].as<double>(),
-				vm["Fdead"].as<double>()) {}
+				vm["Fdead"].as<double>(),
+				vm["inversebeta"].as<double>()) {}
 
 po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star");
@@ -251,6 +252,7 @@ po::options_description NeutronStarOptions::description() {
 			( "Bx", po::value<double>()->default_value(default_Bx), "Accretor polar magnetic induction, G" )
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Factor in Alfven radius formula" )
 			( "Fdead", po::value<double>()->default_value(default_Fdead), "Minimum viscous torque on inner disk boundary, dyn*cm" )
+			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "???" )
 			;
 	return od;
 }

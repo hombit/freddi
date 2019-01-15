@@ -566,10 +566,10 @@ cdef class FreddiNeutronStar(_BasicFreddi):
 
     def __cinit__(
         self, *,
-        double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double Fdead=default_Fdead,
+        double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double inversebeta=default_inversebeta, double Fdead=default_Fdead,
         **kwargs,
     ):
-        cdef NeutronStarArguments* ns = new NeutronStarArguments(Rx, freqx, Bx, epsilonAlfven, Fdead)
+        cdef NeutronStarArguments* ns = new NeutronStarArguments(Rx, freqx, Bx, epsilonAlfven, inversebeta, Fdead)
         cdef FreddiNeutronStarArguments* ns_args = new FreddiNeutronStarArguments(dereference(self.args), ns)
         self.args = <FreddiArguments*> ns_args
         self.evolution = <FreddiEvolution*> new FreddiNeutronStarEvolution(dereference(ns_args))

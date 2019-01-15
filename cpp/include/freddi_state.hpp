@@ -11,6 +11,7 @@
 
 
 class FreddiState {
+public:
 	typedef std::vector<double> vecd;
 	typedef std::function<vecd (const vecd&, const vecd&, size_t, size_t)> wunc_t;
 private:
@@ -133,9 +134,13 @@ protected:
 	inline double Mdot_in_prev() const { return Mdot_in_prev_; }
 	inline void set_Mdot_in_prev(double Mdot_in) { Mdot_in_prev_ = Mdot_in; }
 	inline void set_Mdot_in_prev() { set_Mdot_in_prev(Mdot_in()); }
-protected:
+private:
 	DiskOptionalStructure disk_str_;
 	std::shared_ptr<BasicWind> wind_;
+protected:
+	virtual const vecd windA() const { return wind_->A(); }
+	virtual const vecd windB() const { return wind_->B(); }
+	virtual const vecd windC() const { return wind_->C(); }
 protected:
 	inline void invalidate_disk_optional_structure() { disk_str_ = DiskOptionalStructure(); };
 	double lazy_magnitude(boost::optional<double>& m, double lambda, double F0);
