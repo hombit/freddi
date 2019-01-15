@@ -6,6 +6,7 @@ from libcpp.vector cimport vector
 cdef extern from 'freddi.hpp':
     cdef cppclass FreddiState:
         FreddiState(const FreddiState&)
+        size_t Nt
         double Mdot_in()
         double Mdot_out()
         double Lx()
@@ -34,9 +35,7 @@ cdef extern from 'freddi.hpp':
         FreddiEvolution(const FreddiArguments&) except +
         void step() except +
         void step(double) except +
-        vector[FreddiState] evolve() except +
         FreddiState& state()
-        size_t Nt
     cdef cppclass FreddiNeutronStarEvolution:
         FreddiNeutronStarEvolution(const FreddiNeutronStarArguments&) except +
 

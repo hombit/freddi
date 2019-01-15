@@ -19,7 +19,8 @@ cython_source = 'cython/freddi' + ext
 
 cpp_source = ('arguments.cpp',
               'opacity_related.cpp',
-              'freddi.cpp',
+              'freddi_evolution.cpp',
+              'freddi_state.cpp',
               'spectrum.cpp',
               'nonlinear_diffusion.cpp',
               'orbit.cpp')

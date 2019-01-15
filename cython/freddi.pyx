@@ -232,15 +232,10 @@ cdef class EvolutionResults:
 
     """
 
-    cdef vector[FreddiState] cpp_states
     cdef object[:] states
 
     def __cinit__(self, _BasicFreddi freddi):
-        self.cpp_states = freddi.evolution.evolve()
-        self.states = np.empty(<Py_ssize_t> self.cpp_states.size(), dtype=object)
-        cdef Py_ssize_t i
-        for i in range(self.states.size):
-            self.states[i] = state_from_cpp(self.cpp_states[i])
+        self.states = np.array(list(freddi), dtype=object)
 
     def flux(self, lmbd) -> np.ndarray:
         """Optical flux of the disk
@@ -263,7 +258,7 @@ cdef class EvolutionResults:
         return arr
 
     def __getattr__(self, attr) -> np.ndarray:
-        cdef size_t len_states = self.cpp_states.size()
+        cdef size_t len_states = self.states.size
         first_val = np.asarray(getattr(self.states[0], attr))
         cdef tuple shape_val = first_val.shape
         cdef tuple shape = (len_states,) + shape_val
@@ -477,7 +472,7 @@ cdef class _BasicFreddi:
 
     @property
     def Nt(self) -> int:
-        return self.evolution.Nt
+        return self.evolution.state().Nt
 
     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):
         cdef double c_Cirr = self.args.irr.get().Cirr if Cirr is None else Cirr
@@ -539,11 +534,10 @@ cdef class _BasicFreddi:
 
         """
         state = self.get_state()
-        yield state
         while state.t <= self.time:
+            yield state
             self.evolution.step()
             state = self.get_state()
-            yield state
 
     def evolve(self):
         """Calculate disk evolution
