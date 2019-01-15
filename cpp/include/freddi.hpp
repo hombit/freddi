@@ -24,7 +24,7 @@ private:
 		const FreddiState* state;
 	public:
 		BasicWind(const FreddiState* state);
-		virtual void update(const FreddiState* _state) { state = _state; }
+		virtual void update() {}
 		inline const vecd& A() const { return A_; }
 		inline const vecd& B() const { return B_; }
 		inline const vecd& C() const { return C_; }
@@ -87,7 +87,7 @@ private:
 	public:
 		__testC_q0_Shields1986__(const FreddiState* state);
 		~__testC_q0_Shields1986__() = default;
-		virtual void update(const FreddiState* state) override;
+		virtual void update() override;
 	};
 
 

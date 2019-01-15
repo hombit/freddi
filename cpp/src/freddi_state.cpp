@@ -106,7 +106,7 @@ void FreddiState::before_step(double tau) {
 	invalidate_disk_optional_structure();
 	i_t_ ++;
 	t_ += tau;
-	wind_->update(this);
+	wind_->update();
 }
 
 
@@ -336,8 +336,8 @@ FreddiState::__testC_q0_Shields1986__::__testC_q0_Shields1986__(const FreddiStat
 		kC(state->args.disk->windparams.at(0)),
 		R_windmin2out(state->args.disk->windparams.at(1)) {}
 
-void FreddiState::__testC_q0_Shields1986__::update(const FreddiState *state) {
-	BasicWind::update(state);
+void FreddiState::__testC_q0_Shields1986__::update() {
+	BasicWind::update();
 	const double h_wind_min = std::sqrt(R_windmin2out) * state->h_.back();
 	for (size_t i = 0; i < state->Nx_; ++i) {
 		if (state->h_[i] > h_wind_min) {
