@@ -110,6 +110,11 @@ void FreddiState::step(double tau) {
 }
 
 
+double FreddiState::Mdot_in() const {
+	return (F()[1] - F()[0]) / (h()[1] - h()[0]);
+}
+
+
 double FreddiState::integrate(const vecd& values) const {
 	double integral = 0.;
 	const size_t N = std::min(values.size(), R_.size());

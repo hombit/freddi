@@ -40,6 +40,9 @@ cdef extern from 'freddi_evolution.hpp':
         FreddiState& state()
     cdef cppclass FreddiNeutronStarEvolution:
         FreddiNeutronStarEvolution(const FreddiNeutronStarArguments&) except +
+        const vector[double]& dFmagn_dh()
+        const vector[double]& d2Fmagn_dh2()
+        const double R_cor
 
 
 cdef extern from 'arguments.hpp':

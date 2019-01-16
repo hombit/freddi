@@ -564,6 +564,8 @@ cdef class FreddiNeutronStar(_BasicFreddi):
     Bx : float, optional
     epsilonAlfven : float, optional""")
 
+    cdef FreddiNeutronStarEvolution* ns_evolution
+
     def __cinit__(
         self, *,
         double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double inversebeta=default_inversebeta, double Fdead=default_Fdead,
@@ -572,4 +574,17 @@ cdef class FreddiNeutronStar(_BasicFreddi):
         cdef NeutronStarArguments* ns = new NeutronStarArguments(Rx, freqx, Bx, epsilonAlfven, inversebeta, Fdead)
         cdef FreddiNeutronStarArguments* ns_args = new FreddiNeutronStarArguments(dereference(self.args), ns)
         self.args = <FreddiArguments*> ns_args
-        self.evolution = <FreddiEvolution*> new FreddiNeutronStarEvolution(dereference(ns_args))
+        self.ns_evolution = new FreddiNeutronStarEvolution(dereference(ns_args))
+        self.evolution = <FreddiEvolution*> self.ns_evolution
+
+    @property
+    def dFmagn_dh(self) -> np.ndarray[np.float]:
+        cdef const double* data = self.ns_evolution.dFmagn_dh().data()
+        cdef size_t size = self.ns_evolution.dFmagn_dh().size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
+
+    @property
+    def Rcor(self) -> double:
+        return self.ns_evolution.R_cor
