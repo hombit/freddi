@@ -23,7 +23,8 @@ cpp_source = ('arguments.cpp',
               'freddi_state.cpp',
               'spectrum.cpp',
               'nonlinear_diffusion.cpp',
-              'orbit.cpp')
+              'orbit.cpp',
+              'util.cpp')
 cpp_source = [os.path.join('cpp/src', f) for f in cpp_source]
 
 extensions = [

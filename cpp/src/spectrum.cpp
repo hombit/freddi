@@ -1,54 +1,31 @@
 #include "spectrum.hpp"
 
-double Luminosity( const std::vector<double> &R, const std::vector<double> &T, double min_nu, double max_nu, int Nnu ){
-	const auto NR = std::min(R.size(), T.size());
-	const double step_nu = Nnu > 1.  ?  ( max_nu - min_nu ) / (Nnu-1.)  :  1.;
-	double L = 0;
-	for ( int i_nu = 0; i_nu < Nnu; ++i_nu ){
-		const double nu = min_nu + step_nu * i_nu;
-		double Inu = 0;
-		for ( int i_R = 0; i_R < NR; ++i_R ){
-			double stepR;
-			if ( i_R == 0               ){
-				stepR = R[i_R+1] - R[i_R  ];
-			} else
-			if ( i_R == NR-1            ){
-				stepR = R[i_R  ] - R[i_R-1];
-			} else{
-				stepR = R[i_R+1] - R[i_R-1];
-			}
-			const double Bnu = 2. * GSL_CONST_CGSM_PLANCKS_CONSTANT_H * nu * nu * nu / GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_SPEED_OF_LIGHT / ( exp( nu*GSL_CONST_CGSM_PLANCKS_CONSTANT_H / GSL_CONST_CGSM_BOLTZMANN / T[i_R] ) - 1. );
-			Inu += .5 * Bnu * 2. * M_PI * R[i_R] * stepR;
-		}
-		if ( (i_nu == 0 or i_nu == Nnu-1) and Nnu > 1. ){
-			L += Inu / 2.;
-		} else{
-			L += Inu;
-		}
+#include <boost/math/quadrature/trapezoidal.hpp>
+
+using boost::math::quadrature::trapezoidal;
+
+
+namespace Spectrum {
+double Planck_nu(const double T, const double nu) {
+	if (T == 0.) {
+		return 0.;
 	}
-	L *= 2. * M_PI * step_nu;
-	return L;
+	return double_h_over_c2 * nu*nu*nu / (std::exp(h_over_kB * nu / T) - 1.);
 }
 
 
-
-double I_lambda( const std::vector<double> &R, const std::vector<double> &T, const double lambda ){
-	double I = 0;
-	const int NR = fmin(R.size(), T.size());
-	for ( int i_R = 0; i_R < NR; ++i_R ){
-		double stepR;
-		if ( i_R == 0               ){
-			stepR = R[i_R+1] - R[i_R  ];
-		} else
-		if ( i_R == NR-1            ){
-			stepR = R[i_R  ] - R[i_R-1];
-		} else{
-			stepR = R[i_R+1] - R[i_R-1];
-		}
-		const double B_lambda =  2. * GSL_CONST_CGSM_PLANCKS_CONSTANT_H * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT / pow(lambda,5.) / ( exp( GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_PLANCKS_CONSTANT_H / lambda / GSL_CONST_CGSM_BOLTZMANN / T[i_R] ) - 1. );
-		I += .5 * B_lambda * 2. * M_PI * R[i_R] * stepR;
+double Planck_lambda(const double T, const double lambda) {
+	if (T == 0.) {
+		return 0.;
 	}
-	return I;
+	return double_h_c2 / (lambda*lambda*lambda*lambda*lambda) / (std::exp( ch_over_kB / (lambda * T) ) - 1.);
+}
+
+
+double Planck_nu1_nu2(const double T, const double nu1, const double nu2, const double tol){
+	// We actually do not need too high precision here, because if adaptive algorithm wants a tiny step, than probably
+	// Bnu is too small. So max_refinements is set to not-too-large value.
+	return trapezoidal([T](const double nu)-> double { return Planck_nu(T, nu); }, nu1, nu2, tol, 9);
 }
 
 
@@ -56,24 +33,29 @@ double I_lambda( const std::vector<double> &R, const std::vector<double> &T, con
 /* General Relativity effects are included in the structure of the disk
    (Page & Thorne 1974; Riffert & Herold 1995). metric = "GR"
 */
-double T_GR( const double r1, const double ak, const double Mx, const double Mdot, const double r_in  ){
-    const double GM = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx;
-    const double rg = GM  / (GSL_CONST_CGSM_SPEED_OF_LIGHT*GSL_CONST_CGSM_SPEED_OF_LIGHT);
-    const double x = sqrt(r1 / rg);
-    const double x0 = sqrt(r_in/rg);
-    
-    const double x1 = 2. * cos ((acos(ak)-M_PI)/3.);
-    const double x2 = 2. * cos ((acos(ak)+M_PI)/3.);
-    const double x3 = -2. * cos (acos(ak)/3.);
-    const double a = 3. * (x1-ak)*(x1-ak) * log((x-x1)/(x0-x1))/x1/(x1-x2)/(x1-x3);
-    const double b = 3. * (x2-ak)*(x2-ak) * log((x-x2)/(x0-x2))/x2/(x2-x1)/(x2-x3);
-    const double c = 3. * (x3-ak)*(x3-ak) * log((x-x3)/(x0-x3))/x3/(x3-x1)/(x3-x2);
-   
-    return( pow(
-        (3.*Mdot * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT,6.) / (8.*M_PI*GM*GM)) *
-            (x-x0-1.5*ak*log(x/x0)-a-b-c) / ( pow(x,4.)*(x*x*x-3.*x+2.*ak) ) /
-			GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT,
-        0.25)
+double T_GR(const double r1, const double ak, const double Mx, const double Mdot, const double r_in){
+	if (r1 < r_in) {
+		return 0.;
+	}
 
-    );
+	const double GM = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx;
+	const double rg = GM  / (GSL_CONST_CGSM_SPEED_OF_LIGHT*GSL_CONST_CGSM_SPEED_OF_LIGHT);
+	const double x = sqrt(r1 / rg);
+	const double x0 = sqrt(r_in/rg);
+
+	const double x1 = 2. * cos ((acos(ak)-M_PI)/3.);
+	const double x2 = 2. * cos ((acos(ak)+M_PI)/3.);
+	const double x3 = -2. * cos (acos(ak)/3.);
+	const double a = 3. * (x1-ak)*(x1-ak) * log((x-x1)/(x0-x1))/x1/(x1-x2)/(x1-x3);
+	const double b = 3. * (x2-ak)*(x2-ak) * log((x-x2)/(x0-x2))/x2/(x2-x1)/(x2-x3);
+	const double c = 3. * (x3-ak)*(x3-ak) * log((x-x3)/(x0-x3))/x3/(x3-x1)/(x3-x2);
+
+	return( pow(
+			(3.*Mdot * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT,6.) / (8.*M_PI*GM*GM)) *
+			(x-x0-1.5*ak*log(x/x0)-a-b-c) / ( pow(x,4.)*(x*x*x-3.*x+2.*ak) ) /
+			GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT,
+			0.25)
+
+	);
 }
+} // namespace Spectrum

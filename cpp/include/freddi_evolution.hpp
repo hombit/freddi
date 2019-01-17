@@ -41,7 +41,7 @@ protected:
 	vecd d2Fmagn_dh2_;
 protected:
 	void initialize_dFmagn_dh();
-	void initialize_magnetic_pseudowindC();
+	void initialize_d2Fmagn_dh2();
 public:
 	const vecd& dFmagn_dh() const { return dFmagn_dh_; }
 	const vecd& d2Fmagn_dh2() const { return d2Fmagn_dh2_; }

@@ -72,7 +72,7 @@ FreddiFileOutput::FreddiFileOutput(FreddiEvolution &freddi_, const boost::progra
 
 void FreddiFileOutput::dump() {
 	auto state = freddi->state();
-	auto Nx = state.Nx();
+	auto Nx = state.Nx;
 	output  << sToDay(state.t())
 			<< "\t" << state.Mdot_in()
 			<< "\t" << state.Mdisk()

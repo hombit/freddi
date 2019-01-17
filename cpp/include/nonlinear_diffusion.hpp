@@ -27,7 +27,8 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 		const vecd &C,
 		const std::function<vecd (const vecd &, const vecd &, size_t, size_t)>& wunc, // first argument is array of x_i, second — array of y(x_i,t); return value — array of w(x_i,y_i)
 		const vecd &x, // array with (non)uniform grid
-		vecd &y// array with initial condition and for results
+		vecd &y, // array with initial condition and for results
+		size_t first, size_t last // indexes of front and back elements
 );
 
 

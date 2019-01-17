@@ -7,12 +7,14 @@ cdef extern from 'freddi_state.hpp':
     cdef cppclass FreddiState:
         FreddiState(const FreddiState&)
         size_t Nt
+        size_t Nx
+        size_t first()
+        size_t last()
         double Mdot_in()
         double Mdot_out()
         double Lx()
         double t()
         size_t i_t()
-        size_t Nx()
         const vector[double]& h()
         const vector[double]& R()
         const vector[double]& F()

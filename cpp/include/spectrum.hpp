@@ -4,16 +4,25 @@
 
 
 #include <cmath>
+#include <limits>
 #include <vector>
 
 #include "gsl_const_cgsm.h"
+#include "util.hpp"
 
 
-double Luminosity(const std::vector<double> &R, const std::vector<double> &T, double min_nu, double max_nu, int Nnu);
+namespace Spectrum {
+constexpr const double double_h_over_c2 = 2. * GSL_CONST_CGSM_PLANCKS_CONSTANT_H / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+constexpr const double h_over_kB = GSL_CONST_CGSM_PLANCKS_CONSTANT_H / GSL_CONST_CGSM_BOLTZMANN;
+constexpr const double double_h_c2 = 2. * GSL_CONST_CGSM_PLANCKS_CONSTANT_H * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT;
+constexpr const double ch_over_kB = GSL_CONST_CGSM_SPEED_OF_LIGHT * h_over_kB;
+double Planck_nu(double T, double nu);
+double Planck_lambda(double T, double lambda);
 
-double I_lambda( const std::vector<double> &R, const std::vector<double> &T, double lambda );
+double Planck_nu1_nu2(double T, double nu1, double nu2, double tol=std::sqrt(std::numeric_limits<double>::epsilon()));
 
-double T_GR( const double r1, const double ak, const double Mx, const double Mdot, const double r_in  );
+double T_GR(double r1, double ak, double Mx, double Mdot, double r_in);
+} // namespace Spectrum
 
 
 #endif // _SPECTRUM_HPP

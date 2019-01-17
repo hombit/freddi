@@ -8,11 +8,11 @@
 
 #include "arguments.hpp"
 #include "spectrum.hpp"
+#include "util.hpp"
 
 
 class FreddiState {
 protected:
-	typedef std::vector<double> vecd;
 	typedef std::function<vecd (const vecd&, const vecd&, size_t, size_t)> wunc_t;
 private:
 	class BasicWind {
@@ -104,6 +104,7 @@ public:
 	virtual void step(double tau);
 public:
 	const size_t Nt;
+	const size_t Nx;
 	const double GM;
 	const double eta;
 	const double cosi;
@@ -117,7 +118,8 @@ protected:
 	double F_in_ = 0;
 	double t_ = 0;
 	size_t i_t_ = 0;
-	size_t Nx_;
+	size_t first_ = 0;
+	size_t last_;
 	vecd h_, R_;
 	vecd F_;
 public:
@@ -129,7 +131,8 @@ public:
 	inline const vecd& F() const { return F_; }
 	inline double t() const { return t_; }
 	inline size_t i_t() const { return i_t_; };
-	inline size_t Nx() const { return Nx_; }
+	inline size_t first() const { return first_; }
+	inline size_t last() const { return last_; }
 protected:
 	inline double Mdot_in_prev() const { return Mdot_in_prev_; }
 	inline void set_Mdot_in_prev(double Mdot_in) { Mdot_in_prev_ = Mdot_in; }
@@ -156,11 +159,13 @@ public:
 	const vecd& Tirr();
 	const vecd& Cirr();
 	const vecd& Height();
-	inline double magnitude(double lambda, double F0) {
-		return -2.5 * log10( I_lambda(R(), Tph(), lambda) * cosiOverD2 / F0 );
+	double I_lambda(double lambda);
+	double Luminosity(const vecd& T, double nu1, double nu2) const;
+	inline double magnitude(const double lambda, const double F0) {
+		return -2.5 * std::log10(I_lambda(lambda) * cosiOverD2 / F0);
 	}
-	inline double flux(double lambda) {
-		return I_lambda(R(), Tph(), lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2;
+	inline double flux(const double lambda) {
+		return I_lambda(lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2;
 	}
 	inline double mU() { return lazy_magnitude(disk_str_.mU_, lambdaU, irr0U); }
 	inline double mB() { return lazy_magnitude(disk_str_.mB_, lambdaB, irr0B); }
@@ -168,7 +173,8 @@ public:
 	inline double mR() { return lazy_magnitude(disk_str_.mR_, lambdaR, irr0R); }
 	inline double mI() { return lazy_magnitude(disk_str_.mI_, lambdaI, irr0I); }
 	inline double mJ() { return lazy_magnitude(disk_str_.mJ_, lambdaJ, irr0J); }
-	double integrate(const vecd& values) const;
+	inline double integrate(const vecd& values) const { return disk_radial_trapz(R(), values, first(), last()); }
+	inline double integrate(std::function<double (size_t)> f) const { return disk_radial_trapz(R(), f, first(), last()); }
 	inline double Mdisk() { return lazy_integrate(disk_str_.Mdisk_, Sigma()); }
 };
 

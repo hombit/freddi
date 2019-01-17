@@ -1,5 +1,4 @@
 #include "nonlinear_diffusion.hpp"
-#include <iostream>
 
 
 double mean_square_rel(const vecd &A, const vecd &B, size_t first, size_t last){
@@ -39,52 +38,52 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 		const vecd &C,
 		const std::function<vecd (const vecd &, const vecd &, size_t, size_t)>& wunc, // first argument is array of x_i, second — array of y(x_i,t); return value — array of w(x_i,y_i)
 		const vecd &x, // array with (non)uniform grid
-		vecd &y// array with initial condition and for results
+		vecd &y, // array with initial condition and for results
+		size_t first, size_t last // indexes of front and back elements
 ) {
-	const size_t N = std::min(x.size(), y.size()); // N_x+1
-	auto W = wunc(x, y, 1, N - 1);
-	vecd K_0(N), K_1(N), frac(N), a(N), b(N), c0(N), f(N);
-	for (size_t i = 1; i < N - 1; ++i) {
+	auto W = wunc(x, y, first + 1, last);
+	vecd K_0(last + 1), K_1(last + 1), frac(last + 1), a(last + 1), b(last + 1), c0(last + 1), f(last + 1);
+	for (size_t i = first + 1; i <= last - 1; ++i) {
 		a[i] = (x[i + 1] - x[i]) / (x[i + 1] - x[i - 1]) * (2.0 - A[i] * (x[i + 1] - x[i]));
 		b[i] = (x[i] - x[i - 1]) / (x[i + 1] - x[i - 1]) * (2.0 + A[i] * (x[i] - x[i - 1]));
 		c0[i] = 2.0 - A[i] * (x[i + 1] - 2 * x[i] + x[i - 1]) - B[i] * (x[i + 1] - x[i]) * (x[i] - x[i - 1]);
 		frac[i] = (x[i + 1] - x[i]) * (x[i] - x[i - 1]) / tau;
 	}
-	a[N - 1] = 1 - 0.5 * A[N - 1] * (x[N - 1] - x[N - 2]);
-	c0[N - 1] = a[N - 1] - 0.5 * B[N - 1] * (x[N - 1] - x[N - 2]) * (x[N - 1] - x[N - 2]);
-	frac[N - 1] = (x[N - 1] - x[N - 2]) * (x[N - 1] - x[N - 2]) * 0.5 / tau;
-	for (size_t i = 1; i < N; ++i) {
+	a[last] = 1 - 0.5 * A[last] * (x[last] - x[last - 1]);
+	c0[last] = a[last] - 0.5 * B[last] * (x[last] - x[last - 1]) * (x[last] - x[last - 1]);
+	frac[last] = (x[last] - x[last - 1]) * (x[last] - x[last - 1]) * 0.5 / tau;
+	for (size_t i = first + 1; i <= last; ++i) {
 		f[i] = frac[i] * (W[i] + tau * C[i]);
 	}
-	for (size_t i = 1; i < N - 1; ++i) {
+	for (size_t i = first + 1; i <= last - 1; ++i) {
 //		K_1[i] = (f[i] + a[i] * y[i - 1] - c0[i] * y[i] + b[i] * y[i + 1]) / y[i];
 //		K_1[i] = frac[i] * W[i] / y[i];
 		K_1[i] = f[i] / y[i];
 	}
-//	K_1[N - 1] = (f[N - 1] + a[N - 1] * y[N - 2] - c0[N - 1] * y[N - 1] + right_bounder_cond * (x[N - 1] - x[N - 2])) / y[N - 1];
-//	K_1[N - 1] = (f[N - 1]) / y[N - 1];
-	 K_1[N - 1] = frac[N - 1] * W[N - 1] / y[N - 1];
+//	K_1[last] = (f[last] + a[last] * y[last - 1] - c0[last] * y[last] + right_bounder_cond * (x[last] - x[last - 1])) / y[last];
+//	K_1[last] = (f[last]) / y[last];
+	K_1[last] = frac[last] * W[last] / y[last];
 
-	vecd alpha(N), beta(N);
+	vecd alpha(last + 1), beta(last + 1);
 	double c;
 	do {
 		K_0 = K_1;
-		alpha[1] = 0.;
-		beta[1] = left_bounder_cond;
-		for (size_t i = 1; i < N - 1; ++i) {
+		alpha[first + 1] = 0.;
+		beta[first + 1] = left_bounder_cond;
+		for (size_t i = first + 1; i <= last - 1; ++i) {
 			c = c0[i] + K_1[i];
 			alpha[i + 1] = b[i] / (c - alpha[i] * a[i]);
 			beta[i + 1] = (beta[i] * a[i] + f[i]) / (c - alpha[i] * a[i]);
 		}
-		y[N - 1] = ((x[N - 1] - x[N - 2]) * right_bounder_cond + f[N - 1] + beta[N - 1] * a[N - 1]) /
-				   (c0[N - 1] + K_1[N - 1] - alpha[N - 1] * a[N - 1]);
-		for (size_t i = N - 2; i > 0; --i) {
+		y[last] = ((x[last] - x[last - 1]) * right_bounder_cond + f[last] + beta[last] * a[last]) /
+				   (c0[last] + K_1[last] - alpha[last] * a[last]);
+		for (size_t i = last - 1; i > first; --i) {
 			y[i] = alpha[i + 1] * y[i + 1] + beta[i + 1];
 		}
-		y[0] = left_bounder_cond;
-		W = wunc(x, y, 1, N - 1);
-		for (size_t i = 1; i < N - 1; ++i) {
+		y[first] = left_bounder_cond;
+		W = wunc(x, y, first + 1, last);
+		for (size_t i = 1; i <= last - 1; ++i) {
 			K_1[i] = frac[i] * W[i] / y[i];
 		}
-	} while (max_dif_rel(K_1, K_0, 1, N - 2) > eps);
+	} while (max_dif_rel(K_1, K_0, 1, last - 1) > eps);
 }

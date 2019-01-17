@@ -26,7 +26,8 @@ void FreddiEvolution::step(const double tau) {
 			F_in(), Mdot_out(),
 			windA(), windB(), windC(),
 			wunc,
-			h(), F_);
+			h(), F_,
+			first(), last());
 	truncateOuterRadius();
 }
 
@@ -36,7 +37,7 @@ void FreddiEvolution::truncateOuterRadius() {
 		return;
 	}
 
-	auto ii = Nx();
+	auto ii = last() + 1;
 	if (args.disk->boundcond == "Teff") {
 		do {
 			ii--;
@@ -49,19 +50,15 @@ void FreddiEvolution::truncateOuterRadius() {
 		throw std::logic_error("Wrong boundcond");
 	}
 
-	if ( ii < Nx_ - 1 ){
-		Nx_ = ii+1;
-		// F.at(Nx-2) = F.at(Nx-1) - Mdot_out / (2.*M_PI) * (h.at(Nx-1) - h.at(Nx-2));
-		h_.resize(Nx_);
-		R_.resize(Nx_);
-		F_.resize(Nx_);
+	if ( ii <= last() - 1 ){
+		last_ = ii;
 	}
 }
 
 
-vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t first, size_t last) const {
-	vecd W(last + 1, 0.);
-	for ( size_t i = first; i <= last; ++i ){
+vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t _first, size_t _last) const {
+	vecd W(_last + 1, 0.);
+	for ( size_t i = _first; i <= _last; ++i ){
 		W[i] = pow(std::abs(F[i]), 1. - oprel.m) * pow(h[i], oprel.n) / (1. - oprel.m) / oprel.D;
 	}
 	return W;
@@ -77,16 +74,17 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 		mu_magn(0.5 * args.ns->Bx * args.ns->Rx*args.ns->Rx*args.ns->Rx),
 		R_dead(std::cbrt(mu_magn*mu_magn / args.ns->Fdead)),
 		R_cor(std::cbrt(GM / (4 * M_PI*M_PI * args.ns->freqx*args.ns->freqx))),
-		inverse_beta(args.ns->inversebeta) {
+		inverse_beta(args.ns->inversebeta),
+		dFmagn_dh_(Nx),
+		d2Fmagn_dh2_(Nx) {
 	initialize_dFmagn_dh();
-	initialize_magnetic_pseudowindC();
+	initialize_d2Fmagn_dh2();
 }
 
 
 void FreddiNeutronStarEvolution::initialize_dFmagn_dh() {
-	dFmagn_dh_ = vecd(Nx());
 	const double k = inverse_beta * 2*mu_magn*mu_magn * GM*GM*GM;
-	for (size_t i = 0; i < Nx_; i++) {
+	for (size_t i = 0; i < Nx; i++) {
 		double brackets;
 		if (R_[i] < R_cor) {
 			brackets = 1 - std::pow(R_[i] / R_cor, 1.5);
@@ -98,10 +96,9 @@ void FreddiNeutronStarEvolution::initialize_dFmagn_dh() {
 }
 
 
-void FreddiNeutronStarEvolution::initialize_magnetic_pseudowindC() {
-	d2Fmagn_dh2_ = vecd(Nx());
+void FreddiNeutronStarEvolution::initialize_d2Fmagn_dh2() {
 	const double C0 = inverse_beta * 2*mu_magn*mu_magn / GM;
-	for (size_t i = 0; i < Nx(); i++) {
+	for (size_t i = 0; i < Nx; i++) {
 		double brackets;
 		if (R_[i] < R_cor) {
 			brackets = -7. + 4. * std::pow(R_[i] / R_cor, 1.5);
@@ -126,15 +123,16 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	double R_m = std::max(R_m_min, R_alfven);
 	R_m = std::min(R_m, R_dead);
 	size_t ii;
-	for (ii = 0; ii < Nx() - 1; ii++) {
-		if (R().at(ii+1) > R_m){
+	for (ii = first_; ii <= last_ - 2; ii++) {
+		if (R_[ii + 1] > R_m){
 			break;
 		}
 	}
-	if (ii >= Nx() - 2) {
+	if (ii >= last_ - 2) {
 		throw std::runtime_error("R_in > R_out");
 	}
-	R_m = R().at(ii);
+	R_m = R_[ii];
+	first_ = ii;
 
 	double new_F_in = 0;
 	if (inverse_beta <= 0.) {
@@ -145,20 +143,13 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 			new_F_in = args_ns->Fdead * std::pow(R_dead / R_m, 3);
 		}
 	}
-	F_in_ = F_[0] = new_F_in;
-
-	if (ii > 0) {
-		Nx_ -= ii;
-		h_.erase(h_.begin(), h_.begin() + ii);
-		R_.erase(R_.begin(), R_.begin() + ii);
-		F_.erase(F_.begin(), F_.begin() + ii);
-	}
+	F_in_ = F_[first_] = new_F_in;
 }
 
 
 double FreddiNeutronStarEvolution::Mdot_in() const {
-	const double dF_dh = (F()[1] - F()[0]) / (h()[1] - h()[0]);
-	return dF_dh + dFmagn_dh_[0];
+	const double dF_dh = (F_[first_ + 1] - F_[first_]) / (h_[first_ + 1] - h_[first_]);
+	return dF_dh + dFmagn_dh_[first_];
 }
 
 
