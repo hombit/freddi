@@ -8,7 +8,7 @@ if(STATIC_LINKING)
     set(CMAKE_EXE_LINKER_FLAGS "-static")
 endif(STATIC_LINKING)
 
-find_package(Boost 1.65.0 COMPONENTS program_options REQUIRED)
+find_package(Boost 1.57.0 COMPONENTS program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 if(Boost_PROGRAM_OPTIONS_FOUND)
     add_definitions("-DHAS_BOOST_PROGRAM_OPTIONS")

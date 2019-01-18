@@ -1,8 +1,8 @@
 #include "spectrum.hpp"
 
-#include <boost/math/quadrature/trapezoidal.hpp>
+#include <boost/numeric/odeint.hpp>
 
-using boost::math::quadrature::trapezoidal;
+namespace odeint = boost::numeric::odeint;
 
 
 namespace Spectrum {
@@ -23,9 +23,16 @@ double Planck_lambda(const double T, const double lambda) {
 
 
 double Planck_nu1_nu2(const double T, const double nu1, const double nu2, const double tol){
-	// We actually do not need too high precision here, because if adaptive algorithm wants a tiny step, than probably
-	// Bnu is too small. So max_refinements is set to not-too-large value.
-	return trapezoidal([T](const double nu)-> double { return Planck_nu(T, nu); }, nu1, nu2, tol, 9);
+	auto stepper = odeint::runge_kutta_cash_karp54<double>();
+	double integral = 0.;
+	integrate_adaptive(
+			odeint::make_controlled(0, tol, stepper),
+			[T](const double &y, double &dydx, double x) {
+				dydx = Planck_nu(T, x);
+			},
+			integral, nu1, nu2, 1e-2 * (nu2 - nu1)
+	);
+	return integral;
 }
 
 
