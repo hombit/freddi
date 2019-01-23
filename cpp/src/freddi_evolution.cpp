@@ -80,7 +80,7 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 		d2Fmagn_dh2(initialize_d2Fmagn_dh2()) {}
 
 
-const vecd FreddiNeutronStarEvolution::initialize_Fmagn() {
+const vecd FreddiNeutronStarEvolution::initialize_Fmagn() const {
 	vecd Fmagn_(Nx);
 	const double k = inverse_beta * mu_magn*mu_magn / 3.;
 	double brackets;
@@ -96,7 +96,7 @@ const vecd FreddiNeutronStarEvolution::initialize_Fmagn() {
 }
 
 
-const vecd FreddiNeutronStarEvolution::initialize_dFmagn_dh() {
+const vecd FreddiNeutronStarEvolution::initialize_dFmagn_dh() const {
 	vecd dFmagn_dh_(Nx);
 	const double k = inverse_beta * 2*mu_magn*mu_magn * GM*GM*GM;
 	double brackets;
@@ -112,7 +112,7 @@ const vecd FreddiNeutronStarEvolution::initialize_dFmagn_dh() {
 }
 
 
-const vecd FreddiNeutronStarEvolution::initialize_d2Fmagn_dh2() {
+const vecd FreddiNeutronStarEvolution::initialize_d2Fmagn_dh2() const {
 	vecd d2Fmagn_dh2_(Nx);
 	const double k = inverse_beta * 2*mu_magn*mu_magn / GM;
 	double brackets;

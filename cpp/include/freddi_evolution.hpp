@@ -42,9 +42,9 @@ public:
 	const vecd dFmagn_dh;
 	const vecd d2Fmagn_dh2;
 protected:
-	const vecd initialize_Fmagn();
-	const vecd initialize_dFmagn_dh();
-	const vecd initialize_d2Fmagn_dh2();
+	const vecd initialize_Fmagn() const;
+	const vecd initialize_dFmagn_dh() const;
+	const vecd initialize_d2Fmagn_dh2() const;
 public:
 public:
 	using FreddiEvolution::step;
