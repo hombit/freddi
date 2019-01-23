@@ -72,12 +72,17 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 		xi_pow_minus_7_2(std::pow(xi, -3.5)),
 		R_m_min(std::max(args.ns->Rx, args.basic->rin)),
 		mu_magn(0.5 * args.ns->Bx * args.ns->Rx*args.ns->Rx*args.ns->Rx),
-		R_dead(std::cbrt(mu_magn*mu_magn / args.ns->Fdead)),
+		R_dead(args.ns->Rdead > 0. ? args.ns->Rdead : INFINITY),
+		F_dead(mu_magn*mu_magn / (R_dead*R_dead*R_dead)),
 		R_cor(std::cbrt(GM / (4 * M_PI*M_PI * args.ns->freqx*args.ns->freqx))),
 		inverse_beta(args.ns->inversebeta),
 		Fmagn(initialize_Fmagn()),
 		dFmagn_dh(initialize_dFmagn_dh()),
-		d2Fmagn_dh2(initialize_d2Fmagn_dh2()) {}
+		d2Fmagn_dh2(initialize_d2Fmagn_dh2()) {
+	if (args_ns->Rdead > 0. && args_ns->Rdead < R_cor) {
+		throw std::logic_error("R_dead is positive and less than R_cor, it is obvious");
+	}
+}
 
 
 const vecd FreddiNeutronStarEvolution::initialize_Fmagn() const {
@@ -129,7 +134,7 @@ const vecd FreddiNeutronStarEvolution::initialize_d2Fmagn_dh2() const {
 
 
 void FreddiNeutronStarEvolution::truncateInnerRadius() {
-	if (args_ns->Fdead <= 0.) {
+	if (args_ns->Rdead <= 0.) {
 		return;
 	}
 	if ( Mdot_in() > Mdot_in_prev() ) {
@@ -154,11 +159,11 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 
 	double new_F_in = 0;
 	if (inverse_beta <= 0.) {
-		if (R_m < R_cor) {
+		if (R_m <= R_cor) {
 			const double n_ws = 1 - k_t * xi_pow_minus_7_2 * std::pow(R_m / R_cor, 3);
 			new_F_in = (1 - n_ws) * Mdot_in() * std::sqrt(GM * R_m);
 		} else {
-			new_F_in = args_ns->Fdead * std::pow(R_dead / R_m, 3);
+			new_F_in = F_dead * std::pow(R_dead / R_m, 3);
 		}
 	}
 	F_in_ = F_[first_] = new_F_in;

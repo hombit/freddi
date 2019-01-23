@@ -33,6 +33,7 @@ public:
 	const double R_m_min;
 	const double mu_magn;
 	const double R_dead;
+	const double F_dead;
 	const double R_cor;
 	const double xi_pow_minus_7_2;
 	const double inverse_beta;

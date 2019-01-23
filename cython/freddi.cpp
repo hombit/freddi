@@ -2716,8 +2716,8 @@ static const char __pyx_k_time[] = "time";
 static const char __pyx_k_type[] = "type";
 static const char __pyx_k_wind[] = "wind";
 static const char __pyx_k_ASCII[] = "ASCII";
-static const char __pyx_k_Fdead[] = "Fdead";
 static const char __pyx_k_Mdot0[] = "Mdot0";
+static const char __pyx_k_Rdead[] = "Rdead";
 static const char __pyx_k_State[] = "State";
 static const char __pyx_k_alpha[] = "alpha";
 static const char __pyx_k_array[] = "array";
@@ -2861,7 +2861,6 @@ static PyObject *__pyx_n_s_Ellipsis;
 static PyObject *__pyx_kp_s_Empty_shape_tuple_for_cython_arr;
 static PyObject *__pyx_n_s_EvolutionResults;
 static PyObject *__pyx_n_s_F0;
-static PyObject *__pyx_n_s_Fdead;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor_2;
 static PyObject *__pyx_n_s_Freddi;
@@ -2889,6 +2888,7 @@ static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_Quantity;
+static PyObject *__pyx_n_s_Rdead;
 static PyObject *__pyx_n_s_RuntimeError;
 static PyObject *__pyx_n_s_Rx;
 static PyObject *__pyx_kp_u_Rx_float_optional_freqx_float_o;
@@ -3115,12 +3115,12 @@ static int __pyx_pf_6freddi_6Freddi___cinit__(struct __pyx_obj_6freddi_Freddi *_
 static PyObject *__pyx_pf_6freddi_6Freddi_2get_state(struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_6Freddi_4__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_Freddi *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_6Freddi_6__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_Freddi *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
-static int __pyx_pf_6freddi_17FreddiNeutronStar___cinit__(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self, double __pyx_v_Rx, double __pyx_v_freqx, double __pyx_v_Bx, double __pyx_v_epsilonAlfven, double __pyx_v_inversebeta, double __pyx_v_Fdead, CYTHON_UNUSED PyObject *__pyx_v_kwargs); /* proto */
+static int __pyx_pf_6freddi_17FreddiNeutronStar___cinit__(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self, double __pyx_v_Rx, double __pyx_v_freqx, double __pyx_v_Bx, double __pyx_v_epsilonAlfven, double __pyx_v_inversebeta, double __pyx_v_Rdead, CYTHON_UNUSED PyObject *__pyx_v_kwargs); /* proto */
 static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_2get_state(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self, int __pyx_v_shadow); /* proto */
 static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_5Fmagn___get__(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_9dFmagn_dh___get__(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_11d2Fmagn_dh2___get__(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_4Rcor___get__(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_5R_cor___get__(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_4__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_6__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
@@ -11416,7 +11416,7 @@ static PyObject *__pyx_pf_6freddi_6Freddi_6__setstate_cython__(CYTHON_UNUSED str
  * 
  *     def __cinit__(             # <<<<<<<<<<<<<<
  *         self, *,
- *         double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double inversebeta=default_inversebeta, double Fdead=default_Fdead,
+ *         double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double inversebeta=default_inversebeta, double Rdead=default_Rdead,
  */
 
 /* Python wrapper */
@@ -11427,7 +11427,7 @@ static int __pyx_pw_6freddi_17FreddiNeutronStar_1__cinit__(PyObject *__pyx_v_sel
   double __pyx_v_Bx;
   double __pyx_v_epsilonAlfven;
   double __pyx_v_inversebeta;
-  double __pyx_v_Fdead;
+  double __pyx_v_Rdead;
   CYTHON_UNUSED PyObject *__pyx_v_kwargs = 0;
   int __pyx_r;
   __Pyx_RefNannyDeclarations
@@ -11435,7 +11435,7 @@ static int __pyx_pw_6freddi_17FreddiNeutronStar_1__cinit__(PyObject *__pyx_v_sel
   __pyx_v_kwargs = PyDict_New(); if (unlikely(!__pyx_v_kwargs)) return -1;
   __Pyx_GOTREF(__pyx_v_kwargs);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_Rx,&__pyx_n_s_freqx,&__pyx_n_s_Bx,&__pyx_n_s_epsilonAlfven,&__pyx_n_s_inversebeta,&__pyx_n_s_Fdead,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_Rx,&__pyx_n_s_freqx,&__pyx_n_s_Bx,&__pyx_n_s_epsilonAlfven,&__pyx_n_s_inversebeta,&__pyx_n_s_Rdead,0};
     PyObject* values[6] = {0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -11485,9 +11485,9 @@ static int __pyx_pw_6freddi_17FreddiNeutronStar_1__cinit__(PyObject *__pyx_v_sel
       __pyx_v_inversebeta = __pyx_k__42;
     }
     if (values[5]) {
-      __pyx_v_Fdead = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_Fdead == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 633, __pyx_L3_error)
+      __pyx_v_Rdead = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_Rdead == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 633, __pyx_L3_error)
     } else {
-      __pyx_v_Fdead = __pyx_k__43;
+      __pyx_v_Rdead = __pyx_k__43;
     }
   }
   goto __pyx_L4_argument_unpacking_done;
@@ -11499,7 +11499,7 @@ static int __pyx_pw_6freddi_17FreddiNeutronStar_1__cinit__(PyObject *__pyx_v_sel
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6freddi_17FreddiNeutronStar___cinit__(((struct __pyx_obj_6freddi_FreddiNeutronStar *)__pyx_v_self), __pyx_v_Rx, __pyx_v_freqx, __pyx_v_Bx, __pyx_v_epsilonAlfven, __pyx_v_inversebeta, __pyx_v_Fdead, __pyx_v_kwargs);
+  __pyx_r = __pyx_pf_6freddi_17FreddiNeutronStar___cinit__(((struct __pyx_obj_6freddi_FreddiNeutronStar *)__pyx_v_self), __pyx_v_Rx, __pyx_v_freqx, __pyx_v_Bx, __pyx_v_epsilonAlfven, __pyx_v_inversebeta, __pyx_v_Rdead, __pyx_v_kwargs);
 
   /* function exit code */
   __Pyx_XDECREF(__pyx_v_kwargs);
@@ -11507,7 +11507,7 @@ static int __pyx_pw_6freddi_17FreddiNeutronStar_1__cinit__(PyObject *__pyx_v_sel
   return __pyx_r;
 }
 
-static int __pyx_pf_6freddi_17FreddiNeutronStar___cinit__(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self, double __pyx_v_Rx, double __pyx_v_freqx, double __pyx_v_Bx, double __pyx_v_epsilonAlfven, double __pyx_v_inversebeta, double __pyx_v_Fdead, CYTHON_UNUSED PyObject *__pyx_v_kwargs) {
+static int __pyx_pf_6freddi_17FreddiNeutronStar___cinit__(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self, double __pyx_v_Rx, double __pyx_v_freqx, double __pyx_v_Bx, double __pyx_v_epsilonAlfven, double __pyx_v_inversebeta, double __pyx_v_Rdead, CYTHON_UNUSED PyObject *__pyx_v_kwargs) {
   NeutronStarArguments *__pyx_v_ns;
   FreddiNeutronStarArguments *__pyx_v_ns_args;
   int __pyx_r;
@@ -11518,15 +11518,15 @@ static int __pyx_pf_6freddi_17FreddiNeutronStar___cinit__(struct __pyx_obj_6fred
   /* "freddi.pyx":636
  *         **kwargs,
  *     ):
- *         cdef NeutronStarArguments* ns = new NeutronStarArguments(Rx, freqx, Bx, epsilonAlfven, inversebeta, Fdead)             # <<<<<<<<<<<<<<
+ *         cdef NeutronStarArguments* ns = new NeutronStarArguments(Rx, freqx, Bx, epsilonAlfven, inversebeta, Rdead)             # <<<<<<<<<<<<<<
  *         cdef FreddiNeutronStarArguments* ns_args = new FreddiNeutronStarArguments(dereference(self.args), ns)
  *         self.args = <FreddiArguments*> ns_args
  */
-  __pyx_v_ns = new NeutronStarArguments(__pyx_v_Rx, __pyx_v_freqx, __pyx_v_Bx, __pyx_v_epsilonAlfven, __pyx_v_inversebeta, __pyx_v_Fdead);
+  __pyx_v_ns = new NeutronStarArguments(__pyx_v_Rx, __pyx_v_freqx, __pyx_v_Bx, __pyx_v_epsilonAlfven, __pyx_v_inversebeta, __pyx_v_Rdead);
 
   /* "freddi.pyx":637
  *     ):
- *         cdef NeutronStarArguments* ns = new NeutronStarArguments(Rx, freqx, Bx, epsilonAlfven, inversebeta, Fdead)
+ *         cdef NeutronStarArguments* ns = new NeutronStarArguments(Rx, freqx, Bx, epsilonAlfven, inversebeta, Rdead)
  *         cdef FreddiNeutronStarArguments* ns_args = new FreddiNeutronStarArguments(dereference(self.args), ns)             # <<<<<<<<<<<<<<
  *         self.args = <FreddiArguments*> ns_args
  *         self.ns_evolution = new FreddiNeutronStarEvolution(dereference(ns_args))
@@ -11534,7 +11534,7 @@ static int __pyx_pf_6freddi_17FreddiNeutronStar___cinit__(struct __pyx_obj_6fred
   __pyx_v_ns_args = new FreddiNeutronStarArguments((*__pyx_v_self->__pyx_base.args), __pyx_v_ns);
 
   /* "freddi.pyx":638
- *         cdef NeutronStarArguments* ns = new NeutronStarArguments(Rx, freqx, Bx, epsilonAlfven, inversebeta, Fdead)
+ *         cdef NeutronStarArguments* ns = new NeutronStarArguments(Rx, freqx, Bx, epsilonAlfven, inversebeta, Rdead)
  *         cdef FreddiNeutronStarArguments* ns_args = new FreddiNeutronStarArguments(dereference(self.args), ns)
  *         self.args = <FreddiArguments*> ns_args             # <<<<<<<<<<<<<<
  *         self.ns_evolution = new FreddiNeutronStarEvolution(dereference(ns_args))
@@ -11571,7 +11571,7 @@ static int __pyx_pf_6freddi_17FreddiNeutronStar___cinit__(struct __pyx_obj_6fred
  * 
  *     def __cinit__(             # <<<<<<<<<<<<<<
  *         self, *,
- *         double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double inversebeta=default_inversebeta, double Fdead=default_Fdead,
+ *         double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double inversebeta=default_inversebeta, double Rdead=default_Rdead,
  */
 
   /* function exit code */
@@ -12242,24 +12242,24 @@ static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_11d2Fmagn_dh2___get__(stru
 /* "freddi.pyx":672
  * 
  *     @property
- *     def Rcor(self) -> double:             # <<<<<<<<<<<<<<
+ *     def R_cor(self) -> double:             # <<<<<<<<<<<<<<
  *         return self.ns_evolution.R_cor
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6freddi_17FreddiNeutronStar_4Rcor_1__get__(PyObject *__pyx_v_self); /*proto*/
-static PyObject *__pyx_pw_6freddi_17FreddiNeutronStar_4Rcor_1__get__(PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_6freddi_17FreddiNeutronStar_5R_cor_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_6freddi_17FreddiNeutronStar_5R_cor_1__get__(PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_6freddi_17FreddiNeutronStar_4Rcor___get__(((struct __pyx_obj_6freddi_FreddiNeutronStar *)__pyx_v_self));
+  __pyx_r = __pyx_pf_6freddi_17FreddiNeutronStar_5R_cor___get__(((struct __pyx_obj_6freddi_FreddiNeutronStar *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_4Rcor___get__(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self) {
+static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_5R_cor___get__(struct __pyx_obj_6freddi_FreddiNeutronStar *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -12267,7 +12267,7 @@ static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_4Rcor___get__(struct __pyx
 
   /* "freddi.pyx":673
  *     @property
- *     def Rcor(self) -> double:
+ *     def R_cor(self) -> double:
  *         return self.ns_evolution.R_cor             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
@@ -12280,14 +12280,14 @@ static PyObject *__pyx_pf_6freddi_17FreddiNeutronStar_4Rcor___get__(struct __pyx
   /* "freddi.pyx":672
  * 
  *     @property
- *     def Rcor(self) -> double:             # <<<<<<<<<<<<<<
+ *     def R_cor(self) -> double:             # <<<<<<<<<<<<<<
  *         return self.ns_evolution.R_cor
  */
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("freddi.FreddiNeutronStar.Rcor.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("freddi.FreddiNeutronStar.R_cor.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -29071,8 +29071,8 @@ static PyObject *__pyx_getprop_6freddi_17FreddiNeutronStar_d2Fmagn_dh2(PyObject 
   return __pyx_pw_6freddi_17FreddiNeutronStar_11d2Fmagn_dh2_1__get__(o);
 }
 
-static PyObject *__pyx_getprop_6freddi_17FreddiNeutronStar_Rcor(PyObject *o, CYTHON_UNUSED void *x) {
-  return __pyx_pw_6freddi_17FreddiNeutronStar_4Rcor_1__get__(o);
+static PyObject *__pyx_getprop_6freddi_17FreddiNeutronStar_R_cor(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_6freddi_17FreddiNeutronStar_5R_cor_1__get__(o);
 }
 
 static PyMethodDef __pyx_methods_6freddi_FreddiNeutronStar[] = {
@@ -29086,7 +29086,7 @@ static struct PyGetSetDef __pyx_getsets_6freddi_FreddiNeutronStar[] = {
   {(char *)"Fmagn", __pyx_getprop_6freddi_17FreddiNeutronStar_Fmagn, 0, (char *)0, 0},
   {(char *)"dFmagn_dh", __pyx_getprop_6freddi_17FreddiNeutronStar_dFmagn_dh, 0, (char *)0, 0},
   {(char *)"d2Fmagn_dh2", __pyx_getprop_6freddi_17FreddiNeutronStar_d2Fmagn_dh2, 0, (char *)0, 0},
-  {(char *)"Rcor", __pyx_getprop_6freddi_17FreddiNeutronStar_Rcor, 0, (char *)0, 0},
+  {(char *)"R_cor", __pyx_getprop_6freddi_17FreddiNeutronStar_R_cor, 0, (char *)0, 0},
   {0, 0, 0, 0, 0}
 };
 
@@ -29982,7 +29982,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Empty_shape_tuple_for_cython_arr, __pyx_k_Empty_shape_tuple_for_cython_arr, sizeof(__pyx_k_Empty_shape_tuple_for_cython_arr), 0, 0, 1, 0},
   {&__pyx_n_s_EvolutionResults, __pyx_k_EvolutionResults, sizeof(__pyx_k_EvolutionResults), 0, 0, 1, 1},
   {&__pyx_n_s_F0, __pyx_k_F0, sizeof(__pyx_k_F0), 0, 0, 1, 1},
-  {&__pyx_n_s_Fdead, __pyx_k_Fdead, sizeof(__pyx_k_Fdead), 0, 0, 1, 1},
   {&__pyx_kp_u_Format_string_allocated_too_shor, __pyx_k_Format_string_allocated_too_shor, sizeof(__pyx_k_Format_string_allocated_too_shor), 0, 1, 0, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor_2, __pyx_k_Format_string_allocated_too_shor_2, sizeof(__pyx_k_Format_string_allocated_too_shor_2), 0, 1, 0, 0},
   {&__pyx_n_s_Freddi, __pyx_k_Freddi, sizeof(__pyx_k_Freddi), 0, 0, 1, 1},
@@ -30010,6 +30009,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_Quantity, __pyx_k_Quantity, sizeof(__pyx_k_Quantity), 0, 0, 1, 1},
+  {&__pyx_n_s_Rdead, __pyx_k_Rdead, sizeof(__pyx_k_Rdead), 0, 0, 1, 1},
   {&__pyx_n_s_RuntimeError, __pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 0, 1, 1},
   {&__pyx_n_s_Rx, __pyx_k_Rx, sizeof(__pyx_k_Rx), 0, 0, 1, 1},
   {&__pyx_kp_u_Rx_float_optional_freqx_float_o, __pyx_k_Rx_float_optional_freqx_float_o, sizeof(__pyx_k_Rx_float_optional_freqx_float_o), 0, 1, 0, 0},
@@ -31265,7 +31265,7 @@ if (!__Pyx_RefNanny) {
   /* "freddi.pyx":633
  *     def __cinit__(
  *         self, *,
- *         double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double inversebeta=default_inversebeta, double Fdead=default_Fdead,             # <<<<<<<<<<<<<<
+ *         double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double inversebeta=default_inversebeta, double Rdead=default_Rdead,             # <<<<<<<<<<<<<<
  *         **kwargs,
  *     ):
  */
@@ -31274,7 +31274,7 @@ if (!__Pyx_RefNanny) {
   __pyx_k__40 = NeutronStarArguments::default_Bx;
   __pyx_k__41 = NeutronStarArguments::default_epsilonAlfven;
   __pyx_k__42 = NeutronStarArguments::default_inversebeta;
-  __pyx_k__43 = NeutronStarArguments::default_Fdead;
+  __pyx_k__43 = NeutronStarArguments::default_Rdead;
 
   /* "freddi.pyx":1
  * # distutils: language = c++             # <<<<<<<<<<<<<<

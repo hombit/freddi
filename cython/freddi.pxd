@@ -88,7 +88,7 @@ cdef extern from 'arguments.hpp':
         shared_ptr[CalculationArguments] calc
     cdef cppclass NeutronStarArguments:
         NeutronStarArguments(double, double, double, double, double, double)
-        const double Rx, freqx, Bx, epsilonAlfven, Fdead
+        const double Rx, freqx, Bx, epsilonAlfven, Rdead
     cdef cppclass FreddiNeutronStarArguments:
         FreddiNeutronStarArguments(const FreddiArguments& freddi_args, NeutronStarArguments* ns)
         shared_ptr[NeutronStarArguments] ns
@@ -140,7 +140,7 @@ cdef extern from 'arguments.hpp' namespace 'CalculationArguments':
 
 
 cdef extern from 'arguments.hpp' namespace 'NeutronStarArguments':
-    cdef const double default_Rx, default_freqx, default_Bx, default_epsilonAlfven, default_inversebeta, default_Fdead
+    cdef const double default_Rx, default_freqx, default_Bx, default_epsilonAlfven, default_inversebeta, default_Rdead
 
 
 cdef extern from 'unit_transformation.hpp':
