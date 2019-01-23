@@ -1,4 +1,5 @@
 # distutils: language = c++
+# cython: language_level = 3
 
 from cython.operator cimport dereference
 from libc cimport math
@@ -18,10 +19,6 @@ cdef class State:
     """
 
     cdef FreddiState* cpp_state
-
-    def __dealloc__(self):
-        if self.cpp_state:
-            del self.cpp_state
 
     @property
     def Mdot_in(self) -> double:
@@ -267,13 +264,6 @@ cdef class State:
             cnp.PyArray_MultiIter_NEXT(it)
         return arr
    
-
-cdef State state_from_cpp(const FreddiState& cpp_state):
-    """Construct State object from C++ FreddiState"""
-    cdef State state = State()
-    state.cpp_state = new FreddiState(cpp_state)
-    return state
-
 
 cdef class EvolutionResults:
     """Temporal distribution of various disk parameters
@@ -582,10 +572,10 @@ cdef class _BasicFreddi:
     def Thot(self, val: double) -> None:
         self.change_DiskStructureArguments(opacity=None, Mdotout=None, boundcond=None, Thot=val)
 
-    cpdef State get_state(self):
-        return state_from_cpp(self.evolution.state())
+    def get_state(self):
+        raise NotImplementedError
 
-    def __iter__(self):
+    def __iter__(self) -> State:
         """Iterate disk over time
 
         The first yielded object is for initial distribution
@@ -596,7 +586,7 @@ cdef class _BasicFreddi:
             `State` disk radial structure object
 
         """
-        state = self.get_state()
+        cdef State state = self.get_state()
         while state.t <= self.time:
             yield state
             self.evolution.step()
@@ -612,12 +602,21 @@ cdef class _BasicFreddi:
         """
         return EvolutionResults(self)
 
+    def __getattr__(self, attr):
+        state = self.get_state()
+        return getattr(state, attr)
+
 
 cdef class Freddi(_BasicFreddi):
     __doc__ = _BasicFreddi.__doc__.format(add_args='')
 
     def __cinit__(self, **kwargs):
         self.evolution = new FreddiEvolution(dereference(self.args))
+
+    cpdef State get_state(self):
+        cdef State state = State.__new__(State)
+        state.cpp_state = <FreddiState*> new FreddiEvolution(dereference(self.evolution))
+        return state
 
 
 cdef class FreddiNeutronStar(_BasicFreddi):
@@ -640,10 +639,31 @@ cdef class FreddiNeutronStar(_BasicFreddi):
         self.ns_evolution = new FreddiNeutronStarEvolution(dereference(ns_args))
         self.evolution = <FreddiEvolution*> self.ns_evolution
 
+    cpdef State get_state(self, bint shadow=False):
+        cdef State state = State.__new__(State)
+        state.cpp_state = <FreddiState*> new FreddiNeutronStarEvolution(dereference(self.ns_evolution))
+        return state
+
+    @property
+    def Fmagn(self) -> np.ndarray[np.float]:
+        cdef const double* data = self.ns_evolution.Fmagn.data()
+        cdef size_t size = self.ns_evolution.Fmagn.size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
+
     @property
     def dFmagn_dh(self) -> np.ndarray[np.float]:
-        cdef const double* data = self.ns_evolution.dFmagn_dh().data()
-        cdef size_t size = self.ns_evolution.dFmagn_dh().size()
+        cdef const double* data = self.ns_evolution.dFmagn_dh.data()
+        cdef size_t size = self.ns_evolution.dFmagn_dh.size()
+        arr = np.asarray(<const double[:size]> data)
+        arr.flags.writeable = False
+        return arr
+
+    @property
+    def d2Fmagn_dh2(self) -> np.ndarray[np.float]:
+        cdef const double* data = self.ns_evolution.d2Fmagn_dh2.data()
+        cdef size_t size = self.ns_evolution.d2Fmagn_dh2.size()
         arr = np.asarray(<const double[:size]> data)
         arr.flags.writeable = False
         return arr

@@ -75,38 +75,56 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 		R_dead(std::cbrt(mu_magn*mu_magn / args.ns->Fdead)),
 		R_cor(std::cbrt(GM / (4 * M_PI*M_PI * args.ns->freqx*args.ns->freqx))),
 		inverse_beta(args.ns->inversebeta),
-		dFmagn_dh_(Nx),
-		d2Fmagn_dh2_(Nx) {
-	initialize_dFmagn_dh();
-	initialize_d2Fmagn_dh2();
+		Fmagn(initialize_Fmagn()),
+		dFmagn_dh(initialize_dFmagn_dh()),
+		d2Fmagn_dh2(initialize_d2Fmagn_dh2()) {}
+
+
+const vecd FreddiNeutronStarEvolution::initialize_Fmagn() {
+	vecd Fmagn_(Nx);
+	const double k = inverse_beta * mu_magn*mu_magn / 3.;
+	double brackets;
+	for (size_t i = 0; i < Nx; i++) {
+		if (R_[i] < R_cor) {
+			brackets = -1. + 2. * std::pow(R_[i] / R_cor, 1.5) - 2./3. * std::pow(R_[i] / R_cor, 3);
+		} else {
+			brackets = 1. - 2./3. * std::pow(R_cor / R_[i], 1.5);
+		}
+		Fmagn_[i] = k / (R_[i]*R_[i]*R_[i]) * brackets;
+	}
+	return Fmagn_;
 }
 
 
-void FreddiNeutronStarEvolution::initialize_dFmagn_dh() {
+const vecd FreddiNeutronStarEvolution::initialize_dFmagn_dh() {
+	vecd dFmagn_dh_(Nx);
 	const double k = inverse_beta * 2*mu_magn*mu_magn * GM*GM*GM;
+	double brackets;
 	for (size_t i = 0; i < Nx; i++) {
-		double brackets;
 		if (R_[i] < R_cor) {
-			brackets = 1 - std::pow(R_[i] / R_cor, 1.5);
+			brackets = 1. - std::pow(R_[i] / R_cor, 1.5);
 		} else {
-			brackets = -1 + std::pow(R_cor / R_[i], 1.5);
+			brackets = -1. + std::pow(R_cor / R_[i], 1.5);
 		}
 		dFmagn_dh_[i] = k / std::pow(h_[i], 7) * brackets;
 	}
+	return dFmagn_dh_;
 }
 
 
-void FreddiNeutronStarEvolution::initialize_d2Fmagn_dh2() {
-	const double C0 = inverse_beta * 2*mu_magn*mu_magn / GM;
+const vecd FreddiNeutronStarEvolution::initialize_d2Fmagn_dh2() {
+	vecd d2Fmagn_dh2_(Nx);
+	const double k = inverse_beta * 2*mu_magn*mu_magn / GM;
+	double brackets;
 	for (size_t i = 0; i < Nx; i++) {
-		double brackets;
 		if (R_[i] < R_cor) {
 			brackets = -7. + 4. * std::pow(R_[i] / R_cor, 1.5);
 		} else {
 			brackets = 7. - 10. * std::pow(R_cor / R_[i], 1.5);
 		}
-		d2Fmagn_dh2_[i] = C0 / (R_[i]*R_[i]*R_[i]*R_[i]) * brackets;
+		d2Fmagn_dh2_[i] = k / std::pow(R_[i], 4) * brackets;
 	}
+	return d2Fmagn_dh2_;
 }
 
 
@@ -149,14 +167,14 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 
 double FreddiNeutronStarEvolution::Mdot_in() const {
 	const double dF_dh = (F_[first_ + 1] - F_[first_]) / (h_[first_ + 1] - h_[first_]);
-	return dF_dh + dFmagn_dh_[first_];
+	return dF_dh + dFmagn_dh[first_];
 }
 
 
 vecd FreddiNeutronStarEvolution::windC() const {
 	auto C = FreddiEvolution::windC();
 	for (size_t i = 0; i < C.size(); i++) {
-		C[i] += d2Fmagn_dh2_[i];
+		C[i] += d2Fmagn_dh2[i];
 	}
 	return C;
 }

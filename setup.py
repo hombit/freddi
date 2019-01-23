@@ -31,6 +31,7 @@ extensions = [
     Extension('freddi',
               cpp_source + [cython_source],
               extra_compile_args=['-std=c++11'],
+              extra_link_args=["-std=c++11"],
               include_dirs=['cpp/include', np.get_include()],)
 ]
 

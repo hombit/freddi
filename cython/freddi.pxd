@@ -1,3 +1,5 @@
+# cython: language_level = 3
+
 from libcpp.memory cimport shared_ptr
 from libcpp.string cimport string
 from libcpp.vector cimport vector
@@ -37,13 +39,16 @@ cdef extern from 'freddi_state.hpp':
 cdef extern from 'freddi_evolution.hpp':
     cdef cppclass FreddiEvolution:
         FreddiEvolution(const FreddiArguments&) except +
+        FreddiEvolution(const FreddiEvolution&)
         void step() except +
         void step(double) except +
         FreddiState& state()
     cdef cppclass FreddiNeutronStarEvolution:
         FreddiNeutronStarEvolution(const FreddiNeutronStarArguments&) except +
-        const vector[double]& dFmagn_dh()
-        const vector[double]& d2Fmagn_dh2()
+        FreddiNeutronStarEvolution(const FreddiNeutronStarEvolution&)
+        const vector[double] Fmagn
+        const vector[double] dFmagn_dh
+        const vector[double] d2Fmagn_dh2
         const double R_cor
 
 

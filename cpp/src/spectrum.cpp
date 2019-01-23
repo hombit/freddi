@@ -7,7 +7,7 @@ namespace odeint = boost::numeric::odeint;
 
 namespace Spectrum {
 double Planck_nu(const double T, const double nu) {
-	if (T == 0.) {
+	if (!(T > 0.)) {  // catches NaN
 		return 0.;
 	}
 	return double_h_over_c2 * nu*nu*nu / (std::exp(h_over_kB * nu / T) - 1.);
@@ -15,7 +15,7 @@ double Planck_nu(const double T, const double nu) {
 
 
 double Planck_lambda(const double T, const double lambda) {
-	if (T == 0.) {
+	if (!(T > 0.)) {  // catches NaN
 		return 0.;
 	}
 	return double_h_c2 / (lambda*lambda*lambda*lambda*lambda) / (std::exp( ch_over_kB / (lambda * T) ) - 1.);

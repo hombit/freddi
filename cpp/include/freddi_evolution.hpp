@@ -19,6 +19,7 @@ protected:
 	virtual vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;
 public:
 	FreddiEvolution(const FreddiArguments& args);
+	FreddiEvolution(const FreddiEvolution&) = default;
 	virtual void step(double tau);
 	inline void step() { return step(args.calc->tau); }
 	inline const FreddiState& state() { return static_cast<FreddiState&>(*this); }
@@ -36,15 +37,15 @@ public:
 	const double xi_pow_minus_7_2;
 	const double inverse_beta;
 	const NeutronStarArguments* args_ns;
-protected:
-	vecd dFmagn_dh_;
-	vecd d2Fmagn_dh2_;
-protected:
-	void initialize_dFmagn_dh();
-	void initialize_d2Fmagn_dh2();
 public:
-	const vecd& dFmagn_dh() const { return dFmagn_dh_; }
-	const vecd& d2Fmagn_dh2() const { return d2Fmagn_dh2_; }
+	const vecd Fmagn;
+	const vecd dFmagn_dh;
+	const vecd d2Fmagn_dh2;
+protected:
+	const vecd initialize_Fmagn();
+	const vecd initialize_dFmagn_dh();
+	const vecd initialize_d2Fmagn_dh2();
+public:
 public:
 	using FreddiEvolution::step;
 protected:
@@ -53,6 +54,7 @@ protected:
 	virtual vecd windC() const override;
 public:
 	FreddiNeutronStarEvolution(const FreddiNeutronStarArguments& args);
+	FreddiNeutronStarEvolution(const FreddiNeutronStarEvolution&) = default;
 };
 
 
