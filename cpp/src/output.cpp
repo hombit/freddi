@@ -8,9 +8,9 @@ constexpr const char FreddiFileOutput::fulldata_header[];
 
 FreddiFileOutput::FreddiFileOutput(FreddiEvolution &freddi_, const boost::program_options::variables_map& vm):
 		freddi(&freddi_),
-		output(freddi_.args.general->dir + "/" + freddi_.args.general->prefix + ".dat") {
+		output(freddi_.args().general->dir + "/" + freddi_.args().general->prefix + ".dat") {
 	output << "#t\tMdot\tMdisk\tRhot\tCirrout\tH2R\tTeffout\tTirrout\tQiir2Qvisout\tLx\tmU\tmB\tmV\tmR\tmI\tmJ\t";
-	for (int i = 0; i < freddi_.args.flux->lambdas.size(); ++i) {
+	for (int i = 0; i < freddi_.args().flux->lambdas.size(); ++i) {
 		output << " Fnu" << i;
 		for (double j = 0; j < 9 - log10(i + 0.1); ++j) {
 			output << "\t";
@@ -18,7 +18,7 @@ FreddiFileOutput::FreddiFileOutput(FreddiEvolution &freddi_, const boost::progra
 	}
 	output << "\n";
 	output << "#days\tg/s\tg\tRsun\tfloat\tfloat\tK\tK\tfloat\terg/s\tmag\tmag\tmag\tmag\tmag\tmag";
-	for (int i = 0; i < freddi_.args.flux->lambdas.size(); ++i) {
+	for (int i = 0; i < freddi_.args().flux->lambdas.size(); ++i) {
 		output << "\terg/s/cm^2/Hz";
 	}
 	output << "\n";
@@ -64,14 +64,14 @@ FreddiFileOutput::FreddiFileOutput(FreddiEvolution &freddi_, const boost::progra
 		}
 	}
 	if (vm.count("rout") == 0) {
-		output << "# --rout hadn't been specified, tidal radius " << freddi_.args.basic->rout / solar_radius << " Rsun was used"
+		output << "# --rout hadn't been specified, tidal radius " << freddi_.args().basic->rout / solar_radius << " Rsun was used"
 			   << std::endl;
 	}
 	output << std::flush;
 }
 
 void FreddiFileOutput::dump() {
-	auto Nx = freddi->Nx;
+	auto Nx = freddi->Nx();
 	output  << sToDay(freddi->t())
 			<< "\t" << freddi->Mdot_in()
 			<< "\t" << freddi->Mdisk()
@@ -88,15 +88,15 @@ void FreddiFileOutput::dump() {
 			<< "\t" << freddi->mR()
 			<< "\t" << freddi->mI()
 			<< "\t" << freddi->mJ();
-	for ( auto &lambda : freddi->args.flux->lambdas ){
+	for ( auto &lambda : freddi->args().flux->lambdas ){
 		output << "\t" << freddi->flux(lambda);
 	}
 	output << std::endl;
 
-	if (freddi->args.general->fulldata) {
+	if (freddi->args().general->fulldata) {
 		std::ostringstream filename;
-		auto i_t = static_cast<int>(std::round(freddi->t() / freddi->args.calc->tau));
-		filename << freddi->args.general->dir << "/" << freddi->args.general->prefix << "_" << i_t << ".dat";
+		auto i_t = static_cast<int>(std::round(freddi->t() / freddi->args().calc->tau));
+		filename << freddi->args().general->dir << "/" << freddi->args().general->prefix << "_" << i_t << ".dat";
 		FstreamWithPath output(filename.str());
 		output << fulldata_header << sToDay(freddi->t()) << " Mdot_in = " << freddi->Mdot_in() << std::endl;
 		for ( int i = 1; i < Nx; ++i ){

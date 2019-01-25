@@ -1288,7 +1288,7 @@ struct __pyx_opt_args_6freddi_12_BasicFreddi_change_DiskStructureArguments;
 struct __pyx_opt_args_6freddi_17FreddiNeutronStar_get_state;
 
 /* "freddi.pyx":530
- *         return self.evolution.state().Nt
+ *         return self.evolution.state().Nt()
  * 
  *     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):             # <<<<<<<<<<<<<<
  *         cdef double c_Cirr = self.args.irr.get().Cirr if Cirr is None else Cirr
@@ -3624,7 +3624,7 @@ static PyObject *__pyx_pf_6freddi_5State_3i_t___get__(struct __pyx_obj_6freddi_S
  * 
  *     @property
  *     def Nx(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.Nx
+ *         return self.cpp_state.Nx()
  * 
  */
 
@@ -3650,12 +3650,12 @@ static PyObject *__pyx_pf_6freddi_5State_2Nx___get__(struct __pyx_obj_6freddi_St
   /* "freddi.pyx":49
  *     @property
  *     def Nx(self) -> int:
- *         return self.cpp_state.Nx             # <<<<<<<<<<<<<<
+ *         return self.cpp_state.Nx()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_self->cpp_state->Nx); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 49, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_self->cpp_state->Nx()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 49, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3665,7 +3665,7 @@ static PyObject *__pyx_pf_6freddi_5State_2Nx___get__(struct __pyx_obj_6freddi_St
  * 
  *     @property
  *     def Nx(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.cpp_state.Nx
+ *         return self.cpp_state.Nx()
  * 
  */
 
@@ -9841,7 +9841,7 @@ static PyObject *__pyx_pf_6freddi_12_BasicFreddi_7lambdas___get__(struct __pyx_o
  * 
  *     @property
  *     def Nt(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.evolution.state().Nt
+ *         return self.evolution.state().Nt()
  * 
  */
 
@@ -9867,12 +9867,12 @@ static PyObject *__pyx_pf_6freddi_12_BasicFreddi_2Nt___get__(struct __pyx_obj_6f
   /* "freddi.pyx":528
  *     @property
  *     def Nt(self) -> int:
- *         return self.evolution.state().Nt             # <<<<<<<<<<<<<<
+ *         return self.evolution.state().Nt()             # <<<<<<<<<<<<<<
  * 
  *     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_self->evolution->state().Nt); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 528, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_self->evolution->state().Nt()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 528, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9882,7 +9882,7 @@ static PyObject *__pyx_pf_6freddi_12_BasicFreddi_2Nt___get__(struct __pyx_obj_6f
  * 
  *     @property
  *     def Nt(self) -> int:             # <<<<<<<<<<<<<<
- *         return self.evolution.state().Nt
+ *         return self.evolution.state().Nt()
  * 
  */
 
@@ -9898,7 +9898,7 @@ static PyObject *__pyx_pf_6freddi_12_BasicFreddi_2Nt___get__(struct __pyx_obj_6f
 }
 
 /* "freddi.pyx":530
- *         return self.evolution.state().Nt
+ *         return self.evolution.state().Nt()
  * 
  *     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):             # <<<<<<<<<<<<<<
  *         cdef double c_Cirr = self.args.irr.get().Cirr if Cirr is None else Cirr
@@ -9990,7 +9990,7 @@ static void __pyx_f_6freddi_12_BasicFreddi_change_SelfIrradiationArguments(struc
   __pyx_v_self->args->irr.reset(__pyx_v_irr);
 
   /* "freddi.pyx":530
- *         return self.evolution.state().Nt
+ *         return self.evolution.state().Nt()
  * 
  *     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):             # <<<<<<<<<<<<<<
  *         cdef double c_Cirr = self.args.irr.get().Cirr if Cirr is None else Cirr

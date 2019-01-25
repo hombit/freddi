@@ -46,7 +46,7 @@ cdef class State:
 
     @property
     def Nx(self) -> int:
-        return self.cpp_state.Nx
+        return self.cpp_state.Nx()
 
     @property
     def h(self) -> np.ndarray[np.float]:
@@ -525,7 +525,7 @@ cdef class _BasicFreddi:
 
     @property
     def Nt(self) -> int:
-        return self.evolution.state().Nt
+        return self.evolution.state().Nt()
 
     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):
         cdef double c_Cirr = self.args.irr.get().Cirr if Cirr is None else Cirr

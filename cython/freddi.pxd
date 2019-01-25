@@ -8,8 +8,8 @@ from libcpp.vector cimport vector
 cdef extern from 'freddi_state.hpp':
     cdef cppclass FreddiState:
         FreddiState(const FreddiState&)
-        size_t Nt
-        size_t Nx
+        size_t Nt()
+        size_t Nx()
         size_t first()
         size_t last()
         double Mdot_in()
