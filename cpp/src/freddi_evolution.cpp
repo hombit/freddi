@@ -72,12 +72,12 @@ vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t _first, size
 FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarArguments &args):
 		FreddiEvolution(args),
 		args_ns(args.ns.get()),
+		xi_pow_minus_7_2(std::pow(xi, -3.5)),
 		R_m_min(std::max(args.ns->Rx, args.basic->rin)),
 		mu_magn(0.5 * args.ns->Bx * args.ns->Rx*args.ns->Rx*args.ns->Rx),
 		R_dead(args.ns->Rdead > 0. ? args.ns->Rdead : INFINITY),
-		F_dead(mu_magn*mu_magn / (R_dead*R_dead*R_dead)),
+		F_dead(k_t * xi_pow_minus_7_2 * mu_magn*mu_magn / (R_dead*R_dead*R_dead)),
 		R_cor(std::cbrt(GM() / (4 * M_PI*M_PI * args.ns->freqx*args.ns->freqx))),
-		xi_pow_minus_7_2(std::pow(xi, -3.5)),
 		inverse_beta(args.ns->inversebeta),
 		Fmagn(initialize_Fmagn()),
 		dFmagn_dh(initialize_dFmagn_dh()),
@@ -175,8 +175,7 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	double new_F_in = 0;
 	if (inverse_beta <= 0.) {
 		if (R_m <= R_cor) {
-			const double n_ws = 1 - k_t * xi_pow_minus_7_2 * std::pow(R_m / R_cor, 3);
-			new_F_in = (1 - n_ws) * Mdot_in() * std::sqrt(GM() * R_m);
+			new_F_in = k_t * xi_pow_minus_7_2 * mu_magn*mu_magn / std::pow(R_cor, 3);
 		} else {
 			new_F_in = F_dead * std::pow(R_dead / R_m, 3);
 		}

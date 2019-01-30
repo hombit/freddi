@@ -31,12 +31,12 @@ public:
 	const NeutronStarArguments* args_ns;
 	const double k_t = 1. / 3.;
 	const double xi = 0.7;
+	const double xi_pow_minus_7_2;
 	const double R_m_min;
 	const double mu_magn;
 	const double R_dead;
 	const double F_dead;
 	const double R_cor;
-	const double xi_pow_minus_7_2;
 	const double inverse_beta;
 public:
 	const vecd Fmagn;
