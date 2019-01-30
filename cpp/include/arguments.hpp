@@ -244,17 +244,17 @@ public:
 	constexpr static const double default_Bx = 0.;
 	constexpr static const double default_epsilonAlfven = 1.;
 	constexpr static const double default_inversebeta = 0.;
-	constexpr static const double default_Fdead = 0.;
+	constexpr static const double default_Rdead = 0.;
 public:
 	const double Rx;
 	const double freqx;
 	const double Bx;
 	const double epsilonAlfven;
 	const double inversebeta;
-	const double Fdead;
+	const double Rdead;
 public:
-	NeutronStarArguments(double Rx, double freqx, double Bx, double epsilonAlfven, double inversebeta, double Fdead):
-			Rx(Rx), freqx(freqx), Bx(Bx), epsilonAlfven(epsilonAlfven), inversebeta(inversebeta), Fdead(Fdead) {}
+	NeutronStarArguments(double Rx, double freqx, double Bx, double epsilonAlfven, double inversebeta, double Rdead):
+			Rx(Rx), freqx(freqx), Bx(Bx), epsilonAlfven(epsilonAlfven), inversebeta(inversebeta), Rdead(Rdead) {}
 };
 
 

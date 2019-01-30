@@ -17,7 +17,7 @@ void run_application(int ac, char *av[]) {
 	Options opts(vm);
 	Evolution freddi(opts);
 	FreddiFileOutput output(freddi, vm);
-	for (int i_t = 0; i_t <= static_cast<int>(freddi.state().args.calc->time / freddi.state().args.calc->tau); i_t++) {
+	for (int i_t = 0; i_t <= static_cast<int>(freddi.args().calc->time / freddi.args().calc->tau); i_t++) {
 		output.dump();
 		freddi.step();
 	}

@@ -214,4 +214,4 @@ constexpr const double NeutronStarArguments::default_freqx;
 constexpr const double NeutronStarArguments::default_Bx;
 constexpr const double NeutronStarArguments::default_epsilonAlfven;
 constexpr const double NeutronStarArguments::default_inversebeta;
-constexpr const double NeutronStarArguments::default_Fdead;
+constexpr const double NeutronStarArguments::default_Rdead;

@@ -12,107 +12,140 @@
 #include "orbit.hpp"
 
 
-FreddiState::FreddiState(const FreddiArguments& args_, wunc_t wunc_):
-		args(args_),
-		Nt(static_cast<size_t>(std::round(args_.calc->time / args_.calc->tau))),
-		GM(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * args_.basic->Mx),
-		eta(efficiency_of_accretion(args_.basic->kerr)),
-		cosi(std::cos(args_.flux->inclination / 180 * M_PI)),
-		cosiOverD2(std::cos(args_.flux->inclination / 180 * M_PI) / (args_.flux->distance * args_.flux->distance)),
-		oprel(*args_.disk->oprel.get()),
-		wunc(wunc_),
-		Nx(args_.calc->Nx),
-		last_(args_.calc->Nx - 1),
-		h_(Nx),
-		R_(Nx),
-		F_(Nx),
-		Mdot_out_(args.disk->Mdotout) {
-	initializeGrid();
-	initializeF();
-}
+FreddiState::DiskStructure::DiskStructure(const FreddiArguments &args, const wunc_t& wunc):
+		args(args),
+		Nt(static_cast<size_t>(std::round(args.calc->time / args.calc->tau))),
+		Nx(args.calc->Nx),
+		GM(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * args.basic->Mx),
+		eta(efficiency_of_accretion(args.basic->kerr)),
+		cosi(std::cos(args.flux->inclination / 180 * M_PI)),
+		distance(args.flux->distance),
+		cosiOverD2(cosi / (distance*distance)),
+		oprel(*(args.disk->oprel.get())),
+		h(initialize_h(args, Nx)),
+		R(initialize_R(h, GM)),
+		wunc(wunc) {}
 
-
-void FreddiState::initializeGrid() {
+vecd FreddiState::DiskStructure::initialize_h(const FreddiArguments& args, size_t Nx) {
 	const double h_in = args.basic->h(args.basic->rin);
 	const double h_out = args.basic->h(args.basic->rout);
 
-	for (size_t i = 0; i < Nx; ++i) {
+	vecd h(Nx);
+	for (size_t i = 0; i < Nx; i++) {
 		if (args.calc->gridscale == "log") {
-			h_[i] = h_in * pow(h_out / h_in, i / (Nx - 1.));
+			h[i] = h_in * pow(h_out / h_in, i / (Nx - 1.));
 		} else if (args.calc->gridscale == "linear") {
-			h_[i] = h_in + (h_out - h_in) * i / (Nx - 1.);
+			h[i] = h_in + (h_out - h_in) * i / (Nx - 1.);
 		} else {
 			throw std::logic_error("Wrong gridscale");
 		}
-		R_[i] = h_[i] * h_[i] / GM;
 	}
+	return h;
+}
+
+vecd FreddiState::DiskStructure::initialize_R(const vecd& h, double GM) {
+	vecd R(h.size());
+	for (size_t i = 0; i < h.size(); i++) {
+		R[i] = h[i]*h[i] / GM;
+	}
+	return R;
 }
 
 
-void FreddiState::initializeF() {
-	const double h_in = args.basic->h(args.basic->rin);
-	const double h_out = args.basic->h(args.basic->rout);
+FreddiState::CurrentState::CurrentState(const DiskStructure& str):
+		Mdot_out(str.args.disk->Mdotout),
+		last(str.Nx - 1),
+		F(initializeF(str)) {}
 
-	if (args.disk->initialcond == "power" or args.disk->initialcond == "powerF") {
-		for (size_t i = 0; i < Nx; ++i) {
-			F_[i] = args.disk->F0 * std::pow((h_[i] - h_in) / (h_out - h_in), args.disk->powerorder);
+vecd FreddiState::CurrentState::initializeF(const DiskStructure& str) {
+	const auto& disk = str.args.disk;
+	const auto& h = str.h;
+	const auto& oprel = str.oprel;
+
+	const double h_in = h.front();
+	const double h_out = h.back();
+
+	vecd F(str.Nx);
+
+	if (disk->initialcond == "power" or disk->initialcond == "powerF") {
+		for (size_t i = 0; i < str.Nx; ++i) {
+			F[i] = disk->F0 * std::pow((h[i] - h_in) / (h_out - h_in), disk->powerorder);
 		}
-	} else if (args.disk->initialcond == "powerSigma") {
-		for (size_t i = 0; i < Nx; ++i) {
-			const double Sigma_to_Sigmaout = std::pow((h_[i] - h_in) / (h_out - h_in), args.disk->powerorder);
-			F_[i] = args.disk->F0 * std::pow(h_[i] / h_out, (3. - oprel.n) / (1. - oprel.m)) *
+	} else if (disk->initialcond == "powerSigma") {
+		for (size_t i = 0; i < str.Nx; ++i) {
+			const double Sigma_to_Sigmaout = std::pow((h[i] - h_in) / (h_out - h_in), disk->powerorder);
+			F[i] = disk->F0 * std::pow(h[i] / h_out, (3. - oprel.n) / (1. - oprel.m)) *
 					std::pow(Sigma_to_Sigmaout, 1. / (1. - oprel.m));
 		}
-	} else if (args.disk->initialcond == "sinusF" || args.disk->initialcond == "sinus") {
-		for (size_t i = 0; i < Nx; ++i) {
-			F_[i] = args.disk->F0 * std::sin((h_[i] - h_in) / (h_out - h_in) * M_PI_2);
+	} else if (disk->initialcond == "sinusF" || disk->initialcond == "sinus") {
+		for (size_t i = 0; i < str.Nx; ++i) {
+			F[i] = disk->F0 * std::sin((h[i] - h_in) / (h_out - h_in) * M_PI_2);
 		}
-	} else if (args.disk->initialcond == "quasistat") {
-		for (size_t i = 0; i < Nx; ++i) {
-			const double xi_LS2000 = h_[i] / h_out;
-			F_[i] = args.disk->F0 * oprel.f_F(xi_LS2000) * (1. - h_in / h_[i]) / (1. - h_in / h_out);
+	} else if (disk->initialcond == "quasistat") {
+		for (size_t i = 0; i < str.Nx; ++i) {
+			const double xi_LS2000 = h[i] / h_out;
+			F[i] = disk->F0 * oprel.f_F(xi_LS2000) * (1. - h_in / h[i]) / (1. - h_in / h_out);
 		}
-	} else if (args.disk->initialcond == "gaussF") {
-		for (size_t i = 0; i < Nx; ++i) {
-			const double xi = (h_[i] - h_in) / (h_out - h_in);
-			F_[i] = args.disk->F0 * exp(-(xi - args.disk->gaussmu) * (xi - args.disk->gaussmu) /
-										 (2. * args.disk->gausssigma * args.disk->gausssigma));
+	} else if (disk->initialcond == "gaussF") {
+		for (size_t i = 0; i < str.Nx; ++i) {
+			const double xi = (h[i] - h_in) / (h_out - h_in);
+			F[i] = disk->F0 *
+					std::exp(-(xi - disk->gaussmu)*(xi - disk->gaussmu) / (2. * disk->gausssigma*disk->gausssigma));
 		}
 	} else {
 		throw std::logic_error("Wrong initialcond");
 	}
 
-	if (args.disk->wind == "no") {
-		wind_.reset(new NoWind(this));
-	} else if (args.disk->wind == "SS73C") {
-		wind_.reset(new SS73CWind(this));
-	} else if (args.disk->wind == "Cambier2013") { // Cambier & Smith 1303.6218
-		wind_.reset(new Cambier2013Wind(this));
-	} else if (args.disk->wind == "__testA__") {
-		wind_.reset(new __testA__Wind(this));
-	} else if (args.disk->wind == "__testB__") {
-		wind_.reset(new __testB__Wind(this));
-	} else if (args.disk->wind == "__testC__") {
-		wind_.reset(new __testC__Wind(this));
-	} else if (args.disk->wind == "__testC_q0_Shields1986__") {
-		wind_.reset(new __testC_q0_Shields1986__(this));
+	return F;
+}
+
+
+FreddiState::FreddiState(const FreddiArguments& args, const wunc_t& wunc):
+		 str_(new DiskStructure(args, wunc)),
+		 current_(*str_) {
+	initializeWind();
+}
+
+
+void FreddiState::initializeWind() {
+	if (args().disk->wind == "no") {
+		wind_.reset(static_cast<BasicWind*>(new NoWind(*this)));
+	} else if (args().disk->wind == "SS73C") {
+		wind_.reset(static_cast<BasicWind*>(new SS73CWind(*this)));
+	} else if (args().disk->wind == "Cambier2013") { // Cambier & Smith 1303.6218
+		wind_.reset(static_cast<BasicWind*>(new Cambier2013Wind(*this)));
+	} else if (args().disk->wind == "__testA__") {
+		wind_.reset(static_cast<BasicWind*>(new __testA__Wind(*this)));
+	} else if (args().disk->wind == "__testB__") {
+		wind_.reset(static_cast<BasicWind*>(new __testB__Wind(*this)));
+	} else if (args().disk->wind == "__testC__") {
+		wind_.reset(static_cast<BasicWind*>(new __testC__Wind(*this)));
+	} else if (args().disk->wind == "__testC_q0_Shields1986__") {
+		wind_.reset(static_cast<BasicWind*>(new __testC_q0_Shields1986__(*this)));
 	} else {
 		throw std::logic_error("Wrong wind");
 	}
 }
 
 
+FreddiState::FreddiState(const FreddiState& other):
+		str_(other.str_),
+		current_(other.current_),
+		opt_str_(other.opt_str_),
+		wind_(other.wind_->clone()) {}
+
+
 void FreddiState::step(double tau) {
 	set_Mdot_in_prev();
 	invalidate_disk_optional_structure();
-	i_t_ ++;
-	t_ += tau;
-	wind_->update();
+	current_.i_t ++;
+	current_.t += tau;
+	wind_->update(*this);
 }
 
 
 double FreddiState::Mdot_in() const {
-	return (F_[first_ + 1] - F_[first_]) / (h_[first_ + 1] - h_[first_]);
+	return (F()[first() + 1] - F()[first()]) / (h()[first() + 1] - h()[first()]);
 }
 
 
@@ -125,133 +158,133 @@ double FreddiState::lazy_integrate(boost::optional<double>& x, const vecd& value
 
 
 double FreddiState::Lx() {
-	if (!disk_str_.Lx_) {
-		disk_str_.Lx_ = Luminosity(Tph_X(), args.flux->emin, args.flux->emax) * pow(args.flux->colourfactor, -4);
+	if (!opt_str_.Lx) {
+		opt_str_.Lx = Luminosity(Tph_X(), args().flux->emin, args().flux->emax) * pow(args().flux->colourfactor, -4);
 	}
-	return *disk_str_.Lx_;
+	return *opt_str_.Lx;
 }
 
 
 const vecd& FreddiState::W() {
-	if (!disk_str_.W_) {
-		auto x = wunc(h(), F(), first(), last());
-		x.resize(Nx);
-		disk_str_.W_ = std::move(x);
+	if (!opt_str_.W) {
+		auto x = wunc()(h(), F(), first(), last());
+		x.resize(Nx());
+		opt_str_.W = std::move(x);
 	}
-	return *disk_str_.W_;
+	return *opt_str_.W;
 }
 
 
 const vecd& FreddiState::Sigma() {
-	if (!disk_str_.Sigma_) {
-		vecd x(Nx);
+	if (!opt_str_.Sigma) {
+		vecd x(Nx());
 		const vecd& WW = W();
-		for (size_t i = first_; i <= last_; i++) {
-			x[i] = WW[i] * GM * GM / (4. * M_PI * pow(h_[i], 3.));
+		for (size_t i = first(); i <= last(); i++) {
+			x[i] = WW[i] * GM() * GM() / (4. * M_PI * pow(h()[i], 3.));
 		}
-		disk_str_.Sigma_ = std::move(x);
+		opt_str_.Sigma = std::move(x);
 	}
-	return *disk_str_.Sigma_;
+	return *opt_str_.Sigma;
 }
 
 
 const vecd& FreddiState::Tph() {
-	if (!disk_str_.Tph_) {
-		vecd x(Nx);
+	if (!opt_str_.Tph) {
+		vecd x(Nx());
 		const vecd& Tvis = Tph_vis();
 		const vecd& QxQx = Qx();
-		for (size_t i = first_; i <= last_; i++) {
+		for (size_t i = first(); i <= last(); i++) {
 			x[i] = std::pow(std::pow(Tvis[i], 4) + QxQx[i] / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25);
 		}
-		disk_str_.Tph_ = std::move(x);
+		opt_str_.Tph = std::move(x);
 	}
-	return *disk_str_.Tph_;
+	return *opt_str_.Tph;
 }
 
 
 const vecd& FreddiState::Tirr() {
-	if (!disk_str_.Tirr_) {
-		vecd x(Nx);
+	if (!opt_str_.Tirr) {
+		vecd x(Nx());
 		const vecd& QxQx = Qx();
-		for (size_t i = first_; i <= last_; i++) {
+		for (size_t i = first(); i <= last(); i++) {
 			x[i] = std::pow(QxQx[i] / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25);
 		}
-		disk_str_.Tirr_ = std::move(x);
+		opt_str_.Tirr = std::move(x);
 	}
-	return *disk_str_.Tirr_;
+	return *opt_str_.Tirr;
 }
 
 
 const vecd& FreddiState::Qx() {
-	if (!disk_str_.Qx_) {
-		vecd x(Nx);
+	if (!opt_str_.Qx) {
+		vecd x(Nx());
 		const vecd& CirrCirr = Cirr();
 		const double Mdot = Mdot_in();
-		for (size_t i = first_; i <= last_; i++) {
-			x[i] = (CirrCirr[i] * eta * Mdot * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT
-					/ (4. * M_PI * R_[i] * R_[i]));
+		for (size_t i = first(); i <= last(); i++) {
+			x[i] = (CirrCirr[i] * eta() * Mdot * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT
+					/ (4. * M_PI * R()[i] * R()[i]));
 		}
-		disk_str_.Qx_ = std::move(x);
+		opt_str_.Qx = std::move(x);
 	}
-	return *disk_str_.Qx_;
+	return *opt_str_.Qx;
 }
 
 
 const vecd& FreddiState::Cirr() {
-	if (!disk_str_.Cirr_) {
-		if (args.irr->irrfactortype == "const") {
-			disk_str_.Cirr_ = vecd(Nx, args.irr->Cirr);
-		} else if (args.irr->irrfactortype == "square") {
-			vecd x(Nx);
+	if (!opt_str_.Cirr) {
+		if (args().irr->irrfactortype == "const") {
+			opt_str_.Cirr = vecd(Nx(), args().irr->Cirr);
+		} else if (args().irr->irrfactortype == "square") {
+			vecd x(Nx());
 			const vecd& H = Height();
-			for (size_t i = first_; i <= last_; i++) {
-				x[i] = args.irr->Cirr * (H[i] / R_[i]) * (H[i] / R_[i]);
+			for (size_t i = first(); i <= last(); i++) {
+				x[i] = args().irr->Cirr * (H[i] / R()[i]) * (H[i] / R()[i]);
 			}
-			disk_str_.Cirr_ = std::move(x);
+			opt_str_.Cirr = std::move(x);
 		} else {
 			throw std::logic_error("Wrong irrfactor");
 		}
 	}
-	return *disk_str_.Cirr_;
+	return *opt_str_.Cirr;
 }
 
 
 const vecd& FreddiState::Height() {
-	if (!disk_str_.Height_) {
-		vecd x(Nx);
-		for (size_t i = first_; i <= last_; i++) {
-			x[i] = oprel.Height(R_[i], F_[i]);
+	if (!opt_str_.Height) {
+		vecd x(Nx());
+		for (size_t i = first(); i <= last(); i++) {
+			x[i] = oprel().Height(R()[i], F()[i]);
 		}
-		disk_str_.Height_ = std::move(x);
+		opt_str_.Height = std::move(x);
 	}
-	return *disk_str_.Height_;
+	return *opt_str_.Height;
 }
 
 
 const vecd& FreddiState::Tph_vis() {
-	if (!disk_str_.Tph_vis_) {
-		vecd x(Nx);
-		for (size_t i = first_; i <= last_; i++) {
-			x[i] = (GM * std::pow(h_[i], -1.75)
-					* std::pow(3. / (8. * M_PI) * F_[i] / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25));
+	if (!opt_str_.Tph_vis) {
+		vecd x(Nx());
+		for (size_t i = first(); i <= last(); i++) {
+			x[i] = (GM() * std::pow(h()[i], -1.75)
+					* std::pow(3. / (8. * M_PI) * F()[i] / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25));
 		}
-		disk_str_.Tph_vis_ = std::move(x);
+		opt_str_.Tph_vis = std::move(x);
 	}
-	return *disk_str_.Tph_vis_;
+	return *opt_str_.Tph_vis;
 }
 
 
 const vecd& FreddiState::Tph_X() {
-	if (!disk_str_.Tph_X_) {
-		vecd x(Nx);
-		x[first_] = 0;
-		for (size_t i = first_ + 1; i <= last_; i++) {
-			x[i] = (args.flux->colourfactor * Spectrum::T_GR(R_[i], args.basic->kerr, args.basic->Mx,
-					F_[i] / (h_[i] - h_[first_]), R_[first_]));
+	if (!opt_str_.Tph_X) {
+		vecd x(Nx());
+		x[first()] = 0;
+		for (size_t i = first() + 1; i <= last(); i++) {
+			x[i] = (args().flux->colourfactor * Spectrum::T_GR(R()[i], args().basic->kerr, args().basic->Mx,
+					F()[i] / (h()[i] - h()[first()]), R()[first()]));
 		}
-		disk_str_.Tph_X_ = std::move(x);
+		opt_str_.Tph_X = std::move(x);
 	}
-	return *disk_str_.Tph_X_;
+	return *opt_str_.Tph_X;
 }
 
 
@@ -274,86 +307,87 @@ double FreddiState::Luminosity(const vecd& T, double nu1, double nu2) const {
 }
 
 
-FreddiState::BasicWind::BasicWind(const FreddiState *state):
-		state(state),
-		A_(state->Nx, 0.), B_(state->Nx, 0.), C_(state->Nx, 0.) {}
+FreddiState::BasicWind::BasicWind(const FreddiState &state):
+		A_(state.Nx(), 0.), B_(state.Nx(), 0.), C_(state.Nx(), 0.) {}
 
-FreddiState::SS73CWind::SS73CWind(const FreddiState *state):
+FreddiState::BasicWind::~BasicWind() = default;
+
+FreddiState::SS73CWind::SS73CWind(const FreddiState &state):
 		BasicWind(state) {
 	const double L_edd = 4. * M_PI * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT /
-						 GSL_CONST_CGSM_THOMSON_CROSS_SECTION * state->GM;
+						 GSL_CONST_CGSM_THOMSON_CROSS_SECTION * state.GM();
 	const double Mdot_crit = L_edd / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT *
-			state->eta);
-	for (size_t i = 0; i < state->Nx; ++i) {
-		C_[i] = -Mdot_crit / (2 * M_PI * state->R_.front() * state->R_[i]) *
-				(4 * M_PI * state->h_[i] * state->h_[i] * state->h_[i]) / (state->GM * state->GM);
+			state.eta());
+	for (size_t i = 0; i < state.Nx(); ++i) {
+		C_[i] = -Mdot_crit / (2 * M_PI * state.R().front() * state.R()[i]) *
+				(4 * M_PI * state.h()[i] * state.h()[i] * state.h()[i]) / (state.GM() * state.GM());
 	}
 }
 
-FreddiState::Cambier2013Wind::Cambier2013Wind(const FreddiState *state):
+FreddiState::Cambier2013Wind::Cambier2013Wind(const FreddiState& state):
 		BasicWind(state),
-		kC(state->args.disk->windparams.at(0)),
-		R_IC2out(state->args.disk->windparams.at(1)) {
-	const auto disk = state->args.disk;
-	const double m_ch0 = -kC * disk->Mdot0 / (M_PI * state->R_.back()*state->R_.back());  // dM / dA
+		kC(state.args().disk->windparams.at(0)),
+		R_IC2out(state.args().disk->windparams.at(1)) {
+	const auto disk = state.args().disk;
+	const double m_ch0 = -kC * disk->Mdot0 / (M_PI * state.R().back()*state.R().back());  // dM / dA
 	const double L_edd = 4. * M_PI * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT /
-						 GSL_CONST_CGSM_THOMSON_CROSS_SECTION * state->GM;
-	const double Mdot_crit = L_edd / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * state->eta);
+						 GSL_CONST_CGSM_THOMSON_CROSS_SECTION * state.GM();
+	const double Mdot_crit = L_edd / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * state.eta());
 	const double eta = 0.025 * 33 * disk->Mdot0 / Mdot_crit;
-	const double R_iC = R_IC2out * state->R_.back();
-	for (size_t i = 0; i < state->Nx; ++i) {
-		const double xi = state->R_[i] / R_iC;
-		const double C0 = m_ch0 * (4 * M_PI * state->h_[i]*state->h_[i]*state->h_[i]) / (state->GM*state->GM);
+	const double R_iC = R_IC2out * state.R().back();
+	for (size_t i = 0; i < state.Nx(); ++i) {
+		const double xi = state.R()[i] / R_iC;
+		const double C0 = m_ch0 * (4 * M_PI * state.h()[i]*state.h()[i]*state.h()[i]) / (state.GM()*state.GM());
 		C_[i] = C0 * std::pow((1 + std::pow(0.125 * eta / xi, 2))
 								  / (1 + 1. / (std::pow(eta, 8) * std::pow(1 + 262 * xi * xi, 2))), 1. / 6.)
 					* std::exp(-std::pow(1 - 1. / std::sqrt(1 + 0.25 / (xi * xi)), 2) / (2 * xi));
 	}
 }
 
-FreddiState::__testA__Wind::__testA__Wind(const FreddiState *state):
+FreddiState::__testA__Wind::__testA__Wind(const FreddiState& state):
 		BasicWind(state),
-		kA(state->args.disk->windparams.at(0)) {
-	const double A0 = -kA / ((state->h_.back() - state->h_.front()) * (state->h_.back() - state->h_.front()));
-	for (size_t i = 0; i < state->Nx; ++i) {
-		A_[i] = A0 * (state->h_[i] - state->h_.front());
+		kA(state.args().disk->windparams.at(0)) {
+	const double A0 = -kA / ((state.h().back() - state.h().front()) * (state.h().back() - state.h().front()));
+	for (size_t i = 0; i < state.Nx(); ++i) {
+		A_[i] = A0 * (state.h()[i] - state.h().front());
 	}
 }
 
-FreddiState::__testB__Wind::__testB__Wind(const FreddiState *state):
+FreddiState::__testB__Wind::__testB__Wind(const FreddiState& state):
 		BasicWind(state),
-		kB(state->args.disk->windparams.at(0)) {
-	const double B0 = -kB / ((state->h_.back() - state->h_.front()) * (state->h_.back() - state->h_.front()));
-	for (size_t i = 0; i < state->Nx; ++i) {
+		kB(state.args().disk->windparams.at(0)) {
+	const double B0 = -kB / ((state.h().back() - state.h().front()) * (state.h().back() - state.h().front()));
+	for (size_t i = 0; i < state.Nx(); ++i) {
 		B_[i] = B0;
 	}
 }
 
-FreddiState::__testC__Wind::__testC__Wind(const FreddiState *state):
+FreddiState::__testC__Wind::__testC__Wind(const FreddiState& state):
 		BasicWind(state),
-		kC(state->args.disk->windparams.at(0)) {
-	const double C0 = kC * state->args.disk->Mdotout / (state->h_.back() - state->h_.front());
-	const double h_wind_min = state->h_.back() / 2;
-	for (size_t i = 0; i < state->Nx; ++i) {
-		if (state->h_[i] > h_wind_min) {
+		kC(state.args().disk->windparams.at(0)) {
+	const double C0 = kC * state.args().disk->Mdotout / (state.h().back() - state.h().front());
+	const double h_wind_min = state.h().back() / 2;
+	for (size_t i = 0; i < state.Nx(); ++i) {
+		if (state.h()[i] > h_wind_min) {
 			C_[i] = C0 * 0.5 *
-					(std::cos(2. * M_PI * (state->h_[i] - h_wind_min) / (state->h_.back() - h_wind_min)) - 1);
+					(std::cos(2. * M_PI * (state.h()[i] - h_wind_min) / (state.h().back() - h_wind_min)) - 1);
 		}
 	}
 }
 
-FreddiState::__testC_q0_Shields1986__::__testC_q0_Shields1986__(const FreddiState *state):
+FreddiState::__testC_q0_Shields1986__::__testC_q0_Shields1986__(const FreddiState& state):
 		BasicWind(state),
-		kC(state->args.disk->windparams.at(0)),
-		R_windmin2out(state->args.disk->windparams.at(1)) {}
+		kC(state.args().disk->windparams.at(0)),
+		R_windmin2out(state.args().disk->windparams.at(1)) {}
 
-void FreddiState::__testC_q0_Shields1986__::update() {
-	BasicWind::update();
-	const double h_wind_min = std::sqrt(R_windmin2out) * state->h_.back();
-	for (size_t i = state->first(); i <= state->last(); ++i) {
-		if (state->h_[i] > h_wind_min) {
-			C_[i] = -0.5/M_PI * kC * state->Mdot_in() /
-					(std::log(1 / R_windmin2out) * state->R_[i] * state->R_[i]) *
-					(4 * M_PI * state->h_[i]*state->h_[i]*state->h_[i]) / (state->GM*state->GM);
+void FreddiState::__testC_q0_Shields1986__::update(const FreddiState& state) {
+	BasicWind::update(state);
+	const double h_wind_min = std::sqrt(R_windmin2out) * state.h().back();
+	for (size_t i = state.first(); i <= state.last(); ++i) {
+		if (state.h()[i] > h_wind_min) {
+			C_[i] = -0.5/M_PI * kC * state.Mdot_in() /
+					(std::log(1 / R_windmin2out) * state.R()[i] * state.R()[i]) *
+					(4 * M_PI * state.h()[i]*state.h()[i]*state.h()[i]) / (state.GM()*state.GM());
 		}
 	}
 }

@@ -241,7 +241,7 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 				vm["freqx"].as<double>(),
 				vm["Bx"].as<double>(),
 				vm["epsilonAlfven"].as<double>(),
-				vm["Fdead"].as<double>(),
+				vm["Rdead"].as<double>(),
 				vm["inversebeta"].as<double>()) {}
 
 po::options_description NeutronStarOptions::description() {
@@ -251,7 +251,7 @@ po::options_description NeutronStarOptions::description() {
 			( "freqx", po::value<double>()->default_value(default_freqx), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
 			( "Bx", po::value<double>()->default_value(default_Bx), "Accretor polar magnetic induction, G" )
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Factor in Alfven radius formula" )
-			( "Fdead", po::value<double>()->default_value(default_Fdead), "Minimum viscous torque on inner disk boundary, dyn*cm" )
+			( "Rdead", po::value<double>()->default_value(default_Rdead), "Maximum inner radius of the disk that can be obtained, it characterises minimum torque in the dead disk, cm" )
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "???" )
 			;
 	return od;
