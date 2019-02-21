@@ -1,6 +1,7 @@
 # distutils: language = c++
 # cython: language_level = 3
 
+from typing import Iterable
 from cython.operator cimport dereference
 from libc cimport math
 
@@ -270,8 +271,8 @@ cdef class EvolutionResults:
 
     Parameters
     ----------
-    freddi: Freddi
-        Freddi object to be evolved and prepared
+    states: Iterable of states, e.g. list of Freddi
+        States to be stored as results
 
     Methods
     -------
@@ -282,8 +283,8 @@ cdef class EvolutionResults:
 
     cdef object[:] states
 
-    def __cinit__(self, _BasicFreddi freddi):
-        self.states = np.array(list(freddi), dtype=object)
+    def __cinit__(self, states: Iterable[State]):
+        self.states = np.array(list(states), dtype=object)
 
     def flux(self, lmbd) -> np.ndarray:
         """Optical flux of the disk
