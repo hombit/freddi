@@ -174,6 +174,7 @@ public:
 	inline const FreddiArguments& args() const { return str_->args; }
 	inline const vecd& h() const { return str_->h; }
 	inline const vecd& R() const { return str_->R; }
+	void replaceArgs(const FreddiArguments& args);  // Danger!
 // current_
 public:
 	inline double Mdot_out() const { return current_.Mdot_out; }

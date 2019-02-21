@@ -134,6 +134,11 @@ FreddiState::FreddiState(const FreddiState& other):
 		opt_str_(other.opt_str_),
 		wind_(other.wind_->clone()) {}
 
+void FreddiState::replaceArgs(const FreddiArguments &args) {
+	str_.reset(new DiskStructure(args, wunc()));
+	invalidate_disk_optional_structure();
+}
+
 
 void FreddiState::step(double tau) {
 	set_Mdot_in_prev();

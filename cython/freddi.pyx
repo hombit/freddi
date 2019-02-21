@@ -533,6 +533,7 @@ cdef class _BasicFreddi:
         cdef string c_irrfactortype = self.args.irr.get().irrfactortype if irrfactortype is None else irrfactortype
         cdef SelfIrradiationArguments* irr = new SelfIrradiationArguments(c_Cirr, c_irrfactortype)
         self.args.irr.reset(irr)
+        self._update_args()
 
     @property
     def Cirr(self) -> double:
@@ -543,19 +544,20 @@ cdef class _BasicFreddi:
         self.change_SelfIrradiationArguments(Cirr=val)
 
     cdef void change_DiskStructureArguments(self, opacity=None, Mdotout=None, boundcond=None, Thot=None):
-            cdef string c_opacity = self.args.disk.get().opacity if opacity is None else opacity
-            cdef double c_Mdotout = self.args.disk.get().Mdotout if Mdotout is None else Mdotout
-            cdef string c_boundcond = self.args.disk.get().boundcond if boundcond is None else boundcond
-            cdef double c_Thot = self.args.disk.get().Thot if Thot is None else Thot
-            cdef DiskStructureArguments* disk = new DiskStructureArguments(
-                dereference(self.args.basic.get()),
-                c_opacity, c_Mdotout, c_boundcond, c_Thot,
-                self.args.disk.get().initialcond, self.args.disk.get().F0, self.args.disk.get().powerorder,
-                self.args.disk.get().gaussmu, self.args.disk.get().gausssigma,
-                True, True, self.args.disk.get().Mdisk0, self.args.disk.get().Mdot0,
-                self.args.disk.get().wind, self.args.disk.get().windparams,
-            )
-            self.args.disk.reset(disk)
+        cdef string c_opacity = self.args.disk.get().opacity if opacity is None else opacity
+        cdef double c_Mdotout = self.args.disk.get().Mdotout if Mdotout is None else Mdotout
+        cdef string c_boundcond = self.args.disk.get().boundcond if boundcond is None else boundcond
+        cdef double c_Thot = self.args.disk.get().Thot if Thot is None else Thot
+        cdef DiskStructureArguments* disk = new DiskStructureArguments(
+            dereference(self.args.basic.get()),
+            c_opacity, c_Mdotout, c_boundcond, c_Thot,
+            self.args.disk.get().initialcond, self.args.disk.get().F0, self.args.disk.get().powerorder,
+            self.args.disk.get().gaussmu, self.args.disk.get().gausssigma,
+            True, True, self.args.disk.get().Mdisk0, self.args.disk.get().Mdot0,
+            self.args.disk.get().wind, self.args.disk.get().windparams,
+        )
+        self.args.disk.reset(disk)
+        self._update_args()
 
     @property
     def boundcond(self) -> bytes:
@@ -606,6 +608,9 @@ cdef class _BasicFreddi:
     def __getattr__(self, attr):
         state = self.get_state()
         return getattr(state, attr)
+
+    cdef void _update_args(self):
+        self.evolution.replaceArgs(dereference(self.args))
 
 
 cdef class Freddi(_BasicFreddi):

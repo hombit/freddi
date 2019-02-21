@@ -35,9 +35,10 @@ cdef extern from 'freddi_state.hpp':
         double mI() 
         double mJ() 
         double Mdisk()
+        void replaceArgs(const FreddiArguments&)  # Danger!
 
 cdef extern from 'freddi_evolution.hpp':
-    cdef cppclass FreddiEvolution:
+    cdef cppclass FreddiEvolution(FreddiState):
         FreddiEvolution(const FreddiArguments&) except +
         FreddiEvolution(const FreddiEvolution&)
         void step() except +
