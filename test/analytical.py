@@ -62,7 +62,10 @@ class ShakuraSunyaevSupercriticalTestCase(unittest.TestCase):
             pass
         h = state.h
         F = Mcrit / Rin / (3 * GM) * (h**3 - h[0]**3)
-        assert_allclose(state.F, F, rtol=1e-5)
+        with self.subTest('Viscous torque'):
+            assert_allclose(state.F, F, rtol=1e-5)
+        with self.subTest('Wind rate'):
+            assert_allclose(state.Mdot_wind, Mcrit * (Rout/Rin - 1))
 
 
 class StationaryWindATestCase(unittest.TestCase):
@@ -92,7 +95,10 @@ class StationaryWindATestCase(unittest.TestCase):
         h = state.h
         F = (Mdot * (h[-1] - h[0]) * np.sqrt(np.pi/2/self._k_A0) * np.exp(-self._k_A0/2)
              * scipy.special.erfi(np.sqrt(self._k_A0/2) * (h - h[0]) / (h[-1] - h[0])))
-        assert_allclose(state.F, F, rtol=1e-6)
+        with self.subTest('Viscous torque'):
+            assert_allclose(state.F, F, rtol=1e-6)
+        with self.subTest('Wind rate'):
+            assert_allclose(state.Mdot_wind, Mdot * (1 - np.exp(-self._k_A0/2)))
 
 
 class StationaryWindBTestCase(unittest.TestCase):
@@ -122,7 +128,10 @@ class StationaryWindBTestCase(unittest.TestCase):
         F = (Mdot / np.sqrt(self._k_B0) * (h[-1] - h[0])
              / np.sinh(np.sqrt(self._k_B0))
              * np.sinh((h - h[0]) / (h[-1] - h[0]) * np.sqrt(self._k_B0)))
-        assert_allclose(state.F, F, rtol=1e-3)
+        with self.subTest('Viscous torque'):
+            assert_allclose(state.F, F, rtol=1e-3)
+        with self.subTest('Wind rate'):
+            assert_allclose(state.Mdot_wind, Mdot * (1 - 1 / np.sinh(np.sqrt(self._k_B0))), rtol=1e-4)
 
 
 class StationaryWindCTestCase(unittest.TestCase):
@@ -221,4 +230,7 @@ class ShieldPowerLawWindTestCase(unittest.TestCase):
         F = Mdotin * (h - h[0])
         i = h > h_w
         F[i] += self._k_C * Mdotin * (h[i] * np.log(h[i] / h_w) - (h[i] - h_w)) / np.log(h[-1] / h_w)
-        assert_allclose(state.F, F, rtol=1e-3)
+        with self.subTest('Viscous torque'):
+            assert_allclose(state.F, F, rtol=1e-3)
+        with self.subTest('Wind rate'):
+            assert_allclose(state.Mdot_wind, Mdotout * self._k_C / (1 + self._k_C), rtol=1e-3)

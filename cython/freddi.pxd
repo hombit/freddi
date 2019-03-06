@@ -14,6 +14,7 @@ cdef extern from 'freddi_state.hpp':
         size_t last()
         double Mdot_in()
         double Mdot_out()
+        double Mdot_wind()
         double Lx()
         double t()
         size_t i_t()
