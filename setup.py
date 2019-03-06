@@ -50,6 +50,7 @@ setup(
     description='Compute FRED light curves of LMXBs outbursts',
     ext_modules=extensions,
     install_requires=['numpy'],
+    tests_require=['parameterized'],
     python_requires='>=3.5',
     test_suite='test',
     classifiers=[

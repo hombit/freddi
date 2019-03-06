@@ -2,6 +2,7 @@ import unittest
 
 import numpy as np
 from numpy.testing import assert_allclose
+from parameterized import parameterized
 
 from freddi import Freddi
 
@@ -69,10 +70,9 @@ class ShakuraSunyaevSupercriticalTestCase(unittest.TestCase):
 
 
 class StationaryWindATestCase(unittest.TestCase):
-    _k_A0 = 10.0
-
     @unittest.skipIf(scipy is None, 'No scipy module is available')
-    def test(self):
+    @parameterized.expand([[0.1], [1.], [10.]])
+    def test(self, k_A0):
         """Stationary disk with outflow rate proportional to accretion rate
 
         Outflow rate $d\dot M / dA ~ dF/dh$:
@@ -88,23 +88,22 @@ class StationaryWindATestCase(unittest.TestCase):
 
         """
         Mdot = 1e18
-        fr = Freddi(wind=b'__testA__', windparams=[self._k_A0], Mdotout=Mdot, initialcond=b'sinusF', Mdot0=Mdot,
+        fr = Freddi(wind=b'__testA__', windparams=[k_A0], Mdotout=Mdot, initialcond=b'sinusF', Mdot0=Mdot,
             time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
         for state in fr:
             pass
         h = state.h
-        F = (Mdot * (h[-1] - h[0]) * np.sqrt(np.pi/2/self._k_A0) * np.exp(-self._k_A0/2)
-             * scipy.special.erfi(np.sqrt(self._k_A0/2) * (h - h[0]) / (h[-1] - h[0])))
+        F = (Mdot * (h[-1] - h[0]) * np.sqrt(np.pi/2/k_A0) * np.exp(-k_A0/2)
+             * scipy.special.erfi(np.sqrt(k_A0/2) * (h - h[0]) / (h[-1] - h[0])))
         with self.subTest('Viscous torque'):
             assert_allclose(state.F, F, rtol=1e-6)
         with self.subTest('Wind rate'):
-            assert_allclose(state.Mdot_wind, Mdot * (1 - np.exp(-self._k_A0/2)))
+            assert_allclose(state.Mdot_wind, Mdot * (1 - np.exp(-k_A0/2)))
 
 
 class StationaryWindBTestCase(unittest.TestCase):
-    _k_B0 = 16.0
-
-    def test(self):
+    @parameterized.expand([[16.], [25.], [36.]])
+    def test(self, k_B0):
         """Stationary disk with outflow rate proportional to viscous torque
 
         Outflow rate $d\dot M / dA ~ F$:
@@ -120,25 +119,23 @@ class StationaryWindBTestCase(unittest.TestCase):
 
         """
         Mdot = 1e18
-        fr = Freddi(wind=b'__testB__', windparams=[self._k_B0], Mdotout=Mdot, initialcond=b'sinusF', Mdot0=Mdot,
+        fr = Freddi(wind=b'__testB__', windparams=[k_B0], Mdotout=Mdot, initialcond=b'sinusF', Mdot0=Mdot,
                     time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
         for state in fr:
             pass
         h = state.h
-        F = (Mdot / np.sqrt(self._k_B0) * (h[-1] - h[0])
-             / np.sinh(np.sqrt(self._k_B0))
-             * np.sinh((h - h[0]) / (h[-1] - h[0]) * np.sqrt(self._k_B0)))
+        F = (Mdot / np.sqrt(k_B0) * (h[-1] - h[0])
+             / np.sinh(np.sqrt(k_B0))
+             * np.sinh((h - h[0]) / (h[-1] - h[0]) * np.sqrt(k_B0)))
         with self.subTest('Viscous torque'):
             assert_allclose(state.F, F, rtol=1e-3)
         with self.subTest('Wind rate'):
-            assert_allclose(state.Mdot_wind, Mdot * (1 - 1 / np.sinh(np.sqrt(self._k_B0))), rtol=1e-4)
+            assert_allclose(state.Mdot_wind, Mdot * (1 - 1 / np.sinh(np.sqrt(k_B0))), rtol=1e-4)
 
 
 class StationaryWindCTestCase(unittest.TestCase):
-    _k_hw = 0.5
-    _k_C0 = 3.0
-
-    def test(self):
+    @parameterized.expand([[1.0], [2.0], [3.0]])
+    def test(self, k_C0, k_hw=0.5):
         """Stationary disk with constant outflow rate
 
         Outflow rate $d\dot M / dA$ doesn't depend on F nor dF/dh
@@ -151,13 +148,13 @@ class StationaryWindCTestCase(unittest.TestCase):
 
         """
         Mdot = 1e18
-        fr = Freddi(wind=b'__testC__', windparams=[self._k_C0], Mdotout=Mdot, initialcond=b'sinusF', Mdot0=Mdot,
+        fr = Freddi(wind=b'__testC__', windparams=[k_C0], Mdotout=Mdot, initialcond=b'sinusF', Mdot0=Mdot,
                     time=10000*DAY, tau=10*DAY, gridscale=b'linear')
         for state in fr:
             pass
         h = state.h
-        h_w = self._k_hw * h[-1]
-        C0 = self._k_C0 * Mdot / (h[-1] - h[0])
+        h_w = k_hw * h[-1]
+        C0 = k_C0 * Mdot / (h[-1] - h[0])
         F = (Mdot - C0 / 2 * (h[-1] - h_w)) * (h - h[0])
         i = h >= h_w
         F[i] += C0 / 2 * (
