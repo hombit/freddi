@@ -21,6 +21,9 @@ cdef class State:
 
     cdef FreddiState* cpp_state
 
+    def __init__(self):
+        raise NotImplementedError
+
     def __dealloc__(self):
         del self.cpp_state
 
@@ -411,7 +414,7 @@ cdef class _BasicFreddi:
     cdef FreddiEvolution* evolution
 
     def __cinit__(
-        self, *, bint cgs=True, bytes type=b'Normal',
+        self, *, bint cgs=True,
         double alpha=default_alpha, double Mx=default_Mx, double kerr=default_kerr, double Mopt=default_Mopt,
             double period=default_period, rin=None, rout=None,
         string opacity=default_opacity, double Mdotout=default_Mdotout,
