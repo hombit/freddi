@@ -19,10 +19,9 @@ protected:
 	virtual vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;
 public:
 	FreddiEvolution(const FreddiArguments& args);
-	FreddiEvolution(const FreddiEvolution&) = default;
+	FreddiEvolution(const FreddiEvolution&) = delete;
 	virtual void step(double tau);
 	inline void step() { return step(args().calc->tau); }
-	inline const FreddiState& state() { return static_cast<FreddiState&>(*this); }
 };
 
 
@@ -55,7 +54,7 @@ protected:
 	virtual vecd windC() const override;
 public:
 	FreddiNeutronStarEvolution(const FreddiNeutronStarArguments& args);
-	FreddiNeutronStarEvolution(const FreddiNeutronStarEvolution&) = default;
+	FreddiNeutronStarEvolution(const FreddiNeutronStarEvolution&) = delete;
 };
 
 

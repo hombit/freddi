@@ -40,13 +40,10 @@ cdef extern from 'freddi_state.hpp':
 cdef extern from 'freddi_evolution.hpp':
     cdef cppclass FreddiEvolution(FreddiState):
         FreddiEvolution(const FreddiArguments&) except +
-        FreddiEvolution(const FreddiEvolution&)
         void step() except +
         void step(double) except +
-        FreddiState& state()
     cdef cppclass FreddiNeutronStarEvolution:
         FreddiNeutronStarEvolution(const FreddiNeutronStarArguments&) except +
-        FreddiNeutronStarEvolution(const FreddiNeutronStarEvolution&)
         const vector[double] Fmagn
         const vector[double] dFmagn_dh
         const vector[double] d2Fmagn_dh2

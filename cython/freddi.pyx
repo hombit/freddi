@@ -475,7 +475,6 @@ cdef class _BasicFreddi:
 
     def __dealloc__(self):
         del self.args
-        del self.evolution
 
     @classmethod
     def alt(cls, **kwargs):
@@ -532,7 +531,7 @@ cdef class _BasicFreddi:
 
     @property
     def Nt(self) -> int:
-        return self.evolution.state().Nt()
+        return self.evolution.Nt()
 
     cdef void change_SelfIrradiationArguments(self, Cirr=None, irrfactortype=None):
         cdef double c_Cirr = self.args.irr.get().Cirr if Cirr is None else Cirr
@@ -581,8 +580,10 @@ cdef class _BasicFreddi:
     def Thot(self, val: double) -> None:
         self.change_DiskStructureArguments(opacity=None, Mdotout=None, boundcond=None, Thot=val)
 
-    def get_state(self):
-        raise NotImplementedError
+    cpdef State get_state(self, bint shadow=False):
+        cdef State state = State.__new__(State)
+        state.cpp_state = new FreddiState(dereference(self.evolution))
+        return state
 
     def __iter__(self) -> State:
         """Iterate disk over time
@@ -625,10 +626,8 @@ cdef class Freddi(_BasicFreddi):
     def __cinit__(self, **kwargs):
         self.evolution = new FreddiEvolution(dereference(self.args))
 
-    cpdef State get_state(self):
-        cdef State state = State.__new__(State)
-        state.cpp_state = <FreddiState*> new FreddiEvolution(dereference(self.evolution))
-        return state
+    def __dealloc__(self):
+        del self.evolution
 
 
 cdef class FreddiNeutronStar(_BasicFreddi):
@@ -651,10 +650,8 @@ cdef class FreddiNeutronStar(_BasicFreddi):
         self.ns_evolution = new FreddiNeutronStarEvolution(dereference(ns_args))
         self.evolution = <FreddiEvolution*> self.ns_evolution
 
-    cpdef State get_state(self, bint shadow=False):
-        cdef State state = State.__new__(State)
-        state.cpp_state = <FreddiState*> new FreddiNeutronStarEvolution(dereference(self.ns_evolution))
-        return state
+    def __dealloc__(self):
+        del self.ns_evolution
 
     @property
     def Fmagn(self) -> np.ndarray[np.float]:
