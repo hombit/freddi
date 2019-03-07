@@ -21,6 +21,9 @@ cdef class State:
 
     cdef FreddiState* cpp_state
 
+    def __dealloc__(self):
+        del self.cpp_state
+
     @property
     def Mdot_in(self) -> double:
        return self.cpp_state.Mdot_in()
