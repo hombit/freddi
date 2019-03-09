@@ -14,6 +14,8 @@ RUN mkdir -p ${BUILD} &&\
     cmake ${SOURCE} -DSTATIC_LINKING=TRUE &&\
     make install
 
+RUN make test
+
 
 FROM alpine
 

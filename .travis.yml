@@ -146,7 +146,6 @@ matrix:
       install:
         - docker build -f Dockerfile -t freddi:exe-travis .
       script:
-        - docker run --rm -t --entrypoint="make test" freddi:exe-travis
         - docker run --rm -t freddi:exe-travis
         - docker run --rm -t --entrypoint="/bin/freddi-ns" freddi:exe-travis
     - name: "Python Wheel in Docker"
