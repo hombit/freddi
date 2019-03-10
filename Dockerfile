@@ -7,12 +7,13 @@ ENV BUILD "/tmp/build"
 RUN apt-get update &&\
     apt-get install -y ${PACKAGES}
 
+RUN mkdir -p ${BUILD}
+WORKDIR ${BUILD}
+
 COPY ./ ${SOURCE}/
 
-RUN mkdir -p ${BUILD} &&\
-    cd ${BUILD} &&\
-    cmake ${SOURCE} -DSTATIC_LINKING=TRUE &&\
-    make install
+RUN cmake ${SOURCE} -DSTATIC_LINKING=TRUE &&\
+    make install -j
 
 RUN make test
 
