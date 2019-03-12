@@ -102,6 +102,19 @@ private:
 		virtual void update(const FreddiState&) override;
 	};
 
+	class __Unstedy_Test_Hunter__: public BasicWind {
+	private:
+		// windparams
+		const double fXI;
+		const double T_iC;
+	public:
+		explicit __Unstedy_Test_Hunter__(const FreddiState& state);
+		~__Unstedy_Test_Hunter__() override = default;
+		__Unstedy_Test_Hunter__(const __Unstedy_Test_Hunter__&) = default;
+		virtual __Unstedy_Test_Hunter__* clone() const override { return new __Unstedy_Test_Hunter__(*this); }
+		virtual void update(const FreddiState&) override;
+	};
+
 	class DiskStructure {
 	public:
 		FreddiArguments args;

@@ -122,6 +122,8 @@ void FreddiState::initializeWind() {
 		wind_.reset(static_cast<BasicWind*>(new __testC__Wind(*this)));
 	} else if (args().disk->wind == "__testC_q0_Shields1986__") {
 		wind_.reset(static_cast<BasicWind*>(new __testC_q0_Shields1986__(*this)));
+    } else if (args().disk->wind == "__Unstedy_Test_Hunter__") {
+        wind_.reset(static_cast<BasicWind*>(new __Unstedy_Test_Hunter__(*this)));
 	} else {
 		throw std::logic_error("Wrong wind");
 	}
@@ -307,6 +309,7 @@ double FreddiState::Luminosity(const vecd& T, double nu1, double nu2) const {
 }
 
 
+
 FreddiState::BasicWind::BasicWind(const FreddiState &state):
 		A_(state.Nx(), 0.), B_(state.Nx(), 0.), C_(state.Nx(), 0.) {}
 
@@ -390,4 +393,38 @@ void FreddiState::__testC_q0_Shields1986__::update(const FreddiState& state) {
 					(4 * M_PI * state.h()[i]*state.h()[i]*state.h()[i]) / (state.GM()*state.GM());
 		}
 	}
+}
+FreddiState::__Unstedy_Test_Hunter__::__Unstedy_Test_Hunter__(const FreddiState& state):
+        BasicWind(state),
+		fXI(state.args().disk->windparams.at(0)),
+        T_iC(state.args().disk->windparams.at(1)) {}
+
+void FreddiState::__Unstedy_Test_Hunter__::update(const FreddiState& state) {
+    BasicWind::update(state);
+    const auto disk = state.args().disk;
+    //  1983ApJ...271...70B page 4
+    const double L = state.Mdot_in() * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * state.eta();
+    //  1983ApJ...271...70B page 3
+    const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_iC);
+	const double P_0 = fXI*L/(4 * M_PI * GSL_CONST_CGSM_SPEED_OF_LIGHT * R_iC * R_iC);
+	const double C_ch = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_iC)/(disk->mu * GSL_CONST_CGSM_MASS_PROTON));
+	const double m_ch0 = P_0/C_ch;
+    //const double m_ch0 = disk->Mdot0 / (M_PI * state.R().back()*state.R().back());
+    const double L_edd = (4.0 * M_PI * state.GM()* 2.0 * disk->mu * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION);
+    const double L_crit = 0.03 * std::sqrt(1e8/T_iC) * L_edd;
+	const double el = L/L_crit;
+
+	std::cerr << L << "\t" << L_crit << "\t" << T_iC << "\t" << R_iC  << "\t" << L_edd << "\t" << C_ch << "\t" << m_ch0 << std::endl;
+
+	for (size_t i = state.first(); i <= state.last(); ++i) {
+        //  1986ApJ...306...90S page 2
+        if (state.R()[i] > 0.1*R_iC) {
+            const double xi = state.R()[i] / R_iC;
+            const double C0 = (4 * M_PI * state.h()[i]*state.h()[i]*state.h()[i]) / (state.GM()*state.GM());
+            //  1986ApJ...306...90S appendix B page 16
+            const double y = std::sqrt(1 + 1/(4*xi*xi) + ((xi*xi)/(1 + xi*xi))*((1.2*xi/(xi + el) + 2.2/(1 + el*el*xi))*(1.2*xi/(xi + el) + 2.2/(1 + el*el*xi))));
+            const double Mach_cc = std::pow(((1 + (el + 1)/xi)/(1 + 1/((1 + xi*xi)*el*el*el*el))) , 1/3);
+			const double p_po = 0.5 * std::exp(-(((1 - 1/y)*(1 - 1/y))/(2*xi)));
+			C_[i] = -2.0 * C0 * m_ch0 * Mach_cc * p_po * y * y * std::pow(xi, -5/3);		}
+    }
 }
