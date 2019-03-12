@@ -150,15 +150,6 @@ double FreddiState::Mdot_in() const {
 	return (F()[first() + 1] - F()[first()]) / (h()[first() + 1] - h()[first()]);
 }
 
-
-double FreddiState::lazy_integrate(boost::optional<double>& x, const vecd& values) {
-	if (!x) {
-		x = integrate(values);
-	}
-	return *x;
-}
-
-
 double FreddiState::Lx() {
 	if (!opt_str_.Lx) {
 		opt_str_.Lx = Luminosity(Tph_X(), args().flux->emin, args().flux->emax) * pow(args().flux->colourfactor, -4);
@@ -305,7 +296,31 @@ double FreddiState::I_lambda(const double lambda) {
 
 
 double FreddiState::Luminosity(const vecd& T, double nu1, double nu2) const {
-	return 2. * M_PI * integrate([&T, nu1, nu2](const size_t i) -> double { return Spectrum::Planck_nu1_nu2(T[i], nu1, nu2, 1e-4); });
+	return 2. * M_PI * integrate(
+			[&T, nu1, nu2](const size_t i) -> double { return Spectrum::Planck_nu1_nu2(T[i], nu1, nu2, 1e-4); }
+	);
+}
+
+
+double FreddiState::Mdot_wind() {
+	auto dMdot_dh = [this](const size_t i) -> double {
+		double dFdh;
+		if (i == first()) {
+			dFdh = (F()[i+1] - F()[i]) / (h()[i+1] - h()[i]);
+		} else if (i == last()) {
+			dFdh = (F()[i] - F()[i-1]) / (h()[i] - h()[i-1]);
+		} else {
+			const double delta_0 = h()[i] - h()[i-1];
+			const double delta_1 = h()[i+1] - h()[i];
+			dFdh = (F()[i+1] * delta_0 * delta_0 / (delta_0 + delta_1) +
+					F()[i] * (delta_1 - delta_0) -
+					F()[i-1] * delta_1 * delta_1 / (delta_0 + delta_1)) /
+					(delta_0 * delta_1);
+		}
+		// Wind loss rate sign is opposite disk loss rate sign, e.g. usually it should be positive
+		return -(windA()[i] * dFdh + windB()[i] * F()[i] + windC()[i]);
+	};
+	return lazy_integrate(opt_str_.Mdot_wind, h(), dMdot_dh);
 }
 
 

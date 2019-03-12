@@ -33,6 +33,10 @@ cdef class State:
         return self.cpp_state.Mdot_out()
 
     @property
+    def Mdot_wind(self) -> double:
+        return self.cpp_state.Mdot_wind()
+
+    @property
     def Lx(self) -> double:
         return self.cpp_state.Lx()
         

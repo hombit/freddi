@@ -155,6 +155,7 @@ private:
 	struct DiskOptionalStructure {
 		boost::optional<double> Mdisk;
 		boost::optional<double> Lx;
+		boost::optional<double> Mdot_wind;
 		boost::optional<double> mU, mB, mV, mR, mI, mJ;
 		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Cirr, Sigma, Height;
 	};
@@ -209,8 +210,23 @@ protected:
 // opt_str_
 protected:
 	inline void invalidate_disk_optional_structure() { opt_str_ = DiskOptionalStructure(); };
+public:
+	template<typename T> double integrate(const vecd& x, T values) const { return trapz(x, values, first(), last()); }
+	template<typename T> double integrate(T values) const { return disk_radial_trapz(R(), values, first(), last()); }
+protected:
 	double lazy_magnitude(boost::optional<double>& m, double lambda, double F0);
-	double lazy_integrate(boost::optional<double>& x, const vecd& values);
+	template<typename T> double lazy_integrate(boost::optional<double> &opt, const vecd& x, T values) {
+		if (!opt) {
+			opt = integrate(x, values);
+		}
+		return *opt;
+	}
+	template<typename T> double lazy_integrate(boost::optional<double>& opt, T values) {
+		if (!opt) {
+			opt = integrate(values);
+		}
+		return *opt;
+	}
 	const vecd& Tph_X();
 	const vecd& Qx();
 public:
@@ -236,9 +252,8 @@ public:
 	inline double mR() { return lazy_magnitude(opt_str_.mR, lambdaR, irr0R); }
 	inline double mI() { return lazy_magnitude(opt_str_.mI, lambdaI, irr0I); }
 	inline double mJ() { return lazy_magnitude(opt_str_.mJ, lambdaJ, irr0J); }
-	inline double integrate(const vecd& values) const { return disk_radial_trapz(R(), values, first(), last()); }
-	inline double integrate(std::function<double (size_t)> f) const { return disk_radial_trapz(R(), f, first(), last()); }
 	inline double Mdisk() { return lazy_integrate(opt_str_.Mdisk, Sigma()); }
+	double Mdot_wind();
 };
 
 #endif //FREDDI_FREDDI_STATE_HPP
