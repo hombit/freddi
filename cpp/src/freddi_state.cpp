@@ -412,7 +412,9 @@ void FreddiState::__testC_q0_Shields1986__::update(const FreddiState& state) {
 FreddiState::__Unstedy_Test_Hunter__::__Unstedy_Test_Hunter__(const FreddiState& state):
         BasicWind(state),
 		fXI(state.args().disk->windparams.at(0)),
-        T_iC(state.args().disk->windparams.at(1)) {}
+        T_iC(state.args().disk->windparams.at(1)) {
+	update(state);
+}
 
 void FreddiState::__Unstedy_Test_Hunter__::update(const FreddiState& state) {
     BasicWind::update(state);

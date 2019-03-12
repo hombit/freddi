@@ -26,6 +26,9 @@ private:
 		inline const vecd& A() const { return A_; }
 		inline const vecd& B() const { return B_; }
 		inline const vecd& C() const { return C_; }
+
+
+
 	};
 
 	class NoWind: public BasicWind {
