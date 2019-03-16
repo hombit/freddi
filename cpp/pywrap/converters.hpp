@@ -1,0 +1,8 @@
+#ifndef FREDDI_PYTHON_CONVERTERS_HPP
+#define FREDDI_PYTHON_CONVERTERS_HPP
+
+
+void register_converters();
+
+
+#endif //FREDDI_PYTHON_CONVERTERS_HPP

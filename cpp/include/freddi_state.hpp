@@ -153,7 +153,7 @@ protected:
 	std::unique_ptr<BasicWind> wind_;
 public:
 	FreddiState(const FreddiArguments& args, const wunc_t& wunc);
-	FreddiState(const FreddiState&);
+	explicit FreddiState(const FreddiState&);
 	FreddiState(FreddiState&&) = delete;
 	FreddiState& operator=(const FreddiState&) = delete;
 	FreddiState& operator=(FreddiState&&) = delete;
@@ -174,6 +174,7 @@ public:
 	inline const FreddiArguments& args() const { return str_->args; }
 	inline const vecd& h() const { return str_->h; }
 	inline const vecd& R() const { return str_->R; }
+	inline const vecd& lambdas() const { return str_->args.flux->lambdas; }
 	void replaceArgs(const FreddiArguments& args);  // Danger!
 // current_
 public:

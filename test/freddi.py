@@ -4,6 +4,7 @@ from freddi import Freddi
 
 
 class ChangeArgsTestCase(unittest.TestCase):
+    @unittest.skip('Changing arguments is not supported any more')
     def test_Cirr(self):
         fr = Freddi(Cirr=1e-3)
         self.assertGreater(fr.last_Tirr, 0)

@@ -1,0 +1,6 @@
+#ifndef FREDDI_PYTHON_EVOLUTION_HPP
+#define FREDDI_PYTHON_EVOLUTION_HPP
+
+void wrap_evolution();
+
+#endif //FREDDI_PYTHON_EVOLUTION_HPP

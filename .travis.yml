@@ -39,6 +39,7 @@ matrix:
       addons:
         apt:
           packages:
+            - cmake
             - libboost-all-dev
       install:
         - pip install numpy scipy
@@ -57,6 +58,7 @@ matrix:
       addons:
         apt:
           packages:
+            - cmake
             - libboost-all-dev
       install:
         - pip install numpy scipy
@@ -75,6 +77,7 @@ matrix:
       addons:
         apt:
           packages:
+            - cmake
             - libboost-all-dev
       install:
         - pip install numpy scipy
@@ -91,6 +94,7 @@ matrix:
         - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg
         - sudo installer -pkg /tmp/Python.pkg -target /
       install:
+        - brew install cmake
         - pip3 install numpy scipy
         - python3 setup.py install
       script:
@@ -106,6 +110,7 @@ matrix:
         - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.7.2/python-3.7.2-macosx10.9.pkg
         - sudo installer -pkg /tmp/Python.pkg -target /
       install:
+        - brew install cmake
         - pip3 install numpy scipy
         - python3 setup.py install
       script:
@@ -123,6 +128,7 @@ matrix:
       addons:
         apt:
           packages:
+            - cmake
             - libopenblas-dev
             - liblapack-dev
             - libboost-all-dev

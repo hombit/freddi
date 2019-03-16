@@ -1,43 +1,57 @@
 #!/usr/bin/env python
 
 import os
-from glob import glob
-from sys import argv
+import pathlib
 
-import numpy as np
 from setuptools import setup, Extension
+from setuptools.command.build_ext import build_ext
 
 
-try:
-    argv.remove('--cython')
-    USE_CYTHON = True
-except ValueError:
-    USE_CYTHON = False
+# https://stackoverflow.com/questions/42585210/extending-setuptools-extension-to-use-cmake-in-setup-py
+class CMakeExtension(Extension):
+    def __init__(self, name):
+        super().__init__(name, sources=[])
 
-ext = '.pyx' if USE_CYTHON else '.cpp'
-cython_source = 'cython/freddi' + ext
 
-cpp_source = ('arguments.cpp',
-              'opacity_related.cpp',
-              'freddi_evolution.cpp',
-              'freddi_state.cpp',
-              'spectrum.cpp',
-              'nonlinear_diffusion.cpp',
-              'orbit.cpp',
-              'util.cpp')
-cpp_source = [os.path.join('cpp/src', f) for f in cpp_source]
+class BuildExt(build_ext):
+    def run(self):
+        for ext in self.extensions:
+            self.build_cmake(ext)
+        super().run()
 
-extensions = [
-    Extension('freddi',
-              cpp_source + [cython_source],
-              extra_compile_args=['-std=c++11'],
-              extra_link_args=["-std=c++11"],
-              include_dirs=['cpp/include', np.get_include()],)
-]
+    def build_cmake(self, ext):
+        cwd = pathlib.Path().absolute()
 
-if USE_CYTHON:
-    from Cython.Build import cythonize
-    extensions = cythonize(extensions, annotate=True, force=True)
+        # these dirs will be created in build_py, so if you don't have
+        # any python sources to bundle, the dirs will be missing
+        build_temp = pathlib.Path(self.build_temp)
+        build_temp.mkdir(parents=True, exist_ok=True)
+        extpath = pathlib.Path(self.get_ext_fullpath(ext.name))
+        extname, extsuffix = os.path.splitext(extpath.name)
+        extpath.parent.mkdir(parents=True, exist_ok=True)
+        target = ext.name.split('.')[-1]
+
+        # example of cmake args
+        config = 'Debug' if self.debug else 'Release'
+        cmake_args = [
+            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(extpath.parent.absolute()),
+            '-DMODULE_OUTPUT_NAME={}'.format(extname),
+            '-DMODULE_OUTPUT_SUFFIX={}'.format(extsuffix),
+            '-DCMAKE_BUILD_TYPE={}'.format(config)
+        ]
+
+        # example of build args
+        build_args = [
+            '--config', config,
+            '--target', target,
+            '--', '-j4',
+        ]
+
+        os.chdir(build_temp)
+        self.spawn(['cmake', str(cwd)] + cmake_args)
+        if not self.dry_run:
+            self.spawn(['cmake', '--build', '.'] + build_args)
+        os.chdir(cwd)
 
 
 setup(
@@ -48,7 +62,10 @@ setup(
     author='Konstantin Malanchev',
     author_email='malanchev@sai.msu.ru',
     description='Compute FRED light curves of LMXBs outbursts',
-    ext_modules=extensions,
+    ext_modules=[CMakeExtension('freddi._freddi')],
+    package_dir={'': 'python'},
+    packages=['freddi'],
+    cmdclass={'build_ext': BuildExt},
     install_requires=['numpy'],
     python_requires='>=3.5',
     test_suite='test',

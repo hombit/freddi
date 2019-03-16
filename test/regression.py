@@ -38,9 +38,12 @@ class RegressionTestCase(unittest.TestCase):
         if isinstance(value, tuple):
             return [self.convert_config_value(v) for v in value]
         try:
-            return float(value)
+            return int(value)
         except ValueError:
-            return value.encode()
+            try:
+                return float(value)
+            except ValueError:
+                return value.encode()
 
     def load_config(self, data_file, arguments_to_remove=()):
         section = 'section'
@@ -59,7 +62,7 @@ class RegressionTestCase(unittest.TestCase):
             config[name] = self.convert_config_value(value)
         if 'lambda' in config:
             config['lambdas'] = config.pop('lambda')
-        config['cgs'] = False
+        config['__cgs'] = False
         return config
 
     def test(self):

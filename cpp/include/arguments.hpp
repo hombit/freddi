@@ -76,6 +76,7 @@ public:
 			Mx(Mx), kerr(kerr),
 			Mopt(Mopt), period(period),
 			rin(rin), rout(rout) {}
+	BasicDiskBinaryArguments(const BasicDiskBinaryArguments&) = default;
 	BasicDiskBinaryArguments(BasicDiskBinaryArguments&&) = default;
 	static inline double rinFromMxKerr(double Mx, double kerr) { return rISCO(Mx, kerr); }
 	static inline double routFromMxMoptPeriod(double Mx, double Mopt, double period) {
@@ -138,7 +139,7 @@ public:
 	const double Mdot0;
 	const bool is_Mdisk0_specified;
 	const bool is_Mdot0_specified;
-	std::unique_ptr<const OpacityRelated> oprel;
+	std::shared_ptr<const OpacityRelated> oprel;
 	const double F0;
 protected:
 	double F0Initializer(double F0_, const BasicDiskBinaryArguments& bdb_args);
@@ -153,6 +154,7 @@ public:
 			bool is_Mdisk0_specified, bool is_Mdot0_specified,
 			double Mdisk0, double Mdot0,
 			const std::string& wind, const std::vector<double>& windparams);
+	DiskStructureArguments(const DiskStructureArguments&) = default;
 };
 
 
