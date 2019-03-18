@@ -8,20 +8,24 @@ matrix:
       addons:
         apt:
           packages:
-            - libboost-all-dev
             - cmake
+            - g++
+      before_install:
+        - sudo bash .ci/install-boost.sh 69
       install:
         - mkdir cmake-build
         - cd cmake-build
-        - cmake ..
+        - cmake --target ..
         - make VERBOSE=1
         - sudo make install VERBOSE=1
       script:
         - freddi
         - freddi-ns
-    - name: "C++ on MacOS"
+    - name: "C++ on macOS"
       os: osx
       language: cpp
+      before_install:
+        - brew install cmake boost
       install:
         - mkdir cmake-build
         - cd cmake-build
@@ -42,7 +46,7 @@ matrix:
             - cmake
             - g++
       before_install:
-        - bash .ci/install-boost.sh 69
+        - sudo bash .ci/install-boost.sh 69
       install:
         - pip install numpy scipy
         - python setup.py install
@@ -63,7 +67,7 @@ matrix:
             - cmake
             - g++
       before_install:
-        - bash .ci/install-boost.sh 69
+        - sudo bash .ci/install-boost.sh 69
       install:
         - pip install numpy scipy
         - python setup.py install
@@ -84,7 +88,7 @@ matrix:
             - cmake
             - g++
       before_install:
-        - bash .ci/install-boost.sh 69
+        - sudo bash .ci/install-boost.sh 69
       install:
         - pip install numpy scipy
         - python setup.py install
@@ -93,12 +97,13 @@ matrix:
         - python setup.py test
       before_deploy:
         - python setup.py bdist_wheel
-    - name: "Python 3.6 on MacOS"
+    - name: "Python 3.6 on macOS"
       os: osx
       language: c++
       before_install:
         - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg
         - sudo installer -pkg /tmp/Python.pkg -target /
+        - brew install cmake boost
       install:
         - brew install cmake
         - pip3 install numpy scipy
@@ -109,12 +114,13 @@ matrix:
       before_deploy:
         - pip3 install wheel
         - python3 setup.py bdist_wheel
-    - name: "Python 3.7 on MacOS"
+    - name: "Python 3.7 on macOS"
       os: osx
       language: c++
       before_install:
         - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.7.2/python-3.7.2-macosx10.9.pkg
         - sudo installer -pkg /tmp/Python.pkg -target /
+        - brew install cmake boost
       install:
         - brew install cmake
         - pip3 install numpy scipy
@@ -141,7 +147,7 @@ matrix:
       cache:
         - pip
       before_install:
-        - bash .ci/install-boost.sh 69
+        - sudo bash .ci/install-boost.sh 69
       install:
         - pip install numpy scipy
         - python setup.py install
