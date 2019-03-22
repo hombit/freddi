@@ -9,5 +9,5 @@ curl -LOJ https://dl.bintray.com/boostorg/release/${BOOST_DOT_VERSION}/source/bo
 tar --gzip -xf boost_${BOOST_VERSION}.tar.gz
 cd boost_${BOOST_VERSION}
 ./bootstrap.sh --with-libraries=program_options,python --with-python=python3
+./b2 link=shared,static
 ./b2 install
-
