@@ -46,7 +46,7 @@ matrix:
         - pip install cmake numpy
         - sudo bash .ci/install-boost.sh 69
       install:
-        - pip install scipy
+#        - pip install scipy
         - python setup.py install
       script:
         - python -c "import freddi"
@@ -67,7 +67,7 @@ matrix:
         - pip install cmake numpy
         - sudo bash .ci/install-boost.sh 69
       install:
-        - pip install scipy
+#        - pip install scipy
         - python setup.py install
       script:
         - python -c "import freddi"
@@ -88,7 +88,7 @@ matrix:
         - pip install cmake numpy
         - sudo bash .ci/install-boost.sh 69
       install:
-        - pip install scipy
+#        - pip install scipy
         - python setup.py install
       script:
         - python -c "import freddi"
