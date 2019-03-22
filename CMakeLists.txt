@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.1)
 project(freddi)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -8,6 +8,7 @@ include_directories("${PROJECT_SOURCE_DIR}/cpp/include")
 
 function(CREATE_EXE targ)
     set(TARGET freddi${targ}-exe)
+    set(EXE freddi${targ})
 
     set(STATIC_LINKING FALSE CACHE BOOL "Build a static binary?")
     if(STATIC_LINKING)
@@ -17,6 +18,7 @@ function(CREATE_EXE targ)
 
     file(GLOB_RECURSE SOURCES cpp/main${targ}.cpp cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
     add_executable(${TARGET} ${SOURCES})
+    set_property(TARGET ${TARGET} PROPERTY OUTPUT_NAME ${EXE})
 
     find_package(Boost 1.57.0 COMPONENTS program_options REQUIRED)
     target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIR})
