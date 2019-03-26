@@ -7,15 +7,17 @@ ENV BUILD "/tmp/build"
 RUN apt-get update &&\
     apt-get install -y ${PACKAGES}
 
-COPY ./ ${SOURCE}/
+COPY CMakeLists.txt freddi.ini ${SOURCE}/
+COPY cpp ${SOURCE}/cpp
 
 RUN mkdir -p ${BUILD} &&\
     cd ${BUILD} &&\
-    cmake ${SOURCE} -DSTATIC_LINKING=TRUE &&\
-    make install
+    cmake ${SOURCE} -DSTATIC_LINKING=TRUE -DNO_PYTHON_MODULE=TRUE &&\
+    make install VERBOSE=1
 
 
-FROM alpine
+
+FROM ubuntu:18.04
 
 LABEL maintainer="Konstantin Malanchev <malanchev@sai.msu.ru>"
 
