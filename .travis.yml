@@ -99,9 +99,9 @@ matrix:
       os: osx
       language: c++
       before_install:
+        - brew install boost-python3
         - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg
         - sudo installer -pkg /tmp/Python.pkg -target /
-        - brew install boost-python3
       install:
         - pip3 install numpy scipy
         - python3 setup.py install
@@ -115,9 +115,9 @@ matrix:
       os: osx
       language: c++
       before_install:
+        - brew install boost-python3
         - curl -LJ -o/tmp/Python.pkg https://www.python.org/ftp/python/3.7.2/python-3.7.2-macosx10.9.pkg
         - sudo installer -pkg /tmp/Python.pkg -target /
-        - brew install boost-python3
       install:
         - pip3 install numpy scipy
         - python3 setup.py install
