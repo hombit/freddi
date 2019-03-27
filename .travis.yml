@@ -12,10 +12,11 @@ matrix:
             - g++
       before_install:
         - sudo bash .ci/install-boost.sh 69
+        - sudo ldconfig
       install:
         - mkdir cmake-build
         - cd cmake-build
-        - cmake --target ..
+        - cmake ..
         - make VERBOSE=1
         - sudo make install VERBOSE=1
       script:
@@ -45,6 +46,7 @@ matrix:
       before_install:
         - pip install cmake numpy
         - sudo bash .ci/install-boost.sh 69
+        - sudo ldconfig
       install:
         - pip install scipy
         - python setup.py install
@@ -66,6 +68,7 @@ matrix:
       before_install:
         - pip install cmake numpy
         - sudo bash .ci/install-boost.sh 69
+        - sudo ldconfig
       install:
         - pip install scipy
         - python setup.py install
@@ -87,6 +90,7 @@ matrix:
       before_install:
         - pip install cmake numpy
         - sudo bash .ci/install-boost.sh 69
+        - sudo ldconfig
       install:
         - pip install scipy
         - python setup.py install
@@ -144,6 +148,7 @@ matrix:
       before_install:
         - pip install cmake numpy
         - sudo bash .ci/install-boost.sh 69
+        - sudo ldconfig
       install:
         - pip install scipy
         - python setup.py install
