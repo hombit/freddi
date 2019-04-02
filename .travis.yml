@@ -44,9 +44,10 @@ matrix:
           packages:
             - g++
       before_install:
-        - pip install cmake numpy
         - sudo bash .ci/install-boost.sh 69
         - sudo ldconfig
+        - pip install cmake numpy
+        - cmake --version
       install:
         - pip install scipy
         - python setup.py install
@@ -66,9 +67,10 @@ matrix:
           packages:
             - g++
       before_install:
-        - pip install cmake numpy
         - sudo bash .ci/install-boost.sh 69
         - sudo ldconfig
+        - pip install cmake numpy
+        - cmake --version
       install:
         - pip install scipy
         - python setup.py install
@@ -88,9 +90,10 @@ matrix:
           packages:
             - g++
       before_install:
-        - pip install cmake numpy
         - sudo bash .ci/install-boost.sh 69
         - sudo ldconfig
+        - pip install cmake numpy
+        - cmake --version
       install:
         - pip install scipy
         - python setup.py install
@@ -146,9 +149,10 @@ matrix:
       cache:
         - pip
       before_install:
-        - pip install cmake numpy
         - sudo bash .ci/install-boost.sh 69
         - sudo ldconfig
+        - pip install cmake numpy
+        - cmake --version
       install:
         - pip install scipy
         - python setup.py install
