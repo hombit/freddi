@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import pathlib
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
@@ -20,35 +19,31 @@ class BuildExt(build_ext):
         super().run()
 
     def build_cmake(self, ext):
-        cwd = pathlib.Path().absolute()
+        cwd = os.getcwd()
 
-        # these dirs will be created in build_py, so if you don't have
-        # any python sources to bundle, the dirs will be missing
-        build_temp = pathlib.Path(self.build_temp)
-        build_temp.mkdir(parents=True, exist_ok=True)
-        extpath = pathlib.Path(self.get_ext_fullpath(ext.name))
-        extname, extsuffix = os.path.splitext(extpath.name)
-        extpath.parent.mkdir(parents=True, exist_ok=True)
+        os.makedirs(self.build_temp, exist_ok=True)
+        extpath = os.path.abspath(self.get_ext_fullpath(ext.name))
+        extpath_dir = os.path.dirname(extpath)
+        extname, extsuffix = os.path.splitext(os.path.basename(extpath))
+        os.makedirs(extpath_dir, exist_ok=True)
         target = ext.name.split('.')[-1]
 
-        # example of cmake args
         config = 'Debug' if self.debug else 'Release'
         cmake_args = [
-            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(extpath.parent.absolute()),
+            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(extpath_dir),
             '-DMODULE_OUTPUT_NAME={}'.format(extname),
             '-DMODULE_OUTPUT_SUFFIX={}'.format(extsuffix),
             '-DCMAKE_BUILD_TYPE={}'.format(config)
         ]
 
-        # example of build args
         build_args = [
             '--config', config,
             '--target', target,
             '--', '-j4',
         ]
 
-        os.chdir(build_temp)
-        self.spawn(['cmake', str(cwd)] + cmake_args)
+        os.chdir(self.build_temp)
+        self.spawn(['cmake', cwd] + cmake_args)
         if not self.dry_run:
             self.spawn(['cmake', '--build', '.'] + build_args)
         os.chdir(cwd)
