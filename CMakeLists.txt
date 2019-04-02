@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
+message("CMake version: ${CMAKE_VERSION}")
 project(freddi)
 
 set(CMAKE_CXX_STANDARD 11)
