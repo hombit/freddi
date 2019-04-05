@@ -240,9 +240,11 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 				vm["Rx"].as<double>(),
 				vm["freqx"].as<double>(),
 				vm["Bx"].as<double>(),
+				vm["hotspotarea"].as<double>(),
 				vm["epsilonAlfven"].as<double>(),
 				vm["inversebeta"].as<double>(),
-				vm["Rdead"].as<double>()) {}
+				vm["Rdead"].as<double>(),
+				vm["fptype"].as<std::string>()) {}
 
 po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star");
@@ -250,9 +252,11 @@ po::options_description NeutronStarOptions::description() {
 			( "Rx", po::value<double>()->default_value(default_Rx), "Accretor radius, cm" )
 			( "freqx", po::value<double>()->default_value(default_freqx), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
 			( "Bx", po::value<double>()->default_value(default_Bx), "Accretor polar magnetic induction, G" )
+			( "hotspotarea", po::value<double>()->default_value(default_hotspotarea), "??? Relative area of hot spot on the accretor" )
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Factor in Alfven radius formula" )
-			( "Rdead", po::value<double>()->default_value(default_Rdead), "Maximum inner radius of the disk that can be obtained, it characterises minimum torque in the dead disk, cm" )
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "???" )
+			( "Rdead", po::value<double>()->default_value(default_Rdead), "Maximum inner radius of the disk that can be obtained, it characterises minimum torque in the dead disk, cm" )
+			( "fptype", po::value<std::string>()->default_value(default_fptype), "??? Accretor Mdot fraction" )
 			;
 	return od;
 }

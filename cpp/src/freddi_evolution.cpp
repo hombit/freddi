@@ -69,18 +69,20 @@ vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t _first, size
 };
 
 
-FreddiNeutronStarEvolution::MagneticFieldStructure::MagneticFieldStructure(
+FreddiNeutronStarEvolution::NeutronStarStructure::NeutronStarStructure(
 		const NeutronStarArguments &args_ns, FreddiEvolution* evolution):
 
 		args_ns(args_ns),
 		xi_pow_minus_7_2(std::pow(xi, -3.5)),
-		R_m_min(std::max(args_ns.Rx, evolution->R()[evolution->first()])),
-		mu_magn(0.5 * args_ns.Bx * m::pow<3>(args_ns.Rx)),
+		R_x(args_ns.Rx),
+		R_m_min(std::max(R_x, evolution->R()[evolution->first()])),
+		mu_magn(0.5 * args_ns.Bx * m::pow<3>(R_x)),
 		R_dead(args_ns.Rdead > 0. ? args_ns.Rdead : INFINITY),
 		F_dead(k_t * xi_pow_minus_7_2 * m::pow<2>(mu_magn) / m::pow<3>(R_dead)),
 		R_cor(std::cbrt(evolution->GM() / m::pow<2>(2*M_PI * args_ns.freqx))),
 		inverse_beta(args_ns.inversebeta),
 		epsilon_Alfven(args_ns.epsilonAlfven),
+		hot_spot_area(args_ns.hotspotarea),
 		Fmagn(initialize_Fmagn(evolution)),
 		dFmagn_dh(initialize_dFmagn_dh(evolution)),
 		d2Fmagn_dh2(initialize_d2Fmagn_dh2(evolution)) {
@@ -90,8 +92,7 @@ FreddiNeutronStarEvolution::MagneticFieldStructure::MagneticFieldStructure(
 }
 
 
-
-vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_Fmagn(FreddiEvolution* evolution) const {
+vecd FreddiNeutronStarEvolution::NeutronStarStructure::initialize_Fmagn(FreddiEvolution* evolution) const {
 	vecd Fmagn_(evolution->Nx());
 	const double k = inverse_beta * m::pow<2>(mu_magn) / 3.;
 	double brackets;
@@ -107,7 +108,7 @@ vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_Fmagn(Freddi
 }
 
 
-vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_dFmagn_dh(FreddiEvolution* evolution) const {
+vecd FreddiNeutronStarEvolution::NeutronStarStructure::initialize_dFmagn_dh(FreddiEvolution* evolution) const {
 	vecd dFmagn_dh_(evolution->Nx());
 	const double k = inverse_beta * 2 * m::pow<2>(mu_magn) * m::pow<3>(evolution->GM());
 	double brackets;
@@ -123,7 +124,7 @@ vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_dFmagn_dh(Fr
 }
 
 
-vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_d2Fmagn_dh2(FreddiEvolution* evolution) const {
+vecd FreddiNeutronStarEvolution::NeutronStarStructure::initialize_d2Fmagn_dh2(FreddiEvolution* evolution) const {
 	vecd d2Fmagn_dh2_(evolution->Nx());
 	const double k = inverse_beta * 2 * m::pow<2>(mu_magn) / evolution->GM();
 	double brackets;
@@ -139,11 +140,25 @@ vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_d2Fmagn_dh2(
 }
 
 
+FreddiNeutronStarEvolution::BasicNSMdotFraction::~BasicNSMdotFraction() {}
+
+
+double FreddiNeutronStarEvolution::NoOutflowNSMdotFraction::operator()(double R_to_Rcor) {
+	return 1.;
+}
+
+
+double FreddiNeutronStarEvolution::PropellerNSMdotFraction::operator()(double R_to_Rcor) {
+	return 0.;
+}
+
+
 FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarArguments &args):
 		FreddiEvolution(args),
-		magn_field_str_(new MagneticFieldStructure(*args.ns, this)) {
+		ns_str_(new NeutronStarStructure(*args.ns, this)) {
 	// Change initial condition due presence of magnetic field torque. It can spoil user-defined initial disk
 	// parameters, such as mass or Fout
+	initializeNsMdotFraction();
 	if (inverse_beta() <= 0.) {  // F_in is non-zero, Fmang is zero everywhere
 		current_.F_in = k_t() * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
 		for (size_t i = 0; i < Nx(); i++) {
@@ -154,6 +169,42 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 			current_.F[i] += -Fmagn()[i] + Fmagn()[0];
 		}
 	}
+}
+
+
+void FreddiNeutronStarEvolution::initializeNsMdotFraction() {
+	if (ns_str_->args_ns.fptype == "no-outflow") {
+		fp_.reset(static_cast<BasicNSMdotFraction *>(new NoOutflowNSMdotFraction));
+	} else if(ns_str_->args_ns.fptype == "propeller") {
+		fp_.reset(static_cast<BasicNSMdotFraction *>(new PropellerNSMdotFraction));
+	} else {
+		throw std::logic_error("Wrong fptype");
+	}
+}
+
+
+double FreddiNeutronStarEvolution::Lbol_ns() const {
+	return eta_ns() * fp() * Mdot_in() * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT;
+}
+
+
+double FreddiNeutronStarEvolution::T_hot_spot() const {
+	return std::pow(Lbol_ns() / (4*M_PI * hot_spot_area() * m::pow<2>(R_x()) * GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT), 0.25);
+}
+
+
+double FreddiNeutronStarEvolution::Lx_ns() {
+	if (!ns_opt_str_.Lx_ns) {
+		const double intensity = Spectrum::Planck_nu1_nu2(T_hot_spot(), args().flux->emin, args().flux->emax, 1e-4);
+		ns_opt_str_.Lx_ns = 4*M_PI * hot_spot_area() * m::pow<2>(R_x()) * M_PI * intensity;
+	}
+	return *ns_opt_str_.Lx_ns;
+}
+
+
+void FreddiNeutronStarEvolution::invalidate_optional_structure() {
+	FreddiEvolution::invalidate_optional_structure();
+	ns_opt_str_ = NeutronStarOptionalStructure();
 }
 
 
@@ -205,4 +256,27 @@ vecd FreddiNeutronStarEvolution::windC() const {
 		C[i] += d2Fmagn_dh2()[i];
 	}
 	return C;
+}
+
+
+const vecd& FreddiNeutronStarEvolution::Qx() {
+	// TODO: do all
+	if (!opt_str_.Qx) {
+		vecd x(Nx());
+		const vecd& CirrCirr = Cirr();
+		const double L_disk = (F()[first()] + 0.5 * Mdot_in() * h()[first()]) * omega_i(first());
+		const double L_ns = Lbol_ns();
+		for (size_t i = first(); i <= last(); i++) {
+			x[i] = CirrCirr[i] * (L_ns + L_disk) / (4. * M_PI * R()[i] * R()[i]);
+		}
+		opt_str_.Qx = std::move(x);
+	}
+	return *opt_str_.Qx;
+}
+
+
+double FreddiNeutronStarEvolution::eta_ns() const {
+	const double R_g = GM() / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+	const double eta = R_g * (1. / R_x() - 0.5 / R()[first()]);
+	return eta;
 }

@@ -244,19 +244,28 @@ public:
 	constexpr static const double default_Rx = 1e6;
 	constexpr static const double default_freqx = 0.;
 	constexpr static const double default_Bx = 0.;
+	constexpr static const double default_hotspotarea = 1.;
 	constexpr static const double default_epsilonAlfven = 1.;
 	constexpr static const double default_inversebeta = 0.;
 	constexpr static const double default_Rdead = 0.;
+	constexpr static const char default_fptype[] = "no-outflow";
 public:
 	const double Rx;
 	const double freqx;
 	const double Bx;
+	const double hotspotarea;
 	const double epsilonAlfven;
 	const double inversebeta;
 	const double Rdead;
+	const std::string fptype;
 public:
-	NeutronStarArguments(double Rx, double freqx, double Bx, double epsilonAlfven, double inversebeta, double Rdead):
-			Rx(Rx), freqx(freqx), Bx(Bx), epsilonAlfven(epsilonAlfven), inversebeta(inversebeta), Rdead(Rdead) {}
+	NeutronStarArguments(
+			double Rx, double freqx, double Bx, double hotspotarea,
+			double epsilonAlfven, double inversebeta, double Rdead,
+			const std::string& fptype):
+			Rx(Rx), freqx(freqx), Bx(Bx), hotspotarea(hotspotarea),
+			epsilonAlfven(epsilonAlfven), inversebeta(inversebeta), Rdead(Rdead),
+			fptype(fptype) {}
 };
 
 

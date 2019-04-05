@@ -189,6 +189,8 @@ public:
 	inline void set_Mdot_in_prev(double Mdot_in) { current_.Mdot_in_prev = Mdot_in; }
 	inline void set_Mdot_in_prev() { set_Mdot_in_prev(Mdot_in()); }
 public:
+	inline double omega_R(double r) const { return std::sqrt(GM() / (r*r*r)); }
+	inline double omega_i(size_t i) const { return omega_R(R()[i]); }
 	virtual double Mdot_in() const;
 // wind_
 protected:
@@ -197,11 +199,11 @@ protected:
 	virtual vecd windC() const { return wind_->C(); }
 // opt_str_
 protected:
-	inline void invalidate_disk_optional_structure() { opt_str_ = DiskOptionalStructure(); };
+	virtual void invalidate_optional_structure();
 	double lazy_magnitude(boost::optional<double>& m, double lambda, double F0);
 	double lazy_integrate(boost::optional<double>& x, const vecd& values);
 	const vecd& Tph_X();
-	const vecd& Qx();
+	virtual const vecd& Qx();
 public:
 	double Lx();
 	const vecd& W();

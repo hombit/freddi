@@ -123,8 +123,13 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(
 }
 
 boost::shared_ptr<NeutronStarArguments> make_neutron_star_arguments(
-		double Rx, double freqx, double Bx, double epsilonAlfven, double inversebeta, double Rdead) {
-	return boost::make_shared<NeutronStarArguments>(Rx, freqx, Bx, epsilonAlfven, inversebeta, Rdead);
+		double Rx, double freqx, double Bx, double hotspotarea,
+		double epsilonAlfven, double inversebeta, double Rdead,
+		const std::string& fptype) {
+	return boost::make_shared<NeutronStarArguments>(
+			Rx, freqx, Bx, hotspotarea,
+			epsilonAlfven, inversebeta, Rdead,
+			fptype);
 }
 
 boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments(
@@ -200,9 +205,11 @@ void wrap_arguments() {
 				(arg("Rx")=NeutronStarArguments::default_Rx,
 				 arg("freqx")=NeutronStarArguments::default_freqx,
 				 arg("Bx")=NeutronStarArguments::default_Bx,
+				 arg("hotspotarea")=NeutronStarArguments::default_hotspotarea,
 				 arg("epsilonAlfven")=NeutronStarArguments::default_epsilonAlfven,
 				 arg("inversebeta")=NeutronStarArguments::default_inversebeta,
-				 arg("Rdead")=NeutronStarArguments::default_Rdead))
+				 arg("Rdead")=NeutronStarArguments::default_Rdead,
+				 arg("fptype")=NeutronStarArguments::default_fptype))
 			)
 	;
 	class_< FreddiNeutronStarArguments, bases<FreddiArguments> >("_FreddiNeutronStarArguments", no_init)

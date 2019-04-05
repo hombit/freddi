@@ -160,9 +160,11 @@ dict neutron_star_evolution_kwdefaults() {
 	kw["Rx"] = NeutronStarArguments::default_Rx;
 	kw["freqx"] = NeutronStarArguments::default_freqx;
 	kw["Bx"] = NeutronStarArguments::default_Bx;
+	kw["hotspotarea"] = NeutronStarArguments::default_hotspotarea;
 	kw["epsilonAlfven"] = NeutronStarArguments::default_epsilonAlfven;
 	kw["inversebeta"] = NeutronStarArguments::default_inversebeta;
 	kw["Rdead"] = NeutronStarArguments::default_Rdead;
+	kw["fptype"] = NeutronStarArguments::default_fptype;
 
 	return kw;
 }
@@ -170,8 +172,9 @@ dict neutron_star_evolution_kwdefaults() {
 boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments(dict& kw) {
 	const auto freddi_args = make_freddi_arguments(kw);
 	const auto ns_args = make_neutron_star_arguments(
-			extract<double>(kw["Rx"]), extract<double>(kw["freqx"]), extract<double>(kw["Bx"]),
-			extract<double>(kw["epsilonAlfven"]), extract<double>(kw["inversebeta"]), extract<double>(kw["Rdead"]));
+			extract<double>(kw["Rx"]), extract<double>(kw["freqx"]), extract<double>(kw["Bx"]), extract<double>(kw["hotspotarea"]),
+			extract<double>(kw["epsilonAlfven"]), extract<double>(kw["inversebeta"]), extract<double>(kw["Rdead"]),
+			extract<std::string>(kw["fptype"]));
 	return make_freddi_neutron_star_arguments(*freddi_args, *ns_args);
 }
 
@@ -193,6 +196,9 @@ object raw_make_neutron_star_evolution(const tuple& args, const dict& kwargs) {
 }
 
 
+double (FreddiNeutronStarEvolution::*fp_getter)() const = &FreddiNeutronStarEvolution::fp;
+
+
 void wrap_evolution() {
 	class_<FreddiEvolution, bases<FreddiState> >("_Freddi", no_init)
 		.def("__init__", raw_function(&raw_make_evolution))
@@ -211,5 +217,10 @@ void wrap_evolution() {
 		.add_property("Fmagn", make_function(&FreddiNeutronStarEvolution::Fmagn, return_value_policy<copy_const_reference>()))
 		.add_property("dFmagn_dh", make_function(&FreddiNeutronStarEvolution::dFmagn_dh, return_value_policy<copy_const_reference>()))
 		.add_property("d2Fmagn_dh2", make_function(&FreddiNeutronStarEvolution::d2Fmagn_dh2, return_value_policy<copy_const_reference>()))
+		.add_property("eta_ns", &FreddiNeutronStarEvolution::eta_ns)
+		.add_property("fp", fp_getter)
+		.add_property("T_hot_spot", &FreddiNeutronStarEvolution::T_hot_spot)
+		.add_property("Lbol_ns", &FreddiNeutronStarEvolution::Lbol_ns)
+		.add_property("Lx_ns", &FreddiNeutronStarEvolution::Lx_ns)
 	;
 }
