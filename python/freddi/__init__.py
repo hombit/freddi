@@ -36,6 +36,7 @@ class _MetaFreddi(type(_Freddi)):
 class _BasePyFreddi:
     def __init__(self, **kwargs):
         self._freddi = self._boost_class(**kwargs)
+        self._kwargs = self._freddi._kwargs
 
     @classmethod
     def _from_boost(cls, boost_freddi):
@@ -89,7 +90,7 @@ class _BasePyFreddi:
 
     def __iter__(self):
         for value in self._freddi:
-            value = Freddi._from_boost(value)
+            value = self._from_boost(value)
             yield value
 
 

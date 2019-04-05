@@ -44,8 +44,7 @@ class BuildExt(build_ext):
 
         os.chdir(self.build_temp)
         self.spawn(['cmake', cwd] + cmake_args)
-        if not self.dry_run:
-            self.spawn(['cmake', '--build', '.'] + build_args)
+        self.spawn(['cmake', '--build', '.'] + build_args)
         os.chdir(cwd)
 
 
