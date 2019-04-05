@@ -32,21 +32,29 @@ struct VectorToNumpyConverter {
 	}
 };
 
-template<typename T>
+template<typename CTYPE, int NPTYPE>
 struct NumpyToVectorConverter {
 	NumpyToVectorConverter() {
-		converter::registry::push_back(convertible, construct, type_id<std::vector<T> >());
+		converter::registry::push_back(convertible, construct, type_id<std::vector<CTYPE> >());
 	}
 	static void* convertible(PyObject* obj) {
-		return PyArray_Check(obj) ? obj : nullptr;
+		if (!PyArray_Check(obj)) {
+			return nullptr;
+		}
+		const auto arr = reinterpret_cast<PyArrayObject*>(obj);
+		const auto dtype = PyArray_DTYPE(arr);
+		if (dtype->type_num != NPTYPE) {
+			return nullptr;
+		}
+		return obj;
 	}
 	static void construct(PyObject* obj, converter::rvalue_from_python_stage1_data* data) {
-		auto arr = reinterpret_cast<PyArrayObject*>(obj);
+		const auto arr = reinterpret_cast<PyArrayObject*>(obj);
 		const auto size = PyArray_SIZE(arr);
-		T* arr_data = reinterpret_cast<T*>(PyArray_DATA(arr));
+		CTYPE* arr_data = reinterpret_cast<CTYPE*>(PyArray_DATA(arr));
 
-		auto storage = reinterpret_cast<converter::rvalue_from_python_storage<std::vector<T> >*>(data)->storage.bytes;
-		new(storage) std::vector<T>(arr_data, arr_data + size);
+		auto storage = reinterpret_cast<converter::rvalue_from_python_storage<std::vector<CTYPE> >*>(data)->storage.bytes;
+		new(storage) std::vector<CTYPE>(arr_data, arr_data + size);
 		data->convertible = storage;
 	}
 };
@@ -54,5 +62,5 @@ struct NumpyToVectorConverter {
 
 void register_converters() {
 	to_python_converter<vecd, VectorToNumpyConverter<double>, false>();
-//	NumpyToVectorConverter<double>();
+	NumpyToVectorConverter<double, NPY_DOUBLE>();
 }
