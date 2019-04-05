@@ -153,6 +153,18 @@ double FreddiNeutronStarEvolution::PropellerNSMdotFraction::operator()(double R_
 }
 
 
+// https://arxiv.org/pdf/1010.1528.pdf Eksi-Kutlu (2010)
+// fastness = (R_in/R_cor)^(3/2)  */
+double FreddiNeutronStarEvolution::EksiKultu2010NSMdotFraction::operator()(double R_to_Rcor) {
+	const double fastness2 = m::pow<3>(R_to_Rcor);
+	double p = (1. - 1./fastness2);
+	if (p < 0){
+		p = 0;
+	}
+	return 1. - 1.5 * std::sqrt(p) + 0.5 * std::pow(p, 1.5);
+}
+
+
 FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarArguments &args):
 		FreddiEvolution(args),
 		ns_str_(new NeutronStarStructure(*args.ns, this)) {
@@ -175,8 +187,10 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 void FreddiNeutronStarEvolution::initializeNsMdotFraction() {
 	if (ns_str_->args_ns.fptype == "no-outflow") {
 		fp_.reset(static_cast<BasicNSMdotFraction *>(new NoOutflowNSMdotFraction));
-	} else if(ns_str_->args_ns.fptype == "propeller") {
+	} else if (ns_str_->args_ns.fptype == "propeller") {
 		fp_.reset(static_cast<BasicNSMdotFraction *>(new PropellerNSMdotFraction));
+	} else if (ns_str_->args_ns.fptype == "eksi-kultu2010") {
+		fp_.reset(static_cast<BasicNSMdotFraction *>(new EksiKultu2010NSMdotFraction));
 	} else {
 		throw std::logic_error("Wrong fptype");
 	}
@@ -184,7 +198,7 @@ void FreddiNeutronStarEvolution::initializeNsMdotFraction() {
 
 
 double FreddiNeutronStarEvolution::Lbol_ns() const {
-	return eta_ns() * fp() * Mdot_in() * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT;
+	return eta_ns() * fp() * Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
 }
 
 
@@ -267,7 +281,7 @@ const vecd& FreddiNeutronStarEvolution::Qx() {
 		const double L_disk = (F()[first()] + 0.5 * Mdot_in() * h()[first()]) * omega_i(first());
 		const double L_ns = Lbol_ns();
 		for (size_t i = first(); i <= last(); i++) {
-			x[i] = CirrCirr[i] * (L_ns + L_disk) / (4. * M_PI * R()[i] * R()[i]);
+			x[i] = CirrCirr[i] * (L_ns + L_disk) / (4. * M_PI * m::pow<2>(R()[i]));
 		}
 		opt_str_.Qx = std::move(x);
 	}
@@ -276,7 +290,7 @@ const vecd& FreddiNeutronStarEvolution::Qx() {
 
 
 double FreddiNeutronStarEvolution::eta_ns() const {
-	const double R_g = GM() / (GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+	const double R_g = GM() / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
 	const double eta = R_g * (1. / R_x() - 0.5 / R()[first()]);
 	return eta;
 }

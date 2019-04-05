@@ -110,6 +110,14 @@ private:
 		~PropellerNSMdotFraction() override = default;
 		virtual double operator()(double R_to_Rcor) override;
 	};
+
+	// https://arxiv.org/pdf/1010.1528.pdf Eksi-Kutlu (2010)
+	class EksiKultu2010NSMdotFraction: public BasicNSMdotFraction {
+	public:
+		EksiKultu2010NSMdotFraction() = default;
+		~EksiKultu2010NSMdotFraction() override = default;
+		virtual double operator()(double R_to_Rcor) override;
+	};
 private:
 	std::shared_ptr<const NeutronStarStructure> ns_str_;
 	NeutronStarOptionalStructure ns_opt_str_;
