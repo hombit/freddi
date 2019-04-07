@@ -3,6 +3,7 @@
 #include <boost/numeric/odeint.hpp>
 
 #include "arguments.hpp"
+#include "util.hpp"
 
 
 namespace odeint = boost::numeric::odeint;
@@ -21,7 +22,7 @@ constexpr const double BasicDiskBinaryArguments::default_period;
 
 double BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(const double MxToMopt) { // Eggleton, P. P. 1983, ApJ, 268, 368
 	const double q = std::cbrt(MxToMopt);
-	return 0.49 * q * q / (0.6 * q * q + std::log(1. + q));
+	return 0.49 * m::pow<2>(q) / (0.6 * m::pow<2>(q) + std::log(1. + q));
 }
 
 constexpr const char DiskStructureArguments::default_opacity[];
@@ -109,7 +110,7 @@ double DiskStructureArguments::F0Initializer(double F0_, const BasicDiskBinaryAr
 					},
 					integral, 0., 1., 0.01
 			);
-			F0_ = pow(Mdisk0 * (1. - oprel->m) * oprel->D * pow(h_out, 3. - oprel->n) / pow(h_out - h_in, 4.) / integral,
+			F0_ = pow(Mdisk0 * (1. - oprel->m) * oprel->D * pow(h_out, 3. - oprel->n) / m::pow<4>(h_out - h_in) / integral,
 					  1. / (1. - oprel->m));
 			return F0_;
 		}
@@ -145,7 +146,7 @@ double DiskStructureArguments::F0Initializer(double F0_, const BasicDiskBinaryAr
 		}
 		if (is_Mdot0_specified) {
 			throw std::runtime_error("Setting of Mdot with initialcond=gaussF produces unstable results and it isn't motivated physically. Set F0 or Mdisk0 instead");
-			//F0_ = Mdot_in * (h_out - h_in) * gauss_sigma*gauss_sigma / gauss_mu * exp( gauss_mu*gauss_mu / (2. * gauss_sigma*gauss_sigma) );
+			//F0_ = Mdot_in * (h_out - h_in) * m::pow<2>(gauss_sigma) / gauss_mu * exp( m::pow<2>(gauss_mu) / (2. * m::pow<2>(gauss_sigma)) );
 		}
 		if (is_Mdisk0_specified){
 			odeint::runge_kutta_cash_karp54<double> stepper;
@@ -156,7 +157,7 @@ double DiskStructureArguments::F0Initializer(double F0_, const BasicDiskBinaryAr
 			integrate_adaptive(
 					stepper,
 					[a,b,x0,this]( const double &y, double &dydx, double x ){
-						dydx = exp( -(x - this->gaussmu)*(x - this->gaussmu) * a / (2. * this->gausssigma*this->gausssigma) ) * pow(x + x0, b);
+						dydx = exp( -m::pow<2>(x - this->gaussmu) * a / (2. * m::pow<2>(this->gausssigma)) ) * pow(x + x0, b);
 					},
 					integral, 0., 1., 0.01
 			);

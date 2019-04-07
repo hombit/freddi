@@ -10,7 +10,7 @@ double Planck_nu(const double T, const double nu) {
 	if (!(T > 0.)) {  // catches NaN
 		return 0.;
 	}
-	return double_h_over_c2 * nu*nu*nu / (std::exp(h_over_kB * nu / T) - 1.);
+	return double_h_over_c2 * m::pow<3>(nu) / (std::exp(h_over_kB * nu / T) - 1.);
 }
 
 
@@ -18,7 +18,7 @@ double Planck_lambda(const double T, const double lambda) {
 	if (!(T > 0.)) {  // catches NaN
 		return 0.;
 	}
-	return double_h_c2 / (lambda*lambda*lambda*lambda*lambda) / (std::exp( ch_over_kB / (lambda * T) ) - 1.);
+	return double_h_c2 / m::pow<5>(lambda) / (std::exp( ch_over_kB / (lambda * T) ) - 1.);
 }
 
 
@@ -46,7 +46,7 @@ double T_GR(const double r1, const double ak, const double Mx, const double Mdot
 	}
 
 	const double GM = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx;
-	const double rg = GM  / (GSL_CONST_CGSM_SPEED_OF_LIGHT*GSL_CONST_CGSM_SPEED_OF_LIGHT);
+	const double rg = GM  / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
 	const double x = sqrt(r1 / rg);
 	const double x0 = sqrt(r_in/rg);
 
@@ -58,8 +58,8 @@ double T_GR(const double r1, const double ak, const double Mx, const double Mdot
 	const double c = 3. * (x3-ak)*(x3-ak) * log((x-x3)/(x0-x3))/x3/(x3-x1)/(x3-x2);
 
 	return( pow(
-			(3.*Mdot * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT,6.) / (8.*M_PI*GM*GM)) *
-			(x-x0-1.5*ak*log(x/x0)-a-b-c) / ( pow(x,4.)*(x*x*x-3.*x+2.*ak) ) /
+			(3.*Mdot * m::pow<6>(GSL_CONST_CGSM_SPEED_OF_LIGHT) / (8.*M_PI * m::pow<2>(GM))) *
+			(x - x0 - 1.5 * ak * std::log(x/x0) - a - b -c) / ( m::pow<4>(x)*(m::pow<3>(x) - 3.*x + 2. * ak) ) /
 			GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT,
 			0.25)
 

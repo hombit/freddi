@@ -4,6 +4,11 @@
 #include <functional>
 #include <vector>
 
+#include <boost/math/special_functions/pow.hpp>
+
+
+namespace m = boost::math;
+
 
 typedef std::vector<double> vecd;
 

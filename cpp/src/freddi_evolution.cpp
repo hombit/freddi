@@ -10,6 +10,7 @@
 #include "constants.hpp"
 #include "nonlinear_diffusion.hpp"
 #include "orbit.hpp"
+#include "util.hpp"
 
 using namespace std::placeholders;
 
@@ -74,10 +75,10 @@ FreddiNeutronStarEvolution::MagneticFieldStructure::MagneticFieldStructure(
 		args_ns(args_ns),
 		xi_pow_minus_7_2(std::pow(xi, -3.5)),
 		R_m_min(std::max(args_ns.Rx, evolution->R()[evolution->first()])),
-		mu_magn(0.5 * args_ns.Bx * args_ns.Rx*args_ns.Rx*args_ns.Rx),
+		mu_magn(0.5 * args_ns.Bx * m::pow<3>(args_ns.Rx)),
 		R_dead(args_ns.Rdead > 0. ? args_ns.Rdead : INFINITY),
-		F_dead(k_t * xi_pow_minus_7_2 * mu_magn*mu_magn / (R_dead*R_dead*R_dead)),
-		R_cor(std::cbrt(evolution->GM() / (4 * M_PI*M_PI * args_ns.freqx*args_ns.freqx))),
+		F_dead(k_t * xi_pow_minus_7_2 * m::pow<2>(mu_magn) / m::pow<3>(R_dead)),
+		R_cor(std::cbrt(evolution->GM() / m::pow<2>(2*M_PI * args_ns.freqx))),
 		inverse_beta(args_ns.inversebeta),
 		epsilon_Alfven(args_ns.epsilonAlfven),
 		Fmagn(initialize_Fmagn(evolution)),
@@ -92,15 +93,15 @@ FreddiNeutronStarEvolution::MagneticFieldStructure::MagneticFieldStructure(
 
 vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_Fmagn(FreddiEvolution* evolution) const {
 	vecd Fmagn_(evolution->Nx());
-	const double k = inverse_beta * mu_magn*mu_magn / 3.;
+	const double k = inverse_beta * m::pow<2>(mu_magn) / 3.;
 	double brackets;
 	for (size_t i = 0; i < evolution->Nx(); i++) {
 		if (evolution->R()[i] < R_cor) {
-			brackets = -1. + 2. * std::pow(evolution->R()[i] / R_cor, 1.5) - 2./3. * std::pow(evolution->R()[i] / R_cor, 3);
+			brackets = -1. + 2. * std::pow(evolution->R()[i] / R_cor, 1.5) - 2./3. * m::pow<3>(evolution->R()[i] / R_cor);
 		} else {
 			brackets = 1. - 2./3. * std::pow(R_cor / evolution->R()[i], 1.5);
 		}
-		Fmagn_[i] = k / (evolution->R()[i]*evolution->R()[i]*evolution->R()[i]) * brackets;
+		Fmagn_[i] = k / m::pow<3>(evolution->R()[i]) * brackets;
 	}
 	return Fmagn_;
 }
@@ -108,7 +109,7 @@ vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_Fmagn(Freddi
 
 vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_dFmagn_dh(FreddiEvolution* evolution) const {
 	vecd dFmagn_dh_(evolution->Nx());
-	const double k = inverse_beta * 2*mu_magn*mu_magn * evolution->GM()*evolution->GM()*evolution->GM();
+	const double k = inverse_beta * 2 * m::pow<2>(mu_magn) * m::pow<3>(evolution->GM());
 	double brackets;
 	for (size_t i = 0; i < evolution->Nx(); i++) {
 		if (evolution->R()[i] < R_cor) {
@@ -116,7 +117,7 @@ vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_dFmagn_dh(Fr
 		} else {
 			brackets = -1. + std::pow(R_cor / evolution->R()[i], 1.5);
 		}
-		dFmagn_dh_[i] = k / std::pow(evolution->h()[i], 7) * brackets;
+		dFmagn_dh_[i] = k / m::pow<7>(evolution->h()[i]) * brackets;
 	}
 	return dFmagn_dh_;
 }
@@ -124,7 +125,7 @@ vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_dFmagn_dh(Fr
 
 vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_d2Fmagn_dh2(FreddiEvolution* evolution) const {
 	vecd d2Fmagn_dh2_(evolution->Nx());
-	const double k = inverse_beta * 2*mu_magn*mu_magn / evolution->GM();
+	const double k = inverse_beta * 2 * m::pow<2>(mu_magn) / evolution->GM();
 	double brackets;
 	for (size_t i = 0; i < evolution->Nx(); i++) {
 		if (evolution->R()[i] < R_cor) {
@@ -132,7 +133,7 @@ vecd FreddiNeutronStarEvolution::MagneticFieldStructure::initialize_d2Fmagn_dh2(
 		} else {
 			brackets = 7. - 10. * std::pow(R_cor / evolution->R()[i], 1.5);
 		}
-		d2Fmagn_dh2_[i] = k / std::pow(evolution->R()[i], 4) * brackets;
+		d2Fmagn_dh2_[i] = k / m::pow<4>(evolution->R()[i]) * brackets;
 	}
 	return d2Fmagn_dh2_;
 }
@@ -144,7 +145,7 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 	// Change initial condition due presence of magnetic field torque. It can spoil user-defined initial disk
 	// parameters, such as mass or Fout
 	if (inverse_beta() <= 0.) {  // F_in is non-zero, Fmang is zero everywhere
-		const double F_in = k_t() * mu_magn()*mu_magn() / (R_cor()*R_cor()*R_cor());
+		const double F_in = k_t() * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
 		for (size_t i = 0; i < Nx(); i++) {
 			current_.F[i] += F_in;
 		}
@@ -165,7 +166,7 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	}
 
 	const double R_alfven = epsilon_Alfven() *
-			std::pow(mu_magn()*mu_magn()*mu_magn()*mu_magn() / (Mdot_in()*Mdot_in() * GM()), 1./7.);
+			std::pow(m::pow<4>(mu_magn()) / (m::pow<2>(Mdot_in()) * GM()), 1./7.);
 	double R_m = std::max(R_m_min(), R_alfven);
 	R_m = std::min(R_m, R_dead());
 	size_t ii;
@@ -183,9 +184,9 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	double new_F_in = 0;
 	if (inverse_beta() <= 0.) {
 		if (R_m <= R_cor()) {
-			new_F_in = k_t() * xi_pow_minus_7_2() * mu_magn()*mu_magn() / std::pow(R_cor(), 3);
+			new_F_in = k_t() * xi_pow_minus_7_2() * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
 		} else {
-			new_F_in = F_dead() * std::pow(R_dead() / R_m, 3);
+			new_F_in = F_dead() * m::pow<3>(R_dead() / R_m);
 		}
 	}
 	current_.F_in = new_F_in;

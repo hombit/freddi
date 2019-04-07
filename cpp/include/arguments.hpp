@@ -10,6 +10,7 @@
 #include "constants.hpp"
 #include "opacity_related.hpp"
 #include "orbit.hpp"
+#include "util.hpp"
 #include "unit_transformation.hpp"
 
 
@@ -39,7 +40,7 @@ class BinaryFunctions {
 public:
 	static double rocheLobeVolumeRadiusSemiaxis(double MxToMopt);
 	static inline double semiaxis(const double total_mass, const double period) {
-		return std::cbrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * total_mass * period*period / (4. * M_PI*M_PI));
+		return std::cbrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * total_mass * m::pow<2>(period) / (4. * m::pow<2>(M_PI)));
 	}
 	static inline double semiaxis(const double Mx, const double Mopt, const double period) {
 		return semiaxis(Mx + Mopt, period);

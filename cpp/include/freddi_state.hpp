@@ -217,7 +217,7 @@ public:
 		return -2.5 * std::log10(I_lambda(lambda) * cosiOverD2() / F0);
 	}
 	inline double flux(const double lambda) {
-		return I_lambda(lambda) * lambda*lambda / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2();
+		return I_lambda(lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2();
 	}
 	inline double mU() { return lazy_magnitude(opt_str_.mU, lambdaU, irr0U); }
 	inline double mB() { return lazy_magnitude(opt_str_.mB, lambdaB, irr0B); }
