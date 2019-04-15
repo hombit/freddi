@@ -47,7 +47,7 @@ DiskStructureArguments::DiskStructureArguments(
 	const double powerorder, const double gaussmu, const double gausssigma,
 	const bool is_Mdisk0_specified, const bool is_Mdot0_specified,
 	const double Mdisk0, const double Mdot0,
-	const std::string& wind, const std::vector<double>& windparams):
+	const std::string& wind, const pard& windparams):
 		opacity(opacity),
 		oprel(new OpacityRelated(opacity, bdb_args.Mx, bdb_args.alpha, mu)),
 		Mdotout(Mdotout),

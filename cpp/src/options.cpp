@@ -167,13 +167,13 @@ FluxOptions::FluxOptions(const po::variables_map &vm):
 				kpcToCm(vm["distance"].as<double>()),
 				lambdasInitializer(vm)) {}
 
-std::vector<double> FluxOptions::lambdasInitializer(const po::variables_map &vm) const {
+vecd FluxOptions::lambdasInitializer(const po::variables_map &vm) const {
 	if (vm.count("lambda") > 0) {
-		std::vector<double> lambdas(vm["lambda"].as<std::vector<double> >());
+		vecd lambdas(vm["lambda"].as<vecd>());
 		transform(lambdas.begin(), lambdas.end(), lambdas.begin(), angstromToCm);
 		return lambdas;
 	}
-	return std::vector<double>();
+	return vecd();
 }
 
 po::options_description FluxOptions::description() {
@@ -184,7 +184,7 @@ po::options_description FluxOptions::description() {
 			( "emax", po::value<double>()->default_value(hertzToKev(default_emax)), "Maximum energy of X-ray band, keV" )
 			( "inclination,i", po::value<double>()->default_value(default_inclination), "Inclination of the system, degrees" )
 			( "distance", po::value<double>()->default_value(cmToKpc(default_distance)), "Distance to the system, kpc" )
-			( "lambda", po::value< std::vector<double> >()->multitoken(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced" )
+			( "lambda", po::value<vecd>()->multitoken(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced" )
 			;
 	return od;
 }

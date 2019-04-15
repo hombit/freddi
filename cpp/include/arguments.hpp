@@ -4,7 +4,6 @@
 #include <cmath>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "gsl_const_cgsm.h"
 #include "constants.hpp"
@@ -135,7 +134,7 @@ public:
 	const double gaussmu;
 	const double gausssigma;
 	const std::string wind;
-	const std::vector<double> windparams;
+	const pard windparams;
 	const double Mdisk0;
 	const double Mdot0;
 	const bool is_Mdisk0_specified;
@@ -154,7 +153,7 @@ public:
 			double powerorder, double gaussmu, double gausssigma,
 			bool is_Mdisk0_specified, bool is_Mdot0_specified,
 			double Mdisk0, double Mdot0,
-			const std::string& wind, const std::vector<double>& windparams);
+			const std::string& wind, const pard& windparams);
 	DiskStructureArguments(const DiskStructureArguments&) = default;
 };
 
@@ -185,13 +184,13 @@ public:
 	const double emax;
 	const double inclination;  // degrees
 	const double distance;
-	const std::vector<double> lambdas;
+	const vecd lambdas;
 public:
 	FluxArguments(
 			double colourfactor,
 			double emin, double emax,
 			double inclination, double distance,
-	        const std::vector<double>& lambdas):
+	        const vecd& lambdas):
 			colourfactor(colourfactor),
 			emin(emin), emax(emax),
 			inclination(inclination), distance(distance),

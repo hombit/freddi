@@ -2,6 +2,8 @@
 #define FREDDI_UTIL_HPP
 
 #include <functional>
+#include <map>
+#include <string>
 #include <vector>
 
 #include <boost/math/special_functions/pow.hpp>
@@ -11,6 +13,7 @@ namespace m = boost::math;
 
 
 typedef std::vector<double> vecd;
+typedef std::map<std::string, double> pard;
 
 double trapz(const vecd& x, const vecd& y, size_t first, size_t last);
 double trapz(const vecd& x, std::function<double (size_t)> f, size_t first, size_t last);

@@ -7,11 +7,37 @@
 #endif  // INSTALLPATHPREFIX
 
 #include <fstream>
+#include <string>
+#include <vector>
+
+#include <boost/algorithm/string.hpp> // split
+#include <boost/any.hpp>
 #include <boost/program_options.hpp>
 
 #include "arguments.hpp"
+#include "util.hpp"
 
 namespace po = boost::program_options;
+
+
+// TODO: draft, inspect it
+template<typename Key, typename T>
+void validate(boost::any& v, const std::vector<std::string>& values, std::map<Key, T>*, int) {
+	typedef std::map<Key, T> map_t;
+
+	if (v.empty()) {
+		v = boost::any(map_t());
+	}
+	auto m = boost::any_cast<map_t&>(v);
+	for (const auto& value : values) {
+		std::vector<std::string> sub_str;
+		boost::split(sub_str, value, ":");
+		if (sub_str.size() != 2) {
+			throw po::validation_error(po::validation_error::invalid_option_value);
+		}
+		m[sub_str[0]] = sub_str[1];
+	}
+}
 
 
 class GeneralOptions: public GeneralArguments {
@@ -50,7 +76,7 @@ public:
 
 class FluxOptions: public FluxArguments {
 protected:
-	std::vector<double> lambdasInitializer(const po::variables_map& vm) const;
+	vecd lambdasInitializer(const po::variables_map& vm) const;
 public:
 	FluxOptions(const po::variables_map& vm);
 	static po::options_description description();

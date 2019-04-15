@@ -55,9 +55,14 @@ boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
 		is_Mdot0_specified = true;
 	}
 
-	vecd windparams(len(windparams_));
-	for (size_t i = 0; i < windparams.size(); i++) {
-		windparams[i] = extract<double>(windparams_[i]);
+	if (!PyMapping_Check(windparams_.ptr())) {
+		PyErr_SetString(PyExc_TypeError, "windparams argument must be a mapping");
+		throw error_already_set();
+	}
+	pard windparams;
+	stl_input_iterator<object> begin(windparams_), end;
+	for (auto key = begin; key != end; ++key) {
+		windparams[extract<std::string>(*key)] = extract<double>(windparams_[*key]);
 	}
 
 	return boost::make_shared<DiskStructureArguments>(
