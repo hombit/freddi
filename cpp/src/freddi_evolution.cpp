@@ -165,6 +165,21 @@ double FreddiNeutronStarEvolution::EksiKultu2010NSMdotFraction::operator()(doubl
 }
 
 
+// Return fraction of the accretion rate penetrating to the NS surface
+// according to numerical results of MHD simulations (Romanova+2018, Table 2)
+double FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::operator()(double R_to_Rcor) {
+	const double fastness = std::pow(R_to_Rcor, 1.5);
+	double _fp = 0;
+	if (fastness >= 1) {
+		_fp = par1 * std::pow(fastness, par2);
+	}
+	if (_fp > 1) {
+		_fp = 1.;
+	}
+	return 1. - _fp;
+}
+
+
 FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarArguments &args):
 		FreddiEvolution(args),
 		ns_str_(new NeutronStarStructure(*args.ns, this)) {
@@ -191,6 +206,8 @@ void FreddiNeutronStarEvolution::initializeNsMdotFraction() {
 		fp_.reset(static_cast<BasicNSMdotFraction *>(new PropellerNSMdotFraction));
 	} else if (ns_str_->args_ns.fptype == "eksi-kultu2010") {
 		fp_.reset(static_cast<BasicNSMdotFraction *>(new EksiKultu2010NSMdotFraction));
+	} else if (ns_str_->args_ns.fptype == "romanova2018") {
+		fp_.reset(static_cast<BasicNSMdotFraction *>(new Romanova2018NSMdotFraction));
 	} else {
 		throw std::logic_error("Wrong fptype");
 	}

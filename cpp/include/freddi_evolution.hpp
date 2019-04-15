@@ -118,6 +118,16 @@ private:
 		~EksiKultu2010NSMdotFraction() override = default;
 		virtual double operator()(double R_to_Rcor) override;
 	};
+
+	class Romanova2018NSMdotFraction: public BasicNSMdotFraction {
+	private:
+		const double par1 = 6e-4; // 0.57
+		const double par2 = 4.; // 0.3
+	public:
+		Romanova2018NSMdotFraction() = default;
+		~Romanova2018NSMdotFraction() override = default;
+		virtual double operator()(double R_to_Rcor) override;
+	};
 private:
 	std::shared_ptr<const NeutronStarStructure> ns_str_;
 	NeutronStarOptionalStructure ns_opt_str_;
