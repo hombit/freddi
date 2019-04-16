@@ -165,6 +165,9 @@ double FreddiNeutronStarEvolution::EksiKultu2010NSMdotFraction::operator()(doubl
 }
 
 
+FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::Romanova2018NSMdotFraction(double par1, double par2):
+		par1(par1), par2(par2) {}
+
 // Return fraction of the accretion rate penetrating to the NS surface
 // according to numerical results of MHD simulations (Romanova+2018, Table 2)
 double FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::operator()(double R_to_Rcor) {
@@ -180,22 +183,23 @@ double FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::operator()(double
 }
 
 
+FreddiNeutronStarEvolution::GeometricalNSMdotFraction::GeometricalNSMdotFraction(double chi):
+		chi(chi) {
+	if (chi == 0) {
+		throw std::logic_error("chi cannot be zero here, PropellerNSMdotFraction should be used in this case");
+	}
+}
+
 // Return fraction of the accretion rate penetrating to the NS surface
 // for an inclined dipole with angle chi [grad] and rratio = Rin/Rcor > 1
 // see magnetospheric_form_1.mw
 double FreddiNeutronStarEvolution::GeometricalNSMdotFraction::operator()(double R_to_Rcor) {
 	const double mdot_factor = std::pow(R_to_Rcor, -3.5);
 	const double tmp = mdot_factor - m::pow<2>(std::cos(chi));
-	if ( chi == 0. ) {
-		if (mdot_factor >= 1.) {
-			return 1;
-		}
-		return 0.;
+	if ( tmp < 0. ) {
+		return 0;
 	}
-	if ( tmp >= 0 ) {
-		return 1. - 2./M_PI * std::acos( std::sqrt(tmp) / std::sin(chi) ) ;
-	}
-	return 0;
+	return 1. - 2./M_PI * std::acos(std::sqrt(tmp) / std::sin(chi));
 }
 
 
@@ -219,16 +223,23 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 
 
 void FreddiNeutronStarEvolution::initializeNsMdotFraction() {
-	if (ns_str_->args_ns.fptype == "no-outflow") {
+	const auto fptype = ns_str_->args_ns.fptype;
+	const auto fpparams = ns_str_->args_ns.fpparams;
+	if (fptype == "no-outflow") {
 		fp_.reset(static_cast<BasicNSMdotFraction *>(new NoOutflowNSMdotFraction));
-	} else if (ns_str_->args_ns.fptype == "propeller") {
+	} else if (fptype == "propeller") {
 		fp_.reset(static_cast<BasicNSMdotFraction *>(new PropellerNSMdotFraction));
-	} else if (ns_str_->args_ns.fptype == "eksi-kultu2010") {
+	} else if (fptype == "eksi-kultu2010") {
 		fp_.reset(static_cast<BasicNSMdotFraction *>(new EksiKultu2010NSMdotFraction));
-	} else if (ns_str_->args_ns.fptype == "romanova2018") {
-		fp_.reset(static_cast<BasicNSMdotFraction *>(new Romanova2018NSMdotFraction));
-	} else if (ns_str_->args_ns.fptype == "geometrical") {
-		fp_.reset(static_cast<BasicNSMdotFraction *>(new GeometricalNSMdotFraction));
+	} else if (fptype == "romanova2018") {
+		fp_.reset(static_cast<BasicNSMdotFraction *>(new Romanova2018NSMdotFraction(fpparams.at("par1"), fpparams.at("par2"))));
+	} else if (fptype == "geometrical") {
+		const double chi = fpparams.at("chi") * M_PI / 180.;
+		if (chi == 0) {
+			fp_.reset(static_cast<BasicNSMdotFraction *>(new PropellerNSMdotFraction));
+		} else {
+			fp_.reset(static_cast<BasicNSMdotFraction *>(new GeometricalNSMdotFraction(chi)));
+		}
 	} else {
 		throw std::logic_error("Wrong fptype");
 	}

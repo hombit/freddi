@@ -5,8 +5,11 @@
 #include <util.hpp>
 
 #include "arguments.hpp"
+#include "converters.hpp"
+
 
 using namespace boost::python;
+
 
 boost::shared_ptr<GeneralArguments> make_general_arguments() {
 	return boost::make_shared<GeneralArguments>("", "", false);
@@ -55,16 +58,6 @@ boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
 		is_Mdot0_specified = true;
 	}
 
-	if (!PyMapping_Check(windparams_.ptr())) {
-		PyErr_SetString(PyExc_TypeError, "windparams argument must be a mapping");
-		throw error_already_set();
-	}
-	pard windparams;
-	stl_input_iterator<object> begin(windparams_), end;
-	for (auto key = begin; key != end; ++key) {
-		windparams[extract<std::string>(*key)] = extract<double>(windparams_[*key]);
-	}
-
 	return boost::make_shared<DiskStructureArguments>(
 			basic_disk_binary_arguments,
 			opacity,
@@ -74,7 +67,7 @@ boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
 			powerorder, gaussmu, gausssigma,
 			is_Mdisk0_specified, is_Mdot0_specified,
 			Mdisk0, Mdot0,
-			wind, windparams);
+			wind, mapping_to_map(windparams_));
 }
 
 boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(double Cirr, const std::string& irrfactortype) {
@@ -125,11 +118,11 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(
 boost::shared_ptr<NeutronStarArguments> make_neutron_star_arguments(
 		double Rx, double freqx, double Bx, double hotspotarea,
 		double epsilonAlfven, double inversebeta, double Rdead,
-		const std::string& fptype) {
+		const std::string& fptype, const object& fpparams_) {
 	return boost::make_shared<NeutronStarArguments>(
 			Rx, freqx, Bx, hotspotarea,
 			epsilonAlfven, inversebeta, Rdead,
-			fptype);
+			fptype, mapping_to_map(fpparams_));
 }
 
 boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments(
@@ -209,7 +202,8 @@ void wrap_arguments() {
 				 arg("epsilonAlfven")=NeutronStarArguments::default_epsilonAlfven,
 				 arg("inversebeta")=NeutronStarArguments::default_inversebeta,
 				 arg("Rdead")=NeutronStarArguments::default_Rdead,
-				 arg("fptype")=NeutronStarArguments::default_fptype))
+				 arg("fptype")=NeutronStarArguments::default_fptype,
+				 arg("fpparams")=tuple()))
 			)
 	;
 	class_< FreddiNeutronStarArguments, bases<FreddiArguments> >("_FreddiNeutronStarArguments", no_init)

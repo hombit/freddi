@@ -244,7 +244,8 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 				vm["epsilonAlfven"].as<double>(),
 				vm["inversebeta"].as<double>(),
 				vm["Rdead"].as<double>(),
-				vm["fptype"].as<std::string>()) {}
+				vm["fptype"].as<std::string>(),
+				{}) {}
 
 po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star");

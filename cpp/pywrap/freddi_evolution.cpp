@@ -165,6 +165,7 @@ dict neutron_star_evolution_kwdefaults() {
 	kw["inversebeta"] = NeutronStarArguments::default_inversebeta;
 	kw["Rdead"] = NeutronStarArguments::default_Rdead;
 	kw["fptype"] = NeutronStarArguments::default_fptype;
+	kw["fpparams"] = tuple();
 
 	return kw;
 }
@@ -174,7 +175,7 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 	const auto ns_args = make_neutron_star_arguments(
 			extract<double>(kw["Rx"]), extract<double>(kw["freqx"]), extract<double>(kw["Bx"]), extract<double>(kw["hotspotarea"]),
 			extract<double>(kw["epsilonAlfven"]), extract<double>(kw["inversebeta"]), extract<double>(kw["Rdead"]),
-			extract<std::string>(kw["fptype"]));
+			extract<std::string>(kw["fptype"]), kw["fpparams"]);
 	return make_freddi_neutron_star_arguments(*freddi_args, *ns_args);
 }
 

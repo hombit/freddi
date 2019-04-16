@@ -2,17 +2,28 @@
 #include <string>
 #include <vector>
 
-#include <boost/python.hpp>
 #include <boost/python/numpy.hpp>
 #include <numpy/arrayobject.h>
-
-#include <util.hpp>
 
 #include "converters.hpp"
 
 
 using namespace boost::python;
 namespace np = boost::python::numpy;
+
+
+pard mapping_to_map(const object& obj) {
+	if (!PyMapping_Check(obj.ptr())) {
+		PyErr_SetString(PyExc_TypeError, "windparams argument must be a mapping");
+		throw error_already_set();
+	}
+	pard m;
+	stl_input_iterator<object> begin(obj), end;
+	for (auto key = begin; key != end; ++key) {
+		m[extract<std::string>(*key)] = extract<double>(obj[*key]);
+	}
+	return m;
+}
 
 
 struct VectorToListConverter {

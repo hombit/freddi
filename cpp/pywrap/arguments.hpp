@@ -51,7 +51,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(
 boost::shared_ptr<NeutronStarArguments> make_neutron_star_arguments(
 		double Rx, double freqx, double Bx, double hotspotarea,
 		double epsilonAlfven, double inversebeta, double Rdead,
-		const std::string& fptype);
+		const std::string& fptype, const object& fpparams_);
 
 boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments(
 		const FreddiArguments& freddi_args, const NeutronStarArguments& ns);

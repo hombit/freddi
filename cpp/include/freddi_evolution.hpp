@@ -121,19 +121,19 @@ private:
 
 	class Romanova2018NSMdotFraction: public BasicNSMdotFraction {
 	private:
-		const double par1 = 6e-4; // 0.57
-		const double par2 = 4.; // 0.3
+		const double par1;
+		const double par2;
 	public:
-		Romanova2018NSMdotFraction() = default;
+		Romanova2018NSMdotFraction(double par1, double par2);
 		~Romanova2018NSMdotFraction() override = default;
 		virtual double operator()(double R_to_Rcor) override;
 	};
 
 	class GeometricalNSMdotFraction: public BasicNSMdotFraction {
 	private:
-		const double chi = 0.;
+		const double chi;
 	public:
-		GeometricalNSMdotFraction() = default;
+		GeometricalNSMdotFraction(double chi);
 		~GeometricalNSMdotFraction() override = default;
 		virtual double operator()(double R_to_Rcor) override;
 	};

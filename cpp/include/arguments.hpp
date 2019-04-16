@@ -258,14 +258,15 @@ public:
 	const double inversebeta;
 	const double Rdead;
 	const std::string fptype;
+	const pard fpparams;
 public:
 	NeutronStarArguments(
 			double Rx, double freqx, double Bx, double hotspotarea,
 			double epsilonAlfven, double inversebeta, double Rdead,
-			const std::string& fptype):
+			const std::string& fptype, const pard& fpparams):
 			Rx(Rx), freqx(freqx), Bx(Bx), hotspotarea(hotspotarea),
 			epsilonAlfven(epsilonAlfven), inversebeta(inversebeta), Rdead(Rdead),
-			fptype(fptype) {}
+			fptype(fptype), fpparams(fpparams) {}
 };
 
 
