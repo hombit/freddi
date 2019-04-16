@@ -39,8 +39,8 @@ function(CREATE_PY_MODULE)
     find_package(Python3 COMPONENTS Development Interpreter)
     foreach(Boost_Python3_VERSION_TAG
             "${Python3_VERSION_MAJOR}"
-            "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
             "-py${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
+            "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
             "-${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
             "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
             "-${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
