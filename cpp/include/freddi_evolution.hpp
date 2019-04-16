@@ -111,6 +111,13 @@ private:
 		virtual double operator()(double R_to_Rcor) override;
 	};
 
+	class CorotationBlockNSMdotFraction: public BasicNSMdotFraction {
+	public:
+		CorotationBlockNSMdotFraction() = default;
+		~CorotationBlockNSMdotFraction() override = default;
+		virtual double operator()(double R_to_Rcor) override;
+	};
+
 	// https://arxiv.org/pdf/1010.1528.pdf Eksi-Kutlu (2010)
 	class EksiKultu2010NSMdotFraction: public BasicNSMdotFraction {
 	public:

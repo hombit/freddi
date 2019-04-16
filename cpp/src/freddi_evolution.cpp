@@ -153,6 +153,14 @@ double FreddiNeutronStarEvolution::PropellerNSMdotFraction::operator()(double R_
 }
 
 
+double FreddiNeutronStarEvolution::CorotationBlockNSMdotFraction::operator()(double R_to_Rcor) {
+	if (R_to_Rcor < 1.) {
+		return 0.;
+	}
+	return 1.;
+}
+
+
 // https://arxiv.org/pdf/1010.1528.pdf Eksi-Kutlu (2010)
 // fastness = (R_in/R_cor)^(3/2)  */
 double FreddiNeutronStarEvolution::EksiKultu2010NSMdotFraction::operator()(double R_to_Rcor) {
@@ -229,6 +237,8 @@ void FreddiNeutronStarEvolution::initializeNsMdotFraction() {
 		fp_.reset(static_cast<BasicNSMdotFraction *>(new NoOutflowNSMdotFraction));
 	} else if (fptype == "propeller") {
 		fp_.reset(static_cast<BasicNSMdotFraction *>(new PropellerNSMdotFraction));
+	} else if (fptype == "corotation-block") {
+		fp_.reset(static_cast<BasicNSMdotFraction *>(new CorotationBlockNSMdotFraction));
 	} else if (fptype == "eksi-kultu2010") {
 		fp_.reset(static_cast<BasicNSMdotFraction *>(new EksiKultu2010NSMdotFraction));
 	} else if (fptype == "romanova2018") {
@@ -236,7 +246,7 @@ void FreddiNeutronStarEvolution::initializeNsMdotFraction() {
 	} else if (fptype == "geometrical") {
 		const double chi = fpparams.at("chi") * M_PI / 180.;
 		if (chi == 0) {
-			fp_.reset(static_cast<BasicNSMdotFraction *>(new PropellerNSMdotFraction));
+			fp_.reset(static_cast<BasicNSMdotFraction *>(new CorotationBlockNSMdotFraction));
 		} else {
 			fp_.reset(static_cast<BasicNSMdotFraction *>(new GeometricalNSMdotFraction(chi)));
 		}
