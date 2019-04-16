@@ -42,7 +42,8 @@ function(CREATE_PY_MODULE)
             "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
             "-py${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
             "-${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
-            "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
+            "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
+            "-${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
         find_package(Boost QUIET COMPONENTS "python${Boost_Python3_VERSION_TAG}")
         if(${Boost_FOUND})
             message("Boost_Python3_VERSION_TAG: ${Boost_Python3_VERSION_TAG}")
