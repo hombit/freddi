@@ -7,6 +7,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
 include_directories("${PROJECT_SOURCE_DIR}/cpp/include")
 
+find_package(Boost 1.57.0 COMPONENTS program_options REQUIRED)
+
 function(CREATE_EXE targ)
     set(TARGET freddi${targ}-exe)
     set(EXE freddi${targ})
@@ -21,7 +23,6 @@ function(CREATE_EXE targ)
     add_executable(${TARGET} ${SOURCES})
     set_property(TARGET ${TARGET} PROPERTY OUTPUT_NAME ${EXE})
 
-    find_package(Boost 1.57.0 COMPONENTS program_options REQUIRED)
     target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIR})
 
     target_compile_definitions(${TARGET} PUBLIC INSTALLPATHPREFIX="${CMAKE_INSTALL_PREFIX}")
@@ -36,14 +37,18 @@ CREATE_EXE("-ns")
 
 function(CREATE_PY_MODULE)
     find_package(Python3 COMPONENTS Development Interpreter)
-    find_package(Boost 1.64.0)
-    if (${Boost_VERSION} VERSION_LESS 1.67.0)
-        set(PYVERSION ${Python3_VERSION_MAJOR})
-    else()
-        set(PYVERSION ${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR})
-    endif()
-    find_package(Boost 1.64.0 COMPONENTS program_options python${PYVERSION} numpy${PYVERSION})
-    message("Boost libraries: ${Boost_LIBRARIES}")
+    foreach(Boost_Python3_VERSION_TAG
+            "${Python3_VERSION_MAJOR}"
+            "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
+            "-py${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
+            "-${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
+            "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
+        find_package(Boost QUIET COMPONENTS "python${Boost_Python3_VERSION_TAG}")
+        if(${Boost_FOUND})
+            find_package(Boost COMPONENTS "python${Boost_Python3_VERSION_TAG}" "numpy${Boost_Python3_VERSION_TAG}")
+            break()
+        endif()
+    endforeach()
     if (${Python3_FOUND} AND ${Boost_FOUND})
         set(TARGET _freddi)
         file(GLOB_RECURSE SOURCES cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h cpp/pywrap/*.cpp cpp/pywrap/*.hpp)
