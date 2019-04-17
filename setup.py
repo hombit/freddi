@@ -39,7 +39,8 @@ class BuildExt(build_ext):
         build_args = [
             '--config', config,
             '--target', target,
-            '--', '-j4',
+            '--',
+            '-j', str(os.cpu_count())
         ]
 
         os.chdir(self.build_temp)
