@@ -24,6 +24,9 @@ class _MetaFreddi(type(_Freddi)):
 
         return super().__new__(mcs, name, bases, attrs)
 
+    def __init__(cls, name, bases, attrs, boost_cls=object):
+        super().__init__(name, bases, attrs)
+
     @staticmethod
     def _boost_cls_property(attr_name, self):
         return getattr(self._freddi, attr_name)
