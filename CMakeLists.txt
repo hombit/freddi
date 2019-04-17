@@ -7,8 +7,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
 include_directories("${PROJECT_SOURCE_DIR}/cpp/include")
 
-find_package(Boost 1.57.0 COMPONENTS program_options REQUIRED)
-
 function(CREATE_EXE targ)
     set(TARGET freddi${targ}-exe)
     set(EXE freddi${targ})
@@ -18,6 +16,7 @@ function(CREATE_EXE targ)
         set(Boost_USE_STATIC_LIBS "ON")
     endif(STATIC_LINKING)
 
+    find_package(Boost 1.57.0 COMPONENTS program_options REQUIRED)
 
     file(GLOB_RECURSE SOURCES cpp/main${targ}.cpp cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
     add_executable(${TARGET} ${SOURCES})
@@ -37,20 +36,31 @@ CREATE_EXE("-ns")
 
 function(CREATE_PY_MODULE)
     find_package(Python3 COMPONENTS Development Interpreter)
-    foreach(Boost_Python3_VERSION_TAG
-            "${Python3_VERSION_MAJOR}"
-            "-py${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
-            "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
-            "-${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
-            "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
-            "-${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
-        find_package(Boost QUIET COMPONENTS "python${Boost_Python3_VERSION_TAG}")
-        if(${Boost_FOUND})
-            message("Boost_Python3_VERSION_TAG: ${Boost_Python3_VERSION_TAG}")
-            find_package(Boost COMPONENTS "python${Boost_Python3_VERSION_TAG}" "numpy${Boost_Python3_VERSION_TAG}")
-            break()
-        endif()
-    endforeach()
+    message("Python3_LIBRARIES: ${Python3_LIBRARIES}")
+    
+    function(LOCATE_BOOST_PYTHON Boost_Python3_VERSION_TAG)
+        foreach(TAG
+                "${Python3_VERSION_MAJOR}"
+                "-py${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
+                "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
+                "-${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
+                "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
+                "-${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
+            find_package(Boost QUIET COMPONENTS "python${TAG}")
+            if(${Boost_FOUND})
+                message("Boost_Python3_VERSION_TAG: ${TAG}")
+                set(Boost_Python3_VERSION_TAG ${TAG} PARENT_SCOPE)
+                break()
+            endif()
+        endforeach()
+    endfunction(LOCATE_BOOST_PYTHON)
+
+    find_package(Python3 COMPONENTS Development Interpreter)
+
+    LOCATE_BOOST_PYTHON(Boost_Python3_VERSION_TAG)
+    find_package(Boost COMPONENTS program_options "python${Boost_Python3_VERSION_TAG}" "numpy${Boost_Python3_VERSION_TAG}")    
+    message("Boost_LIBRARIES: ${Boost_LIBRARIES}")
+
     if (${Python3_FOUND} AND ${Boost_FOUND})
         set(TARGET _freddi)
         file(GLOB_RECURSE SOURCES cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h cpp/pywrap/*.cpp cpp/pywrap/*.hpp)
