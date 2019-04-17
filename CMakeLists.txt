@@ -40,9 +40,9 @@ function(CREATE_PY_MODULE)
     
     function(LOCATE_BOOST_PYTHON Boost_Python3_VERSION_TAG)
         foreach(TAG
+                "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
                 "${Python3_VERSION_MAJOR}"
                 "-py${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
-                "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
                 "-${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
                 "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
                 "-${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
