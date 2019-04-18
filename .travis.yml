@@ -134,33 +134,6 @@ matrix:
       before_deploy:
         - pip3 install wheel
         - python3 setup.py bdist_wheel
-    - name: "PyPy 3.5 on Linux"
-      os: linux
-      dist: xenial
-      sudo: true
-      language: python
-      python: "pypy3.5"
-      addons:
-        apt:
-          packages:
-            - libopenblas-dev
-            - liblapack-dev
-            - g++
-      cache:
-        - pip
-      before_install:
-        - pip install cmake numpy
-        - cmake --version
-        - sudo bash .ci/install-boost.sh 69
-        - sudo ldconfig
-      install:
-        - pip install scipy
-        - python setup.py install
-      script:
-        - python -c "import freddi"
-        - python setup.py test
-      before_deploy:
-        - python setup.py bdist_wheel
     - name: "C++ in Docker"
       os: linux
       language: generic
