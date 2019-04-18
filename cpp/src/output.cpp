@@ -97,10 +97,10 @@ void FreddiFileOutput::dump() {
 		std::ostringstream filename;
 		auto i_t = static_cast<int>(std::round(freddi->t() / freddi->args().calc->tau));
 		filename << freddi->args().general->dir << "/" << freddi->args().general->prefix << "_" << i_t << ".dat";
-		FstreamWithPath output(filename.str());
-		output << fulldata_header << sToDay(freddi->t()) << " Mdot_in = " << freddi->Mdot_in() << std::endl;
+		FstreamWithPath full_output(filename.str());
+		full_output << fulldata_header << sToDay(freddi->t()) << " Mdot_in = " << freddi->Mdot_in() << std::endl;
 		for ( int i = 1; i < Nx; ++i ){
-			output		<< freddi->h()[i]
+			full_output		<< freddi->h()[i]
 				<< "\t" << freddi->R()[i]
 				<< "\t" << freddi->F()[i]
 				<< "\t" << freddi->Sigma()[i]

@@ -145,9 +145,9 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 	// Change initial condition due presence of magnetic field torque. It can spoil user-defined initial disk
 	// parameters, such as mass or Fout
 	if (inverse_beta() <= 0.) {  // F_in is non-zero, Fmang is zero everywhere
-		const double F_in = k_t() * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
+		current_.F_in = k_t() * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
 		for (size_t i = 0; i < Nx(); i++) {
-			current_.F[i] += F_in;
+			current_.F[i] += current_.F_in;
 		}
 	} else {  // F_in is zero, and F + Fmagn = initial_cond + Fmang_in
 		for (size_t i = 0; i < Nx(); i++) {
