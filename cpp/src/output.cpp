@@ -58,6 +58,16 @@ FreddiFileOutput::FreddiFileOutput(FreddiEvolution &freddi_, const boost::progra
 					   << i
 					   << "\n";
 			}
+		} else if (auto v = boost::any_cast<std::vector<std::string> >(&value)) {
+			for (int i = 0; i < v->size(); ++i) {
+				output << "# "
+					   << it.first.c_str()
+					   << "="
+					   << v->at(i)
+					   << "  # "
+					   << i
+					   << "\n";
+			}
 		} else {
 //			output << "error\n";
 			throw boost::program_options::invalid_option_value(it.first.c_str());

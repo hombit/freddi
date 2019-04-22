@@ -249,6 +249,7 @@ public:
 	constexpr static const double default_inversebeta = 0.;
 	constexpr static const double default_Rdead = 0.;
 	constexpr static const char default_fptype[] = "no-outflow";
+	const pard default_fpparams = {};
 public:
 	const double Rx;
 	const double freqx;

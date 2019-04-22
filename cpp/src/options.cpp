@@ -1,4 +1,7 @@
 #include <algorithm>  // transform
+#include <vector>
+
+#include <boost/algorithm/string.hpp> // split
 
 #include "options.hpp"
 
@@ -167,13 +170,13 @@ FluxOptions::FluxOptions(const po::variables_map &vm):
 				kpcToCm(vm["distance"].as<double>()),
 				lambdasInitializer(vm)) {}
 
-vecd FluxOptions::lambdasInitializer(const po::variables_map &vm) const {
-	if (vm.count("lambda") > 0) {
-		vecd lambdas(vm["lambda"].as<vecd>());
-		transform(lambdas.begin(), lambdas.end(), lambdas.begin(), angstromToCm);
-		return lambdas;
+vecd FluxOptions::lambdasInitializer(const po::variables_map &vm) {
+	if (vm.count("lambda") == 0) {
+		return vecd();
 	}
-	return vecd();
+	vecd lambdas(vm["lambda"].as<vecd>());
+	transform(lambdas.begin(), lambdas.end(), lambdas.begin(), angstromToCm);
+	return lambdas;
 }
 
 po::options_description FluxOptions::description() {
@@ -245,7 +248,24 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 				vm["inversebeta"].as<double>(),
 				vm["Rdead"].as<double>(),
 				vm["fptype"].as<std::string>(),
-				{}) {}
+				fpparamsInitializer(vm)) {}
+
+pard NeutronStarOptions::fpparamsInitializer(const po::variables_map& vm) {
+	pard m;
+	if (vm.count("fpparams") == 0) {
+		return m;
+	}
+	const std::vector<std::string > tokens(vm["fpparams"].as<std::vector<std::string> >());
+	for (const auto& token : tokens) {
+		std::vector<std::string> parts;
+		boost::split(parts, token, boost::is_any_of(":"));
+		if (parts.size() != 2) {
+			throw po::validation_error(po::validation_error::invalid_option_value);
+		}
+		m[parts[0]] = std::stod(parts[1]);
+	}
+	return m;
+}
 
 po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star");
@@ -258,6 +278,7 @@ po::options_description NeutronStarOptions::description() {
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "???" )
 			( "Rdead", po::value<double>()->default_value(default_Rdead), "Maximum inner radius of the disk that can be obtained, it characterises minimum torque in the dead disk, cm" )
 			( "fptype", po::value<std::string>()->default_value(default_fptype), "??? Accretor Mdot fraction" )
+			( "fpparams", po::value<std::vector<std::string> >()->multitoken(), "??? Accretor Mdot fraction parameters, specific for each fptype. Specify them i format name:value" )
 			;
 	return od;
 }
