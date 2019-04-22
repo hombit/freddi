@@ -71,16 +71,16 @@ FreddiFileOutput::FreddiFileOutput(FreddiEvolution &freddi_, const boost::progra
 }
 
 void FreddiFileOutput::dump() {
-	auto Nx = freddi->Nx();
+	const auto last = freddi->last();
 	output  << sToDay(freddi->t())
 			<< "\t" << freddi->Mdot_in()
 			<< "\t" << freddi->Mdisk()
-			<< "\t" << cmToSun(freddi->R()[Nx-1])
-			<< "\t" << freddi->Cirr()[Nx-1]
-			<< "\t" << freddi->Height()[Nx-1] / freddi->R()[Nx-1]
-			<< "\t" << freddi->Tph()[Nx-1]
-			<< "\t" << freddi->Tirr()[Nx-1]
-			<< "\t" << pow(freddi->Tirr()[Nx-1] / freddi->Tph_vis()[Nx-1], 4. )
+			<< "\t" << cmToSun(freddi->R()[last])
+			<< "\t" << freddi->Cirr()[last]
+			<< "\t" << freddi->Height()[last] / freddi->R()[last]
+			<< "\t" << freddi->Tph()[last]
+			<< "\t" << freddi->Tirr()[last]
+			<< "\t" << pow(freddi->Tirr()[last] / freddi->Tph_vis()[last], 4. )
 			<< "\t" << freddi->Lx()
 			<< "\t" << freddi->mU()
 			<< "\t" << freddi->mB()
@@ -99,7 +99,7 @@ void FreddiFileOutput::dump() {
 		filename << freddi->args().general->dir << "/" << freddi->args().general->prefix << "_" << i_t << ".dat";
 		FstreamWithPath full_output(filename.str());
 		full_output << fulldata_header << sToDay(freddi->t()) << " Mdot_in = " << freddi->Mdot_in() << std::endl;
-		for ( int i = 1; i < Nx; ++i ){
+		for ( int i = freddi->first(); i <= freddi->last(); ++i ){
 			full_output		<< freddi->h()[i]
 				<< "\t" << freddi->R()[i]
 				<< "\t" << freddi->F()[i]
