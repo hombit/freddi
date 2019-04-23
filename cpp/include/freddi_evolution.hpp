@@ -94,28 +94,28 @@ private:
 	public:
 		BasicNSMdotFraction() = default;
 		virtual ~BasicNSMdotFraction() = 0;
-		virtual double operator()(double R_to_Rcor) = 0;
+		virtual double operator()(double R_to_Rcor) const = 0;
 	};
 
 	class NoOutflowNSMdotFraction: public BasicNSMdotFraction {
 	public:
 		NoOutflowNSMdotFraction() = default;
 		~NoOutflowNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) override;
+		virtual double operator()(double R_to_Rcor) const override;
 	};
 
 	class PropellerNSMdotFraction: public BasicNSMdotFraction {
 	public:
 		PropellerNSMdotFraction() = default;
 		~PropellerNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) override;
+		virtual double operator()(double R_to_Rcor) const override;
 	};
 
 	class CorotationBlockNSMdotFraction: public BasicNSMdotFraction {
 	public:
 		CorotationBlockNSMdotFraction() = default;
 		~CorotationBlockNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) override;
+		virtual double operator()(double R_to_Rcor) const override;
 	};
 
 	// https://arxiv.org/pdf/1010.1528.pdf Eksi-Kutlu (2010)
@@ -123,7 +123,7 @@ private:
 	public:
 		EksiKultu2010NSMdotFraction() = default;
 		~EksiKultu2010NSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) override;
+		virtual double operator()(double R_to_Rcor) const override;
 	};
 
 	class Romanova2018NSMdotFraction: public BasicNSMdotFraction {
@@ -133,7 +133,7 @@ private:
 	public:
 		Romanova2018NSMdotFraction(double par1, double par2);
 		~Romanova2018NSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) override;
+		virtual double operator()(double R_to_Rcor) const override;
 	};
 
 	class GeometricalNSMdotFraction: public BasicNSMdotFraction {
@@ -142,7 +142,7 @@ private:
 	public:
 		GeometricalNSMdotFraction(double chi);
 		~GeometricalNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) override;
+		virtual double operator()(double R_to_Rcor) const override;
 	};
 private:
 	std::shared_ptr<const NeutronStarStructure> ns_str_;
@@ -174,8 +174,8 @@ public:
 	double Lx_ns();
 // fp_
 public:
-	inline double fp(double R) const { return (*fp_)(R / R_cor()); }
-	inline double fp() const { return (*fp_)(R()[first()]); }
+	inline double fp(double radius) const { return (*fp_)(radius / R_cor()); }
+	inline double fp() const { return fp(R()[first()]); }
 public:
 	using FreddiEvolution::step;
 protected:

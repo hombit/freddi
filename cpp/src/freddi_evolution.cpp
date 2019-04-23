@@ -143,17 +143,17 @@ vecd FreddiNeutronStarEvolution::NeutronStarStructure::initialize_d2Fmagn_dh2(Fr
 FreddiNeutronStarEvolution::BasicNSMdotFraction::~BasicNSMdotFraction() {}
 
 
-double FreddiNeutronStarEvolution::NoOutflowNSMdotFraction::operator()(double R_to_Rcor) {
+double FreddiNeutronStarEvolution::NoOutflowNSMdotFraction::operator()(double R_to_Rcor) const {
 	return 1.;
 }
 
 
-double FreddiNeutronStarEvolution::PropellerNSMdotFraction::operator()(double R_to_Rcor) {
+double FreddiNeutronStarEvolution::PropellerNSMdotFraction::operator()(double R_to_Rcor) const {
 	return 0.;
 }
 
 
-double FreddiNeutronStarEvolution::CorotationBlockNSMdotFraction::operator()(double R_to_Rcor) {
+double FreddiNeutronStarEvolution::CorotationBlockNSMdotFraction::operator()(double R_to_Rcor) const {
 	if (R_to_Rcor > 1.) {
 		return 0.;
 	}
@@ -163,7 +163,7 @@ double FreddiNeutronStarEvolution::CorotationBlockNSMdotFraction::operator()(dou
 
 // https://arxiv.org/pdf/1010.1528.pdf Eksi-Kutlu (2010)
 // fastness = (R_in/R_cor)^(3/2)  */
-double FreddiNeutronStarEvolution::EksiKultu2010NSMdotFraction::operator()(double R_to_Rcor) {
+double FreddiNeutronStarEvolution::EksiKultu2010NSMdotFraction::operator()(double R_to_Rcor) const {
 	const double fastness2 = m::pow<3>(R_to_Rcor);
 	double p = (1. - 1./fastness2);
 	if (p < 0){
@@ -178,7 +178,7 @@ FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::Romanova2018NSMdotFracti
 
 // Return fraction of the accretion rate penetrating to the NS surface
 // according to numerical results of MHD simulations (Romanova+2018, Table 2)
-double FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::operator()(double R_to_Rcor) {
+double FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::operator()(double R_to_Rcor) const {
 	const double fastness = std::pow(R_to_Rcor, 1.5);
 	double _fp = 0;
 	if (fastness >= 1) {
@@ -194,14 +194,14 @@ double FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::operator()(double
 FreddiNeutronStarEvolution::GeometricalNSMdotFraction::GeometricalNSMdotFraction(double chi):
 		chi(chi) {
 	if (chi == 0) {
-		throw std::logic_error("chi cannot be zero here, PropellerNSMdotFraction should be used in this case");
+		throw std::logic_error("chi cannot be zero here, CorotationBlockNSMdotFraction should be used in this case");
 	}
 }
 
 // Return fraction of the accretion rate penetrating to the NS surface
-// for an inclined dipole with angle chi [grad] and rratio = Rin/Rcor > 1
+// for an inclined dipole with angle chi [grad] and R_to_R_cor = Rin/Rcor > 1
 // see magnetospheric_form_1.mw
-double FreddiNeutronStarEvolution::GeometricalNSMdotFraction::operator()(double R_to_Rcor) {
+double FreddiNeutronStarEvolution::GeometricalNSMdotFraction::operator()(double R_to_Rcor) const {
 	const double mdot_factor = std::pow(R_to_Rcor, -3.5);
 	const double tmp = mdot_factor - m::pow<2>(std::cos(chi));
 	if ( tmp < 0. ) {

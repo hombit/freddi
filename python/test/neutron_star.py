@@ -1,5 +1,6 @@
 import unittest
 
+import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 
 from freddi import FreddiNeutronStar
@@ -40,14 +41,50 @@ class FmagnDerivativesTestCase(unittest.TestCase):
 class NSMdotFractionTestCase(unittest.TestCase):
     """fp(r/r_cor) function"""
     basic_kwargs = dict(
+        Mdot0=1e16,
+        initialcond='quasistat',
+        Mx=1.4 * 2e33,  # g
+        Rx=1e6,  # cm
         freqx=500,  # Hz
         rout=1e11,  # cm
         Bx=1e8,  # G
-        Rdead=1e7,  # cm
-        time=100 * 86400,  # s
+        Rdead=5e6,  # cm
+        time=200 * 86400,  # s
         tau=0.1 * 86400,  # s
     )
 
     def test_no_outflow(self):
         fr = FreddiNeutronStar(fptype='no-outflow', **self.basic_kwargs)
-        assert_array_equal(1, fr.fp)
+        result = fr.evolve()
+        assert_array_equal(1, result.fp)
+
+    def test_propeller(self):
+        fr = FreddiNeutronStar(fptype='propeller', **self.basic_kwargs)
+        result = fr.evolve()
+        assert_array_equal(0, result.fp)
+
+    def test_corotation_block(self):
+        fr = FreddiNeutronStar(fptype='corotation-block', **self.basic_kwargs)
+        result = fr.evolve()
+        r = result.first_R / fr.R_cor
+        assert np.any(r < 1)
+        assert np.any(r > 1)
+        assert_array_equal(r < 1, result.fp)
+
+    def test_geometrical_chi_zero(self):
+        fr_corotation_block = FreddiNeutronStar(fptype='corotation-block', **self.basic_kwargs)
+        result_corotation_block = fr_corotation_block.evolve()
+        fr_geometrical = FreddiNeutronStar(fptype='geometrical', fpparams={'chi': 0}, **self.basic_kwargs)
+        result_geometrical = fr_geometrical.evolve()
+        assert_array_equal(result_corotation_block.fp, result_geometrical.fp)
+
+    def test_geometrical_chi_nonzero(self):
+        fr = FreddiNeutronStar(fptype='geometrical', fpparams={'chi': 30}, **self.basic_kwargs)
+        result = fr.evolve()
+        fp = result.fp
+        r = result.first_R / fr.R_cor
+        assert_array_equal(1, fp)
+        assert np.all(fp >= 0) and np.all(fp <= 1)
+        assert r[0] < 1
+        assert fp[0] < 1
+        assert_array_equal(1, fp[r > 1])
