@@ -154,7 +154,7 @@ double FreddiNeutronStarEvolution::PropellerNSMdotFraction::operator()(double R_
 
 
 double FreddiNeutronStarEvolution::CorotationBlockNSMdotFraction::operator()(double R_to_Rcor) {
-	if (R_to_Rcor < 1.) {
+	if (R_to_Rcor > 1.) {
 		return 0.;
 	}
 	return 1.;
