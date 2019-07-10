@@ -2,7 +2,9 @@
 #define FREDDI_FREDDIFILEOUTPUT_H
 
 #include <fstream>
+#include <functional>
 #include <string>
+#include <vector>
 
 #include <boost/program_options.hpp>
 
@@ -21,14 +23,38 @@ public:
 
 class FreddiFileOutput {
 protected:
-	constexpr static const char fulldata_header[] = "#h\tR\tF\tSigma\tTeff\tTvis\tTirr\tHeight\n#cm^2/s\tcm\tdyn*cm\tg/cm^2\tK\tK\tK\tcm\n# Time = ";
-private:
+	struct ShortField {
+		std::string name;
+		std::string unit;
+		std::function<double ()> func;
+	};
+	struct LongField {
+		std::string name;
+		std::string unit;
+		std::function<const vecd& ()> func;
+	};
+
 	FreddiEvolution* freddi;
+	virtual void shortDump();
+	virtual void longDump();
+	const std::vector<ShortField> short_fields;
+	const std::vector<LongField> long_fields;
+	virtual std::vector<ShortField> initializeShortFields() const;
+	virtual std::vector<LongField> initializeLongFields() const;
+
+private:
 	FstreamWithPath output;
+	std::string fulldata_header;
+	std::string initializeFulldataHeader() const;
 public:
 	FreddiFileOutput(FreddiEvolution& freddi, const boost::program_options::variables_map& vm);
 	void dump();
 	inline std::string path() const { return output.path; }
+};
+
+
+class FreddiNeutronStarFileOutput: public FreddiFileOutput {
+
 };
 
 

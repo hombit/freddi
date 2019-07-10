@@ -3,6 +3,6 @@
 
 
 int main(int ac, char *av[]) {
-	run_application<FreddiOptions, FreddiEvolution>(ac, av);
+	run_application<FreddiFileOutput, FreddiOptions, FreddiEvolution>(ac, av);
 	return 0;
 }

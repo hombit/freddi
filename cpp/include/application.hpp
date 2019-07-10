@@ -7,7 +7,7 @@
 #include "output.hpp"
 
 
-template <typename Options, typename Evolution>
+template <typename Output, typename Options, typename Evolution>
 void run_application(int ac, char *av[]) {
 	auto vm = parseOptions<Options>(ac, av);
 	if (vm.count("help") > 0) {
@@ -16,7 +16,7 @@ void run_application(int ac, char *av[]) {
 	}
 	Options opts(vm);
 	Evolution freddi(opts);
-	FreddiFileOutput output(freddi, vm);
+	Output output(freddi, vm);
 	for (int i_t = 0; i_t <= static_cast<int>(freddi.args().calc->time / freddi.args().calc->tau); i_t++) {
 		output.dump();
 		freddi.step();
