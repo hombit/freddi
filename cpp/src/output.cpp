@@ -141,88 +141,60 @@ void BasicFreddiFileOutput::dump() {
 std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const std::shared_ptr<FreddiEvolution>& freddi) {
 	std::vector<FileOutputShortField> fields {
 			{"t", "days", [freddi]() {return sToDay(freddi->t());}},
-			{"Mdot", "g/s",  std::bind(&FreddiEvolution::Mdot_in, freddi)},
-			{"Mdisk", "g", std::bind(&FreddiEvolution::Mdisk, freddi)},
+			{"Mdot", "g/s",  [freddi]() {return freddi->Mdot_in();}},
+			{"Mdisk", "g", [freddi]() {return freddi->Mdisk();}},
 			{"Rhot", "Rsun", [freddi]() {return cmToSun(freddi->R()[freddi->last()]);}},
 			{"Cirrout", "float", [freddi]() {return freddi->Cirr()[freddi->last()];}},
 			{"H2R", "float", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
 			{"Teffout", "K", [freddi]() {return freddi->Tph()[freddi->last()];}},
 			{"Tirrout", "K", [freddi]() {return freddi->Tirr()[freddi->last()];}},
 			{"Qiir2Qvisout", "float", [freddi]() {return pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
-			{"Lx", "erg/s", std::bind(&FreddiEvolution::Lx, freddi)},
-			{"mU", "mag", std::bind(&FreddiEvolution::mU, freddi)},
-			{"mB", "mag", std::bind(&FreddiEvolution::mB, freddi)},
-			{"mV", "mag", std::bind(&FreddiEvolution::mV, freddi)},
-			{"mR", "mag", std::bind(&FreddiEvolution::mR, freddi)},
-			{"mI", "mag", std::bind(&FreddiEvolution::mI, freddi)},
-			{"mJ", "mag", std::bind(&FreddiEvolution::mJ, freddi)},
+			{"Lx", "erg/s", [freddi]() {return freddi->Lx();}},
+			{"mU", "mag", [freddi]() {return freddi->mU();}},
+			{"mB", "mag", [freddi]() {return freddi->mB();}},
+			{"mV", "mag", [freddi]() {return freddi->mV();}},
+			{"mR", "mag", [freddi]() {return freddi->mR();}},
+			{"mI", "mag", [freddi]() {return freddi->mI();}},
+			{"mJ", "mag", [freddi]() {return freddi->mJ();}},
 	};
 	const auto& lambdas = freddi->args().flux->lambdas;
 	for (size_t i = 0; i < lambdas.size(); ++i) {
 		const double lambda = lambdas[i];
-		fields.push_back(FileOutputShortField{
+		fields.emplace_back(
 				std::string("Fnu") + std::to_string(i),
 				"erg/s/cm^2/Hz",
 				[freddi, lambda]() { return freddi->flux(lambda); }
-		});
+		);
 	}
 	return fields;
 }
 
 std::vector<FileOutputLongField> FreddiFileOutput::initializeLongFields(const std::shared_ptr<FreddiEvolution>& freddi) {
 	return {
-			{"h", "cm^2/s", std::bind(&FreddiEvolution::h, freddi)},
-			{"R", "cm", std::bind(&FreddiEvolution::R, freddi)},
-			{"F", "dyn*cm", std::bind(&FreddiEvolution::F, freddi)},
-			{"Sigma", "g/cm^2", std::bind(&FreddiEvolution::Sigma, freddi)},
-			{"Teff", "K", std::bind(&FreddiEvolution::Tph, freddi)},
-			{"Tvis", "K", std::bind(&FreddiEvolution::Tph_vis, freddi)},
-			{"Tirr", "K", std::bind(&FreddiEvolution::Tirr, freddi)},
-			{"Height", "cm", std::bind(&FreddiEvolution::Height, freddi)},
+			{"h", "cm^2/s", [freddi]() {return freddi->h();}},
+			{"R", "cm", [freddi]() {return freddi->R();}},
+			{"F", "dyn*cm", [freddi]() {return freddi->F();}},
+			{"Sigma", "g/cm^2", [freddi]() {return freddi->Sigma();}},
+			{"Teff", "K", [freddi]() {return freddi->Tph();}},
+			{"Tvis", "K", [freddi]() {return freddi->Tph_vis();}},
+			{"Tirr", "K", [freddi]() {return freddi->Tirr();}},
+			{"Height", "cm", [freddi]() {return freddi->Height();}},
 	};
 }
 
 
 std::vector<FileOutputShortField> FreddiNeutronStarFileOutput::initializeShortFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi) {
-	std::vector<FileOutputShortField> fields {
-			{"t", "days", [freddi]() {return sToDay(freddi->t());}},
-			{"Mdot", "g/s",  std::bind(&FreddiEvolution::Mdot_in, freddi)},
-			{"Mdisk", "g", std::bind(&FreddiEvolution::Mdisk, freddi)},
-			{"Rhot", "Rsun", [freddi]() {return cmToSun(freddi->R()[freddi->last()]);}},
-			{"Cirrout", "float", [freddi]() {return freddi->Cirr()[freddi->last()];}},
-			{"H2R", "float", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
-			{"Teffout", "K", [freddi]() {return freddi->Tph()[freddi->last()];}},
-			{"Tirrout", "K", [freddi]() {return freddi->Tirr()[freddi->last()];}},
-			{"Qiir2Qvisout", "float", [freddi]() {return pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
-			{"Lx", "erg/s", std::bind(&FreddiEvolution::Lx, freddi)},
-			{"mU", "mag", std::bind(&FreddiEvolution::mU, freddi)},
-			{"mB", "mag", std::bind(&FreddiEvolution::mB, freddi)},
-			{"mV", "mag", std::bind(&FreddiEvolution::mV, freddi)},
-			{"mR", "mag", std::bind(&FreddiEvolution::mR, freddi)},
-			{"mI", "mag", std::bind(&FreddiEvolution::mI, freddi)},
-			{"mJ", "mag", std::bind(&FreddiEvolution::mJ, freddi)},
-	};
-	const auto& lambdas = freddi->args().flux->lambdas;
-	for (size_t i = 0; i < lambdas.size(); ++i) {
-		const double lambda = lambdas[i];
-		fields.push_back(FileOutputShortField{
-				std::string("Fnu") + std::to_string(i),
-				"erg/s/cm^2/Hz",
-				[freddi, lambda]() { return freddi->flux(lambda); }
-		});
-	}
+	auto fields = FreddiFileOutput::initializeShortFields(freddi);
+	fields.emplace_back("Rin", "cm", [freddi]() {return freddi->R()[freddi->first()];});
+	fields.emplace_back("Lxns", "erg/s", [freddi]() {return freddi->Lx_ns();});
+	fields.emplace_back("Lbolns", "erg/s", [freddi]() {return freddi->Lbol_ns();});
+	fields.emplace_back("fpin", "float", [freddi]() {return freddi->fp();});
+	fields.emplace_back("Fmagnin", "dyn*cm", [freddi]() {return freddi->Fmagn()[freddi->first()];});
 	return fields;
 }
 
 std::vector<FileOutputLongField> FreddiNeutronStarFileOutput::initializeLongFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi) {
-	return {
-			{"h", "cm^2/s", std::bind(&FreddiEvolution::h, freddi)},
-			{"R", "cm", std::bind(&FreddiEvolution::R, freddi)},
-			{"F", "dyn*cm", std::bind(&FreddiEvolution::F, freddi)},
-			{"Sigma", "g/cm^2", std::bind(&FreddiEvolution::Sigma, freddi)},
-			{"Teff", "K", std::bind(&FreddiEvolution::Tph, freddi)},
-			{"Tvis", "K", std::bind(&FreddiEvolution::Tph_vis, freddi)},
-			{"Tirr", "K", std::bind(&FreddiEvolution::Tirr, freddi)},
-			{"Height", "cm", std::bind(&FreddiEvolution::Height, freddi)},
-	};
+	auto fields = FreddiFileOutput::initializeLongFields(freddi);
+	fields.emplace_back("Fmagn", "dyn*cm", [freddi]() {return freddi->Fmagn();});
+	return fields;
 }

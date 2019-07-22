@@ -24,12 +24,16 @@ struct FileOutputShortField {
 	std::string name;
 	std::string unit;
 	std::function<double ()> func;
+	FileOutputShortField(const std::string&& name, const std::string&& unit, const std::function<double ()>&& func):
+			name(name), unit(unit), func(func) {};
 };
 
 struct FileOutputLongField {
 	std::string name;
 	std::string unit;
 	std::function<const vecd& ()> func;
+	FileOutputLongField(const std::string&& name, const std::string&& unit, const std::function<const vecd& ()>&& func):
+			name(name), unit(unit), func(func) {};
 };
 
 
@@ -52,7 +56,7 @@ public:
 };
 
 class FreddiFileOutput: public BasicFreddiFileOutput {
-private:
+public:
 	static std::vector<FileOutputShortField> initializeShortFields(const std::shared_ptr<FreddiEvolution>& freddi);
 	static std::vector<FileOutputLongField> initializeLongFields(const std::shared_ptr<FreddiEvolution>& freddi);
 public:
@@ -62,7 +66,7 @@ public:
 
 
 class FreddiNeutronStarFileOutput: public BasicFreddiFileOutput {
-private:
+public:
 	static std::vector<FileOutputShortField> initializeShortFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi);
 	static std::vector<FileOutputLongField> initializeLongFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi);
 public:
