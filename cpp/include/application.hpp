@@ -15,11 +15,11 @@ void run_application(int ac, char *av[]) {
 		return;
 	}
 	Options opts(vm);
-	Evolution freddi(opts);
+	std::shared_ptr<Evolution> freddi{new Evolution(opts)};
 	Output output(freddi, vm);
-	for (int i_t = 0; i_t <= static_cast<int>(freddi.args().calc->time / freddi.args().calc->tau); i_t++) {
+	for (int i_t = 0; i_t <= static_cast<int>(freddi->args().calc->time / freddi->args().calc->tau); i_t++) {
 		output.dump();
-		freddi.step();
+		freddi->step();
 	}
 }
 

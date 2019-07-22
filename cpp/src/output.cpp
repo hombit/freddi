@@ -4,11 +4,12 @@
 
 #include "unit_transformation.hpp"
 
-FreddiFileOutput::FreddiFileOutput(FreddiEvolution &freddi_, const boost::program_options::variables_map& vm):
-		freddi(&freddi_),
-		output(freddi_.args().general->dir + "/" + freddi_.args().general->prefix + ".dat"),
-		short_fields(initializeShortFields()),
-		long_fields(initializeLongFields()),
+BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvolution>& freddi, const boost::program_options::variables_map& vm,
+											 const std::vector<FileOutputShortField>&& short_fields, const std::vector<FileOutputLongField>&& long_fields):
+		freddi(freddi),
+		output(freddi->args().general->dir + "/" + freddi->args().general->prefix + ".dat"),
+		short_fields(short_fields),
+		long_fields(long_fields),
 		fulldata_header(initializeFulldataHeader()) {
 	output << "#" << short_fields.at(0).name;
 	for (size_t i = 1; i < short_fields.size(); ++i) {
@@ -74,57 +75,14 @@ FreddiFileOutput::FreddiFileOutput(FreddiEvolution &freddi_, const boost::progra
 		}
 	}
 	if (vm.count("rout") == 0) {
-		output << "# --rout hadn't been specified, tidal radius " << freddi_.args().basic->rout / solar_radius << " Rsun was used"
+		output << "# --rout hadn't been specified, tidal radius " << freddi->args().basic->rout / solar_radius << " Rsun was used"
 			   << std::endl;
 	}
 	output << std::flush;
 }
 
-std::vector<FreddiFileOutput::ShortField> FreddiFileOutput::initializeShortFields() const {
-	std::vector<FreddiFileOutput::ShortField> fields {
-			{"t", "days", [this]() {return sToDay(freddi->t());}},
-			{"Mdot", "g/s",  std::bind(&FreddiEvolution::Mdot_in, freddi)},
-			{"Mdisk", "g", std::bind(&FreddiEvolution::Mdisk, freddi)},
-			{"Rhot", "Rsun", [this]() {return cmToSun(freddi->R()[freddi->last()]);}},
-			{"Cirrout", "float", [this]() {return freddi->Cirr()[freddi->last()];}},
-			{"H2R", "float", [this]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
-			{"Teffout", "K", [this]() {return freddi->Tph()[freddi->last()];}},
-			{"Tirrout", "K", [this]() {return freddi->Tirr()[freddi->last()];}},
-			{"Qiir2Qvisout", "float", [this]() {return pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
-			{"Lx", "erg/s", std::bind(&FreddiEvolution::Lx, freddi)},
-			{"mU", "mag", std::bind(&FreddiEvolution::mU, freddi)},
-			{"mB", "mag", std::bind(&FreddiEvolution::mB, freddi)},
-			{"mV", "mag", std::bind(&FreddiEvolution::mV, freddi)},
-			{"mR", "mag", std::bind(&FreddiEvolution::mR, freddi)},
-			{"mI", "mag", std::bind(&FreddiEvolution::mI, freddi)},
-			{"mJ", "mag", std::bind(&FreddiEvolution::mJ, freddi)},
-	};
-	const auto& lambdas = freddi->args().flux->lambdas;
-	for (size_t i = 0; i < lambdas.size(); ++i) {
-		const double lambda = lambdas[i];
-		fields.push_back(FreddiFileOutput::ShortField{
-				std::string("Fnu") + std::to_string(i),
-				"erg/s/cm^2/Hz",
-				[this, lambda]() { return freddi->flux(lambda); }
-		});
-	}
-	return fields;
-}
 
-std::vector<FreddiFileOutput::LongField> FreddiFileOutput::initializeLongFields() const {
-	return {
-			{"h", "cm^2/s", std::bind(&FreddiEvolution::h, freddi)},
-			{"R", "cm", std::bind(&FreddiEvolution::R, freddi)},
-			{"F", "dyn*cm", std::bind(&FreddiEvolution::F, freddi)},
-			{"Sigma", "g/cm^2", std::bind(&FreddiEvolution::Sigma, freddi)},
-			{"Teff", "K", std::bind(&FreddiEvolution::Tph, freddi)},
-			{"Tvis", "K", std::bind(&FreddiEvolution::Tph_vis, freddi)},
-			{"Tirr", "K", std::bind(&FreddiEvolution::Tirr, freddi)},
-			{"Height", "cm", std::bind(&FreddiEvolution::Height, freddi)},
-	};
-}
-
-std::string FreddiFileOutput::initializeFulldataHeader() const {
+std::string BasicFreddiFileOutput::initializeFulldataHeader() const {
 	std::string s;
 
 	s += "#" + long_fields.at(0).name;
@@ -142,7 +100,7 @@ std::string FreddiFileOutput::initializeFulldataHeader() const {
 	return s;
 }
 
-void FreddiFileOutput::shortDump() {
+void BasicFreddiFileOutput::shortDump() {
 	output << short_fields[0].func();
 	for (size_t i = 1; i < short_fields.size(); ++i) {
 		output << "\t" << short_fields[i].func();
@@ -150,7 +108,7 @@ void FreddiFileOutput::shortDump() {
 	output << std::endl;
 }
 
-void FreddiFileOutput::longDump() {
+void BasicFreddiFileOutput::longDump() {
 	std::ostringstream filename;
 	auto i_t = static_cast<int>(std::round(freddi->t() / freddi->args().calc->tau));
 	filename << freddi->args().general->dir << "/" << freddi->args().general->prefix << "_" << i_t << ".dat";
@@ -171,10 +129,100 @@ void FreddiFileOutput::longDump() {
 	full_output << std::flush;
 }
 
-void FreddiFileOutput::dump() {
+void BasicFreddiFileOutput::dump() {
 	shortDump();
 
 	if (freddi->args().general->fulldata) {
 		longDump();
 	}
+}
+
+
+std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const std::shared_ptr<FreddiEvolution>& freddi) {
+	std::vector<FileOutputShortField> fields {
+			{"t", "days", [freddi]() {return sToDay(freddi->t());}},
+			{"Mdot", "g/s",  std::bind(&FreddiEvolution::Mdot_in, freddi)},
+			{"Mdisk", "g", std::bind(&FreddiEvolution::Mdisk, freddi)},
+			{"Rhot", "Rsun", [freddi]() {return cmToSun(freddi->R()[freddi->last()]);}},
+			{"Cirrout", "float", [freddi]() {return freddi->Cirr()[freddi->last()];}},
+			{"H2R", "float", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
+			{"Teffout", "K", [freddi]() {return freddi->Tph()[freddi->last()];}},
+			{"Tirrout", "K", [freddi]() {return freddi->Tirr()[freddi->last()];}},
+			{"Qiir2Qvisout", "float", [freddi]() {return pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
+			{"Lx", "erg/s", std::bind(&FreddiEvolution::Lx, freddi)},
+			{"mU", "mag", std::bind(&FreddiEvolution::mU, freddi)},
+			{"mB", "mag", std::bind(&FreddiEvolution::mB, freddi)},
+			{"mV", "mag", std::bind(&FreddiEvolution::mV, freddi)},
+			{"mR", "mag", std::bind(&FreddiEvolution::mR, freddi)},
+			{"mI", "mag", std::bind(&FreddiEvolution::mI, freddi)},
+			{"mJ", "mag", std::bind(&FreddiEvolution::mJ, freddi)},
+	};
+	const auto& lambdas = freddi->args().flux->lambdas;
+	for (size_t i = 0; i < lambdas.size(); ++i) {
+		const double lambda = lambdas[i];
+		fields.push_back(FileOutputShortField{
+				std::string("Fnu") + std::to_string(i),
+				"erg/s/cm^2/Hz",
+				[freddi, lambda]() { return freddi->flux(lambda); }
+		});
+	}
+	return fields;
+}
+
+std::vector<FileOutputLongField> FreddiFileOutput::initializeLongFields(const std::shared_ptr<FreddiEvolution>& freddi) {
+	return {
+			{"h", "cm^2/s", std::bind(&FreddiEvolution::h, freddi)},
+			{"R", "cm", std::bind(&FreddiEvolution::R, freddi)},
+			{"F", "dyn*cm", std::bind(&FreddiEvolution::F, freddi)},
+			{"Sigma", "g/cm^2", std::bind(&FreddiEvolution::Sigma, freddi)},
+			{"Teff", "K", std::bind(&FreddiEvolution::Tph, freddi)},
+			{"Tvis", "K", std::bind(&FreddiEvolution::Tph_vis, freddi)},
+			{"Tirr", "K", std::bind(&FreddiEvolution::Tirr, freddi)},
+			{"Height", "cm", std::bind(&FreddiEvolution::Height, freddi)},
+	};
+}
+
+
+std::vector<FileOutputShortField> FreddiNeutronStarFileOutput::initializeShortFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi) {
+	std::vector<FileOutputShortField> fields {
+			{"t", "days", [freddi]() {return sToDay(freddi->t());}},
+			{"Mdot", "g/s",  std::bind(&FreddiEvolution::Mdot_in, freddi)},
+			{"Mdisk", "g", std::bind(&FreddiEvolution::Mdisk, freddi)},
+			{"Rhot", "Rsun", [freddi]() {return cmToSun(freddi->R()[freddi->last()]);}},
+			{"Cirrout", "float", [freddi]() {return freddi->Cirr()[freddi->last()];}},
+			{"H2R", "float", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
+			{"Teffout", "K", [freddi]() {return freddi->Tph()[freddi->last()];}},
+			{"Tirrout", "K", [freddi]() {return freddi->Tirr()[freddi->last()];}},
+			{"Qiir2Qvisout", "float", [freddi]() {return pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
+			{"Lx", "erg/s", std::bind(&FreddiEvolution::Lx, freddi)},
+			{"mU", "mag", std::bind(&FreddiEvolution::mU, freddi)},
+			{"mB", "mag", std::bind(&FreddiEvolution::mB, freddi)},
+			{"mV", "mag", std::bind(&FreddiEvolution::mV, freddi)},
+			{"mR", "mag", std::bind(&FreddiEvolution::mR, freddi)},
+			{"mI", "mag", std::bind(&FreddiEvolution::mI, freddi)},
+			{"mJ", "mag", std::bind(&FreddiEvolution::mJ, freddi)},
+	};
+	const auto& lambdas = freddi->args().flux->lambdas;
+	for (size_t i = 0; i < lambdas.size(); ++i) {
+		const double lambda = lambdas[i];
+		fields.push_back(FileOutputShortField{
+				std::string("Fnu") + std::to_string(i),
+				"erg/s/cm^2/Hz",
+				[freddi, lambda]() { return freddi->flux(lambda); }
+		});
+	}
+	return fields;
+}
+
+std::vector<FileOutputLongField> FreddiNeutronStarFileOutput::initializeLongFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi) {
+	return {
+			{"h", "cm^2/s", std::bind(&FreddiEvolution::h, freddi)},
+			{"R", "cm", std::bind(&FreddiEvolution::R, freddi)},
+			{"F", "dyn*cm", std::bind(&FreddiEvolution::F, freddi)},
+			{"Sigma", "g/cm^2", std::bind(&FreddiEvolution::Sigma, freddi)},
+			{"Teff", "K", std::bind(&FreddiEvolution::Tph, freddi)},
+			{"Tvis", "K", std::bind(&FreddiEvolution::Tph_vis, freddi)},
+			{"Tirr", "K", std::bind(&FreddiEvolution::Tirr, freddi)},
+			{"Height", "cm", std::bind(&FreddiEvolution::Height, freddi)},
+	};
 }

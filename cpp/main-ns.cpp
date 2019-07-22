@@ -4,6 +4,6 @@
 
 
 int main(int ac, char *av[]) {
-	run_application<FreddiNeutronStarOptions, FreddiNeutronStarFileOutput, FreddiNeutronStarEvolution>(ac, av);
+	run_application< FreddiNeutronStarFileOutput, FreddiNeutronStarOptions, FreddiNeutronStarEvolution>(ac, av);
 	return 0;
 }
