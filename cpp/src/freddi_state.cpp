@@ -124,6 +124,10 @@ void FreddiState::initializeWind() {
 		wind_.reset(static_cast<BasicWind*>(new __testC_q0_Shields1986__(*this)));
     } else if (args().disk->wind == "__Unstedy_Test_Hunter__") {
         wind_.reset(static_cast<BasicWind*>(new __Unstedy_Test_Hunter__(*this)));
+    } else if (args().disk->wind == "__Agnieszka_Wind_Paper__") {
+        wind_.reset(static_cast<BasicWind*>(new __Agnieszka_Wind_Paper__(*this)));
+    } else if (args().disk->wind == "__Woods_McKee_Klein__") {
+        wind_.reset(static_cast<BasicWind*>(new __Woods_McKee_Klein__(*this)));
 	} else {
 		throw std::logic_error("Wrong wind");
 	}
@@ -411,8 +415,9 @@ void FreddiState::__testC_q0_Shields1986__::update(const FreddiState& state) {
 }
 FreddiState::__Unstedy_Test_Hunter__::__Unstedy_Test_Hunter__(const FreddiState& state):
         BasicWind(state),
-		fXI(state.args().disk->windparams.at(0)),
-        T_iC(state.args().disk->windparams.at(1)) {
+		f_X(state.args().disk->windparams.at(0)),
+		X_f(state.args().disk->windparams.at(1)),
+        T_iC(state.args().disk->windparams.at(2)) {
 	update(state);
 }
 
@@ -423,7 +428,7 @@ void FreddiState::__Unstedy_Test_Hunter__::update(const FreddiState& state) {
     const double L = state.Mdot_in() * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * state.eta();
     //  1983ApJ...271...70B page 3
     const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_iC);
-	const double P_0 = fXI*L/(4 * M_PI * GSL_CONST_CGSM_SPEED_OF_LIGHT * R_iC * R_iC);
+	const double P_0 = (f_X/X_f)*L/(4 * M_PI * GSL_CONST_CGSM_SPEED_OF_LIGHT * R_iC * R_iC);
 	const double C_ch = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_iC)/(disk->mu * GSL_CONST_CGSM_MASS_PROTON));
 	const double m_ch0 = P_0/C_ch;
     //const double m_ch0 = disk->Mdot0 / (M_PI * state.R().back()*state.R().back());
@@ -431,7 +436,7 @@ void FreddiState::__Unstedy_Test_Hunter__::update(const FreddiState& state) {
     const double L_crit = 0.03 * std::sqrt(1e8/T_iC) * L_edd;
 	const double el = L/L_crit;
 
-	std::cerr << L << "\t" << L_crit << "\t" << T_iC << "\t" << R_iC  << "\t" << L_edd << "\t" << C_ch << "\t" << m_ch0 << std::endl;
+	std::cerr << "\t" << L << "\t" << R_iC  << "\t" << L_edd << "\t" << C_ch << "\t" << P_0 << "\t" << m_ch0 << std::endl;
 
 	for (size_t i = state.first(); i <= state.last(); ++i) {
         //  1986ApJ...306...90S page 2
@@ -445,3 +450,80 @@ void FreddiState::__Unstedy_Test_Hunter__::update(const FreddiState& state) {
 			C_[i] = -2.0 * C0 * m_ch0 * Mach_cc * p_po * y * y * std::pow(xi, -5/3);		}
     }
 }
+
+FreddiState::__Agnieszka_Wind_Paper__::__Agnieszka_Wind_Paper__(const FreddiState& state):
+        BasicWind(state),
+        A_0(state.args().disk->windparams.at(0)),
+        B_1(state.args().disk->windparams.at(1)) {
+    update(state);
+}
+
+void FreddiState::__Agnieszka_Wind_Paper__::update(const FreddiState& state) {
+    BasicWind::update(state);
+    const auto disk = state.args().disk;
+    const double L = state.Mdot_in() * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * state.eta();
+    const double R_g = 2*state.GM()/(GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+    const double L_edd = (4.0 * M_PI * state.GM()* 2.0 * disk->mu * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION);
+    const double lol = L/L_edd;
+	std::cerr << R_g << "\t" << L/L_edd << "\t" << state.R()[state.last()]/R_g << std::endl;
+
+    for (size_t i = state.first(); i <= state.last(); ++i) {
+        //  https://arxiv.org/pdf/1411.4434.pdf
+        if (state.R()[i] > 70.0*R_g) {
+			const double fout = 1 - 1/(1+A_0*lol*lol);
+            const double C_0 = (4 * M_PI * state.h()[i]*state.h()[i]*state.h()[i]) / (state.GM()*state.GM());
+			//C_[i] =  B_1 * 3000.0 * v_r * R_g * fout * ( std::pow((state.R()[state.last()]/R_g), 0.2) - std::pow((state.R()[i]/R_g), 0.2) );
+            //*( std::pow((state.R()[state.last()]/R_g), 0.2) - std::pow((state.R()[i]/R_g), 0.2)
+            const double Q = 2 * (3/(8 * M_PI)) * ((state.GM() * state.GM() * state.GM() * state.GM())/(std::pow(state.h()[i], 7)))  ;
+            B_[i] =  - 0.75 * C_0 * (1/B_1) * ((4 * Q * state.R()[i])/(3* state.GM()))*fout ; }
+    }
+}
+
+FreddiState::__Woods_McKee_Klein__::__Woods_McKee_Klein__(const FreddiState& state):
+        BasicWind(state),
+        C_0(state.args().disk->windparams.at(0)),
+        T_iC(state.args().disk->windparams.at(1)) {
+    update(state);
+}
+
+void FreddiState::__Woods_McKee_Klein__::update(const FreddiState& state) {
+    BasicWind::update(state);
+    const auto disk = state.args().disk;
+    const double L = state.Mdot_in() * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT * state.eta();
+    const double L_edd = (4.0 * M_PI * state.GM()* 2.0 * disk->mu * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION);
+    const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_iC);
+    const double le = L/L_edd;
+    double R_tr;
+    if ( le <= 0.01 ) {
+        R_tr = 6.0*R_iC;
+    }
+    else
+        {
+            R_tr = R_iC*(6.0 + 5.4*std::log(le/0.01) + 4.1*((std::log(le/0.01))*(std::log(le/0.01))));
+    }
+
+    double f_L;
+    if ( le <= 0.1 ) {
+        f_L = 1.0 ;
+    }
+    else {
+            f_L = std::pow((0.1/le), 0.15) ;
+    }
+
+
+    std::cerr << "\t" << L << "\t" << R_iC  << "\t" << L_edd << std::endl;
+
+    for (size_t i = state.first(); i <= state.last(); ++i) {
+        //
+        double g_R;
+        if ( state.R()[i] <= R_tr ) {
+            g_R = 1.0 ;
+        }
+        else {
+            g_R = state.R()[i]/R_tr ;
+        }
+        const double xi1 = R_iC / state.R()[i];
+        const double C0 = (4 * M_PI * state.h()[i]*state.h()[i]*state.h()[i]) / (state.GM()*state.GM());
+        const double ExP = std::exp(-(((1.0 - (1/std::sqrt(1.0 + 0.25*xi1*xi1)))*(1.0 - (1/std::sqrt(1.0 + 0.25*xi1*xi1))))/(2.0/xi1)));
+        C_[i] = -2.0 *(2e42/(state.args().basic->Mx))*(C_0/1e13) * C0 * le * xi1* xi1 * f_L * g_R * ExP ;		}
+    }

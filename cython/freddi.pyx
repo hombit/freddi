@@ -143,6 +143,33 @@ cdef class State:
         return arr
 
     @property
+    def windA(self) -> np.ndarray[np.float]:
+        cdef size_t first = self.cpp_state.first()
+        cdef size_t last = self.cpp_state.last()
+        cdef const double* data = self.cpp_state.windA().data() + first
+        arr = np.asarray(<const double[:last + 1 - first]> data)
+        arr.flags.writeable = False
+        return arr
+
+    @property
+    def windB(self) -> np.ndarray[np.float]:
+        cdef size_t first = self.cpp_state.first()
+        cdef size_t last = self.cpp_state.last()
+        cdef const double* data = self.cpp_state.windB().data() + first
+        arr = np.asarray(<const double[:last + 1 - first]> data)
+        arr.flags.writeable = False
+        return arr
+
+    @property
+    def windC(self) -> np.ndarray[np.float]:
+        cdef size_t first = self.cpp_state.first()
+        cdef size_t last = self.cpp_state.last()
+        cdef const double* data = self.cpp_state.windC().data() + first
+        arr = np.asarray(<const double[:last + 1 - first]> data)
+        arr.flags.writeable = False
+        return arr
+
+    @property
     def first(self) -> int:
         return self.cpp_state.first()
 
@@ -424,7 +451,7 @@ cdef class _BasicFreddi:
             double inclination=default_inclination, double distance=default_distance, vector[double] lambdas=[],
         double time=default_time, double tau=default_tau, unsigned int Nx=default_Nx,
             string gridscale=default_gridscale, eps=None,
-        **kwargs,
+        **kwargs
     ):
         if not cgs:
             Mx = sunToGram(Mx)
@@ -635,7 +662,7 @@ cdef class FreddiNeutronStar(_BasicFreddi):
     def __cinit__(
         self, *,
         double Rx=default_Rx, double freqx=default_freqx, double Bx=default_Bx, double epsilonAlfven=default_epsilonAlfven, double inversebeta=default_inversebeta, double Rdead=default_Rdead,
-        **kwargs,
+        **kwargs
     ):
         cdef NeutronStarArguments* ns = new NeutronStarArguments(Rx, freqx, Bx, epsilonAlfven, inversebeta, Rdead)
         cdef FreddiNeutronStarArguments* ns_args = new FreddiNeutronStarArguments(dereference(self.args), ns)

@@ -26,9 +26,6 @@ private:
 		inline const vecd& A() const { return A_; }
 		inline const vecd& B() const { return B_; }
 		inline const vecd& C() const { return C_; }
-
-
-
 	};
 
 	class NoWind: public BasicWind {
@@ -108,7 +105,8 @@ private:
 	class __Unstedy_Test_Hunter__: public BasicWind {
 	private:
 		// windparams
-		const double fXI;
+		const double f_X;
+        const double X_f;
 		const double T_iC;
 	public:
 		explicit __Unstedy_Test_Hunter__(const FreddiState& state);
@@ -117,6 +115,32 @@ private:
 		virtual __Unstedy_Test_Hunter__* clone() const override { return new __Unstedy_Test_Hunter__(*this); }
 		virtual void update(const FreddiState&) override;
 	};
+
+    class  __Agnieszka_Wind_Paper__: public BasicWind {
+    private:
+        // windparams
+        const double A_0;
+        const double B_1;
+    public:
+        explicit  __Agnieszka_Wind_Paper__(const FreddiState& state);
+        ~__Agnieszka_Wind_Paper__() override = default;
+        __Agnieszka_Wind_Paper__(const  __Agnieszka_Wind_Paper__&) = default;
+        virtual  __Agnieszka_Wind_Paper__* clone() const override { return new  __Agnieszka_Wind_Paper__(*this); }
+        virtual void update(const FreddiState&) override;
+    };
+
+    class __Woods_McKee_Klein__: public BasicWind {
+    private:
+        // windparams
+        const double C_0;
+        const double T_iC;
+    public:
+        explicit __Woods_McKee_Klein__(const FreddiState& state);
+        ~__Woods_McKee_Klein__() override = default;
+        __Woods_McKee_Klein__(const __Woods_McKee_Klein__&) = default;
+        virtual __Woods_McKee_Klein__* clone() const override { return new __Woods_McKee_Klein__(*this); }
+        virtual void update(const FreddiState&) override;
+    };
 
 	class DiskStructure {
 	public:
@@ -206,7 +230,7 @@ public:
 public:
 	virtual double Mdot_in() const;
 // wind_
-protected:
+public:
 	virtual vecd windA() const { return wind_->A(); }
 	virtual vecd windB() const { return wind_->B(); }
 	virtual vecd windC() const { return wind_->C(); }
