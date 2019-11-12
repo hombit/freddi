@@ -203,6 +203,9 @@ FreddiNeutronStarEvolution::GeometricalNSMdotFraction::GeometricalNSMdotFraction
 // see magnetospheric_form_1.mw
 double FreddiNeutronStarEvolution::GeometricalNSMdotFraction::operator()(double R_to_Rcor) const {
 	const double mdot_factor = std::pow(R_to_Rcor, -3.5);
+	if ( mdot_factor > 1. ) {
+		return 1;
+	}
 	const double tmp = mdot_factor - m::pow<2>(std::cos(chi));
 	if ( tmp < 0. ) {
 		return 0;
