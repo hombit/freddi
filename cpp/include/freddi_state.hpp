@@ -202,7 +202,7 @@ protected:
 	virtual void invalidate_optional_structure();
 	double lazy_magnitude(boost::optional<double>& m, double lambda, double F0);
 	double lazy_integrate(boost::optional<double>& x, const vecd& values);
-	const vecd& Tph_X();
+	virtual const vecd& Tph_X();
 	virtual const vecd& Qx();
 public:
 	double Lx();

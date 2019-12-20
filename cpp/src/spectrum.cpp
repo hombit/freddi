@@ -1,3 +1,4 @@
+#include "orbit.hpp"
 #include "spectrum.hpp"
 
 #include <boost/numeric/odeint.hpp>
@@ -40,24 +41,24 @@ double Planck_nu1_nu2(const double T, const double nu1, const double nu2, const 
 /* General Relativity effects are included in the structure of the disk
    (Page & Thorne 1974; Riffert & Herold 1995). metric = "GR"
 */
-double T_GR(const double r1, const double ak, const double Mx, const double Mdot, const double r_in){
-	if (r1 < r_in) {
-		return 0.;
-	}
-
+double T_GR(const double r1, const double ak, const double Mx, const double Mdot){
 	const double GM = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx;
 	const double rg = GM  / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
-	const double x = sqrt(r1 / rg);
-	const double x0 = sqrt(r_in/rg);
+	const double x = std::sqrt(r1 / rg);
+	const double x0 = std::sqrt(rISCORg(ak));
 
-	const double x1 = 2. * cos ((acos(ak)-M_PI)/3.);
-	const double x2 = 2. * cos ((acos(ak)+M_PI)/3.);
-	const double x3 = -2. * cos (acos(ak)/3.);
-	const double a = 3. * (x1-ak)*(x1-ak) * log((x-x1)/(x0-x1))/x1/(x1-x2)/(x1-x3);
-	const double b = 3. * (x2-ak)*(x2-ak) * log((x-x2)/(x0-x2))/x2/(x2-x1)/(x2-x3);
-	const double c = 3. * (x3-ak)*(x3-ak) * log((x-x3)/(x0-x3))/x3/(x3-x1)/(x3-x2);
+	if (x < x0) {
+		return 0.;
+	}
+	
+	const double x1 = 2. * std::cos ((std::acos(ak)-M_PI)/3.);
+	const double x2 = 2. * std::cos ((std::acos(ak)+M_PI)/3.);
+	const double x3 = -2. * std::cos (std::acos(ak)/3.);
+	const double a = 3. * (x1-ak)*(x1-ak) * std::log((x-x1)/(x0-x1))/x1/(x1-x2)/(x1-x3);
+	const double b = 3. * (x2-ak)*(x2-ak) * std::log((x-x2)/(x0-x2))/x2/(x2-x1)/(x2-x3);
+	const double c = 3. * (x3-ak)*(x3-ak) * std::log((x-x3)/(x0-x3))/x3/(x3-x1)/(x3-x2);
 
-	return( pow(
+	return( std::pow(
 			(3.*Mdot * m::pow<6>(GSL_CONST_CGSM_SPEED_OF_LIGHT) / (8.*M_PI * m::pow<2>(GM))) *
 			(x - x0 - 1.5 * ak * std::log(x/x0) - a - b -c) / ( m::pow<4>(x)*(m::pow<3>(x) - 3.*x + 2. * ak) ) /
 			GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT,
