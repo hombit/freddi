@@ -184,6 +184,7 @@ protected:
 	virtual double Mdot_in() const override;
 	virtual vecd windC() const override;
 	virtual const vecd& Qx() override;
+	virtual const vecd& Tph_X() override;
 public:
 	FreddiNeutronStarEvolution(const FreddiNeutronStarArguments& args);
 	explicit FreddiNeutronStarEvolution(const FreddiNeutronStarEvolution&) = default;

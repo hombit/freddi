@@ -350,6 +350,18 @@ const vecd& FreddiNeutronStarEvolution::Qx() {
 	return *opt_str_.Qx;
 }
 
+const vecd& FreddiNeutronStarEvolution::Tph_X() {
+	if (!opt_str_.Tph_X) {
+		vecd x(Nx());
+		const vecd& Tvis = Tph_vis();
+		for (size_t i = first(); i <= last(); i++) {
+			x[i] = args().flux->colourfactor * Tvis[i];
+		}
+		opt_str_.Tph_X = std::move(x);
+	}
+	return *opt_str_.Tph_X;
+}
+
 
 double FreddiNeutronStarEvolution::eta_ns() const {
 	const double R_g = GM() / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
