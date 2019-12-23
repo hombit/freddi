@@ -31,7 +31,7 @@ struct FileOutputShortField {
 struct FileOutputLongField {
 	std::string name;
 	std::string unit;
-	std::function<const vecd& ()> func;
+	std::function<const vecd ()> func;
 	FileOutputLongField(const std::string&& name, const std::string&& unit, const std::function<const vecd ()>&& func):
 			name(name), unit(unit), func(func) {};
 };
