@@ -190,6 +190,7 @@ std::vector<FileOutputShortField> FreddiNeutronStarFileOutput::initializeShortFi
 	fields.emplace_back("Lbolns", "erg/s", [freddi]() {return freddi->Lbol_ns();});
 	fields.emplace_back("fpin", "float", [freddi]() {return freddi->fp();});
 	fields.emplace_back("Fmagnin", "dyn*cm", [freddi]() {return freddi->Fmagn()[freddi->first()];});
+        fields.emplace_back("Fin", "dyn*cm", [freddi]() {return freddi->F()[freddi->first()];});
 	return fields;
 }
 
