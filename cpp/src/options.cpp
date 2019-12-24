@@ -277,8 +277,8 @@ po::options_description NeutronStarOptions::description() {
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Factor in Alfven radius formula" )
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "???" )
 			( "Rdead", po::value<double>()->default_value(default_Rdead), "Maximum inner radius of the disk that can be obtained, it characterises minimum torque in the dead disk, cm" )
-			( "fptype", po::value<std::string>()->default_value(default_fptype), "??? Accretor Mdot fraction" )
-			( "fpparams", po::value<std::vector<std::string> >()->multitoken(), "??? Accretor Mdot fraction parameters, specific for each fptype. Specify them i format name:value" )
+			( "fptype", po::value<std::string>()->default_value(default_fptype), "Accretor Mdot fraction mode: no-outflow, propeller, corotation-block, eksi-kultu2010, romanova2018, geometrical" )
+			( "fpparams", po::value<std::vector<std::string> >()->multitoken(), "Accretor Mdot fraction parameters, specific for each fptype. Format is name:value. Examples: 1) for geometrical chi:15; 2) for romanova2018 par1:0.15 par2:0.92" )
 			;
 	return od;
 }
