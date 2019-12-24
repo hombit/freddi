@@ -140,7 +140,7 @@ SelfIrradiationOptions::SelfIrradiationOptions(const po::variables_map &vm, cons
 				vm["Cirr"].as<double>(),
 				vm["irrfactortype"].as<std::string>()) {
 	if (Cirr <= 0. && dsa_args.boundcond == "Tirr") {
-		throw po::error("It is obvious to use nonpositive --Cirr with --boundcond=Tirr");
+		throw po::error("Set positive --Cirr when --boundcond=Tirr !");
 	}
 	if (irrfactortype != "const" && irrfactortype != "square") {
 		throw po::invalid_option_value("--irrfactortype has invalid value");
