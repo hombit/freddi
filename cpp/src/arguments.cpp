@@ -72,7 +72,7 @@ double DiskStructureArguments::F0Initializer(double F0_, const BasicDiskBinaryAr
 
 	if (initialcond == "powerF" || initialcond == "power") {
 		if (is_Mdot0_specified) {
-			throw std::runtime_error("It is obvious to set Mdot with initialcond=powerF");
+			throw std::runtime_error("Set Mdisk0 or F0 instead of Mdot0 if initialcond=powerF !");
 		}
 		if (is_Mdisk0_specified) {
 			odeint::runge_kutta_cash_karp54<double> stepper;
@@ -95,7 +95,7 @@ double DiskStructureArguments::F0Initializer(double F0_, const BasicDiskBinaryAr
 	}
 	if (initialcond == "powerSigma") {
 		if (is_Mdot0_specified) {
-			throw std::runtime_error("It is obvious to set Mdot with initialcond=powerSigma");
+			throw std::runtime_error("Set Mdisk0 or F0 instead of Mdot0 if initialcond=powerSigma !");
 		}
 		if (is_Mdisk0_specified) {
 			odeint::runge_kutta_cash_karp54<double> stepper;
@@ -142,10 +142,10 @@ double DiskStructureArguments::F0Initializer(double F0_, const BasicDiskBinaryAr
 	}
 	if (initialcond == "gaussF") {
 		if (gaussmu <= 0. or gaussmu > 1.){
-			throw std::runtime_error("gaussmu value should be large than 0 and not large than 1");
+			throw std::runtime_error("gaussmu value should be in [0..1] !");
 		}
 		if (is_Mdot0_specified) {
-			throw std::runtime_error("Setting of Mdot with initialcond=gaussF produces unstable results and it isn't motivated physically. Set F0 or Mdisk0 instead");
+			throw std::runtime_error("Setting Mdot if initialcond=gaussF produces unstable results and it isn't motivated physically. Set F0 or Mdisk0 instead");
 			//F0_ = Mdot_in * (h_out - h_in) * m::pow<2>(gauss_sigma) / gauss_mu * exp( m::pow<2>(gauss_mu) / (2. * m::pow<2>(gauss_sigma)) );
 		}
 		if (is_Mdisk0_specified){
