@@ -1,4 +1,4 @@
-#t	Mdot	Mdisk	Rhot	Cirrout	H2R	Teffout	Tirrout	Qiir2Qvisout	Lx	mU	mB	mV	mR	mI	mJ	 Fnu0										 Fnu1									 Fnu2									
+#t	Mdot	Mdisk	Rhot	Cirrout	H2R	Teffout	Tirrout	Qiir2Qvisout	Lx	mU	mB	mV	mR	mI	mJ	Fnu0	Fnu1	Fnu2
 #days	g/s	g	Rsun	float	float	K	K	float	erg/s	mag	mag	mag	mag	mag	mag	erg/s/cm^2/Hz	erg/s/cm^2/Hz	erg/s/cm^2/Hz
 # Cirr=0
 # F0=2e+38
