@@ -78,14 +78,11 @@ class NSMdotFractionTestCase(unittest.TestCase):
         result_geometrical = fr_geometrical.evolve()
         assert_array_equal(result_corotation_block.fp, result_geometrical.fp)
 
-    @unittest.skip('Check later')
     def test_geometrical_chi_nonzero(self):
         fr = FreddiNeutronStar(fptype='geometrical', fpparams={'chi': 30}, **self.basic_kwargs)
         result = fr.evolve()
         fp = result.fp
         r = result.first_R / fr.R_cor
-        assert_array_equal(1, fp)
         assert np.all(fp >= 0) and np.all(fp <= 1)
-        assert r[0] < 1
-        assert fp[0] < 1
-        assert_array_equal(1, fp[r > 1])
+        assert r[0] < 1 and fp[0] == 1, 'Initial inner radius should be less than corotation one and fp should equal zero'
+        assert np.all(fp[r > 1] < 1)
