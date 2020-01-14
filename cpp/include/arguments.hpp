@@ -9,6 +9,7 @@
 #include "constants.hpp"
 #include "opacity_related.hpp"
 #include "orbit.hpp"
+#include "passband.hpp"
 #include "util.hpp"
 #include "unit_transformation.hpp"
 
@@ -185,16 +186,19 @@ public:
 	const double inclination;  // degrees
 	const double distance;
 	const vecd lambdas;
+	const std::vector<Passband> passbands;
 public:
 	FluxArguments(
 			double colourfactor,
 			double emin, double emax,
 			double inclination, double distance,
-	        const vecd& lambdas):
+	        const vecd& lambdas,
+	        const std::vector<Passband> passbands):
 			colourfactor(colourfactor),
 			emin(emin), emax(emax),
 			inclination(inclination), distance(distance),
-			lambdas(lambdas) {}
+			lambdas(lambdas),
+			passbands(passbands) {}
 };
 
 
