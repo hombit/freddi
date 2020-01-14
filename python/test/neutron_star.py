@@ -83,8 +83,6 @@ class NSMdotFractionTestCase(unittest.TestCase):
         result = fr.evolve()
         fp = result.fp
         r = result.first_R / fr.R_cor
-        assert_array_equal(1, fp)
         assert np.all(fp >= 0) and np.all(fp <= 1)
-        assert r[0] < 1
-        assert fp[0] < 1
-        assert_array_equal(1, fp[r > 1])
+        assert r[0] < 1 and fp[0] == 1, 'Initial inner radius should be less than corotation one and fp should equal zero'
+        assert np.all(fp[r > 1] < 1)

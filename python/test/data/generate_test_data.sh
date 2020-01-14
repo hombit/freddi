@@ -1,6 +1,6 @@
 #!/bin/bash
 # Run from test/data/ directory
-# FREDDI=../../cmake-build-debug/freddi ./generate_test_data.sh
+# FREDDI=../../../cmake-build-debug/freddi ./generate_test_data.sh
 
 FREDDI=${FREDDI-freddi}
 
