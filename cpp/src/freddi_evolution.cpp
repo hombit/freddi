@@ -368,4 +368,3 @@ double FreddiNeutronStarEvolution::eta_ns() const {
 	const double eta = R_g * (1. / R_x() - 0.5 / R()[first()]);
 	return eta;
 }
->>>>>>> 0f493708160de317583adc7e59beee708ef6d01f
