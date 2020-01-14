@@ -7,6 +7,7 @@
 #include <boost/optional.hpp>
 
 #include "arguments.hpp"
+#include "passband.hpp"
 #include "spectrum.hpp"
 #include "util.hpp"
 
@@ -221,6 +222,7 @@ public:
 	inline double flux(const double lambda) {
 		return I_lambda(lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2();
 	}
+	double flux(const Passband& passband);
 	inline double mU() { return lazy_magnitude(opt_str_.mU, lambdaU, irr0U); }
 	inline double mB() { return lazy_magnitude(opt_str_.mB, lambdaB, irr0B); }
 	inline double mV() { return lazy_magnitude(opt_str_.mV, lambdaV, irr0V); }

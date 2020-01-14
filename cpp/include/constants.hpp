@@ -1,6 +1,7 @@
 #ifndef _CONSTANTS_HPP
 #define _CONSTANTS_HPP
 
+#include "gsl_const_cgsm.h"
 
 constexpr const double DAY = 86400.;
 constexpr const double Angstrem = 1e-8;

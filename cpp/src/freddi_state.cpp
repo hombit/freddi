@@ -1,13 +1,11 @@
 #include "freddi_state.hpp"
 
 #include <cmath>
-#include <exception>
 #include <string>
 
 #include "gsl_const_cgsm.h"
 
 #include "arguments.hpp"
-#include "constants.hpp"
 #include "nonlinear_diffusion.hpp"
 #include "orbit.hpp"
 
@@ -315,6 +313,18 @@ double FreddiState::I_lambda(const double lambda) {
 
 double FreddiState::Luminosity(const vecd& T, double nu1, double nu2) const {
 	return 2. * M_PI * integrate([&T, nu1, nu2](const size_t i) -> double { return Spectrum::Planck_nu1_nu2(T[i], nu1, nu2, 1e-4); });
+}
+
+
+double FreddiState::flux(const Passband& passband) {
+	const double intens = trapz(
+			passband.lambdas,
+			[this, &passband](const size_t i) -> double {
+				return I_lambda(passband.lambdas[i]) * passband.transmissions[i];
+			},
+			0,
+			passband.data.size() - 1);
+	return intens * cosiOverD2() / passband.t_dnu;
 }
 
 

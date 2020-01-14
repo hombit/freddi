@@ -1,5 +1,3 @@
-#include <exception>
-
 #include <boost/numeric/odeint.hpp>
 
 #include "arguments.hpp"

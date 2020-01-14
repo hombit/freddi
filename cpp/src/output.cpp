@@ -166,6 +166,13 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 				[freddi, lambda]() { return freddi->flux(lambda); }
 		);
 	}
+	for (const auto& pb : freddi->args().flux->passbands) {
+		fields.emplace_back(
+				"Fnu" + pb.name,
+				"erg/s/cm^2/Hz",
+				[freddi, pb]() { return freddi->flux(pb); }
+		);
+	}
 	return fields;
 }
 

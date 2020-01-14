@@ -16,7 +16,7 @@ function(CREATE_EXE targ)
         set(Boost_USE_STATIC_LIBS "ON")
     endif(STATIC_LINKING)
 
-    find_package(Boost 1.57.0 COMPONENTS program_options REQUIRED)
+    find_package(Boost 1.57.0 COMPONENTS program_options filesystem REQUIRED)
 
     file(GLOB_RECURSE SOURCES cpp/main${targ}.cpp cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
     add_executable(${TARGET} ${SOURCES})
@@ -58,7 +58,7 @@ function(CREATE_PY_MODULE)
     find_package(Python3 COMPONENTS Development Interpreter)
 
     LOCATE_BOOST_PYTHON(Boost_Python3_VERSION_TAG)
-    find_package(Boost COMPONENTS program_options "python${Boost_Python3_VERSION_TAG}" "numpy${Boost_Python3_VERSION_TAG}")    
+    find_package(Boost COMPONENTS program_options filesystem "python${Boost_Python3_VERSION_TAG}" "numpy${Boost_Python3_VERSION_TAG}")
     message("Boost_LIBRARIES: ${Boost_LIBRARIES}")
 
     if (${Python3_FOUND} AND ${Boost_FOUND})

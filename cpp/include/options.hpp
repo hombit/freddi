@@ -13,6 +13,7 @@
 #include <boost/program_options.hpp>
 
 #include "arguments.hpp"
+#include "passband.hpp"
 #include "util.hpp"
 
 namespace po = boost::program_options;
@@ -55,6 +56,7 @@ public:
 class FluxOptions: public FluxArguments {
 protected:
 	static vecd lambdasInitializer(const po::variables_map& vm);
+	static std::vector<Passband> passbandsInitializer(const po::variables_map& vm);
 public:
 	FluxOptions(const po::variables_map& vm);
 	static po::options_description description();

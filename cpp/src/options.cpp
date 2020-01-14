@@ -168,7 +168,8 @@ FluxOptions::FluxOptions(const po::variables_map &vm):
 				kevToHertz(vm["emax"].as<double>()),
 				vm["inclination"].as<double>(),
 				kpcToCm(vm["distance"].as<double>()),
-				lambdasInitializer(vm)) {}
+				lambdasInitializer(vm),
+				passbandsInitializer(vm)) {}
 
 vecd FluxOptions::lambdasInitializer(const po::variables_map &vm) {
 	if (vm.count("lambda") == 0) {
@@ -177,6 +178,22 @@ vecd FluxOptions::lambdasInitializer(const po::variables_map &vm) {
 	vecd lambdas(vm["lambda"].as<vecd>());
 	transform(lambdas.begin(), lambdas.end(), lambdas.begin(), angstromToCm);
 	return lambdas;
+}
+
+std::vector<Passband> FluxOptions::passbandsInitializer(const po::variables_map& vm) {
+	if (vm.count("passband") == 0) {
+		return {};
+	}
+	auto filepaths = vm["passband"].as<std::vector<std::string>>();
+	std::vector<Passband> passbands;
+	for (const auto &filepath : filepaths) {
+		try {
+			passbands.emplace_back(filepath);
+		} catch (const std::ios_base::failure& e) {
+			throw po::invalid_option_value("Passband file doesn't exist");
+		}
+	}
+	return passbands;
 }
 
 po::options_description FluxOptions::description() {
@@ -188,6 +205,7 @@ po::options_description FluxOptions::description() {
 			( "inclination,i", po::value<double>()->default_value(default_inclination), "Inclination of the system, degrees" )
 			( "distance", po::value<double>()->default_value(cmToKpc(default_distance)), "Distance to the system, kpc" )
 			( "lambda", po::value<vecd>()->multitoken(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced" )
+			( "passband", po::value<std::vector<std::string>>()->multitoken(), "Path of a file contained tabulated passband, the first column for wavelength in Angstrom, the second column for transmission factor, columns should be separated by spaces" )
 			;
 	return od;
 }
