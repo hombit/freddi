@@ -342,7 +342,7 @@ const vecd& FreddiNeutronStarEvolution::Qx() {
 		const vecd& CirrCirr = Cirr();
 		const double L_disk = (F()[first()] + 0.5 * Mdot_in() * h()[first()]) * omega_i(first());
 		const double L_ns = Lbol_ns();
-		for (size_t i = first(); i <= last(); i++) {
+		for (size_t i = first(); i < Nx(); i++) {
 			x[i] = CirrCirr[i] * (L_ns + L_disk) / (4. * M_PI * m::pow<2>(R()[i]));
 		}
 		opt_str_.Qx = std::move(x);
@@ -354,7 +354,7 @@ const vecd& FreddiNeutronStarEvolution::Tph_X() {
 	if (!opt_str_.Tph_X) {
 		vecd x(Nx());
 		const vecd& Tvis = Tph_vis();
-		for (size_t i = first(); i <= last(); i++) {
+		for (size_t i = first(); i < Nx(); i++) {
 			x[i] = args().flux->colourfactor * Tvis[i];
 		}
 		opt_str_.Tph_X = std::move(x);

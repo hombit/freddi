@@ -158,14 +158,6 @@ double FreddiState::Mdot_in() const {
 }
 
 
-double FreddiState::lazy_integrate(boost::optional<double>& x, const vecd& values) {
-	if (!x) {
-		x = integrate(values);
-	}
-	return *x;
-}
-
-
 double FreddiState::Lx() {
 	if (!opt_str_.Lx) {
 		opt_str_.Lx = Luminosity(Tph_X(), args().flux->emin, args().flux->emax) / m::pow<4>(args().flux->colourfactor);
@@ -188,7 +180,7 @@ const vecd& FreddiState::Sigma() {
 	if (!opt_str_.Sigma) {
 		vecd x(Nx());
 		const vecd& WW = W();
-		for (size_t i = first(); i <= last(); i++) {
+		for (size_t i = first(); i < Nx(); i++) {
 			x[i] = WW[i] * m::pow<2>(GM()) / (4. * M_PI * m::pow<3>(h()[i]));
 		}
 		opt_str_.Sigma = std::move(x);
@@ -202,7 +194,7 @@ const vecd& FreddiState::Tph() {
 		vecd x(Nx());
 		const vecd& Tvis = Tph_vis();
 		const vecd& QxQx = Qx();
-		for (size_t i = first(); i <= last(); i++) {
+		for (size_t i = first(); i < Nx(); i++) {
 			x[i] = std::pow(m::pow<4>(Tvis[i]) + QxQx[i] / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25);
 		}
 		opt_str_.Tph = std::move(x);
@@ -215,7 +207,7 @@ const vecd& FreddiState::Tirr() {
 	if (!opt_str_.Tirr) {
 		vecd x(Nx());
 		const vecd& QxQx = Qx();
-		for (size_t i = first(); i <= last(); i++) {
+		for (size_t i = first(); i < Nx(); i++) {
 			x[i] = std::pow(QxQx[i] / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25);
 		}
 		opt_str_.Tirr = std::move(x);
@@ -229,7 +221,7 @@ const vecd& FreddiState::Qx() {
 		vecd x(Nx());
 		const vecd& CirrCirr = Cirr();
 		const double Mdot = Mdot_in();
-		for (size_t i = first(); i <= last(); i++) {
+		for (size_t i = first(); i < Nx(); i++) {
 			x[i] = (CirrCirr[i] * eta() * Mdot * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT)
 					/ (4. * M_PI * m::pow<2>(R()[i])));
 		}
@@ -246,7 +238,7 @@ const vecd& FreddiState::Cirr() {
 		} else if (args().irr->irrfactortype == "square") {
 			vecd x(Nx());
 			const vecd& H = Height();
-			for (size_t i = first(); i <= last(); i++) {
+			for (size_t i = first(); i < Nx(); i++) {
 				x[i] = args().irr->Cirr * (H[i] / R()[i]) * (H[i] / R()[i]);
 			}
 			opt_str_.Cirr = std::move(x);
@@ -261,7 +253,7 @@ const vecd& FreddiState::Cirr() {
 const vecd& FreddiState::Height() {
 	if (!opt_str_.Height) {
 		vecd x(Nx());
-		for (size_t i = first(); i <= last(); i++) {
+		for (size_t i = first(); i < Nx(); i++) {
 			x[i] = oprel().Height(R()[i], F()[i]);
 		}
 		opt_str_.Height = std::move(x);
@@ -273,7 +265,7 @@ const vecd& FreddiState::Height() {
 const vecd& FreddiState::Tph_vis() {
 	if (!opt_str_.Tph_vis) {
 		vecd x(Nx());
-		for (size_t i = first(); i <= last(); i++) {
+		for (size_t i = first(); i < Nx(); i++) {
 			x[i] = (GM() * std::pow(h()[i], -1.75)
 					* std::pow(3. / (8. * M_PI) * F()[i] / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25));
 		}
@@ -287,7 +279,7 @@ const vecd& FreddiState::Tph_X() {
 	if (!opt_str_.Tph_X) {
 		vecd x(Nx());
 		x[first()] = 0;
-		for (size_t i = first() + 1; i <= last(); i++) {
+		for (size_t i = first() + 1; i < Nx(); i++) {
 			x[i] = (args().flux->colourfactor * Spectrum::T_GR(R()[i], args().basic->kerr, args().basic->Mx,
 					F()[i] / (h()[i] - h()[first()])));
 		}
@@ -305,26 +297,8 @@ double FreddiState::lazy_magnitude(boost::optional<double>& m, double lambda, do
 }
 
 
-double FreddiState::I_lambda(const double lambda) {
-	const vecd& T = Tph();
-	return integrate([&T, lambda](const size_t i) -> double { return Spectrum::Planck_lambda(T[i], lambda); });
-}
-
-
 double FreddiState::Luminosity(const vecd& T, double nu1, double nu2) const {
-	return 2. * M_PI * integrate([&T, nu1, nu2](const size_t i) -> double { return Spectrum::Planck_nu1_nu2(T[i], nu1, nu2, 1e-4); });
-}
-
-
-double FreddiState::flux(const Passband& passband) {
-	const double intens = trapz(
-			passband.lambdas,
-			[this, &passband](const size_t i) -> double {
-				return I_lambda(passband.lambdas[i]) * passband.transmissions[i];
-			},
-			0,
-			passband.data.size() - 1);
-	return intens * cosiOverD2() / passband.t_dnu;
+	return 2. * M_PI * integrate<DiskHotZone>([&T, nu1, nu2](const size_t i) -> double { return Spectrum::Planck_nu1_nu2(T[i], nu1, nu2, 1e-4); });
 }
 
 
