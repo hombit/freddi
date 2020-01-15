@@ -60,8 +60,6 @@ class RegressionTestCase(unittest.TestCase):
             config.pop(kwarg, None)
         for name, value in config.items():
             config[name] = self.convert_config_value(value)
-        if 'lambda' in config:
-            config['lambdas'] = config.pop('lambda')
         config['__cgs'] = False
         return config
 
@@ -69,6 +67,7 @@ class RegressionTestCase(unittest.TestCase):
         columns_to_compare = ('Mdot', 'Mdisk', 'Lx', 'mU', 'mB', 'mV', 'mR', 'mI', 'mJ')
         for data_file in self.data_files:
             config = self.load_config(data_file, ('dir', 'prefix', 'fulldata'))
+            lmbd_ = np.array(config.pop('lambda', [])) * 1e-8
             f = Freddi(**config)
             result = f.evolve()
             data = np.genfromtxt(data_file, names=True)
@@ -77,7 +76,7 @@ class RegressionTestCase(unittest.TestCase):
             for column in columns_to_compare:
                 assert_allclose(getattr(result, column), data[column], rtol=1e-4,
                                 err_msg='File: {}, column {}:'.format(data_file, column))
-            for i_lmbd, lmbd in enumerate(f.lambdas):
+            for i_lmbd, lmbd in enumerate(lmbd_):
                 column = 'Fnu{}'.format(i_lmbd)
                 if column in data.dtype.names:
                     assert_allclose(result.flux(lmbd), data[column], rtol=1e-4,

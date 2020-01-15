@@ -1,4 +1,3 @@
-#include <iostream> // TODO: remove
 #include <sstream>
 #include <string>
 
@@ -49,7 +48,6 @@ dict evolution_kwdefaults() {
 	kw["emax"] = FluxArguments::default_emax;
 	kw["inclination"] = FluxArguments::default_inclination;
 	kw["distance"] = FluxArguments::default_distance;
-	kw["lambdas"] = tuple();
 
 	kw["time"] = CalculationArguments::default_time;
 	kw["tau"] = CalculationArguments::default_tau;
@@ -96,9 +94,6 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 		kw["emin"] = kevToHertz(extract<double>(kw["emin"]));
 		kw["emax"] = kevToHertz(extract<double>(kw["emax"]));
 		kw["distance"] = kpcToCm(extract<double>(kw["distance"]));
-		for (size_t i = 0; i < len(kw["lambdas"]); ++i) {
-			kw["lambdas"][i] = angstromToCm(extract<double>(kw["lambdas"][i]));
-		}
 		kw["time"] = dayToS(extract<double>(kw["time"]));
 		kw["tau"] = dayToS(extract<double>(kw["tau"]));
 	}
@@ -124,8 +119,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 	const auto flux = make_flux_arguments(
 			extract<double>(kw["colourfactor"]),
 			extract<double>(kw["emin"]), extract<double>(kw["emax"]),
-			extract<double>(kw["inclination"]), extract<double>(kw["distance"]),
-			kw["lambdas"]);
+			extract<double>(kw["inclination"]), extract<double>(kw["distance"]));
 	const auto calc = make_calculation_arguments(
 			extract<double>(kw["time"]), extract<double>(kw["tau"]),
 			extract<unsigned int>(kw["Nx"]), extract<std::string>(kw["gridscale"]),

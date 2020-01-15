@@ -33,8 +33,7 @@ boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(doub
 boost::shared_ptr<FluxArguments> make_flux_arguments(
 			double colourfactor,
 			double emin, double emax,
-			double inclination, double distance,
-			const object& lambdas_);
+			double inclination, double distance);
 
 boost::shared_ptr<CalculationArguments> make_calculation_arguments(
 		double time, double tau, unsigned int Nx, const std::string& gridscale,
