@@ -157,6 +157,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"mI", "mag", [freddi]() {return freddi->mI();}},
 			{"mJ", "mag", [freddi]() {return freddi->mJ();}},
 	};
+	const bool cold_disk = freddi->args().flux->cold_disk;
 	const auto& lambdas = freddi->args().flux->lambdas;
 	for (size_t i = 0; i < lambdas.size(); ++i) {
 		const double lambda = lambdas[i];
@@ -165,13 +166,27 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 				"erg/s/cm^2/Hz",
 				[freddi, lambda]() { return freddi->flux(lambda); }
 		);
+		if (cold_disk) {
+			fields.emplace_back(
+					std::string("Fnu") + std::to_string(i) + "_cold",
+					"erg/s/cm^2/Hz",
+					[freddi, lambda]() { return freddi->flux_region<FreddiState::ColdRegion>(lambda); }
+			);
+		}
 	}
 	for (const auto& pb : freddi->args().flux->passbands) {
 		fields.emplace_back(
 				"Fnu" + pb.name,
 				"erg/s/cm^2/Hz",
-				[freddi, pb]() { return freddi->flux(pb); }
+				[freddi, &pb]() { return freddi->flux(pb); }
 		);
+		if (cold_disk) {
+			fields.emplace_back(
+					std::string("Fnu") + pb.name + "_cold",
+					"erg/s/cm^2/Hz",
+					[freddi, &pb]() { return freddi->flux_region<FreddiState::ColdRegion>(pb); }
+			);
+		}
 	}
 	return fields;
 }

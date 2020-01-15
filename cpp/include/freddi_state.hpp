@@ -248,19 +248,6 @@ protected:
 		}
 		return integrate<Region>([T, lambda](const size_t i) -> double { return Spectrum::Planck_lambda((*T)[i], lambda); });
 	}
-	template <DiskIntegrationRegion Region> double flux_region(double lambda) {
-		return I_lambda<HotRegion>(lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2();
-	}
-	template <DiskIntegrationRegion Region> double flux_region(const Passband& passband) {
-		const double intens = trapz(
-				passband.lambdas,
-				[this, &passband](const size_t i) -> double {
-					return I_lambda<Region>(passband.lambdas[i]) * passband.transmissions[i];
-				},
-				0,
-				passband.data.size() - 1);
-		return intens * cosiOverD2() / passband.t_dnu;
-	}
 	double lazy_magnitude(boost::optional<double>& m, double lambda, double F0);
 	virtual const vecd& Tph_X();
 	virtual const vecd& Qx();
@@ -276,6 +263,19 @@ public:
 	double Luminosity(const vecd& T, double nu1, double nu2) const;
 	inline double magnitude(const double lambda, const double F0) {
 		return -2.5 * std::log10(I_lambda<HotRegion>(lambda) * cosiOverD2() / F0);
+	}
+	template <DiskIntegrationRegion Region> double flux_region(double lambda) {
+		return I_lambda<HotRegion>(lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2();
+	}
+	template <DiskIntegrationRegion Region> double flux_region(const Passband& passband) {
+		const double intens = trapz(
+				passband.lambdas,
+				[this, &passband](const size_t i) -> double {
+					return I_lambda<Region>(passband.lambdas[i]) * passband.transmissions[i];
+				},
+				0,
+				passband.data.size() - 1);
+		return intens * cosiOverD2() / passband.t_dnu;
 	}
 	inline double flux(const double lambda) { return flux_region<HotRegion>(lambda); }
 	inline double flux(const Passband& passband) { return flux_region<HotRegion>(passband); }
