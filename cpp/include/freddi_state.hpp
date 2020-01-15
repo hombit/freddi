@@ -16,9 +16,9 @@ class FreddiState {
 protected:
 	typedef std::function<vecd (const vecd&, const vecd&, size_t, size_t)> wunc_t;
 public:
-	enum DiskIntegrationZone {
-		DiskHotZone,
-		DiskColdZone,
+	enum DiskIntegrationRegion {
+		HotRegion,
+		ColdRegion,
 	};
 private:
 	class BasicWind {
@@ -207,48 +207,55 @@ protected:
 protected:
 	virtual void invalidate_optional_structure();
 
-	template <DiskIntegrationZone Zone> size_t zone_first() const {
-		if constexpr(Zone == DiskHotZone) {
+	template <DiskIntegrationRegion Region> size_t region_first() const {
+		if constexpr(Region == HotRegion) {
 			return first();
-		} else if constexpr(Zone == DiskColdZone) {
+		} else if constexpr(Region == ColdRegion) {
 			return last() + 1;
 		} else {
-			static_assert("Wrong Zone template argument");
+			static_assert("Wrong Region template argument");
 		}
 	}
-	template <DiskIntegrationZone Zone> size_t zone_last() const {
-		if constexpr(Zone == DiskHotZone) {
+	template <DiskIntegrationRegion Region> size_t region_last() const {
+		if constexpr(Region == HotRegion) {
 			return last();
-		} else if constexpr(Zone == DiskColdZone) {
+		} else if constexpr(Region == ColdRegion) {
 			return Nx() - 1;
 		} else {
-			static_assert("Wrong Zone template argument");
+			static_assert("Wrong Region template argument");
 		}
 	}
-	template <DiskIntegrationZone Zone> double integrate(const vecd& values) const {
-		return disk_radial_trapz(R(), values, zone_first<Zone>(), zone_last<Zone>());
+	template <DiskIntegrationRegion Region> double integrate(const vecd& values) const {
+		return disk_radial_trapz(R(), values, region_first<Region>(), region_last<Region>());
 	}
-	template <DiskIntegrationZone Zone> double integrate(const std::function<double (size_t)>& func) const {
-		return disk_radial_trapz(R(), func, zone_first<Zone>(), zone_last<Zone>());
+	template <DiskIntegrationRegion Region> double integrate(const std::function<double (size_t)>& func) const {
+		return disk_radial_trapz(R(), func, region_first<Region>(), region_last<Region>());
 	}
-	template <DiskIntegrationZone Zone> double lazy_integrate(boost::optional<double>& x, const vecd& values) {
+	template <DiskIntegrationRegion Region> double lazy_integrate(boost::optional<double>& x, const vecd& values) {
 		if (!x) {
-			x = integrate<Zone>(values);
+			x = integrate<Region>(values);
 		}
 		return *x;
 	}
-	template <DiskIntegrationZone Zone> double I_lambda(double lambda) {
-		const vecd& T = Tph();
-		return integrate<Zone>([&T, lambda](const size_t i) -> double { return Spectrum::Planck_lambda(T[i], lambda); });
+	template <DiskIntegrationRegion Region> double I_lambda(double lambda) {
+		const vecd* T;
+		if constexpr(Region == HotRegion) {
+			T = &Tph();
+		} else if constexpr(Region == ColdRegion) {
+			T = &Tirr();
+		} else {
+			static_assert("Wrong Region template argument");
+		}
+		return integrate<Region>([T, lambda](const size_t i) -> double { return Spectrum::Planck_lambda((*T)[i], lambda); });
 	}
-	template <DiskIntegrationZone Zone> double flux_zone(double lambda) {
-		return I_lambda<DiskHotZone>(lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2();
+	template <DiskIntegrationRegion Region> double flux_region(double lambda) {
+		return I_lambda<HotRegion>(lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2();
 	}
-	template <DiskIntegrationZone Zone> double flux_zone(const Passband& passband) {
+	template <DiskIntegrationRegion Region> double flux_region(const Passband& passband) {
 		const double intens = trapz(
 				passband.lambdas,
 				[this, &passband](const size_t i) -> double {
-					return I_lambda<Zone>(passband.lambdas[i]) * passband.transmissions[i];
+					return I_lambda<Region>(passband.lambdas[i]) * passband.transmissions[i];
 				},
 				0,
 				passband.data.size() - 1);
@@ -268,17 +275,17 @@ public:
 	const vecd& Height();
 	double Luminosity(const vecd& T, double nu1, double nu2) const;
 	inline double magnitude(const double lambda, const double F0) {
-		return -2.5 * std::log10(I_lambda<DiskHotZone>(lambda) * cosiOverD2() / F0);
+		return -2.5 * std::log10(I_lambda<HotRegion>(lambda) * cosiOverD2() / F0);
 	}
-	inline double flux(const double lambda) { return flux_zone<DiskHotZone>(lambda); }
-	inline double flux(const Passband& passband) { return flux_zone<DiskHotZone>(passband); }
+	inline double flux(const double lambda) { return flux_region<HotRegion>(lambda); }
+	inline double flux(const Passband& passband) { return flux_region<HotRegion>(passband); }
 	inline double mU() { return lazy_magnitude(opt_str_.mU, lambdaU, irr0U); }
 	inline double mB() { return lazy_magnitude(opt_str_.mB, lambdaB, irr0B); }
 	inline double mV() { return lazy_magnitude(opt_str_.mV, lambdaV, irr0V); }
 	inline double mR() { return lazy_magnitude(opt_str_.mR, lambdaR, irr0R); }
 	inline double mI() { return lazy_magnitude(opt_str_.mI, lambdaI, irr0I); }
 	inline double mJ() { return lazy_magnitude(opt_str_.mJ, lambdaJ, irr0J); }
-	inline double Mdisk() { return lazy_integrate<DiskHotZone>(opt_str_.Mdisk, Sigma()); }
+	inline double Mdisk() { return lazy_integrate<HotRegion>(opt_str_.Mdisk, Sigma()); }
 };
 
 #endif //FREDDI_FREDDI_STATE_HPP

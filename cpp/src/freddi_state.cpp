@@ -298,7 +298,7 @@ double FreddiState::lazy_magnitude(boost::optional<double>& m, double lambda, do
 
 
 double FreddiState::Luminosity(const vecd& T, double nu1, double nu2) const {
-	return 2. * M_PI * integrate<DiskHotZone>([&T, nu1, nu2](const size_t i) -> double { return Spectrum::Planck_nu1_nu2(T[i], nu1, nu2, 1e-4); });
+	return 2. * M_PI * integrate<HotRegion>([&T, nu1, nu2](const size_t i) -> double { return Spectrum::Planck_nu1_nu2(T[i], nu1, nu2, 1e-4); });
 }
 
 
