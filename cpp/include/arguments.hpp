@@ -179,12 +179,14 @@ public:
 	constexpr static const double default_emax = kevToHertz(12.);
 	constexpr static const double default_inclination = 0.;  // degrees
 	constexpr static const double default_distance = kpcToCm(10.);
+	constexpr static const bool default_cold_disk = false;
 public:
 	const double colourfactor;
 	const double emin;
 	const double emax;
 	const double inclination;  // degrees
 	const double distance;
+	const bool cold_disk;
 	const vecd lambdas;
 	const std::vector<Passband> passbands;
 public:
@@ -192,11 +194,13 @@ public:
 			double colourfactor,
 			double emin, double emax,
 			double inclination, double distance,
+	        bool cold_disk,
 	        const vecd& lambdas,
 	        const std::vector<Passband> passbands):
 			colourfactor(colourfactor),
 			emin(emin), emax(emax),
 			inclination(inclination), distance(distance),
+			cold_disk(cold_disk),
 			lambdas(lambdas),
 			passbands(passbands) {}
 };
