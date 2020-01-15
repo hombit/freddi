@@ -77,17 +77,12 @@ boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(doub
 boost::shared_ptr<FluxArguments> make_flux_arguments(
 		double colourfactor,
 		double emin, double emax,
-		double inclination, double distance,
-		const object& lambdas_) {
-	vecd lambdas(len(lambdas_));
-	for (size_t i = 0; i < lambdas.size(); i++) {
-		lambdas[i] = extract<double>(lambdas_[i]);
-	}
+		double inclination, double distance) {
 	return boost::make_shared<FluxArguments>(
 			colourfactor,
 			emin, emax,
 			inclination, distance,
-			lambdas,
+			vecd(),
 			std::vector<Passband>());
 }
 
@@ -178,8 +173,7 @@ void wrap_arguments() {
 				 arg("emin")=FluxArguments::default_emin,
 				 arg("emax")=FluxArguments::default_emax,
 				 arg("inclination")=FluxArguments::default_inclination,
-				 arg("distance")=FluxArguments::default_distance,
-				 arg("lambdas")=tuple()))
+				 arg("distance")=FluxArguments::default_distance))
 			)
 	;
 	class_<CalculationArguments>("_CalculationArguments", no_init)
