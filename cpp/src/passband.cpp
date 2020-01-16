@@ -4,6 +4,7 @@
 
 #include "constants.hpp"
 #include "passband.hpp"
+#include "spectrum.hpp"
 #include "unit_transformation.hpp"
 
 std::string Passband::nameFromPath(const std::string& filepath) {
@@ -55,4 +56,12 @@ std::function<double (size_t)> Passband::widthFrequencyIntegrationFunction(const
 	return [&lambdas, &transmissions](const size_t i) -> double {
 		return transmissions[i] * GSL_CONST_CGSM_SPEED_OF_LIGHT / m::pow<2>(lambdas[i]);
 	};
+}
+
+double Passband::bb_integral(const double temp) const {
+	return trapz(lambdas, [this, temp](const size_t i) -> double {
+		return transmissions[i] * Spectrum::Planck_lambda(temp, lambdas[i]);
+	},
+			0,
+			data.size() - 1);
 }

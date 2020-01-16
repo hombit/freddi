@@ -37,6 +37,10 @@ public:
 			t_dnu(trapz(lambdas, widthFrequencyIntegrationFunction(lambdas, transmissions), 0, data.size() - 1)) {};
 	Passband(const std::string& filepath):
 			Passband(nameFromPath(filepath), dataFromFile(filepath)) {};
+	inline double bb_lambda(double temp) const { return bb_integral(temp) / t_dl; }
+	inline double bb_nu(double temp) const { return bb_integral(temp) / t_dnu; }
+protected:
+	double bb_integral(double temp) const;
 };
 
 #endif //FREDDI_PASSBAND_HPP
