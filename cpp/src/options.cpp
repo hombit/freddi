@@ -166,7 +166,7 @@ FluxOptions::FluxOptions(const po::variables_map &vm):
 				kevToHertz(vm["emax"].as<double>()),
 				vm["inclination"].as<double>(),
 				kpcToCm(vm["distance"].as<double>()),
-				vm.count("cold_disk_flux") > 0,
+				vm.count("colddiskflux") > 0,
 				lambdasInitializer(vm),
 				passbandsInitializer(vm)) {}
 
@@ -203,7 +203,7 @@ po::options_description FluxOptions::description() {
 			( "emax", po::value<double>()->default_value(hertzToKev(default_emax)), "Maximum energy of X-ray band, keV" )
 			( "inclination,i", po::value<double>()->default_value(default_inclination), "Inclination of the system, degrees" )
 			( "distance", po::value<double>()->default_value(cmToKpc(default_distance)), "Distance to the system, kpc" )
-			( "cold_disk_flux", "Add Fnu for cold disk into output file. Default output is for hot disk only" )
+			( "colddiskflux", "Add Fnu for cold disk into output file. Default output is for hot disk only" )
 			( "lambda", po::value<vecd>()->multitoken(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced" )
 			( "passband", po::value<std::vector<std::string>>()->multitoken(), "Path of a file containing tabulated passband, the first column for wavelength in Angstrom, the second column for transmission factor, columns should be separated by spaces" )
 			;
