@@ -6,6 +6,7 @@
 
 #include <freddi_evolution.hpp>
 #include <unit_transformation.hpp>
+#include <ns/ns_evolution.hpp>
 
 #include "arguments.hpp"
 #include "freddi_evolution.hpp"

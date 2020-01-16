@@ -5,6 +5,7 @@
 #include <boost/smart_ptr.hpp>
 
 #include <arguments.hpp>
+#include <ns/ns_arguments.hpp>
 
 using object = boost::python::object;
 

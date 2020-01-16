@@ -65,13 +65,4 @@ public:
 };
 
 
-class FreddiNeutronStarFileOutput: public BasicFreddiFileOutput {
-public:
-	static std::vector<FileOutputShortField> initializeShortFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi);
-	static std::vector<FileOutputLongField> initializeLongFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi);
-public:
-	FreddiNeutronStarFileOutput(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi, const boost::program_options::variables_map& vm):
-			BasicFreddiFileOutput(freddi, vm, initializeShortFields(freddi), initializeLongFields(freddi)) {}
-};
-
 #endif //FREDDI_FREDDIFILEOUTPUT_H

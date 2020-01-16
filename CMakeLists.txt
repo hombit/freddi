@@ -12,7 +12,9 @@ function(CREATE_SHARED)
     set(TARGET freddi-dll)
     find_package(Boost 1.57.0 COMPONENTS program_options filesystem REQUIRED)
 
-    file(GLOB_RECURSE SOURCES cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
+    file(GLOB_RECURSE SOURCES
+            cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h
+            cpp/src/ns/*.cpp cpp/include/ns/*.hpp)
     add_library(${TARGET} SHARED ${SOURCES})
     set_property(TARGET ${TARGET} PROPERTY OUTPUT_NAME freddi)
 
@@ -36,8 +38,15 @@ function(CREATE_EXE targ)
 
     find_package(Boost 1.57.0 COMPONENTS program_options filesystem REQUIRED)
 
-    file(GLOB_RECURSE SOURCES cpp/main${targ}.cpp cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
-    add_executable(${TARGET} ${SOURCES})
+    file(GLOB SOURCES
+            cpp/main${targ}.cpp
+            cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
+    set(SOURCES_NS "")
+    if (targ STREQUAL "-ns")
+        file(GLOB SOURCES_NS cpp/src/ns/*.cpp cpp/include/ns/*.hpp)
+    endif()
+
+    add_executable(${TARGET} ${SOURCES} ${SOURCES_NS})
     set_property(TARGET ${TARGET} PROPERTY OUTPUT_NAME ${EXE})
 
     target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIR})
