@@ -7,6 +7,24 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
 include_directories("${PROJECT_SOURCE_DIR}/cpp/include")
 
+
+function(CREATE_SHARED)
+    set(TARGET freddi-dll)
+    find_package(Boost 1.57.0 COMPONENTS program_options filesystem REQUIRED)
+
+    file(GLOB_RECURSE SOURCES cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
+    add_library(${TARGET} SHARED ${SOURCES})
+    set_property(TARGET ${TARGET} PROPERTY OUTPUT_NAME freddi)
+
+    target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIR})
+    target_compile_definitions(${TARGET} PUBLIC INSTALLPATHPREFIX="${CMAKE_INSTALL_PREFIX}")
+    target_link_libraries(${TARGET} ${Boost_LIBRARIES})
+    install(TARGETS ${TARGET} DESTINATION lib)
+endfunction()
+
+CREATE_SHARED()
+
+
 function(CREATE_EXE targ)
     set(TARGET freddi${targ}-exe)
     set(EXE freddi${targ})
