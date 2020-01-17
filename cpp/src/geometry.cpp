@@ -104,15 +104,9 @@ Triangle operator*(const double factor, const Triangle& triangle) {
 }
 
 double Triangle::area() const {
-	// https://en.wikipedia.org/wiki/Shoelace_formula
-	return 0.5 * (
-			vertices[0].x() * vertices[1].y()
-			+ vertices[1].x() * vertices[2].y()
-			+ vertices[2].x() * vertices[0].y()
-			- vertices[1].x() * vertices[0].y()
-			- vertices[2].x() * vertices[1].y()
-			- vertices[0].x() * vertices[2].y()
-			);
+	const Vec3 edge1 = vertices[1] - vertices[0];
+	const Vec3 edge2 = vertices[2] - vertices[0];
+	return 0.5 * edge1.crossProduct(edge2).norm();
 }
 
 UnitVec3 Triangle::normal() const {
