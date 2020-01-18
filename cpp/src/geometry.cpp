@@ -150,11 +150,17 @@ UnitVec3::UnitVec3(const Vec3& vec3):
 UnitVec3::UnitVec3(const double theta, const double phi):
 		Vec3(Vec3::fromSpherical(1.0, theta, phi)) {}
 
+
 Triangle::Triangle(std::array<Vec3, 3>&& vertices):
-		vertices_(vertices) {}
+		Triangle(vertices) {}
 
 Triangle::Triangle(const std::array<Vec3, 3>& vertices):
-		vertices_(vertices) {}
+		vertices_(vertices),
+		area_(0.5 * (vertices[1] - vertices[0]).crossProduct(vertices[2] - vertices[1]).r()),
+		// Use incenter instead?
+		// https://en.wikipedia.org/wiki/Incircle_and_excircles_of_a_triangle#Cartesian_coordinates
+		center_((vertices[0] + vertices[1] + vertices[2]) / 3.0),
+		normal_{(vertices[1] - vertices[0]).crossProduct(vertices[2] - vertices[1])} {}
 
 Triangle::Triangle(const Vec3& vertex1, const Vec3& vertex2, const Vec3& vertex3):
 		Triangle{{vertex1, vertex2, vertex3}} {}
@@ -198,21 +204,15 @@ std::ostream& operator<<(std::ostream& os, const Triangle& triangle) {
 }
 
 double Triangle::area() const {
-	const Vec3 edge1 = vertices_[1] - vertices_[0];
-	const Vec3 edge2 = vertices_[2] - vertices_[0];
-	return 0.5 * edge1.crossProduct(edge2).r();
+	return area_;
 }
 
-UnitVec3 Triangle::normal() const {
-	const Vec3 edge1 = vertices_[1] - vertices_[0];
-	const Vec3 edge2 = vertices_[2] - vertices_[0];
-	return UnitVec3(edge1.crossProduct(edge2));
+const UnitVec3& Triangle::normal() const {
+	return normal_;
 }
 
-// Use incenter instead?
-// https://en.wikipedia.org/wiki/Incircle_and_excircles_of_a_triangle#Cartesian_coordinates
-Vec3 Triangle::center() const {
-	return (vertices_[0] + vertices_[1] + vertices_[2]) / 3.0;
+const Vec3& Triangle::center() const {
+	return center_;
 }
 
 std::array<Triangle, 4> Triangle::divide() const {

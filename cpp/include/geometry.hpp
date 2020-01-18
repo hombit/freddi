@@ -57,14 +57,17 @@ public:
 class Shape {
 public:
 	virtual double area() const = 0;
-	virtual UnitVec3 normal() const = 0;
-	virtual Vec3 center() const = 0;
+	virtual const Vec3& center() const = 0;
+	virtual const UnitVec3& normal() const = 0;
 };
 
 
 class Triangle: Shape {
 protected:
 	std::array<Vec3, 3> vertices_;
+	double area_;
+	Vec3 center_;
+	UnitVec3 normal_;
 public:
 	Triangle(std::array<Vec3, 3>&& vertices);
 	Triangle(const std::array<Vec3, 3>& vertices);
@@ -76,8 +79,8 @@ public:
 	bool operator!=(const Triangle& other) const;
 	Triangle operator*(double factor) const;
 	double area() const override;
-	UnitVec3 normal() const override;
-	Vec3 center() const override;
+	const UnitVec3& normal() const override;
+	const Vec3& center() const override;
 	std::array<Triangle, 4> divide() const;
 	Triangle projectedOntoUnitSphere() const;
 };
