@@ -17,10 +17,10 @@ namespace m = boost::math;
 
 BOOST_AUTO_TEST_CASE(testVec3_norm) {
 	const Vec3 vec1 = {3.0, 4.0, 0.0};
-	BOOST_CHECK_CLOSE(vec1.norm(), 5.0, 1e-12);
+	BOOST_CHECK_CLOSE(vec1.r(), 5.0, 1e-12);
 
 	const Vec3 vec2 = {1.0, 1.0, 1.0};
-	BOOST_CHECK_CLOSE(vec2.norm(), std::sqrt(3.0), 1e-12);
+	BOOST_CHECK_CLOSE(vec2.r(), std::sqrt(3.0), 1e-12);
 }
 
 BOOST_AUTO_TEST_CASE(testVec3_dotProduct) {
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(testVec3_dotProduct) {
 
 BOOST_AUTO_TEST_CASE(testVec3_norm2_eq_dotProduct) {
 	const Vec3 vec = {5.0, 7.0, -3.0};
-	BOOST_CHECK_CLOSE(vec.dotProduct(vec), m::pow<2>(vec.norm()), 1e-12);
+	BOOST_CHECK_CLOSE(vec.dotProduct(vec), m::pow<2>(vec.r()), 1e-12);
 }
 
 BOOST_AUTO_TEST_CASE(testVec3_crossProduct) {
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(testVec3_crossProduct) {
 BOOST_AUTO_TEST_CASE(testUnitVec3_length) {
 	const Vec3 vec1 = {1.0, 2.0, 3.0};
 	const UnitVec3 uvec1(vec1);
-	BOOST_CHECK_EQUAL(uvec1.norm(), 1.0);
+	BOOST_CHECK_EQUAL(uvec1.r(), 1.0);
 	BOOST_CHECK_CLOSE(uvec1.dotProduct(uvec1), 1.0, 1e-12);
 }
 
@@ -86,18 +86,18 @@ BOOST_AUTO_TEST_CASE(testTriangle_edges) {
 			{1.0, 0.0, 0.0},
 			{0.0, 1.0, 0.0});
 	const auto edges1 = tr1.edges();
-	BOOST_CHECK_CLOSE(edges1[0].norm(), 1.0, 1e-12);
-	BOOST_CHECK_CLOSE(edges1[1].norm(), std::sqrt(2), 1e-12);
-	BOOST_CHECK_CLOSE(edges1[2].norm(), 1.0, 1e-12);
+	BOOST_CHECK_CLOSE(edges1[0].r(), 1.0, 1e-12);
+	BOOST_CHECK_CLOSE(edges1[1].r(), std::sqrt(2), 1e-12);
+	BOOST_CHECK_CLOSE(edges1[2].r(), 1.0, 1e-12);
 
 	const Triangle tr2(
 			{0.0, 0.0, 0.0},
 			{0.0, 2.0, 0.0},
 			{0.0, 1.0, std::sqrt(3.0)});
 	const auto edges2 = tr2.edges();
-	BOOST_CHECK_CLOSE(edges2[0].norm(), 2.0, 1e-12);
-	BOOST_CHECK_CLOSE(edges2[1].norm(), 2.0, 1e-12);
-	BOOST_CHECK_CLOSE(edges2[2].norm(), 2.0, 1e-12);
+	BOOST_CHECK_CLOSE(edges2[0].r(), 2.0, 1e-12);
+	BOOST_CHECK_CLOSE(edges2[1].r(), 2.0, 1e-12);
+	BOOST_CHECK_CLOSE(edges2[2].r(), 2.0, 1e-12);
 }
 
 BOOST_AUTO_TEST_CASE(testTriangle_area) {
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(testIcosahedron_vertices) {
 	const auto triangles = polyhedron_triangles<Icosahedron>();
 	for (const auto& tr : triangles) {
 		for (const auto& vertex : tr.vertices()) {
-			BOOST_CHECK_CLOSE(vertex.norm(), 1.0, 1e-12);
+			BOOST_CHECK_CLOSE(vertex.r(), 1.0, 1e-12);
 		}
 	}
 }
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(testIcosahedron_edges) {
 	const auto triangles = polyhedron_triangles<Icosahedron>();
 	for (const auto& tr : triangles) {
 		for (const auto& vertex : tr.edges()) {
-			BOOST_CHECK_CLOSE(vertex.norm(), edge_length, 1e-12);
+			BOOST_CHECK_CLOSE(vertex.r(), edge_length, 1e-12);
 		}
 	}
 }
@@ -158,11 +158,11 @@ BOOST_AUTO_TEST_CASE(testIcosahedron_triangles) {
 	const auto triangles = polyhedron_triangles<Icosahedron>();
 	for (const auto& tr : triangles) {
 		const auto normal = tr.normal();
-		BOOST_CHECK_EQUAL(normal.norm(), 1.0);
+		BOOST_CHECK_EQUAL(normal.r(), 1.0);
 
 		const auto center = tr.center();
-		BOOST_CHECK_GT(center.norm(), 0.0);
-		BOOST_CHECK_LT(center.norm(), 1.0);
+		BOOST_CHECK_GT(center.r(), 0.0);
+		BOOST_CHECK_LT(center.r(), 1.0);
 
 		// Normal should be co-directional with triangles vertices and center
 		BOOST_CHECK_GT(normal.dotProduct(center), 0.0);
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(testUnitSphere_vertices) {
 		const UnitSphere sph(grid_scale);
 		for (const auto& tr : sph.triangles()) {
 			for (const auto& vertex : tr.vertices()) {
-				BOOST_CHECK_CLOSE(vertex.norm(), 1.0, 1e-12);
+				BOOST_CHECK_CLOSE(vertex.r(), 1.0, 1e-12);
 			}
 		}
 	}
@@ -196,11 +196,11 @@ BOOST_AUTO_TEST_CASE(testUnitSphere_triangles) {
 		const UnitSphere sph(grid_scale);
 		for (const auto& tr : sph.triangles()) {
 			const auto normal = tr.normal();
-			BOOST_CHECK_EQUAL(normal.norm(), 1.0);
+			BOOST_CHECK_EQUAL(normal.r(), 1.0);
 
 			const auto center = tr.center();
-			BOOST_CHECK_GT(center.norm(), 0.0);
-			BOOST_CHECK_LT(center.norm(), 1.0);
+			BOOST_CHECK_GT(center.r(), 0.0);
+			BOOST_CHECK_LT(center.r(), 1.0);
 
 			// Normal should be co-directional with triangles vertices and center
 			BOOST_CHECK_GT(normal.dotProduct(center), 0.0);

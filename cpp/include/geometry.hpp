@@ -10,22 +10,35 @@
 class Vec3 {
 protected:
 	std::array<double, 3> cartesian_;
+	std::array<double, 3> spherical_;
+public:
+	static std::array<double, 3> cartesianToSpherical(double x, double y, double z);
+	static std::array<double, 3> cartesianToSpherical(const std::array<double, 3>& cartesian);
+	static std::array<double ,3> sphericalToCartesian(double r, double theta, double phi);
+	static std::array<double ,3> sphericalToCartesian(const std::array<double, 3>& spherical);
+protected:
+	Vec3(const std::array<double, 3>& cartesian, const std::array<double, 3>& spherical);
 public:
 	Vec3(const std::array<double, 3>& cartesian);
 	Vec3(double x, double y, double z);
 	Vec3(const Vec3& other) = default;
+	static Vec3 fromSpherical(const std::array<double, 3>& spherical);
+	static Vec3 fromSpherical(double r, double theta, double phi);
 public:
 	double x() const;
 	double y() const;
 	double z() const;
+	double r() const;
+	double theta() const;
+	double phi() const;
 	const std::array<double, 3>& cartesian() const;
+	const std::array<double, 3>& spherical() const;
 	bool operator==(const Vec3& other) const;
 	bool operator!=(const Vec3& other) const;
 	Vec3 operator+(const Vec3& other) const;
 	Vec3 operator-(const Vec3& other) const;
 	Vec3 operator*(double factor) const;
 	Vec3 operator/(double factor) const;
-	virtual double norm() const;
 	double dotProduct(const Vec3& other) const;
 	Vec3 crossProduct(const Vec3& other) const;
 };
@@ -37,9 +50,7 @@ std::ostream& operator<<(std::ostream& os, const Vec3& vec3);
 class UnitVec3: public Vec3 {
 public:
 	explicit UnitVec3(const Vec3& vec3);
-	UnitVec3(double x, double y, double z);
-public:
-	double norm() const override;
+	UnitVec3(double theta, double phi);
 };
 
 

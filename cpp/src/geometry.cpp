@@ -3,26 +3,84 @@
 #include <geometry.hpp>
 
 
+std::array<double, 3> Vec3::cartesianToSpherical(const double x, const double y, const double z) {
+	const double r = std::sqrt(x*x + y*y + z*z);
+	if (r == 0) {
+		return {0.0, 0.0, 0.0};
+	}
+	return {
+		r,
+		std::acos(z / r),
+		std::atan2(y, x)
+	};
+}
+
+std::array<double, 3> Vec3::cartesianToSpherical(const std::array<double, 3>& cartesian) {
+	return cartesianToSpherical(cartesian[0], cartesian[1], cartesian[2]);
+}
+
+std::array<double ,3> Vec3::sphericalToCartesian(const double r, const double theta, const double phi) {
+	const double sin_theta = std::sin(theta);
+	return {
+		r * sin_theta * std::cos(phi),
+		r * sin_theta * std::sin(phi),
+		r * std::cos(theta)
+	};
+}
+
+std::array<double, 3> Vec3::sphericalToCartesian(const std::array<double, 3>& spherical) {
+	return sphericalToCartesian(spherical[0], spherical[1], spherical[2]);
+}
+
+Vec3::Vec3(const std::array<double, 3>& cartesian, const std::array<double, 3>& spherical):
+		cartesian_(cartesian), spherical_(spherical) {}
+
 Vec3::Vec3(const std::array<double, 3>& cartesian):
-		cartesian_(cartesian) {}
+		cartesian_(cartesian),
+		spherical_(cartesianToSpherical(cartesian)) {}
 
 Vec3::Vec3(const double x, const double y, const double z):
-		cartesian_{x, y, z} {}
+		cartesian_{x, y, z},
+		spherical_(cartesianToSpherical(x, y, z)) {}
 
-inline double Vec3::x() const {
+Vec3 Vec3::fromSpherical(const std::array<double, 3>& spherical) {
+	return Vec3(sphericalToCartesian(spherical), spherical);
+}
+
+Vec3 Vec3::fromSpherical(const double r, const double theta, const double phi) {
+	return Vec3(sphericalToCartesian(r, theta, phi), {r, theta, phi});
+}
+
+double Vec3::x() const {
 	return cartesian_[0];
 }
 
-inline double Vec3::y() const {
+double Vec3::y() const {
 	return cartesian_[1];
 }
 
-inline double Vec3::z() const {
+double Vec3::z() const {
 	return cartesian_[2];
+}
+
+double Vec3::r() const {
+	return spherical_[0];
+}
+
+double Vec3::theta() const {
+	return spherical_[1];
+}
+
+double Vec3::phi() const {
+	return spherical_[2];
 }
 
 const std::array<double, 3>& Vec3::cartesian() const {
 	return cartesian_;
+}
+
+const std::array<double, 3>& Vec3::spherical() const {
+	return spherical_;
 }
 
 bool Vec3::operator==(const Vec3& other) const {
@@ -51,9 +109,8 @@ Vec3 Vec3::operator-(const Vec3& other) const {
 
 Vec3 Vec3::operator*(const double factor) const {
 	return {
-		factor * x(),
-		factor * y(),
-		factor * z()
+			{factor * x(), factor * y(), factor * z()},
+			{factor * r(), theta(), phi()}
 	};
 }
 
@@ -73,10 +130,6 @@ std::ostream& operator<<(std::ostream& os, const Vec3& vec3) {
 	return os;
 }
 
-double Vec3::norm() const {
-	return std::sqrt(dotProduct(*this));
-}
-
 double Vec3::dotProduct(const Vec3& other) const {
 	return x() * other.x() + y() * other.y() + z() * other.z();
 }
@@ -91,15 +144,11 @@ Vec3 Vec3::crossProduct(const Vec3& other) const {
 
 
 UnitVec3::UnitVec3(const Vec3& vec3):
-		Vec3(vec3.x()/vec3.norm(), vec3.y()/vec3.norm(), vec3.z()/vec3.norm()) {}
+		Vec3({vec3.x() / vec3.r(), vec3.y() / vec3.r(), vec3.z() / vec3.r()},
+			{1.0, vec3.theta(), vec3.phi()}) {}
 
-UnitVec3::UnitVec3(const double x, const double y, const double z):
-		UnitVec3(Vec3(x, y, z)) {}
-
-inline double UnitVec3::norm() const {
-	return 1.0;
-}
-
+UnitVec3::UnitVec3(const double theta, const double phi):
+		Vec3(Vec3::fromSpherical(1.0, theta, phi)) {}
 
 Triangle::Triangle(std::array<Vec3, 3>&& vertices):
 		vertices_(vertices) {}
@@ -151,7 +200,7 @@ std::ostream& operator<<(std::ostream& os, const Triangle& triangle) {
 double Triangle::area() const {
 	const Vec3 edge1 = vertices_[1] - vertices_[0];
 	const Vec3 edge2 = vertices_[2] - vertices_[0];
-	return 0.5 * edge1.crossProduct(edge2).norm();
+	return 0.5 * edge1.crossProduct(edge2).r();
 }
 
 UnitVec3 Triangle::normal() const {
@@ -205,7 +254,7 @@ const std::vector<Triangle>& UnitSphere::triangles() const {
 LuminousPolygon::LuminousPolygon(const double flux):
 		flux_(flux) {}
 
-inline double LuminousPolygon::flux() const {
+double LuminousPolygon::flux() const {
 	return flux_;
 }
 
