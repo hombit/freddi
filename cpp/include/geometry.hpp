@@ -2,20 +2,25 @@
 #define FREDDI_GEOMETRY_HPP
 
 #include <array>
+#include <ostream>
 #include <vector>
 
 #include <arguments.hpp>
 
 class Vec3 {
 protected:
-	std::array<double, 3> cartesian;
+	std::array<double, 3> cartesian_;
 public:
 	Vec3(const std::array<double, 3>& cartesian);
 	Vec3(double x, double y, double z);
+	Vec3(const Vec3& other) = default;
 public:
 	double x() const;
 	double y() const;
 	double z() const;
+	const std::array<double, 3>& cartesian() const;
+	bool operator==(const Vec3& other) const;
+	bool operator!=(const Vec3& other) const;
 	Vec3 operator+(const Vec3& other) const;
 	Vec3 operator-(const Vec3& other) const;
 	Vec3 operator*(double factor) const;
@@ -26,6 +31,7 @@ public:
 };
 
 Vec3 operator*(double factor, const Vec3& vec3);
+std::ostream& operator<<(std::ostream& os, const Vec3& vec3);
 
 
 class UnitVec3: public Vec3 {
@@ -37,7 +43,7 @@ public:
 };
 
 
-class Polygon {
+class Shape {
 public:
 	virtual double area() const = 0;
 	virtual UnitVec3 normal() const = 0;
@@ -45,14 +51,18 @@ public:
 };
 
 
-class Triangle: Polygon {
-private:
-	std::array<Vec3, 3> vertices;
+class Triangle: Shape {
+protected:
+	std::array<Vec3, 3> vertices_;
 public:
 	Triangle(std::array<Vec3, 3>&& vertices);
 	Triangle(const std::array<Vec3, 3>& vertices);
 	Triangle(const Vec3& vertex1, const Vec3& vertex2, const Vec3& vertex3);
 public:
+	const std::array<Vec3, 3>& vertices() const;
+	std::array<Vec3, 3> edges() const;
+	bool operator==(const Triangle& other) const;
+	bool operator!=(const Triangle& other) const;
 	Triangle operator*(double factor) const;
 	double area() const override;
 	UnitVec3 normal() const override;
@@ -62,6 +72,7 @@ public:
 };
 
 Triangle operator*(double factor, const Triangle& triangle);
+std::ostream& operator<<(std::ostream& os, const Triangle& triangle);
 
 
 template <size_t VertexCount, size_t TriangleCount>
@@ -93,15 +104,15 @@ public:
 	static const constexpr double x = .525731112119133606;
 	static const constexpr double z = .850650808352039932;
 	static const constexpr std::array<std::array<double, 3>, vertex_count> vertices = {{
-		{-x, 0, z}, {x, 0, z}, {-x, 0, -z}, {x, 0, -z},
-		{0, z, x}, {0, z, -x}, {0, -z, x}, {0, -z, -x},
-		{z, x, 0}, {-z, x, 0}, {-z, -x, 0}
+		{-x, 0.0, z}, {x, 0.0, z}, {-x, 0.0, -z}, {x, 0.0, -z},
+		{0.0, z, x}, {0.0, z, -x}, {0.0, -z, x}, {0.0, -z, -x},
+		{z, x, 0.0}, {-z, x, 0.0}, {z, -x, 0.0}, {-z, -x, 0.0}
 	}};
 	static const constexpr std::array<std::array<size_t, 3>, triangle_count> triangle_indices = {{
-		{0,4,1}, {0,9,4}, {9,5,4}, {4,5,8}, {4,8,1},
-		{8,10,1}, {8,3,10}, {5,3,8}, {5,2,3}, {2,7,3},
-		{7,10,3}, {7,6,10}, {7,11,6}, {11,0,6}, {0,1,6},
-		{6,1,10}, {9,0,11}, {9,11,2}, {9,2,5}, {7,2,11}
+		{0,1,4}, {0,4,9}, {9,4,5}, {4,8,5}, {4,1,8},
+		{8,1,10}, {8,10,3}, {5,8,3}, {5,3,2}, {2,3,7},
+		{7,3,10}, {7,10,6}, {7,6,11}, {11,6,0}, {0,6,1},
+		{6,10,1}, {9,11,0}, {9,2,11}, {9,5,2}, {7,11,2}
 	}};
 };
 
@@ -110,14 +121,14 @@ class UnitSphere {
 protected:
 	std::vector<Triangle> triangles_;
 public:
-	const unsigned int grid_scale;
+	const unsigned short grid_scale;
 public:
-	UnitSphere(unsigned int grid_scale);
+	UnitSphere(unsigned short grid_scale);
 	const std::vector<Triangle>& triangles() const;
 };
 
 
-class LuminousPolygon: public Polygon {
+class LuminousPolygon: public Shape {
 private:
 	double flux_;
 public:
