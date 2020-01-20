@@ -26,7 +26,7 @@ private:
 protected:
 	void invalidate_irradiated_properties();
 public:
-	Star(double temp, double radius, unsigned short grid_scale);
+	Star(double temp, double radius, unsigned short lod);
 protected:
 	double integrate(std::function<double (size_t)> func) const;
 	double integrate(std::function<double (size_t)> func, const UnitVec3& direction) const;

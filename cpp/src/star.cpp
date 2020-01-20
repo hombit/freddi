@@ -4,8 +4,8 @@
 #include <star.hpp>
 
 
-Star::Star(const double temp, const double radius, const unsigned short grid_scale):
-		triangles_(initializeTriangles(radius, grid_scale)),
+Star::Star(const double temp, const double radius, const unsigned short lod):
+		triangles_(initializeTriangles(radius, lod)),
 		Tth_(temp, triangles_.size()),
 		irr_() {}
 
@@ -70,5 +70,5 @@ double Star::luminosity() {
 
 
 FreddiStar::FreddiStar(const FreddiArguments& args):
-		Star(args.basic->Topt, args.basic->Ropt, 3),
+		Star(args.basic->Topt, args.basic->Ropt, args.calc->starlod),
 		args(args) {}

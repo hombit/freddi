@@ -263,9 +263,9 @@ Triangle Triangle::projectedOntoUnitSphere() const {
 }
 
 
-std::vector<Triangle> unit_sphere_triangles(unsigned short grid_scale) {
+std::vector<Triangle> unit_sphere_triangles(unsigned short lod) {
 	std::vector<Triangle> triangles = polyhedron_triangles<Icosahedron>();
-	for (unsigned short i = grid_scale; i != 0; --i) {
+	for (unsigned short i = lod; i != 0; --i) {
 		std::vector<Triangle> tmp;
 		for (const auto& large_triangle : triangles) {
 			for (const auto& small_triangle : large_triangle.divide()) {

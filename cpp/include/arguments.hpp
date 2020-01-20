@@ -224,17 +224,19 @@ public:
 	constexpr static const double default_tau = dayToS(0.25);
 	constexpr static const unsigned int default_Nx = 1000;
 	constexpr static const char default_gridscale[] = "log";
+	constexpr static const unsigned short default_starlod = 3;
 public:
 	const double time;
 	const double tau;
 	const unsigned int Nx;
 	const std::string gridscale;
+	const unsigned short starlod = 3;
 	const double eps;
 public:
 	CalculationArguments(
-			double time, double tau, unsigned int Nx, const std::string& gridscale,
+			double time, double tau, unsigned int Nx, const std::string& gridscale, const unsigned short starlod,
 			double eps=1e-6):
-			time(time), tau(tau), Nx(Nx), gridscale(gridscale), eps(eps) {}
+			time(time), tau(tau), Nx(Nx), gridscale(gridscale), starlod(starlod), eps(eps) {}
 };
 
 

@@ -127,7 +127,7 @@ public:
 };
 
 
-std::vector<Triangle> unit_sphere_triangles(unsigned short grid_scale);
+std::vector<Triangle> unit_sphere_triangles(unsigned short lod);
 
 
 #endif //FREDDI_GEOMETRY_HPP

@@ -55,6 +55,7 @@ dict evolution_kwdefaults() {
 	kw["tau"] = CalculationArguments::default_tau;
 	kw["Nx"] = CalculationArguments::default_Nx;
 	kw["gridscale"] = CalculationArguments::default_gridscale;
+	kw["starlod"] = CalculationArguments::default_starlod;
 	kw["eps"] = object();
 
 	return kw;
@@ -126,6 +127,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 	const auto calc = make_calculation_arguments(
 			extract<double>(kw["time"]), extract<double>(kw["tau"]),
 			extract<unsigned int>(kw["Nx"]), extract<std::string>(kw["gridscale"]),
+			extract<unsigned short>(kw["starlod"]),
 			kw["eps"]);
 	// To avoid copy, create FreddiArguments constructor that accepts shared_ptr
 	return make_freddi_arguments(*general, *basic, *disk, *irr, *flux, *calc);

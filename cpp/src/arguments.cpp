@@ -208,3 +208,4 @@ constexpr const double CalculationArguments::default_time;
 constexpr const double CalculationArguments::default_tau;
 constexpr const unsigned int CalculationArguments::default_Nx;
 constexpr const char CalculationArguments::default_gridscale[];
+constexpr const unsigned short CalculationArguments::default_starlod;

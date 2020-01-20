@@ -89,12 +89,12 @@ boost::shared_ptr<FluxArguments> make_flux_arguments(
 }
 
 boost::shared_ptr<CalculationArguments> make_calculation_arguments(
-		double time, double tau, unsigned int Nx, const std::string& gridscale,
+		double time, double tau, unsigned int Nx, const std::string& gridscale, const unsigned short starlod,
 		const object& eps) {
 	if (eps.ptr() == object().ptr()) {
-		return boost::make_shared<CalculationArguments>(time, tau, Nx, gridscale);
+		return boost::make_shared<CalculationArguments>(time, tau, Nx, gridscale, starlod);
 	}
-	return boost::make_shared<CalculationArguments>(time, tau, Nx, gridscale, extract<double>(eps));
+	return boost::make_shared<CalculationArguments>(time, tau, Nx, gridscale, starlod, extract<double>(eps));
 }
 
 boost::shared_ptr<FreddiArguments> make_freddi_arguments(
@@ -185,6 +185,7 @@ void wrap_arguments() {
 				 arg("tau")=CalculationArguments::default_tau,
 				 arg("Nx")=CalculationArguments::default_Nx,
 				 arg("gridscale")=CalculationArguments::default_gridscale,
+				 arg("starlod")=CalculationArguments::default_starlod,
 				 arg("eps")=object()))
 			)
 	;
