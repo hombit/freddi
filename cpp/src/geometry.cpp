@@ -249,26 +249,3 @@ UnitSphere::UnitSphere(unsigned short grid_scale):
 const std::vector<Triangle>& UnitSphere::triangles() const {
 	return triangles_;
 }
-
-
-LuminousPolygon::LuminousPolygon(const double flux):
-		flux_(flux) {}
-
-double LuminousPolygon::flux() const {
-	return flux_;
-}
-
-void LuminousPolygon::setFlux(const double flux) {
-	flux_ = flux;
-}
-
-double LuminousPolygon::luminosity_cos(const UnitVec3& direction) const {
-	const double cos = direction.dotProduct(normal());
-	if (cos <= 0) {
-		return 0;
-	}
-	return flux() * area() * cos;
-}
-
-LuminousTriangle::LuminousTriangle(const Triangle &triangle, double flux):
-		Triangle(triangle), LuminousPolygon(flux) {}

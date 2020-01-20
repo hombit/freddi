@@ -54,15 +54,7 @@ public:
 };
 
 
-class Shape {
-public:
-	virtual double area() const = 0;
-	virtual const Vec3& center() const = 0;
-	virtual const UnitVec3& normal() const = 0;
-};
-
-
-class Triangle: Shape {
+class Triangle {
 protected:
 	std::array<Vec3, 3> vertices_;
 	double area_;
@@ -78,9 +70,9 @@ public:
 	bool operator==(const Triangle& other) const;
 	bool operator!=(const Triangle& other) const;
 	Triangle operator*(double factor) const;
-	double area() const override;
-	const UnitVec3& normal() const override;
-	const Vec3& center() const override;
+	double area() const;
+	const UnitVec3& normal() const;
+	const Vec3& center() const;
 	std::array<Triangle, 4> divide() const;
 	Triangle projectedOntoUnitSphere() const;
 };
@@ -139,23 +131,6 @@ public:
 public:
 	UnitSphere(unsigned short grid_scale);
 	const std::vector<Triangle>& triangles() const;
-};
-
-
-class LuminousPolygon: public Shape {
-private:
-	double flux_;
-public:
-	LuminousPolygon(double flux);
-public:
-	double flux() const;
-	void setFlux(double flux);
-	double luminosity_cos(const UnitVec3& direction) const;
-};
-
-
-class LuminousTriangle: public Triangle, public LuminousPolygon {
-	LuminousTriangle(const Triangle& triangle, double flux);
 };
 
 
