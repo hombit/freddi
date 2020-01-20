@@ -37,6 +37,7 @@ public:
 	bool operator!=(const Vec3& other) const;
 	Vec3 operator+(const Vec3& other) const;
 	Vec3 operator-(const Vec3& other) const;
+	Vec3& operator*=(double factor);
 	Vec3 operator*(double factor) const;
 	Vec3 operator/(double factor) const;
 	double dotProduct(const Vec3& other) const;
@@ -69,6 +70,7 @@ public:
 	std::array<Vec3, 3> edges() const;
 	bool operator==(const Triangle& other) const;
 	bool operator!=(const Triangle& other) const;
+	Triangle& operator*=(double fector);
 	Triangle operator*(double factor) const;
 	double area() const;
 	const UnitVec3& normal() const;
@@ -125,15 +127,7 @@ public:
 };
 
 
-class UnitSphere {
-protected:
-	std::vector<Triangle> triangles_;
-public:
-	const unsigned short grid_scale;
-public:
-	UnitSphere(unsigned short grid_scale);
-	const std::vector<Triangle>& triangles() const;
-};
+std::vector<Triangle> unit_sphere_triangles(unsigned short grid_scale);
 
 
 #endif //FREDDI_GEOMETRY_HPP

@@ -107,6 +107,14 @@ Vec3 Vec3::operator-(const Vec3& other) const {
 	};
 }
 
+Vec3& Vec3::operator*=(const double factor) {
+	for (auto& component : cartesian_) {
+		component *= factor;
+	}
+	spherical_[0] *= factor;
+	return *this;
+}
+
 Vec3 Vec3::operator*(const double factor) const {
 	return {
 			{factor * x(), factor * y(), factor * z()},
@@ -187,8 +195,19 @@ bool Triangle::operator!=(const Triangle& other) const {
 	return !(*this == other);
 }
 
+Triangle& Triangle::operator*=(const double factor) {
+	for (auto& vertex : vertices_) {
+		vertex *= factor;
+	}
+	area_ *= factor * factor;
+	center_ *= factor;
+	return *this;
+}
+
 Triangle Triangle::operator*(const double factor) const {
-	return {vertices_[0] * factor, vertices_[1] * factor, vertices_[2] * factor};
+	Triangle tr(*this);
+	tr *= factor;
+	return tr;
 }
 
 Triangle operator*(const double factor, const Triangle& triangle) {
@@ -244,20 +263,16 @@ Triangle Triangle::projectedOntoUnitSphere() const {
 }
 
 
-UnitSphere::UnitSphere(unsigned short grid_scale):
-		grid_scale(grid_scale) {
-	triangles_ = polyhedron_triangles<Icosahedron>();
+std::vector<Triangle> unit_sphere_triangles(unsigned short grid_scale) {
+	std::vector<Triangle> triangles = polyhedron_triangles<Icosahedron>();
 	for (unsigned short i = grid_scale; i != 0; --i) {
 		std::vector<Triangle> tmp;
-		for (const auto& large_triangle : triangles_) {
+		for (const auto& large_triangle : triangles) {
 			for (const auto& small_triangle : large_triangle.divide()) {
 				tmp.push_back(small_triangle.projectedOntoUnitSphere());
 			}
 		}
-		triangles_ = tmp;
+		triangles = tmp;
 	}
-}
-
-const std::vector<Triangle>& UnitSphere::triangles() const {
-	return triangles_;
+	return triangles;
 }

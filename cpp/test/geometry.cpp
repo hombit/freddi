@@ -174,16 +174,16 @@ BOOST_AUTO_TEST_CASE(testIcosahedron_triangles) {
 
 
 BOOST_AUTO_TEST_CASE(testUnitSphere_0) {
-	const UnitSphere sph(0);
+	const auto sph_triangles = unit_sphere_triangles(0);
 	const auto icosahedron_triangles = polyhedron_triangles<Icosahedron>();
-	BOOST_CHECK_EQUAL_COLLECTIONS(sph.triangles().begin(), sph.triangles().end(),
+	BOOST_CHECK_EQUAL_COLLECTIONS(sph_triangles.begin(), sph_triangles.end(),
 			icosahedron_triangles.begin(), icosahedron_triangles.end());
 }
 
 BOOST_AUTO_TEST_CASE(testUnitSphere_vertices) {
 	for (unsigned short grid_scale = 0; grid_scale < 4; ++grid_scale) {
-		const UnitSphere sph(grid_scale);
-		for (const auto& tr : sph.triangles()) {
+		const auto sph_triangles = unit_sphere_triangles(grid_scale);
+		for (const auto& tr : sph_triangles) {
 			for (const auto& vertex : tr.vertices()) {
 				BOOST_CHECK_CLOSE(vertex.r(), 1.0, 1e-12);
 			}
@@ -193,8 +193,8 @@ BOOST_AUTO_TEST_CASE(testUnitSphere_vertices) {
 
 BOOST_AUTO_TEST_CASE(testUnitSphere_triangles) {
 	for (unsigned short grid_scale = 0; grid_scale < 4; ++grid_scale) {
-		const UnitSphere sph(grid_scale);
-		for (const auto& tr : sph.triangles()) {
+		const auto sph_triangles = unit_sphere_triangles(grid_scale);
+		for (const auto& tr : sph_triangles) {
 			const auto normal = tr.normal();
 			BOOST_CHECK_EQUAL(normal.r(), 1.0);
 
@@ -219,14 +219,14 @@ double triangles_area(const std::vector<Triangle>& triangles) {
 BOOST_AUTO_TEST_CASE(testUnitSphere_area) {
 	const double four_pi = 4.0 * M_PI;
 
-	const UnitSphere sph0(0);
-	double area_smaller = triangles_area(sph0.triangles());
+	const auto sph0 = unit_sphere_triangles(0);
+	double area_smaller = triangles_area(sph0);
 	BOOST_CHECK_GT(area_smaller, 0.0);
 	BOOST_CHECK_LT(area_smaller, four_pi);
 
 	for (unsigned short grid_scale = 1; grid_scale < 4; ++grid_scale) {
-		const UnitSphere sph(grid_scale);
-		const double area = triangles_area(sph.triangles());
+		const auto sph_triangles = unit_sphere_triangles(grid_scale);
+		const double area = triangles_area(sph_triangles);
 		BOOST_CHECK_GT(area, 0.0);
 		BOOST_CHECK_GT(area, area_smaller);
 		BOOST_CHECK_LT(area, four_pi);
@@ -243,16 +243,20 @@ BOOST_AUTO_TEST_CASE(testUnitSphere_projected_area) {
 	const std::vector<double> thetas = {0.0, M_PI/6.0, 1.0, M_PI/3.0, M_PI/2.0, M_PI};
 	const std::vector<double> phis = {0.0, 1.0, M_PI/3.0, 2.0, M_PI, 1.3 * M_PI, 2.0 * M_PI};
 
-	const UnitSphere sph0(0);
-	const std::vector<UnitSphere> spheres = {{1}, {2}, {3}};
+	const auto sph0 = unit_sphere_triangles(0);
+	std::vector<std::vector<Triangle>> spheres;
+	for (unsigned short grid_scale = 1; grid_scale < 4; ++grid_scale) {
+		spheres.push_back(unit_sphere_triangles(grid_scale));
+	}
+
 	for (const auto& theta : thetas) {
 		for (const auto& phi : phis) {
-			double area_smaller = triangles_area_cos(sph0.triangles(), theta, phi);
+			double area_smaller = triangles_area_cos(sph0, theta, phi);
 			BOOST_CHECK_GT(area_smaller, 0.0);
 			BOOST_CHECK_LT(area_smaller, M_PI);
 
 			for (const auto& sph : spheres) {
-				const double area = triangles_area_cos(sph.triangles(), theta, phi);
+				const double area = triangles_area_cos(sph, theta, phi);
 				BOOST_CHECK_GT(area, 0.0);
 				BOOST_CHECK_GT(area, area_smaller);
 				BOOST_CHECK_LT(area, M_PI);
