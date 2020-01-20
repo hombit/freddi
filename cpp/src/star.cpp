@@ -71,7 +71,10 @@ double Star::luminosity() {
 }
 
 double Star::dLdOmega(const UnitVec3& direction) {
-	return integrate([this](size_t i) -> double { return Qirr()[i]; }, direction) / M_PI;
+	const double integral = integrate([this](size_t i) -> double {
+			return m::pow<4>(Teff()[i]);
+		}, direction);
+	return GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT / M_PI * integral;
 }
 
 double Star::dLdOmega(const UnitVec3& direction, const double lambda) {
