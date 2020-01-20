@@ -18,19 +18,20 @@ boost::shared_ptr<GeneralArguments> make_general_arguments() {
 boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(
 		double alpha,
 		double Mx, double kerr,
-		double Mopt, double period,
+		double Mopt, double Topt,
+		double period,
 		const object& rin, const object& rout) {
 	const auto None = object().ptr();
 	if (rin.ptr() == None && rout.ptr() == None) {
-		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRinRout(alpha, Mx, kerr, Mopt, period));
+		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRinRout(alpha, Mx, kerr, Mopt, Topt, period));
 	}
 	if (rin.ptr() == None) {
-		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRin(alpha, Mx, kerr, Mopt, period, extract<double>(rout)));
+		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRin(alpha, Mx, kerr, Mopt, Topt, period, extract<double>(rout)));
 	}
 	if (rout.ptr() == None) {
-		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRout(alpha, Mx, kerr, Mopt, period, extract<double>(rin)));
+		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRout(alpha, Mx, kerr, Mopt, Topt, period, extract<double>(rin)));
 	}
-	return boost::make_shared<BasicDiskBinaryArguments>(alpha, Mx, kerr, Mopt, period, extract<double>(rin), extract<double>(rout));
+	return boost::make_shared<BasicDiskBinaryArguments>(alpha, Mx, kerr, Mopt, Topt, period, extract<double>(rin), extract<double>(rout));
 }
 
 boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
@@ -138,6 +139,7 @@ void wrap_arguments() {
 				 arg("Mx")=BasicDiskBinaryArguments::default_Mx,
 				 arg("kerr")=BasicDiskBinaryArguments::default_kerr,
 				 arg("Mopt")=BasicDiskBinaryArguments::default_Mopt,
+				 arg("Topt")=BasicDiskBinaryArguments::default_Topt,
 				 arg("period")=BasicDiskBinaryArguments::default_period,
 				 arg("rin")=object(),
 				 arg("rout")=object()))

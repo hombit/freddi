@@ -5,30 +5,45 @@
 #include <optional>
 #include <vector>
 
+#include <arguments.hpp>
 #include <geometry.hpp>
 #include <util.hpp>
 
 
 class Star {
 protected:
-	std::vector<Triangle> triangles_;
-	vecd Tth_;
-	std::optional<vecd> Teff_;
-	std::optional<double> luminosity_;
+	struct IrradiatedProperties {
+		std::optional<vald> Tirr;
+		std::optional<vald> Teff;
+		std::optional<double> luminosity;
+	};
+protected:
+	const std::vector<Triangle> triangles_;
+	const vald Tth_;
 private:
 	static std::vector<Triangle> initializeTriangles(double radius, unsigned short grid_scale);
+	IrradiatedProperties irr_;
+protected:
+	void invalidate_irradiated_properties();
 public:
 	Star(double temp, double radius, unsigned short grid_scale);
 protected:
-	double integrate(const vecd& values) const;
 	double integrate(std::function<double (size_t)> func) const;
-	double integrate(const vecd& values, const UnitVec3& direction) const;
 	double integrate(std::function<double (size_t)> func, const UnitVec3& direction) const;
 public:
 	const std::vector<Triangle>& triangles() const;
-	const vecd& Tth() const;
-	const vecd& Teff();
+	const vald& Tth() const;
+	virtual const vald& Tirr();
+	const vald& Teff();
 	double luminosity();
+};
+
+
+class FreddiStar: public Star {
+protected:
+	FreddiArguments args;
+public:
+	FreddiStar(const FreddiArguments& args);
 };
 
 

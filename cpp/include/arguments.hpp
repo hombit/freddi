@@ -38,15 +38,15 @@ public:
 
 class BinaryFunctions {
 public:
-	static double rocheLobeVolumeRadiusSemiaxis(double MxToMopt);
+	static double rocheLobeVolumeRadiusSemiaxis(double mass_ratio);
 	static inline double semiaxis(const double total_mass, const double period) {
 		return std::cbrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * total_mass * m::pow<2>(period) / (4. * m::pow<2>(M_PI)));
 	}
-	static inline double semiaxis(const double Mx, const double Mopt, const double period) {
-		return semiaxis(Mx + Mopt, period);
+	static inline double semiaxis(const double mass1, const double mass2, const double period) {
+		return semiaxis(mass1 + mass2, period);
 	}
-	static inline double rocheLobeVolumeRadius(const double Mx, const double Mopt, const double period) {
-		return rocheLobeVolumeRadiusSemiaxis(Mx / Mopt) * semiaxis(Mx, Mopt, period);
+	static inline double rocheLobeVolumeRadius(const double mass1, const double mass2, const double period) {
+		return rocheLobeVolumeRadiusSemiaxis(mass1 / mass2) * semiaxis(mass1, mass2, period);
 	}
 };
 
@@ -57,25 +57,31 @@ public:
 	constexpr static const double default_Mx = sunToGram(5.);
 	constexpr static const double default_kerr = 0.;
 	constexpr static const double default_Mopt = sunToGram(0.5);
+	constexpr static const double default_Topt = 4000;
 	constexpr static const double default_period = dayToS(0.25);
 public:
 	const double alpha;
 	const double Mx;
 	const double kerr;
 	const double Mopt;
+	const double Topt;
 	const double period;
+	const double Ropt;
 	const double rin;
 	const double rout;
 public:
 	BasicDiskBinaryArguments(
 			double alpha,
 			double Mx, double kerr,
-			double Mopt, double period,
+			double Mopt, double Topt,
+			double period,
 			double rin, double rout
 	):
 			alpha(alpha),
 			Mx(Mx), kerr(kerr),
-			Mopt(Mopt), period(period),
+			Mopt(Mopt), Topt(Topt),
+			period(period),
+			Ropt(roptFromMxMoptPeriod(Mx, Mopt, period)),
 			rin(rin), rout(rout) {}
 	BasicDiskBinaryArguments(const BasicDiskBinaryArguments&) = default;
 	BasicDiskBinaryArguments(BasicDiskBinaryArguments&&) = default;
@@ -86,24 +92,30 @@ public:
 		// than r_1 or r_2 for axial-symmetric gas disk. Also this factor is in agreement with Gilfanov & Arefiev, 2005
 		return 0.9 * rocheLobeVolumeRadius(Mx, Mopt, period);
 	}
+	static inline double roptFromMxMoptPeriod(const double Mx, const double Mopt, const double period) {
+		return rocheLobeVolumeRadius(Mopt, Mx, period);
+	}
 	static inline BasicDiskBinaryArguments constructWithoutRinRout(const double alpha,
 																   const double Mx, const double kerr,
-																   const double Mopt, const double period) {
-		return {alpha, Mx, kerr, Mopt, period,
+																   const double Mopt, const double Topt,
+																   const double period) {
+		return {alpha, Mx, kerr, Mopt, Topt, period,
 				rinFromMxKerr(Mx, kerr), routFromMxMoptPeriod(Mx, Mopt, period)};
 	}
 	static inline BasicDiskBinaryArguments constructWithoutRin(const double alpha,
 															   const double Mx, const double kerr,
-															   const double Mopt, const double period,
+															   const double Mopt, const double Topt,
+															   const double period,
 															   const double rout) {
-		return {alpha, Mx, kerr, Mopt, period,
+		return {alpha, Mx, kerr, Mopt, Topt, period,
 				rinFromMxKerr(Mx, kerr), rout};
 	}
 	static inline BasicDiskBinaryArguments constructWithoutRout(const double alpha,
 															    const double Mx, const double kerr,
-															    const double Mopt, const double period,
+															    const double Mopt, const double Topt,
+															    const double period,
 															    const double rin) {
-		return {alpha, Mx, kerr, Mopt, period,
+		return {alpha, Mx, kerr, Mopt, Topt, period,
 				rin, routFromMxMoptPeriod(Mx, Mopt, period)};
 	}
 	inline double h(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx * r); }

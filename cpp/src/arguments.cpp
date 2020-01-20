@@ -15,11 +15,12 @@ constexpr const double BasicDiskBinaryArguments::default_alpha;
 constexpr const double BasicDiskBinaryArguments::default_Mx;
 constexpr const double BasicDiskBinaryArguments::default_kerr;
 constexpr const double BasicDiskBinaryArguments::default_Mopt;
+constexpr const double BasicDiskBinaryArguments::default_Topt;
 constexpr const double BasicDiskBinaryArguments::default_period;
 
 
-double BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(const double MxToMopt) { // Eggleton, P. P. 1983, ApJ, 268, 368
-	const double q = std::cbrt(MxToMopt);
+double BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(const double mass_ratio) { // Eggleton, P. P. 1983, ApJ, 268, 368
+	const double q = std::cbrt(mass_ratio);
 	return 0.49 * m::pow<2>(q) / (0.6 * m::pow<2>(q) + std::log(1. + q));
 }
 

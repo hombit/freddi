@@ -23,6 +23,7 @@ dict evolution_kwdefaults() {
 	kw["Mx"] = BasicDiskBinaryArguments::default_Mx;
 	kw["kerr"] = BasicDiskBinaryArguments::default_kerr;
 	kw["Mopt"] = BasicDiskBinaryArguments::default_Mopt;
+	kw["Topt"] = BasicDiskBinaryArguments::default_Topt;
 	kw["period"] = BasicDiskBinaryArguments::default_period;
 	kw["rin"] = object();
 	kw["rout"] = object();
@@ -103,7 +104,8 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 	const auto basic = make_basic_disk_binary_arguments(
 			extract<double>(kw["alpha"]),
 			extract<double>(kw["Mx"]), extract<double>(kw["kerr"]),
-			extract<double>(kw["Mopt"]), extract<double>(kw["period"]),
+			extract<double>(kw["Mopt"]), extract<double>(kw["Topt"]),
+			extract<double>(kw["period"]),
 			kw["rin"], kw["rout"]);
 	const auto disk = make_disk_structure_arguments(
 			*basic,
