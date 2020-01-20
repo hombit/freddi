@@ -77,8 +77,18 @@ function(CREATE_UNIT_TEST targ)
     add_test(${TARGET} ${TARGET})
 endfunction()
 
-CREATE_UNIT_TEST(geometry)
-enable_testing()
+function(CREATE_TESTS)
+    file(GLOB TEST_SOURCES cpp/test/*.cpp)
+
+    foreach(SOURCE_PATH IN LISTS TEST_SOURCES)
+        get_filename_component(TEST_NAME ${SOURCE_PATH} NAME_WLE)
+        CREATE_UNIT_TEST(${TEST_NAME})
+    endforeach()
+
+    enable_testing()
+endfunction()
+
+CREATE_TESTS()
 
 
 function(CREATE_PY_MODULE)
