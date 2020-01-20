@@ -233,3 +233,31 @@ BOOST_AUTO_TEST_CASE(testUnitSphere_area) {
 		area_smaller = area;
 	}
 }
+
+double triangles_area_cos(const std::vector<Triangle>& triangles, const double theta, const double phi) {
+	return std::accumulate(triangles.begin(), triangles.end(), 0.0,
+			[theta, phi](double sum, const Triangle& tr) -> double { return sum + tr.area_cos(theta, phi); });
+}
+
+BOOST_AUTO_TEST_CASE(testUnitSphere_projected_area) {
+	const std::vector<double> thetas = {0.0, M_PI/6.0, 1.0, M_PI/3.0, M_PI/2.0, M_PI};
+	const std::vector<double> phis = {0.0, 1.0, M_PI/3.0, 2.0, M_PI, 1.3 * M_PI, 2.0 * M_PI};
+
+	const UnitSphere sph0(0);
+	const std::vector<UnitSphere> spheres = {{1}, {2}, {3}};
+	for (const auto& theta : thetas) {
+		for (const auto& phi : phis) {
+			double area_smaller = triangles_area_cos(sph0.triangles(), theta, phi);
+			BOOST_CHECK_GT(area_smaller, 0.0);
+			BOOST_CHECK_LT(area_smaller, M_PI);
+
+			for (const auto& sph : spheres) {
+				const double area = triangles_area_cos(sph.triangles(), theta, phi);
+				BOOST_CHECK_GT(area, 0.0);
+				BOOST_CHECK_GT(area, area_smaller);
+				BOOST_CHECK_LT(area, M_PI);
+				area_smaller = area;
+			}
+		}
+	}
+}

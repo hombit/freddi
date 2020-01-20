@@ -215,6 +215,18 @@ const Vec3& Triangle::center() const {
 	return center_;
 }
 
+double Triangle::area_cos(const UnitVec3& uvec3) const {
+	const double cos = uvec3.dotProduct(normal());
+	if (cos <= 0) {
+		return 0;
+	}
+	return area() * cos;
+}
+
+double Triangle::area_cos(const double theta, const double phi) const {
+	return area_cos({theta, phi});
+}
+
 std::array<Triangle, 4> Triangle::divide() const {
 	const Vec3 vertex01 = 0.5 * (vertices_[0] + vertices_[1]);
 	const Vec3 vertex02 = 0.5 * (vertices_[0] + vertices_[2]);

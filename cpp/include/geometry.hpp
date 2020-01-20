@@ -73,6 +73,8 @@ public:
 	double area() const;
 	const UnitVec3& normal() const;
 	const Vec3& center() const;
+	double area_cos(const UnitVec3& uvec3) const;
+	double area_cos(double theta, double phi) const;
 	std::array<Triangle, 4> divide() const;
 	Triangle projectedOntoUnitSphere() const;
 };
