@@ -219,7 +219,7 @@ CalculationOptions::CalculationOptions(const po::variables_map &vm):
 				dayToS(vm["tau"].as<double>()),
 				vm["Nx"].as<unsigned int>(),
 				vm["gridscale"].as<std::string>(),
-				vm["starlod"].as<unsigned short>()) {
+				vm["starlod"].as<unsigned int>()) {
 	if (gridscale != "log" && gridscale != "linear") {
 		throw po::invalid_option_value("Invalid --gridscale value");
 	}
@@ -232,7 +232,7 @@ po::options_description CalculationOptions::description() {
 			( "tau",	po::value<double>()->default_value(sToDay(default_tau)), "Time step, days" )
 			( "Nx",	po::value<unsigned int>()->default_value(default_Nx), "Size of calculation grid" )
 			( "gridscale", po::value<std::string>()->default_value(default_gridscale), "Type of grid for angular momentum h: log or linear" )
-			( "starlod", po::value<unsigned short>()->default_value(default_starlod), "Level of detail of the optical star 3-D model. Optical star is represented by triangular tile, the number of tiles is 20 * 4^starlod" )
+			( "starlod", po::value<unsigned int>()->default_value(default_starlod), "Level of detail of the optical star 3-D model. The optical star is represented by a triangular tile, the number of tiles is 20 * 4^starlod" )
 			;
 	return od;
 }
