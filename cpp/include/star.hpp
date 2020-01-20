@@ -8,6 +8,7 @@
 
 #include <arguments.hpp>
 #include <geometry.hpp>
+#include <passband.hpp>
 #include <util.hpp>
 
 
@@ -38,6 +39,9 @@ public:
 	virtual const vald& Qirr();
 	const vald& Teff();
 	double luminosity();
+	double dLdOmega(const UnitVec3& direction);
+	double dLdOmega(const UnitVec3& direction, double lambda);
+	double dLdOmega(const UnitVec3& direction, const Passband& passband);
 };
 
 
@@ -83,14 +87,6 @@ public:
 public:
 	const std::vector<std::unique_ptr<IrrSource>>& sources() const;
 	const vald& Qirr() override;
-};
-
-
-class FreddiStar: public IrradiatedStar {
-protected:
-	FreddiArguments args;
-public:
-	FreddiStar(const FreddiArguments& args, std::vector<std::unique_ptr<IrrSource>>&& sources);
 };
 
 

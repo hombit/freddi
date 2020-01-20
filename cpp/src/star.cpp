@@ -1,6 +1,7 @@
 #include <numeric> // accumulate
 
 #include <constants.hpp>
+#include <spectrum.hpp>
 #include <star.hpp>
 #include <util.hpp>
 
@@ -69,6 +70,21 @@ double Star::luminosity() {
 	return *irr_.luminosity;
 }
 
+double Star::dLdOmega(const UnitVec3& direction) {
+	return integrate([this](size_t i) -> double { return Qirr()[i]; }, direction) / M_PI;
+}
+
+double Star::dLdOmega(const UnitVec3& direction, const double lambda) {
+	return integrate([this, lambda](size_t i) -> double {
+			return Spectrum::Planck_lambda(Teff()[i], lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT;
+		},
+			direction);
+}
+
+double Star::dLdOmega(const UnitVec3& direction, const Passband& passband) {
+	return integrate([this, &passband](size_t i) -> double { return passband.bb_nu(Teff()[i]); },
+			direction);
+}
 
 IrrSource::IrrSource(const Vec3& position):
 		position_(position),
@@ -142,8 +158,3 @@ const vald& IrradiatedStar::Qirr() {
 	}
 	return *irr_.Qirr;
 }
-
-
-FreddiStar::FreddiStar(const FreddiArguments& args, std::vector<std::unique_ptr<IrrSource>>&& sources):
-		IrradiatedStar(std::move(sources), args.basic->Topt, args.basic->Ropt, args.calc->starlod),
-		args(args) {}
