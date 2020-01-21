@@ -4,6 +4,7 @@
 #include <functional>
 #include <map>
 #include <string>
+#include <valarray>
 #include <vector>
 
 #include <boost/math/special_functions/pow.hpp>
@@ -12,6 +13,7 @@
 namespace m = boost::math;
 
 
+typedef std::valarray<double> vald;
 typedef std::vector<double> vecd;
 typedef std::map<std::string, double> pard;
 

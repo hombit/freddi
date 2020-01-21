@@ -30,6 +30,7 @@ BasicDiskBinaryOptions::BasicDiskBinaryOptions(const po::variables_map &vm):
 				sunToGram(vm["Mx"].as<double>()),
 				vm["kerr"].as<double>(),
 				sunToGram(vm["Mopt"].as<double>()),
+				vm["Topt"].as<double>(),
 				dayToS(vm["period"].as<double>()),
 				rinInitializer(vm),
 				routInitializer(vm)) {
@@ -64,6 +65,7 @@ po::options_description BasicDiskBinaryOptions::description() {
 			( "Mx,M", po::value<double>()->default_value(gramToSun(default_Mx)), "Mass of the central object, in the units of solar masses" )
 			( "kerr", po::value<double>()->default_value(default_kerr), "Dimensionless Kerr parameter of the black hole" )
 			( "Mopt",	po::value<double>()->default_value(gramToSun(default_Mopt)), "Mass of the optical star, in units of solar masses" )
+			( "Topt", po::value<double>()->default_value(default_Topt), "Thermal temperature of the optical star, in units of kelvins" )
 			( "period,P", po::value<double>()->default_value(sToDay(default_period)), "Orbital period of the binary system, in units of days" )
 			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the Schwarzschild radius of the central object 2GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
 			( "rout,R", po::value<double>(), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used defined by --Mx, --Mopt and --period values" )
@@ -167,6 +169,7 @@ FluxOptions::FluxOptions(const po::variables_map &vm):
 				vm["inclination"].as<double>(),
 				kpcToCm(vm["distance"].as<double>()),
 				vm.count("colddiskflux") > 0,
+				vm.count("starflux") > 0,
 				lambdasInitializer(vm),
 				passbandsInitializer(vm)) {}
 
@@ -204,6 +207,7 @@ po::options_description FluxOptions::description() {
 			( "inclination,i", po::value<double>()->default_value(default_inclination), "Inclination of the system, degrees" )
 			( "distance", po::value<double>()->default_value(cmToKpc(default_distance)), "Distance to the system, kpc" )
 			( "colddiskflux", "Add Fnu for cold disk into output file. Default output is for hot disk only" )
+			( "starflux", "Add Fnu for optical star into output file. Mopt and period must be specified, see also Ropt and starlod options. Default output is for hot disk only" )
 			( "lambda", po::value<vecd>()->multitoken(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced" )
 			( "passband", po::value<std::vector<std::string>>()->multitoken(), "Path of a file containing tabulated passband, the first column for wavelength in Angstrom, the second column for transmission factor, columns should be separated by spaces" )
 			;
@@ -216,7 +220,8 @@ CalculationOptions::CalculationOptions(const po::variables_map &vm):
 				dayToS(vm["time"].as<double>()),
 				dayToS(vm["tau"].as<double>()),
 				vm["Nx"].as<unsigned int>(),
-				vm["gridscale"].as<std::string>()) {
+				vm["gridscale"].as<std::string>(),
+				vm["starlod"].as<unsigned int>()) {
 	if (gridscale != "log" && gridscale != "linear") {
 		throw po::invalid_option_value("Invalid --gridscale value");
 	}
@@ -229,6 +234,7 @@ po::options_description CalculationOptions::description() {
 			( "tau",	po::value<double>()->default_value(sToDay(default_tau)), "Time step, days" )
 			( "Nx",	po::value<unsigned int>()->default_value(default_Nx), "Size of calculation grid" )
 			( "gridscale", po::value<std::string>()->default_value(default_gridscale), "Type of grid for angular momentum h: log or linear" )
+			( "starlod", po::value<unsigned int>()->default_value(default_starlod), "Level of detail of the optical star 3-D model. The optical star is represented by a triangular tile, the number of tiles is 20 * 4^starlod" )
 			;
 	return od;
 }
@@ -236,6 +242,11 @@ po::options_description CalculationOptions::description() {
 
 
 FreddiOptions::FreddiOptions(const po::variables_map& vm) {
+	if ((vm.count("starflux") > 0)
+		&& (vm.count("Mx") == 0 || vm.count("Mopt") == 0 || vm.count("period") == 0)) {
+		throw po::invalid_option_value("--starflux requires --Mx, --Mopt and --period to be specified");
+	}
+
 	general.reset(new GeneralOptions(vm));
 	basic.reset(new BasicDiskBinaryOptions(vm));
 	disk.reset(new DiskStructureOptions(vm, *basic));

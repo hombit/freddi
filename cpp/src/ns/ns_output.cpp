@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <ns/ns_output.hpp>
 
 

@@ -158,6 +158,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"mJ", "mag", [freddi]() {return freddi->mJ();}},
 	};
 	const bool cold_disk = freddi->args().flux->cold_disk;
+	const bool star = freddi->args().flux->star;
 	const auto& lambdas = freddi->args().flux->lambdas;
 	for (size_t i = 0; i < lambdas.size(); ++i) {
 		const double lambda = lambdas[i];
@@ -173,6 +174,18 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 					[freddi, lambda]() { return freddi->flux_region<FreddiState::ColdRegion>(lambda); }
 			);
 		}
+		if (star) {
+			fields.emplace_back(
+					"Fnu" + std::to_string(i) + "_star_min",
+					"erg/s/cm^2/Hz",
+					[freddi, lambda]() { return freddi->flux_star(lambda, M_PI); }
+			);
+			fields.emplace_back(
+					"Fnu" + std::to_string(i) + "_star_max",
+					"erg/s/cm^2/Hz",
+					[freddi, lambda]() { return freddi->flux_star(lambda, 0.0); }
+			);
+		}
 	}
 	for (const auto& pb : freddi->args().flux->passbands) {
 		fields.emplace_back(
@@ -185,6 +198,18 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 					std::string("Fnu") + pb.name + "_cold",
 					"erg/s/cm^2/Hz",
 					[freddi, &pb]() { return freddi->flux_region<FreddiState::ColdRegion>(pb); }
+			);
+		}
+		if (star) {
+			fields.emplace_back(
+					"Fnu" + pb.name + "_star_min",
+					"erg/s/cm^2/Hz",
+					[freddi, &pb]() { return freddi->flux_star(pb, M_PI); }
+			);
+			fields.emplace_back(
+					"Fnu" + pb.name + "_star_max",
+					"erg/s/cm^2/Hz",
+					[freddi, &pb]() { return freddi->flux_star(pb, 0.0); }
 			);
 		}
 	}

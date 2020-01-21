@@ -18,19 +18,20 @@ boost::shared_ptr<GeneralArguments> make_general_arguments() {
 boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(
 		double alpha,
 		double Mx, double kerr,
-		double Mopt, double period,
+		double Mopt, double Topt,
+		double period,
 		const object& rin, const object& rout) {
 	const auto None = object().ptr();
 	if (rin.ptr() == None && rout.ptr() == None) {
-		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRinRout(alpha, Mx, kerr, Mopt, period));
+		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRinRout(alpha, Mx, kerr, Mopt, Topt, period));
 	}
 	if (rin.ptr() == None) {
-		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRin(alpha, Mx, kerr, Mopt, period, extract<double>(rout)));
+		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRin(alpha, Mx, kerr, Mopt, Topt, period, extract<double>(rout)));
 	}
 	if (rout.ptr() == None) {
-		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRout(alpha, Mx, kerr, Mopt, period, extract<double>(rin)));
+		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRout(alpha, Mx, kerr, Mopt, Topt, period, extract<double>(rin)));
 	}
-	return boost::make_shared<BasicDiskBinaryArguments>(alpha, Mx, kerr, Mopt, period, extract<double>(rin), extract<double>(rout));
+	return boost::make_shared<BasicDiskBinaryArguments>(alpha, Mx, kerr, Mopt, Topt, period, extract<double>(rin), extract<double>(rout));
 }
 
 boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
@@ -82,18 +83,18 @@ boost::shared_ptr<FluxArguments> make_flux_arguments(
 			colourfactor,
 			emin, emax,
 			inclination, distance,
-			false,
+			false, false,
 			vecd(),
 			std::vector<Passband>());
 }
 
 boost::shared_ptr<CalculationArguments> make_calculation_arguments(
-		double time, double tau, unsigned int Nx, const std::string& gridscale,
+		double time, double tau, unsigned int Nx, const std::string& gridscale, const unsigned short starlod,
 		const object& eps) {
 	if (eps.ptr() == object().ptr()) {
-		return boost::make_shared<CalculationArguments>(time, tau, Nx, gridscale);
+		return boost::make_shared<CalculationArguments>(time, tau, Nx, gridscale, starlod);
 	}
-	return boost::make_shared<CalculationArguments>(time, tau, Nx, gridscale, extract<double>(eps));
+	return boost::make_shared<CalculationArguments>(time, tau, Nx, gridscale, starlod, extract<double>(eps));
 }
 
 boost::shared_ptr<FreddiArguments> make_freddi_arguments(
@@ -138,6 +139,7 @@ void wrap_arguments() {
 				 arg("Mx")=BasicDiskBinaryArguments::default_Mx,
 				 arg("kerr")=BasicDiskBinaryArguments::default_kerr,
 				 arg("Mopt")=BasicDiskBinaryArguments::default_Mopt,
+				 arg("Topt")=BasicDiskBinaryArguments::default_Topt,
 				 arg("period")=BasicDiskBinaryArguments::default_period,
 				 arg("rin")=object(),
 				 arg("rout")=object()))
@@ -183,6 +185,7 @@ void wrap_arguments() {
 				 arg("tau")=CalculationArguments::default_tau,
 				 arg("Nx")=CalculationArguments::default_Nx,
 				 arg("gridscale")=CalculationArguments::default_gridscale,
+				 arg("starlod")=CalculationArguments::default_starlod,
 				 arg("eps")=object()))
 			)
 	;

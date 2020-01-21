@@ -13,8 +13,7 @@ function(CREATE_SHARED)
     find_package(Boost 1.57.0 COMPONENTS program_options filesystem REQUIRED)
 
     file(GLOB_RECURSE SOURCES
-            cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h
-            cpp/src/ns/*.cpp cpp/include/ns/*.hpp)
+            cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
     add_library(${TARGET} SHARED ${SOURCES})
     set_property(TARGET ${TARGET} PROPERTY OUTPUT_NAME freddi)
 
@@ -59,6 +58,37 @@ endfunction()
 
 CREATE_EXE("")
 CREATE_EXE("-ns")
+
+
+function(CREATE_UNIT_TEST targ)
+    set(TARGET test_${targ})
+
+    find_package(Boost 1.57.0 COMPONENTS unit_test_framework program_options filesystem REQUIRED)
+
+    file(GLOB_RECURSE SOURCES
+            cpp/test/${targ}.cpp
+            cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
+
+    add_executable(${TARGET} ${SOURCES})
+
+    target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIR})
+    target_link_libraries(${TARGET} ${Boost_LIBRARIES})
+
+    add_test(${TARGET} ${TARGET})
+endfunction()
+
+function(CREATE_TESTS)
+    file(GLOB TEST_SOURCES cpp/test/*.cpp)
+
+    foreach(SOURCE_PATH IN LISTS TEST_SOURCES)
+        get_filename_component(TEST_NAME ${SOURCE_PATH} NAME_WLE)
+        CREATE_UNIT_TEST(${TEST_NAME})
+    endforeach()
+
+    enable_testing()
+endfunction()
+
+CREATE_TESTS()
 
 
 function(CREATE_PY_MODULE)

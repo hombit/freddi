@@ -16,7 +16,8 @@ boost::shared_ptr<GeneralArguments> make_general_arguments();
 boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(
 		double alpha,
 		double Mx, double kerr,
-		double Mopt, double period,
+		double Mopt, double Topt,
+		double period,
 		const object& rin, const object& rout);
 
 boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
@@ -37,7 +38,7 @@ boost::shared_ptr<FluxArguments> make_flux_arguments(
 			double inclination, double distance);
 
 boost::shared_ptr<CalculationArguments> make_calculation_arguments(
-		double time, double tau, unsigned int Nx, const std::string& gridscale,
+		double time, double tau, unsigned int Nx, const std::string& gridscale, unsigned short starlod,
 		const object& eps);
 
 boost::shared_ptr<FreddiArguments> make_freddi_arguments(

@@ -15,11 +15,12 @@ constexpr const double BasicDiskBinaryArguments::default_alpha;
 constexpr const double BasicDiskBinaryArguments::default_Mx;
 constexpr const double BasicDiskBinaryArguments::default_kerr;
 constexpr const double BasicDiskBinaryArguments::default_Mopt;
+constexpr const double BasicDiskBinaryArguments::default_Topt;
 constexpr const double BasicDiskBinaryArguments::default_period;
 
 
-double BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(const double MxToMopt) { // Eggleton, P. P. 1983, ApJ, 268, 368
-	const double q = std::cbrt(MxToMopt);
+double BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(const double mass_ratio) { // Eggleton, P. P. 1983, ApJ, 268, 368
+	const double q = std::cbrt(mass_ratio);
 	return 0.49 * m::pow<2>(q) / (0.6 * m::pow<2>(q) + std::log(1. + q));
 }
 
@@ -201,9 +202,11 @@ constexpr const double FluxArguments::default_emax;
 constexpr const double FluxArguments::default_inclination;
 constexpr const double FluxArguments::default_distance;
 constexpr const bool FluxArguments::default_cold_disk;
+constexpr const bool FluxArguments::default_star;
 
 
 constexpr const double CalculationArguments::default_time;
 constexpr const double CalculationArguments::default_tau;
 constexpr const unsigned int CalculationArguments::default_Nx;
 constexpr const char CalculationArguments::default_gridscale[];
+constexpr const unsigned short CalculationArguments::default_starlod;

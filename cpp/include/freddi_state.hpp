@@ -6,10 +6,11 @@
 
 #include <boost/optional.hpp>
 
-#include "arguments.hpp"
-#include "passband.hpp"
-#include "spectrum.hpp"
-#include "util.hpp"
+#include <arguments.hpp>
+#include <passband.hpp>
+#include <spectrum.hpp>
+#include <star.hpp>
+#include <util.hpp>
 
 
 class FreddiState {
@@ -115,6 +116,8 @@ private:
 		size_t Nx;
 		double GM;
 		double eta;
+		double semiaxis;
+		double inclination;
 		double cosi;
 		double distance;
 		double cosiOverD2;
@@ -157,6 +160,7 @@ protected:
 	CurrentState current_;
 	DiskOptionalStructure opt_str_;
 	std::unique_ptr<BasicWind> wind_;
+	IrradiatedStar star_;
 public:
 	FreddiState(const FreddiArguments& args, const wunc_t& wunc);
 	explicit FreddiState(const FreddiState&);
@@ -172,6 +176,8 @@ public:
 	inline size_t Nx() const { return str_->Nx; }
 	inline double GM() const { return str_->GM; }
 	inline double eta() const { return str_->eta; }
+	inline double semiaxis() const { return str_->semiaxis; }
+	inline double inclination() const { return str_->inclination; }
 	inline double cosi() const { return str_->cosi; }
 	inline double distance() const { return str_->distance; }
 	inline double cosiOverD2() const { return str_->cosiOverD2; }
@@ -192,12 +198,15 @@ public:
 	inline size_t first() const { return current_.first; }
 	inline size_t last() const { return current_.last; }
 	inline double Mdot_in_prev() const { return current_.Mdot_in_prev; }
+protected:
 	inline void set_Mdot_in_prev(double Mdot_in) { current_.Mdot_in_prev = Mdot_in; }
 	inline void set_Mdot_in_prev() { set_Mdot_in_prev(Mdot_in()); }
+	virtual IrradiatedStar::sources_t star_irr_sources();
 public:
 	inline double omega_R(double r) const { return std::sqrt(GM() / (r*r*r)); }
 	inline double omega_i(size_t i) const { return omega_R(R()[i]); }
 	virtual double Mdot_in() const;
+	virtual double Lbol_disk() const;
 // wind_
 protected:
 	virtual vecd windA() const { return wind_->A(); }
@@ -279,6 +288,8 @@ public:
 	}
 	inline double flux(const double lambda) { return flux_region<HotRegion>(lambda); }
 	inline double flux(const Passband& passband) { return flux_region<HotRegion>(passband); }
+	double flux_star(double lambda, double phase);
+	double flux_star(const Passband& passband, double phase);
 	inline double mU() { return lazy_magnitude(opt_str_.mU, lambdaU, irr0U); }
 	inline double mB() { return lazy_magnitude(opt_str_.mB, lambdaB, irr0B); }
 	inline double mV() { return lazy_magnitude(opt_str_.mV, lambdaV, irr0V); }

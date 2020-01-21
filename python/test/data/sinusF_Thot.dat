@@ -7,6 +7,7 @@
 # Mx=5
 # Nx=1000
 # Thot=10000
+# Topt=4000
 # alpha=0.25
 # boundcond=Teff
 # colourfactor=1.7
@@ -25,6 +26,7 @@
 # period=0.25
 # powerorder=6
 # prefix=sinusF_Thot
+# starlod=3
 # tau=0.25
 # time=50
 # --rout hadn't been specified, tidal radius 1.53444 Rsun was used

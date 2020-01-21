@@ -16,7 +16,9 @@ FreddiState::DiskStructure::DiskStructure(const FreddiArguments &args, const wun
 		Nx(args.calc->Nx),
 		GM(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * args.basic->Mx),
 		eta(efficiency_of_accretion(args.basic->kerr)),
-		cosi(std::cos(args.flux->inclination / 180 * M_PI)),
+		semiaxis(args.basic->semiaxis(args.basic->Mx, args.basic->Mopt, args.basic->period)),
+		inclination(args.flux->inclination / 180.0 * M_PI),
+		cosi(std::cos(args.flux->inclination / 180.0 * M_PI)),
 		distance(args.flux->distance),
 		cosiOverD2(cosi / m::pow<2>(distance)),
 		oprel(*(args.disk->oprel.get())),
@@ -100,7 +102,8 @@ vecd FreddiState::CurrentState::initializeF(const DiskStructure& str) {
 
 FreddiState::FreddiState(const FreddiArguments& args, const wunc_t& wunc):
 		 str_(new DiskStructure(args, wunc)),
-		 current_(*str_) {
+		 current_(*str_),
+		 star_({}, args.basic->Topt, args.basic->Ropt, args.calc->starlod) {
 	initializeWind();
 }
 
@@ -130,7 +133,8 @@ FreddiState::FreddiState(const FreddiState& other):
 		str_(other.str_),
 		current_(other.current_),
 		opt_str_(other.opt_str_),
-		wind_(other.wind_->clone()) {}
+		wind_(other.wind_->clone()),
+		star_(other.star_) {}
 
 
 void FreddiState::invalidate_optional_structure() {
@@ -155,6 +159,11 @@ void FreddiState::step(double tau) {
 
 double FreddiState::Mdot_in() const {
 	return (F()[first() + 1] - F()[first()]) / (h()[first() + 1] - h()[first()]);
+}
+
+
+double FreddiState::Lbol_disk() const {
+	return eta() * Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
 }
 
 
@@ -220,10 +229,9 @@ const vecd& FreddiState::Qx() {
 	if (!opt_str_.Qx) {
 		vecd x(Nx());
 		const vecd& CirrCirr = Cirr();
-		const double Mdot = Mdot_in();
+		const double Lbol = Lbol_disk();
 		for (size_t i = first(); i < Nx(); i++) {
-			x[i] = (CirrCirr[i] * eta() * Mdot * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT)
-					/ (4. * M_PI * m::pow<2>(R()[i])));
+			x[i] = CirrCirr[i] * Lbol / (4. * M_PI * m::pow<2>(R()[i]));
 		}
 		opt_str_.Qx = std::move(x);
 	}
@@ -298,7 +306,32 @@ double FreddiState::lazy_magnitude(boost::optional<double>& m, double lambda, do
 
 
 double FreddiState::Luminosity(const vecd& T, double nu1, double nu2) const {
+	// 2 - two sides
+	// pi = \int cos(phi) dtheta dphi
+	// pi * \int Bnu dnu gives flux
+	// 2 * \int dS gives disk area on both sides
 	return 2. * M_PI * integrate<HotRegion>([&T, nu1, nu2](const size_t i) -> double { return Spectrum::Planck_nu1_nu2(T[i], nu1, nu2, 1e-4); });
+}
+
+
+IrradiatedStar::sources_t FreddiState::star_irr_sources() {
+	const Vec3 position(-semiaxis(), 0.0, 0.0);
+	const UnitVec3 normal(0.0, 0.0);
+	const double luminosity = Lbol_disk();
+	const double Height2R = Height()[last()] / R()[last()];
+
+	IrradiatedStar::sources_t sources;
+	sources.push_back(std::make_unique<CentralDiskSource>(position, normal, luminosity, Height2R));
+	return sources;
+}
+
+
+double FreddiState::flux_star(const double lambda, const double phase) {
+	return star_.dLdOmega({inclination(), phase}, lambda) / m::pow<2>(distance());
+}
+
+double FreddiState::flux_star(const Passband& passband, const double phase) {
+	return star_.dLdOmega({inclination(), phase}, passband) / m::pow<2>(distance());
 }
 
 

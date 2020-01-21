@@ -23,6 +23,7 @@ dict evolution_kwdefaults() {
 	kw["Mx"] = BasicDiskBinaryArguments::default_Mx;
 	kw["kerr"] = BasicDiskBinaryArguments::default_kerr;
 	kw["Mopt"] = BasicDiskBinaryArguments::default_Mopt;
+	kw["Topt"] = BasicDiskBinaryArguments::default_Topt;
 	kw["period"] = BasicDiskBinaryArguments::default_period;
 	kw["rin"] = object();
 	kw["rout"] = object();
@@ -54,6 +55,7 @@ dict evolution_kwdefaults() {
 	kw["tau"] = CalculationArguments::default_tau;
 	kw["Nx"] = CalculationArguments::default_Nx;
 	kw["gridscale"] = CalculationArguments::default_gridscale;
+	kw["starlod"] = CalculationArguments::default_starlod;
 	kw["eps"] = object();
 
 	return kw;
@@ -103,7 +105,8 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 	const auto basic = make_basic_disk_binary_arguments(
 			extract<double>(kw["alpha"]),
 			extract<double>(kw["Mx"]), extract<double>(kw["kerr"]),
-			extract<double>(kw["Mopt"]), extract<double>(kw["period"]),
+			extract<double>(kw["Mopt"]), extract<double>(kw["Topt"]),
+			extract<double>(kw["period"]),
 			kw["rin"], kw["rout"]);
 	const auto disk = make_disk_structure_arguments(
 			*basic,
@@ -124,6 +127,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 	const auto calc = make_calculation_arguments(
 			extract<double>(kw["time"]), extract<double>(kw["tau"]),
 			extract<unsigned int>(kw["Nx"]), extract<std::string>(kw["gridscale"]),
+			extract<unsigned short>(kw["starlod"]),
 			kw["eps"]);
 	// To avoid copy, create FreddiArguments constructor that accepts shared_ptr
 	return make_freddi_arguments(*general, *basic, *disk, *irr, *flux, *calc);
