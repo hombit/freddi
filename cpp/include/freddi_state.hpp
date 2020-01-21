@@ -265,7 +265,7 @@ public:
 		return -2.5 * std::log10(I_lambda<HotRegion>(lambda) * cosiOverD2() / F0);
 	}
 	template <DiskIntegrationRegion Region> double flux_region(double lambda) {
-		return I_lambda<HotRegion>(lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2();
+		return I_lambda<Region>(lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2();
 	}
 	template <DiskIntegrationRegion Region> double flux_region(const Passband& passband) {
 		const double intens = trapz(
