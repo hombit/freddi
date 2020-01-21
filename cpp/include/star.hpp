@@ -52,6 +52,7 @@ public:
 	IrrSource(const Vec3& position);
 	virtual ~IrrSource() = 0;
 public:
+	virtual IrrSource* clone() const = 0;
 	const Vec3& position() const;
 	double irr_flux(const Vec3& coord, const UnitVec3& normal) const;
 	virtual double irr_dLdOmega(const UnitVec3& direction) const = 0;
@@ -109,6 +110,8 @@ class PointAccretorSource: public PointSource, public DiskShadowSource {
 public:
 	PointAccretorSource(const Vec3& position, double luminosity, double relative_semiheight);
 	~PointAccretorSource() override = default;
+public:
+	PointAccretorSource* clone() const override;
 };
 
 
@@ -117,17 +120,24 @@ public:
 	CentralDiskSource(const Vec3& position, const UnitVec3& plain_normal,
 					  double luminosity, double relative_semiheight);
 	~CentralDiskSource() override = default;
+public:
+	CentralDiskSource* clone() const override;
 };
 
 
 class IrradiatedStar: public Star {
+public:
+	using sources_t = std::vector<std::unique_ptr<IrrSource>>;
 protected:
-	std::vector<std::unique_ptr<IrrSource>> sources_;
+	sources_t sources_;
+private:
+	sources_t cloneSources() const;
 public:
-	IrradiatedStar(std::vector<std::unique_ptr<IrrSource>>&& sources,
-			double temp, double radius, unsigned short lod);
+	IrradiatedStar(sources_t&& sources, double temp, double radius, unsigned short lod);
+	IrradiatedStar(const IrradiatedStar& other);
 public:
-	const std::vector<std::unique_ptr<IrrSource>>& sources() const;
+	const sources_t& sources() const;
+	void set_sources(sources_t&& value);
 	const vald& Qirr() override;
 };
 

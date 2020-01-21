@@ -259,6 +259,17 @@ double FreddiNeutronStarEvolution::Mdot_in() const {
 }
 
 
+IrradiatedStar::sources_t FreddiNeutronStarEvolution::star_irr_sources() {
+	const Vec3 position(-semiaxis(), 0.0, 0.0);
+	const double luminosity = Lbol_ns();
+	const double Height2R = Height()[last()] / R()[last()];
+
+	auto sources = FreddiEvolution::star_irr_sources();
+	sources.push_back(std::make_unique<PointAccretorSource>(position, luminosity, Height2R));
+	return sources;
+}
+
+
 vecd FreddiNeutronStarEvolution::windC() const {
 	auto C = FreddiEvolution::windC();
 	for (size_t i = 0; i < C.size(); i++) {
@@ -273,7 +284,7 @@ const vecd& FreddiNeutronStarEvolution::Qx() {
 	if (!opt_str_.Qx) {
 		vecd x(Nx());
 		const vecd& CirrCirr = Cirr();
-		const double L_disk = (F()[first()] + 0.5 * Mdot_in() * h()[first()]) * omega_i(first());
+		const double L_disk = Lbol_disk();
 		const double L_ns = Lbol_ns();
 		for (size_t i = first(); i < Nx(); i++) {
 			x[i] = CirrCirr[i] * (L_ns + L_disk) / (4. * M_PI * m::pow<2>(R()[i]));
@@ -300,4 +311,8 @@ double FreddiNeutronStarEvolution::eta_ns() const {
 	const double R_g = GM() / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
 	const double eta = R_g * (1. / R_x() - 0.5 / R()[first()]);
 	return eta;
+}
+
+double FreddiNeutronStarEvolution::Lbol_disk() const {
+	return (F()[first()] + 0.5 * Mdot_in() * h()[first()]) * omega_i(first());
 }

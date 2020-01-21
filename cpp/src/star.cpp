@@ -171,6 +171,9 @@ PointAccretorSource::PointAccretorSource(const Vec3& position, double luminosity
 		PointSource(position, luminosity),
 		DiskShadowSource(position, relative_semiheight) {}
 
+PointAccretorSource* PointAccretorSource::clone() const {
+	return new PointAccretorSource(*this);
+}
 
 CentralDiskSource::CentralDiskSource(const Vec3& position, const UnitVec3& plain_normal,
 									 const double luminosity, const double relative_semiheight):
@@ -178,14 +181,33 @@ CentralDiskSource::CentralDiskSource(const Vec3& position, const UnitVec3& plain
 		ElementaryPlainSource(position, plain_normal, luminosity),
 		DiskShadowSource(position, relative_semiheight) {}
 
+CentralDiskSource* CentralDiskSource::clone() const {
+	return new CentralDiskSource(*this);
+}
 
-IrradiatedStar::IrradiatedStar(std::vector<std::unique_ptr<IrrSource>>&& sources,
-		const double temp, const double radius, const unsigned short lod):
+IrradiatedStar::IrradiatedStar(sources_t&& sources, const double temp, const double radius, const unsigned short lod):
 		Star(temp, radius, lod),
 		sources_(std::move(sources)) {}
 
-const std::vector<std::unique_ptr<IrrSource>>& IrradiatedStar::sources() const {
+IrradiatedStar::IrradiatedStar(const IrradiatedStar& other):
+		Star(other),
+		sources_(cloneSources()) {}
+
+IrradiatedStar::sources_t IrradiatedStar::cloneSources() const {
+	sources_t result;
+	for (const auto& source : sources()) {
+		result.emplace_back(source->clone());
+	}
+	return result;
+}
+
+const IrradiatedStar::sources_t& IrradiatedStar::sources() const {
 	return sources_;
+}
+
+void IrradiatedStar::set_sources(IrradiatedStar::sources_t&& value) {
+	invalidate_irradiated_properties();
+	sources_ = std::move(value);
 }
 
 const vald& IrradiatedStar::Qirr() {

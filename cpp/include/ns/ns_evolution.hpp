@@ -128,11 +128,13 @@ protected:
 	virtual void invalidate_optional_structure() override;
 	virtual void truncateInnerRadius() override;
 	virtual vecd windC() const override;
+	virtual IrradiatedStar::sources_t star_irr_sources() override;
 	virtual const vecd& Tph_X() override;
 public:
 	FreddiNeutronStarEvolution(const FreddiNeutronStarArguments& args);
 	explicit FreddiNeutronStarEvolution(const FreddiNeutronStarEvolution&) = default;
 	virtual const vecd& Qx() override;
+	virtual double Lbol_disk() const override;
 public:
 	using iterator = EvolutionIterator<FreddiNeutronStarEvolution>;
 	inline iterator begin() { return {this}; }
