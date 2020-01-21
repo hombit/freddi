@@ -202,6 +202,7 @@ constexpr const double FluxArguments::default_emax;
 constexpr const double FluxArguments::default_inclination;
 constexpr const double FluxArguments::default_distance;
 constexpr const bool FluxArguments::default_cold_disk;
+constexpr const bool FluxArguments::default_star;
 
 
 constexpr const double CalculationArguments::default_time;

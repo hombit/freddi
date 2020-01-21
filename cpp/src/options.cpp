@@ -169,6 +169,7 @@ FluxOptions::FluxOptions(const po::variables_map &vm):
 				vm["inclination"].as<double>(),
 				kpcToCm(vm["distance"].as<double>()),
 				vm.count("colddiskflux") > 0,
+				vm.count("starflux") > 0,
 				lambdasInitializer(vm),
 				passbandsInitializer(vm)) {}
 
@@ -206,6 +207,7 @@ po::options_description FluxOptions::description() {
 			( "inclination,i", po::value<double>()->default_value(default_inclination), "Inclination of the system, degrees" )
 			( "distance", po::value<double>()->default_value(cmToKpc(default_distance)), "Distance to the system, kpc" )
 			( "colddiskflux", "Add Fnu for cold disk into output file. Default output is for hot disk only" )
+			( "starflux", "Add Fnu for optical star into output file. Mopt and period must be specified, see also Ropt and starlod options. Default output is for hot disk only" )
 			( "lambda", po::value<vecd>()->multitoken(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced" )
 			( "passband", po::value<std::vector<std::string>>()->multitoken(), "Path of a file containing tabulated passband, the first column for wavelength in Angstrom, the second column for transmission factor, columns should be separated by spaces" )
 			;
@@ -240,6 +242,11 @@ po::options_description CalculationOptions::description() {
 
 
 FreddiOptions::FreddiOptions(const po::variables_map& vm) {
+	if ((vm.count("starflux") > 0)
+		&& (vm.count("Mx") == 0 || vm.count("Mopt") == 0 || vm.count("period") == 0)) {
+		throw po::invalid_option_value("--starflux requires --Mx, --Mopt and --period to be specified");
+	}
+
 	general.reset(new GeneralOptions(vm));
 	basic.reset(new BasicDiskBinaryOptions(vm));
 	disk.reset(new DiskStructureOptions(vm, *basic));

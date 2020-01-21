@@ -83,7 +83,7 @@ boost::shared_ptr<FluxArguments> make_flux_arguments(
 			colourfactor,
 			emin, emax,
 			inclination, distance,
-			false,
+			false, false,
 			vecd(),
 			std::vector<Passband>());
 }
