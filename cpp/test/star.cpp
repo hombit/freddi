@@ -35,13 +35,15 @@ BOOST_AUTO_TEST_CASE(testStar_orbital_light_curve) {
 	}
 
 	std::vector<std::unique_ptr<IrrSource>> sources;
-	sources.push_back(std::make_unique<PointAccretorSource>(Vec3(-2e11, 0.0, 0.0), 6e37, 0.076));
-	IrradiatedStar star(std::move(sources), 4000, 3.5e10, 3);
-	std::cout << star.triangles() << std::endl;
+	sources.push_back(std::make_unique<PointAccretorSource>(Vec3(-3.13e11, 0.0, 0.0), 6e37, 0.076));
+	sources.push_back(std::make_unique<CentralDiskSource>(Vec3(-2e11, 0.0, 0.0), UnitVec3(0, 0), 4e37, 0.076));
+	IrradiatedStar star(std::move(sources), 3000, 9.4e10, 3);
+//	std::cout << star.triangles() << std::endl;
 //	IrradiatedStar star({}, 4000, 3.5e10, 3);
 
 	for (const auto& phase : phases) {
-		const double flux = star.dLdOmega({inclination, phase}, angstromToCm(6500)) / m::pow<2>(kpcToCm(5.0));
-		std::cout << phase << "\t" << flux << std::endl;
+		const double fluxR = star.dLdOmega({inclination, phase}, angstromToCm(6500)) / m::pow<2>(kpcToCm(5.0));
+		const double fluxJ = star.dLdOmega({inclination, phase}, angstromToCm(12400)) / m::pow<2>(kpcToCm(5.0));
+		std::cout << phase << "\t" << fluxR << "\t" << fluxJ << std::endl;
 	}
 }
