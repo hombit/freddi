@@ -130,4 +130,6 @@ public:
 std::vector<Triangle> unit_sphere_triangles(unsigned short lod);
 
 
+std::ostream& operator<<(std::ostream& os, const std::vector<Triangle>& triangles);
+
 #endif //FREDDI_GEOMETRY_HPP

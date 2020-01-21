@@ -90,23 +90,21 @@ double Star::dLdOmega(const UnitVec3& direction, const Passband& passband) {
 }
 
 IrrSource::IrrSource(const Vec3& position):
-		position_(position),
-		luminosity_(0.0) {}
+		position_(position) {}
+
+IrrSource::~IrrSource()	{}
 
 double IrrSource::irr_flux(const Vec3& coord, const UnitVec3& normal) const {
-	return 0.0;
+	const auto distance = coord - position();
+	const UnitVec3 direction(distance);
+	if (shadow(direction)) {
+		return 0;
+	}
+	return irr_dLdOmega(direction) / m::pow<2>(distance.r()) * cos_object(direction, normal);
 }
 
 const Vec3& IrrSource::position() const {
 	return position_;
-}
-
-double IrrSource::luminosity() const {
-	return luminosity_;
-}
-
-void IrrSource::set_luminosity(double value) {
-	luminosity_ = value;
 }
 
 double IrrSource::cos_object(const UnitVec3& unit_distance, const UnitVec3& normal) {
@@ -118,26 +116,67 @@ double IrrSource::cos_object(const UnitVec3& unit_distance, const UnitVec3& norm
 }
 
 
-double PointSource::irr_flux(const Vec3& coord, const UnitVec3& normal) const {
-	const auto vec = coord - position();
-	return luminosity() / (FOUR_M_PI * m::pow<2>(vec.r())) * cos_object(UnitVec3(vec), normal);
+PointLikeSource::PointLikeSource(const Vec3& position, const double luminosity):
+		IrrSource(position),
+		luminosity_(luminosity) {}
+
+PointLikeSource::~PointLikeSource() {}
+
+double PointLikeSource::luminosity() const {
+	return luminosity_;
 }
 
 
-PlainSource::PlainSource(const Vec3& position, const UnitVec3& plain_normal):
-		IrrSource(position),
+double PointSource::irr_dLdOmega(const UnitVec3& direction) const {
+	return luminosity() / FOUR_M_PI;
+}
+
+PointSource::~PointSource() {}
+
+
+ElementaryPlainSource::ElementaryPlainSource(const Vec3& position, const UnitVec3& plain_normal, const double luminosity):
+		PointLikeSource(position, luminosity),
 		plain_normal_(plain_normal) {}
 
-double PlainSource::irr_flux(const Vec3& coord, const UnitVec3& normal) const {
-	const auto vec = coord - position();
-	const auto uvec = UnitVec3(vec);
-	const double cos_source = plain_normal().dotProduct(uvec);
-	return luminosity() * 2.0 * cos_source / m::pow<2>(vec.r()) * cos_object(uvec, normal);
-}
+ElementaryPlainSource::~ElementaryPlainSource() {}
 
-const UnitVec3& PlainSource::plain_normal() const {
+const UnitVec3& ElementaryPlainSource::plain_normal() const {
 	return plain_normal_;
 }
+
+double ElementaryPlainSource::irr_dLdOmega(const UnitVec3& direction) const {
+	const double cos_source = std::abs(plain_normal().dotProduct(direction));
+	return luminosity() * 2.0 * cos_source;
+}
+
+
+DiskShadowSource::DiskShadowSource(const Vec3& position, double relative_semiheight):
+		IrrSource(position),
+		relative_semiheight_squared_(m::pow<2>(relative_semiheight)) {}
+
+DiskShadowSource::~DiskShadowSource() {}
+
+bool DiskShadowSource::shadow(const UnitVec3& direction) const {
+	const double rho2 = m::pow<2>(direction.x()) + m::pow<2>(direction.y());
+	return m::pow<2>(direction.z()) / rho2 < relative_semiheight_squared();
+}
+
+double DiskShadowSource::relative_semiheight_squared() const {
+	return relative_semiheight_squared_;
+}
+
+
+PointAccretorSource::PointAccretorSource(const Vec3& position, double luminosity, double relative_semiheight):
+		IrrSource(position),
+		PointSource(position, luminosity),
+		DiskShadowSource(position, relative_semiheight) {}
+
+
+CentralDiskSource::CentralDiskSource(const Vec3& position, const UnitVec3& plain_normal,
+									 const double luminosity, const double relative_semiheight):
+		IrrSource(position),
+		ElementaryPlainSource(position, plain_normal, luminosity),
+		DiskShadowSource(position, relative_semiheight) {}
 
 
 IrradiatedStar::IrradiatedStar(std::vector<std::unique_ptr<IrrSource>>&& sources,

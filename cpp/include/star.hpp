@@ -48,33 +48,75 @@ public:
 class IrrSource {
 protected:
 	Vec3 position_;
-	double luminosity_;
 public:
 	IrrSource(const Vec3& position);
-	virtual double irr_flux(const Vec3& coord, const UnitVec3& normal) const;
+	virtual ~IrrSource() = 0;
+public:
 	const Vec3& position() const;
-	double luminosity() const;
-	void set_luminosity(double value);
+	double irr_flux(const Vec3& coord, const UnitVec3& normal) const;
+	virtual double irr_dLdOmega(const UnitVec3& direction) const = 0;
+	virtual bool shadow(const UnitVec3& direction) const = 0; // true for shadowed direction
+protected:
 	static double cos_object(const UnitVec3& unit_distance, const UnitVec3& normal);
 };
 
 
-class PointSource: public IrrSource {
+class PointLikeSource: virtual public IrrSource {
+protected:
+	double luminosity_;
 public:
-	using IrrSource::IrrSource;
+	PointLikeSource(const Vec3& position, double luminosity);
+	~PointLikeSource() override = 0;
 public:
-	double irr_flux(const Vec3& coord, const UnitVec3& normal) const override;
+	double luminosity() const;
 };
 
 
-class PlainSource: public IrrSource {
+class PointSource: public PointLikeSource {
+public:
+	using PointLikeSource::PointLikeSource;
+	~PointSource() override = 0;
+public:
+	double irr_dLdOmega(const UnitVec3& direction) const override;
+};
+
+
+class ElementaryPlainSource: public PointLikeSource {
 protected:
 	UnitVec3 plain_normal_;
 public:
-	PlainSource(const Vec3& position, const UnitVec3& plain_normal);
+	ElementaryPlainSource(const Vec3& position, const UnitVec3& plain_normal, double luminosity);
+	~ElementaryPlainSource() override = 0;
 public:
-	double irr_flux(const Vec3& coord, const UnitVec3& normal) const override;
 	const UnitVec3& plain_normal() const;
+	double irr_dLdOmega(const UnitVec3& direction) const override;
+};
+
+
+class DiskShadowSource: virtual public IrrSource {
+protected:
+	double relative_semiheight_squared_;
+public:
+	DiskShadowSource(const Vec3& position, double relative_semiheight);
+	~DiskShadowSource() override = 0;
+public:
+	double relative_semiheight_squared() const;
+	bool shadow(const UnitVec3& direction) const override;
+};
+
+
+class PointAccretorSource: public PointSource, public DiskShadowSource {
+public:
+	PointAccretorSource(const Vec3& position, double luminosity, double relative_semiheight);
+	~PointAccretorSource() override = default;
+};
+
+
+class CentralDiskSource: public ElementaryPlainSource, public DiskShadowSource {
+public:
+	CentralDiskSource(const Vec3& position, const UnitVec3& plain_normal,
+					  double luminosity, double relative_semiheight);
+	~CentralDiskSource() override = default;
 };
 
 

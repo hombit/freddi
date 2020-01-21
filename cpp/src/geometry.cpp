@@ -276,3 +276,11 @@ std::vector<Triangle> unit_sphere_triangles(unsigned short lod) {
 	}
 	return triangles;
 }
+
+
+std::ostream& operator<<(std::ostream& os, const std::vector<Triangle>& triangles) {
+	for (const auto& tr : triangles) {
+		 os << tr << "\n";
+	}
+	return os;
+}
