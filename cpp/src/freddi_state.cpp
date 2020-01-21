@@ -154,7 +154,6 @@ void FreddiState::step(double tau) {
 	current_.i_t ++;
 	current_.t += tau;
 	wind_->update(*this);
-	star_.set_sources(star_irr_sources());
 }
 
 

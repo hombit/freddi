@@ -24,6 +24,7 @@ void FreddiEvolution::step(const double tau) {
 			h(), current_.F,
 			first(), last());
 	truncateOuterRadius();
+	star_.set_sources(star_irr_sources());
 }
 
 
