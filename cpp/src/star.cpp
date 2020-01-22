@@ -108,7 +108,7 @@ const Vec3& IrrSource::position() const {
 }
 
 double IrrSource::cos_object(const UnitVec3& unit_distance, const UnitVec3& normal) {
-	double cos = unit_distance.dotProduct(normal);
+	double cos = -unit_distance.dotProduct(normal);
 	if (cos <= 0.0) {
 		return 0.0;
 	}
