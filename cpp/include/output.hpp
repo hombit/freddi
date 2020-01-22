@@ -31,8 +31,8 @@ struct FileOutputShortField {
 struct FileOutputLongField {
 	std::string name;
 	std::string unit;
-	std::function<const vecd ()> func;
-	FileOutputLongField(const std::string&& name, const std::string&& unit, const std::function<const vecd ()>&& func):
+	std::function<const double (size_t)> func;
+	FileOutputLongField(const std::string&& name, const std::string&& unit, const std::function<const double (size_t)>&& func):
 			name(name), unit(unit), func(func) {};
 };
 
@@ -40,17 +40,22 @@ struct FileOutputLongField {
 class BasicFreddiFileOutput {
 protected:
 	std::shared_ptr<FreddiEvolution> freddi;
-	virtual void shortDump();
-	virtual void longDump();
+	void shortDump();
+	void diskStructureDump();
+	void starDump();
 	const std::vector<FileOutputShortField> short_fields;
-	const std::vector<FileOutputLongField> long_fields;
+	const std::vector<FileOutputLongField> disk_structure_fields;
+	const std::vector<FileOutputLongField> star_fields;
 private:
 	FstreamWithPath output;
-	std::string fulldata_header;
-	std::string initializeFulldataHeader() const;
+	std::string disk_structure_header;
+	std::string star_header;
+	static std::string initializeFulldataHeader(const std::vector<FileOutputLongField>& fields);
 public:
 	BasicFreddiFileOutput(const std::shared_ptr<FreddiEvolution>& freddi, const boost::program_options::variables_map& vm,
-						  const std::vector<FileOutputShortField>&& short_fields, const std::vector<FileOutputLongField>&& long_fields);
+						  std::vector<FileOutputShortField>&& short_fields,
+						  std::vector<FileOutputLongField>&& disk_structure_fields,
+						  std::vector<FileOutputLongField>&& star_fields);
 	void dump();
 	inline std::string path() const { return output.path; }
 };
@@ -58,10 +63,12 @@ public:
 class FreddiFileOutput: public BasicFreddiFileOutput {
 public:
 	static std::vector<FileOutputShortField> initializeShortFields(const std::shared_ptr<FreddiEvolution>& freddi);
-	static std::vector<FileOutputLongField> initializeLongFields(const std::shared_ptr<FreddiEvolution>& freddi);
+	static std::vector<FileOutputLongField> initializeDiskStructureFields(const std::shared_ptr<FreddiEvolution>& freddi);
+	static std::vector<FileOutputLongField> initializeStarFields(const std::shared_ptr<FreddiEvolution>& freddi);
 public:
 	FreddiFileOutput(const std::shared_ptr<FreddiEvolution>& freddi, const boost::program_options::variables_map& vm):
-			BasicFreddiFileOutput(freddi, vm, initializeShortFields(freddi), initializeLongFields(freddi)) {}
+			BasicFreddiFileOutput(freddi, vm, initializeShortFields(freddi), initializeDiskStructureFields(freddi),
+					initializeStarFields(freddi)) {}
 };
 
 

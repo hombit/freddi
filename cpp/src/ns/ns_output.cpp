@@ -15,8 +15,12 @@ std::vector<FileOutputShortField> FreddiNeutronStarFileOutput::initializeShortFi
 	return fields;
 }
 
-std::vector<FileOutputLongField> FreddiNeutronStarFileOutput::initializeLongFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi) {
-	auto fields = FreddiFileOutput::initializeLongFields(freddi);
-	fields.emplace_back("Fmagn", "dyn*cm", [freddi]() {return freddi->Fmagn();});
+std::vector<FileOutputLongField> FreddiNeutronStarFileOutput::initializeDiskStructureFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi) {
+	auto fields = FreddiFileOutput::initializeDiskStructureFields(freddi);
+	fields.emplace_back("Fmagn", "dyn*cm", [freddi](size_t i) {return freddi->Fmagn()[i];});
 	return fields;
+}
+
+std::vector<FileOutputLongField> FreddiNeutronStarFileOutput::initializeStarFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi) {
+	return FreddiFileOutput::initializeStarFields(freddi);
 }

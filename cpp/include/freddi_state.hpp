@@ -187,6 +187,7 @@ public:
 	inline const vecd& h() const { return str_->h; }
 	inline const vecd& R() const { return str_->R; }
 	inline const vecd& lambdas() const { return str_->args.flux->lambdas; }
+	inline Star& star() { return star_; }
 	void replaceArgs(const FreddiArguments& args);  // Danger!
 // current_
 public:

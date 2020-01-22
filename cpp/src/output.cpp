@@ -4,13 +4,18 @@
 
 #include "unit_transformation.hpp"
 
-BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvolution>& freddi, const boost::program_options::variables_map& vm,
-											 const std::vector<FileOutputShortField>&& short_fields, const std::vector<FileOutputLongField>&& long_fields):
+BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvolution>& freddi,
+											 const boost::program_options::variables_map& vm,
+											 std::vector<FileOutputShortField>&& short_fields,
+											 std::vector<FileOutputLongField>&& disk_structure_fields,
+											 std::vector<FileOutputLongField>&& star_fields):
 		freddi(freddi),
 		output(freddi->args().general->dir + "/" + freddi->args().general->prefix + ".dat"),
 		short_fields(short_fields),
-		long_fields(long_fields),
-		fulldata_header(initializeFulldataHeader()) {
+		disk_structure_fields(disk_structure_fields),
+		disk_structure_header(initializeFulldataHeader(disk_structure_fields)),
+		star_fields(star_fields),
+		star_header(initializeFulldataHeader(star_fields)) {
 	output << "#" << short_fields.at(0).name;
 	for (size_t i = 1; i < short_fields.size(); ++i) {
 		output << "\t" << short_fields[i].name;
@@ -82,18 +87,18 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 }
 
 
-std::string BasicFreddiFileOutput::initializeFulldataHeader() const {
+std::string BasicFreddiFileOutput::initializeFulldataHeader(const std::vector<FileOutputLongField>& fields) {
 	std::string s;
 
-	s += "#" + long_fields.at(0).name;
-	for (size_t i = 1; i < long_fields.size(); ++i) {
-		s += "\t" + long_fields[i].name;
+	s += "#" + fields.at(0).name;
+	for (size_t i = 1; i < fields.size(); ++i) {
+		s += "\t" + fields[i].name;
 	}
 	s += "\n";
 
-	s += "#" + long_fields.at(0).unit;
-	for (size_t i = 1; i < long_fields.size(); ++i) {
-		 s += "\t" + long_fields[i].unit;
+	s += "#" + fields.at(0).unit;
+	for (size_t i = 1; i < fields.size(); ++i) {
+		 s += "\t" + fields[i].unit;
 	}
 	s += "\n";
 
@@ -108,21 +113,39 @@ void BasicFreddiFileOutput::shortDump() {
 	output << std::endl;
 }
 
-void BasicFreddiFileOutput::longDump() {
-	std::ostringstream filename;
-	auto i_t = static_cast<int>(std::round(freddi->t() / freddi->args().calc->tau));
-	filename << freddi->args().general->dir << "/" << freddi->args().general->prefix << "_" << i_t << ".dat";
-	FstreamWithPath full_output(filename.str());
+void BasicFreddiFileOutput::diskStructureDump() {
+	auto filename = (freddi->args().general->dir + "/" + freddi->args().general->prefix
+			+ "_" + std::to_string(freddi->i_t()) + ".dat");
+	FstreamWithPath full_output(filename);
 
-	full_output << fulldata_header
+	full_output << disk_structure_header
 			<< "# Time = " << sToDay(freddi->t())
 			<< " Mdot_in = " << freddi->Mdot_in()
 			<< std::endl;
 
 	for ( int i = freddi->first(); i <= freddi->last(); ++i ){
-		full_output << long_fields.at(0).func()[i];
-		for (size_t j = 1; j < long_fields.size(); ++j) {
-			full_output << "\t" << long_fields[j].func()[i];
+		full_output << disk_structure_fields.at(0).func(i);
+		for (size_t j = 1; j < disk_structure_fields.size(); ++j) {
+			full_output << "\t" << disk_structure_fields[j].func(i);
+		}
+		full_output << "\n";
+	}
+	full_output << std::flush;
+}
+
+void BasicFreddiFileOutput::starDump() {
+	auto filename = (freddi->args().general->dir + "/" + freddi->args().general->prefix
+					 + "_" + std::to_string(freddi->i_t()) + "_star.dat");
+	FstreamWithPath full_output(filename);
+
+	full_output << star_header
+				<< "# Time = " << sToDay(freddi->t())
+				<< std::endl;
+
+	for (size_t i = 0; i < freddi->star().triangles().size(); ++i){
+		full_output << star_fields.at(0).func(i);
+		for (size_t j = 1; j < star_fields.size(); ++j) {
+			full_output << "\t" << star_fields[j].func(i);
 		}
 		full_output << "\n";
 	}
@@ -133,8 +156,12 @@ void BasicFreddiFileOutput::dump() {
 	shortDump();
 
 	if (freddi->args().general->fulldata) {
-		longDump();
+		diskStructureDump();
+		if (freddi->args().flux->star) {
+			starDump();
+		}
 	}
+
 }
 
 
@@ -216,15 +243,38 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 	return fields;
 }
 
-std::vector<FileOutputLongField> FreddiFileOutput::initializeLongFields(const std::shared_ptr<FreddiEvolution>& freddi) {
+std::vector<FileOutputLongField> FreddiFileOutput::initializeDiskStructureFields(const std::shared_ptr<FreddiEvolution>& freddi) {
 	return {
-			{"h", "cm^2/s", [freddi]() {return freddi->h();}},
-			{"R", "cm", [freddi]() {return freddi->R();}},
-			{"F", "dyn*cm", [freddi]() {return freddi->F();}},
-			{"Sigma", "g/cm^2", [freddi]() {return freddi->Sigma();}},
-			{"Teff", "K", [freddi]() {return freddi->Tph();}},
-			{"Tvis", "K", [freddi]() {return freddi->Tph_vis();}},
-			{"Tirr", "K", [freddi]() {return freddi->Tirr();}},
-			{"Height", "cm", [freddi]() {return freddi->Height();}},
+			{"h", "cm^2/s", [freddi](size_t i) {return freddi->h()[i];}},
+			{"R", "cm", [freddi](size_t i) {return freddi->R()[i];}},
+			{"F", "dyn*cm", [freddi](size_t i) {return freddi->F()[i];}},
+			{"Sigma", "g/cm^2", [freddi](size_t i) {return freddi->Sigma()[i];}},
+			{"Teff", "K", [freddi](size_t i) {return freddi->Tph()[i];}},
+			{"Tvis", "K", [freddi](size_t i) {return freddi->Tph_vis()[i];}},
+			{"Tirr", "K", [freddi](size_t i) {return freddi->Tirr()[i];}},
+			{"Height", "cm", [freddi](size_t i) {return freddi->Height()[i];}},
 	};
+}
+
+std::vector<FileOutputLongField> FreddiFileOutput::initializeStarFields(const std::shared_ptr<FreddiEvolution>& freddi) {
+	auto& star = freddi->star();
+	const auto& triangles = star.triangles();
+
+	std::vector<FileOutputLongField> fields;
+
+	for (size_t i_vertex = 0; i_vertex < 3; ++i_vertex) {
+		const auto prefix = "vertex" + std::to_string(i_vertex) + "_";
+		fields.emplace_back(prefix + "x", "cm", [triangles, i_vertex](size_t i) {return triangles[i].vertices()[i_vertex].x();});
+		fields.emplace_back(prefix + "y", "cm", [triangles, i_vertex](size_t i) {return triangles[i].vertices()[i_vertex].y();});
+		fields.emplace_back(prefix + "z", "cm", [triangles, i_vertex](size_t i) {return triangles[i].vertices()[i_vertex].z();});
+	}
+
+	fields.emplace_back("center_x", "cm", [triangles](size_t i) {return triangles[i].center().x();});
+	fields.emplace_back("center_y", "cm", [triangles](size_t i) {return triangles[i].center().y();});
+	fields.emplace_back("center_z", "cm", [triangles](size_t i) {return triangles[i].center().z();});
+
+	fields.emplace_back("Tth", "K", [freddi](size_t i) {return freddi->star().Tth()[i];});
+	fields.emplace_back("Teff", "K", [freddi](size_t i) {return freddi->star().Teff()[i];});
+
+	return fields;
 }
