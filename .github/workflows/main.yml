@@ -52,6 +52,9 @@ jobs:
       - name: Run freddi-ns
         run: ./freddi-ns --fulldata --starflux
         working-directory: ./cmake-build
+      - name: Unit tests
+        run: ctest -V
+        working-directory: ./cmake-build  
       - name: Regression test
         run: FREDDI=../../../cmake-build/freddi ./generate_test_data.sh && git diff --word-diff --exit-code
         working-directory: ./python/test/data
