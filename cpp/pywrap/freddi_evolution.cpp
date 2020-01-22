@@ -48,6 +48,7 @@ dict evolution_kwdefaults() {
 	kw["colourfactor"] = FluxArguments::default_colourfactor;
 	kw["emin"] = FluxArguments::default_emin;
 	kw["emax"] = FluxArguments::default_emax;
+	kw["staralbedo"] = FluxArguments::default_star_albedo;
 	kw["inclination"] = FluxArguments::default_inclination;
 	kw["distance"] = FluxArguments::default_distance;
 
@@ -123,6 +124,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 	const auto flux = make_flux_arguments(
 			extract<double>(kw["colourfactor"]),
 			extract<double>(kw["emin"]), extract<double>(kw["emax"]),
+			extract<double>(kw["staralbedo"]),
 			extract<double>(kw["inclination"]), extract<double>(kw["distance"]));
 	const auto calc = make_calculation_arguments(
 			extract<double>(kw["time"]), extract<double>(kw["tau"]),

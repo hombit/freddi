@@ -258,10 +258,9 @@ double FreddiNeutronStarEvolution::Mdot_in() const {
 	return dF_dh + dFmagn_dh()[first()];
 }
 
-
 IrradiatedStar::sources_t FreddiNeutronStarEvolution::star_irr_sources() {
 	const Vec3 position(-semiaxis(), 0.0, 0.0);
-	const double luminosity = Lbol_ns();
+	const double luminosity = (1.0 - args().flux->star_albedo) * Lbol_ns();
 	const double Height2R = Height()[last()] / R()[last()];
 
 	auto sources = FreddiEvolution::star_irr_sources();

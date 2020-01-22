@@ -35,6 +35,7 @@ boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(doub
 boost::shared_ptr<FluxArguments> make_flux_arguments(
 			double colourfactor,
 			double emin, double emax,
+			double star_albedo,
 			double inclination, double distance);
 
 boost::shared_ptr<CalculationArguments> make_calculation_arguments(

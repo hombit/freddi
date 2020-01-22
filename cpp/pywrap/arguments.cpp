@@ -78,10 +78,12 @@ boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(doub
 boost::shared_ptr<FluxArguments> make_flux_arguments(
 		double colourfactor,
 		double emin, double emax,
+		double star_albedo,
 		double inclination, double distance) {
 	return boost::make_shared<FluxArguments>(
 			colourfactor,
 			emin, emax,
+			star_albedo,
 			inclination, distance,
 			false, false,
 			vecd(),

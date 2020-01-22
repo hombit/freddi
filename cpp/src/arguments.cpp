@@ -199,6 +199,7 @@ constexpr const char SelfIrradiationArguments::default_irrfactortype[];
 constexpr const double FluxArguments::default_colourfactor;
 constexpr const double FluxArguments::default_emin;
 constexpr const double FluxArguments::default_emax;
+constexpr const double FluxArguments::default_star_albedo;
 constexpr const double FluxArguments::default_inclination;
 constexpr const double FluxArguments::default_distance;
 constexpr const bool FluxArguments::default_cold_disk;

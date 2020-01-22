@@ -166,6 +166,7 @@ FluxOptions::FluxOptions(const po::variables_map &vm):
 				vm["colourfactor"].as<double>(),
 				kevToHertz(vm["emin"].as<double>()),
 				kevToHertz(vm["emax"].as<double>()),
+				vm["staralbedo"].as<double>(),
 				vm["inclination"].as<double>(),
 				kpcToCm(vm["distance"].as<double>()),
 				vm.count("colddiskflux") > 0,
@@ -204,6 +205,7 @@ po::options_description FluxOptions::description() {
 			( "colourfactor", po::value<double>()->default_value(default_colourfactor), "Colour factor to calculate X-ray flux"  )
 			( "emin", po::value<double>()->default_value(hertzToKev(default_emin)), "Minimum energy of X-ray band, keV" )
 			( "emax", po::value<double>()->default_value(hertzToKev(default_emax)), "Maximum energy of X-ray band, keV" )
+			( "staralbedo", po::value<double>()->default_value(default_star_albedo), "Part of X-ray radiation reflected by optical star, (1 - albedo) heats star's photosphere. Used only when --starflux is specified" )
 			( "inclination,i", po::value<double>()->default_value(default_inclination), "Inclination of the system, degrees" )
 			( "distance", po::value<double>()->default_value(cmToKpc(default_distance)), "Distance to the system, kpc" )
 			( "colddiskflux", "Add Fnu for cold disk into output file. Default output is for hot disk only" )

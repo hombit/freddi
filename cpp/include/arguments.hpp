@@ -189,6 +189,7 @@ public:
 	constexpr static const double default_colourfactor = 1.7;
 	constexpr static const double default_emin = kevToHertz(1.);
 	constexpr static const double default_emax = kevToHertz(12.);
+	constexpr static const double default_star_albedo = 0.0;
 	constexpr static const double default_inclination = 0.;  // degrees
 	constexpr static const double default_distance = kpcToCm(10.);
 	constexpr static const bool default_cold_disk = false;
@@ -197,6 +198,7 @@ public:
 	const double colourfactor;
 	const double emin;
 	const double emax;
+	const double star_albedo;
 	const double inclination;  // degrees
 	const double distance;
 	const bool cold_disk;
@@ -207,12 +209,14 @@ public:
 	FluxArguments(
 			double colourfactor,
 			double emin, double emax,
+			double star_albedo,
 			double inclination, double distance,
 	        bool cold_disk, bool star,
 	        const vecd& lambdas,
 	        const std::vector<Passband> passbands):
 			colourfactor(colourfactor),
 			emin(emin), emax(emax),
+			star_albedo(star_albedo),
 			inclination(inclination), distance(distance),
 			cold_disk(cold_disk), star(star),
 			lambdas(lambdas),
