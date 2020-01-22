@@ -81,14 +81,13 @@ function(CREATE_TESTS)
     file(GLOB TEST_SOURCES cpp/test/*.cpp)
 
     foreach(SOURCE_PATH IN LISTS TEST_SOURCES)
-        get_filename_component(TEST_NAME ${SOURCE_PATH} NAME_WLE)
+        get_filename_component(TEST_NAME ${SOURCE_PATH} NAME_WE)
         CREATE_UNIT_TEST(${TEST_NAME})
     endforeach()
-
-    enable_testing()
 endfunction()
 
 CREATE_TESTS()
+enable_testing()
 
 
 function(CREATE_PY_MODULE)
