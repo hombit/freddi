@@ -27,6 +27,7 @@
 # period=0.25
 # powerorder=6
 # prefix=quasistat_Mdisk0
+# staralbedo=0
 # starlod=3
 # tau=0.25
 # time=50
