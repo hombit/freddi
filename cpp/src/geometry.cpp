@@ -10,7 +10,7 @@ Vec3::Vec3(const std::array<double, 3>& cartesian):
 		Vec3(cartesian, lengthFromCartesian(cartesian)) {}
 
 Vec3::Vec3(const double x, const double y, const double z):
-		Vec3({{x, y, z}}) {}
+		Vec3({x, y, z}, lengthFromCartesian({x, y, z})) {}
 
 double Vec3::lengthFromCartesian(const std::array<double, 3>& cartesian) {
 	return std::sqrt(cartesian[0] * cartesian[0] + cartesian[1] * cartesian[1] + cartesian[2] * cartesian[2]);
