@@ -100,7 +100,7 @@ double IrrSource::irr_flux(const Vec3& coord, const UnitVec3& normal) const {
 	if (shadow(direction)) {
 		return 0;
 	}
-	return irr_dLdOmega(direction) / m::pow<2>(distance.r()) * cos_object(direction, normal);
+	return irr_dLdOmega(direction) / m::pow<2>(distance.length()) * cos_object(direction, normal);
 }
 
 const Vec3& IrrSource::position() const {

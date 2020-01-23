@@ -3,52 +3,17 @@
 #include <geometry.hpp>
 
 
-std::array<double, 3> Vec3::cartesianToSpherical(const double x, const double y, const double z) {
-	const double r = std::sqrt(x*x + y*y + z*z);
-	if (r == 0) {
-		return {0.0, 0.0, 0.0};
-	}
-	return {
-		r,
-		std::acos(z / r),
-		std::atan2(y, x)
-	};
-}
-
-std::array<double, 3> Vec3::cartesianToSpherical(const std::array<double, 3>& cartesian) {
-	return cartesianToSpherical(cartesian[0], cartesian[1], cartesian[2]);
-}
-
-std::array<double ,3> Vec3::sphericalToCartesian(const double r, const double theta, const double phi) {
-	const double sin_theta = std::sin(theta);
-	return {
-		r * sin_theta * std::cos(phi),
-		r * sin_theta * std::sin(phi),
-		r * std::cos(theta)
-	};
-}
-
-std::array<double, 3> Vec3::sphericalToCartesian(const std::array<double, 3>& spherical) {
-	return sphericalToCartesian(spherical[0], spherical[1], spherical[2]);
-}
-
-Vec3::Vec3(const std::array<double, 3>& cartesian, const std::array<double, 3>& spherical):
-		cartesian_(cartesian), spherical_(spherical) {}
+Vec3::Vec3(const std::array<double, 3>& cartesian, const double length):
+		cartesian_(cartesian), length_(length) {}
 
 Vec3::Vec3(const std::array<double, 3>& cartesian):
-		cartesian_(cartesian),
-		spherical_(cartesianToSpherical(cartesian)) {}
+		Vec3(cartesian, lengthFromCartesian(cartesian)) {}
 
 Vec3::Vec3(const double x, const double y, const double z):
-		cartesian_{x, y, z},
-		spherical_(cartesianToSpherical(x, y, z)) {}
+		Vec3({{x, y, z}}) {}
 
-Vec3 Vec3::fromSpherical(const std::array<double, 3>& spherical) {
-	return Vec3(sphericalToCartesian(spherical), spherical);
-}
-
-Vec3 Vec3::fromSpherical(const double r, const double theta, const double phi) {
-	return Vec3(sphericalToCartesian(r, theta, phi), {r, theta, phi});
+double Vec3::lengthFromCartesian(const std::array<double, 3>& cartesian) {
+	return std::sqrt(cartesian[0] * cartesian[0] + cartesian[1] * cartesian[1] + cartesian[2] * cartesian[2]);
 }
 
 double Vec3::x() const {
@@ -63,24 +28,12 @@ double Vec3::z() const {
 	return cartesian_[2];
 }
 
-double Vec3::r() const {
-	return spherical_[0];
-}
-
-double Vec3::theta() const {
-	return spherical_[1];
-}
-
-double Vec3::phi() const {
-	return spherical_[2];
+double Vec3::length() const {
+	return length_;
 }
 
 const std::array<double, 3>& Vec3::cartesian() const {
 	return cartesian_;
-}
-
-const std::array<double, 3>& Vec3::spherical() const {
-	return spherical_;
 }
 
 bool Vec3::operator==(const Vec3& other) const {
@@ -111,15 +64,14 @@ Vec3& Vec3::operator*=(const double factor) {
 	for (auto& component : cartesian_) {
 		component *= factor;
 	}
-	spherical_[0] *= factor;
+	length_ *= factor;
 	return *this;
 }
 
 Vec3 Vec3::operator*(const double factor) const {
-	return {
-			{factor * x(), factor * y(), factor * z()},
-			{factor * r(), theta(), phi()}
-	};
+	auto vec = *this;
+	vec *= factor;
+	return vec;
 }
 
 Vec3 operator*(const double factor, const Vec3& vec3) {
@@ -152,11 +104,21 @@ Vec3 Vec3::crossProduct(const Vec3& other) const {
 
 
 UnitVec3::UnitVec3(const Vec3& vec3):
-		Vec3({vec3.x() / vec3.r(), vec3.y() / vec3.r(), vec3.z() / vec3.r()},
-			{1.0, vec3.theta(), vec3.phi()}) {}
+		Vec3(vec3 / vec3.length()) {
+	length_ = 1.0;
+}
 
 UnitVec3::UnitVec3(const double theta, const double phi):
-		Vec3(Vec3::fromSpherical(1.0, theta, phi)) {}
+		Vec3(cartesianFromSpherical(theta, phi), 1.0) {}
+
+std::array<double, 3> UnitVec3::cartesianFromSpherical(const double theta, const double phi) {
+	const double sin_theta = std::sin(theta);
+	return {
+			sin_theta * std::cos(phi),
+			sin_theta * std::sin(phi),
+			std::cos(theta)
+	};
+}
 
 
 Triangle::Triangle(std::array<Vec3, 3>&& vertices):
@@ -164,7 +126,7 @@ Triangle::Triangle(std::array<Vec3, 3>&& vertices):
 
 Triangle::Triangle(const std::array<Vec3, 3>& vertices):
 		vertices_(vertices),
-		area_(0.5 * (vertices[1] - vertices[0]).crossProduct(vertices[2] - vertices[1]).r()),
+		area_(0.5 * (vertices[1] - vertices[0]).crossProduct(vertices[2] - vertices[1]).length()),
 		// Use incenter instead?
 		// https://en.wikipedia.org/wiki/Incircle_and_excircles_of_a_triangle#Cartesian_coordinates
 		center_((vertices[0] + vertices[1] + vertices[2]) / 3.0),
