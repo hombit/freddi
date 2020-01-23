@@ -10,8 +10,9 @@ private:
 	public:
 		NeutronStarArguments args_ns;
 		double k_t = 1. / 3.;
-		double xi = 0.7;
-		double xi_pow_minus_7_2;
+//      Factor previously used changing initial radius of the disk
+//		double xi = 1.0;
+//		double xi_pow_minus_7_2;
 		double R_x;
 		double R_m_min;
 		double mu_magn;
@@ -98,8 +99,8 @@ private:
 // ns_str_
 public:
 	inline double k_t() const { return ns_str_->k_t; }
-	inline double xi() const { return ns_str_->xi; }
-	inline double xi_pow_minus_7_2() const { return ns_str_->xi_pow_minus_7_2; }
+//	inline double xi() const { return ns_str_->xi; }
+//	inline double xi_pow_minus_7_2() const { return ns_str_->xi_pow_minus_7_2; }
 	inline double R_x() const { return ns_str_->R_x; }
 	inline double R_m_min() const { return ns_str_->R_m_min; }
 	inline double mu_magn() const { return ns_str_->mu_magn; }
