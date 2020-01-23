@@ -207,12 +207,12 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			fields.emplace_back(
 					"Fnu" + std::to_string(i) + "_star_min",
 					"erg/s/cm^2/Hz",
-					[freddi, lambda]() { return freddi->flux_star(lambda, M_PI); }
+					[freddi, lambda]() { return freddi->flux_star(lambda, 0.0); }
 			);
 			fields.emplace_back(
 					"Fnu" + std::to_string(i) + "_star_max",
 					"erg/s/cm^2/Hz",
-					[freddi, lambda]() { return freddi->flux_star(lambda, 0.0); }
+					[freddi, lambda]() { return freddi->flux_star(lambda, M_PI); }
 			);
 		}
 	}
@@ -233,12 +233,12 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			fields.emplace_back(
 					"Fnu" + pb.name + "_star_min",
 					"erg/s/cm^2/Hz",
-					[freddi, &pb]() { return freddi->flux_star(pb, M_PI); }
+					[freddi, &pb]() { return freddi->flux_star(pb, 0.0); }
 			);
 			fields.emplace_back(
 					"Fnu" + pb.name + "_star_max",
 					"erg/s/cm^2/Hz",
-					[freddi, &pb]() { return freddi->flux_star(pb, 0.0); }
+					[freddi, &pb]() { return freddi->flux_star(pb, M_PI); }
 			);
 		}
 	}
