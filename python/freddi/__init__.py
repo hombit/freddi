@@ -84,11 +84,40 @@ class _BasePyFreddi:
         """
         return EvolutionResult(self)
 
-    def flux(self, lmbd):
+    def _flux_hot(self, lmbd, phase):
+        del phase
+        return self._freddi._flux_hot(lmbd)
+
+    def _flux_cold(self, lmbd, phase):
+        del phase
+        return self._freddi._flux_cold(lmbd)
+
+    def _flux_star(self, lmbd, phase):
+        return self._freddi._flux_star(lmbd, phase)
+
+    def flux(self, lmbd, region='hot', phase=None):
+        region = region.lower()
+        if 'hot'.startswith(region):
+            flux = self._flux_hot
+        elif 'cold'.startswith(region):
+            flux = self._flux_cold
+        elif 'disk'.startswith(region):
+            def flux(lmbd, phase):
+                return self._flux_hot(lmbd, phase) + self._flux_cold(lmbd, phase)
+        elif 'star'.startswith(region):
+            if phase is None:
+                raise ValueError('Phase must be specified if star flux is required')
+            flux = self._flux_star
+        elif 'all'.startswith(region):
+            def flux(lmbd, phase):
+                return self._flux_hot(lmbd, phase) + self._flux_cold(lmbd, phase) + self._flux_star(lmbd, phase)
+        else:
+            raise ValueError(f'Zone {region} is not supported')
+
         lmbd = np.asarray(lmbd)
         arr = np.empty_like(lmbd, dtype=float)
         for i, x in np.ndenumerate(lmbd):
-            arr[i] = self._freddi._flux(float(x))
+            arr[i] = flux(float(x), phase)
         return arr
 
     def __iter__(self):

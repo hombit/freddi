@@ -11,7 +11,7 @@ class EvolutionResult:
 
     Methods
     -------
-    flux(lmbd) : array
+    flux(lmbd, region, phase) : array
         Optical flux of the disk
 
     """
@@ -19,13 +19,19 @@ class EvolutionResult:
         self.__states = tuple(states)
         self.__len_states = len(self.__states)
 
-    def flux(self, lmbd) -> np.ndarray:
+    def flux(self, lmbd, region='hot', phase=None) -> np.ndarray:
         """Optical flux of the disk
 
         Parameters
         ----------
         lmbd : array_like
             Observation wavelength
+        region: str, optional
+            Object optically luminous component, could be one of: `hot`, `cold`,
+            `disk`, `star`, `all`
+        phase: float or None, optional
+            Phase of the observation, must be specified if `region` is `star` or
+            `all`
 
         Returns
         -------
@@ -35,7 +41,7 @@ class EvolutionResult:
         lmbd = np.asarray(lmbd)
         arr = np.empty((self.__len_states,) + lmbd.shape, dtype=np.float)
         for i in range(self.__len_states):
-            arr[i] = self.__states[i].flux(lmbd)
+            arr[i] = self.__states[i].flux(lmbd, region, phase)
         return arr
 
     def __getattr__(self, attr) -> np.ndarray:

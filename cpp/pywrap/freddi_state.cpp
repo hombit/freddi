@@ -11,7 +11,9 @@ using namespace boost::python;
 
 
 void wrap_state() {
-	double (FreddiState::*flux_lambda)(double) = &FreddiState::flux;
+	double (FreddiState::*flux_hot)(double) = &FreddiState::flux;
+	double (FreddiState::*flux_cold)(double) = &FreddiState::flux_region<FreddiState::ColdRegion>;
+	double (FreddiState::*flux_star)(double, double) = &FreddiState::flux_star;
 
 	class_<FreddiState>("_State", no_init)
 	    .add_property("GM", &FreddiState::GM)
@@ -46,6 +48,8 @@ void wrap_state() {
 		.add_property("Sigma", make_function(&FreddiState::Sigma, return_value_policy<copy_const_reference>()))
 		.add_property("Height", make_function(&FreddiState::Height, return_value_policy<copy_const_reference>()))
 		.add_property("lambdas", make_function(&FreddiState::lambdas, return_value_policy<copy_const_reference>()))
-		.def("_flux", flux_lambda)
+		.def("_flux_hot", flux_hot)
+		.def("_flux_cold", flux_cold)
+		.def("_flux_star", flux_star)
 	;
 }
