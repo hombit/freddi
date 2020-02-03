@@ -95,29 +95,6 @@ public:
 	static inline double roptFromMxMoptPeriod(const double Mx, const double Mopt, const double period) {
 		return rocheLobeVolumeRadius(Mopt, Mx, period);
 	}
-	static inline BasicDiskBinaryArguments constructWithoutRinRout(const double alpha,
-																   const double Mx, const double kerr,
-																   const double Mopt, const double Topt,
-																   const double period) {
-		return {alpha, Mx, kerr, Mopt, Topt, period,
-				rinFromMxKerr(Mx, kerr), routFromMxMoptPeriod(Mx, Mopt, period)};
-	}
-	static inline BasicDiskBinaryArguments constructWithoutRin(const double alpha,
-															   const double Mx, const double kerr,
-															   const double Mopt, const double Topt,
-															   const double period,
-															   const double rout) {
-		return {alpha, Mx, kerr, Mopt, Topt, period,
-				rinFromMxKerr(Mx, kerr), rout};
-	}
-	static inline BasicDiskBinaryArguments constructWithoutRout(const double alpha,
-															    const double Mx, const double kerr,
-															    const double Mopt, const double Topt,
-															    const double period,
-															    const double rin) {
-		return {alpha, Mx, kerr, Mopt, Topt, period,
-				rin, routFromMxMoptPeriod(Mx, Mopt, period)};
-	}
 	inline double h(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx * r); }
 	inline double omega(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx / r); }
 };

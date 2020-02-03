@@ -20,18 +20,24 @@ boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(
 		double Mx, double kerr,
 		double Mopt, double Topt,
 		double period,
-		const object& rin, const object& rout) {
+		const object& rin_, const object& rout_) {
 	const auto None = object().ptr();
-	if (rin.ptr() == None && rout.ptr() == None) {
-		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRinRout(alpha, Mx, kerr, Mopt, Topt, period));
+
+	double rin;
+	if (rin_.ptr() == None) {
+		rin = BasicDiskBinaryArguments::rinFromMxKerr(Mx, kerr);
+	} else {
+		rin = extract<double>(rin_);
 	}
-	if (rin.ptr() == None) {
-		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRin(alpha, Mx, kerr, Mopt, Topt, period, extract<double>(rout)));
+
+	double rout;
+	if (rout_.ptr() == None) {
+		rout = BasicDiskBinaryArguments::routFromMxMoptPeriod(Mx, Mopt, period);
+	} else {
+		rout = extract<double>(rout_);
 	}
-	if (rout.ptr() == None) {
-		return boost::make_shared<BasicDiskBinaryArguments>(BasicDiskBinaryArguments::constructWithoutRout(alpha, Mx, kerr, Mopt, Topt, period, extract<double>(rin)));
-	}
-	return boost::make_shared<BasicDiskBinaryArguments>(alpha, Mx, kerr, Mopt, Topt, period, extract<double>(rin), extract<double>(rout));
+
+	return boost::make_shared<BasicDiskBinaryArguments>(alpha, Mx, kerr, Mopt, Topt, period, rin, rout);
 }
 
 boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
