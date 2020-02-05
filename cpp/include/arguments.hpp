@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "gsl_const_cgsm.h"
@@ -19,9 +20,9 @@ public:
 	constexpr static const char default_prefix[] = "freddi";
 	constexpr static const char default_dir[] = ".";
 public:
-	const std::string prefix;
-	const std::string dir;
-	const bool fulldata;
+	std::string prefix;
+	std::string dir;
+	bool fulldata;
 public:
 	GeneralArguments(const std::string& prefix, const std::string& dir, bool fulldata=false):
 			prefix(prefix),
@@ -53,36 +54,46 @@ public:
 
 class BasicDiskBinaryArguments: public BlackHoleFunctions, public BinaryFunctions {
 public:
-	constexpr static const double default_alpha = 0.25;
-	constexpr static const double default_Mx = sunToGram(5.);
 	constexpr static const double default_kerr = 0.;
-	constexpr static const double default_Mopt = sunToGram(0.5);
-	constexpr static const double default_Topt = 4000;
-	constexpr static const double default_period = dayToS(0.25);
+	constexpr static const double default_Topt = 0.;
 public:
-	const double alpha;
-	const double Mx;
-	const double kerr;
-	const double Mopt;
-	const double Topt;
-	const double period;
-	const double Ropt;
-	const double rin;
-	const double rout;
+	double alpha;
+	double Mx;
+	double kerr;
+	double period;
+	double Mopt;
+	double Ropt;
+	double Topt;
+	double rin;
+	double rout;
 public:
 	BasicDiskBinaryArguments(
 			double alpha,
 			double Mx, double kerr,
-			double Mopt, double Topt,
 			double period,
+			double Mopt, double Ropt, double Topt,
 			double rin, double rout
 	):
 			alpha(alpha),
 			Mx(Mx), kerr(kerr),
-			Mopt(Mopt), Topt(Topt),
 			period(period),
-			Ropt(roptFromMxMoptPeriod(Mx, Mopt, period)),
+			Mopt(Mopt), Ropt(Ropt), Topt(Topt),
 			rin(rin), rout(rout) {}
+	BasicDiskBinaryArguments(
+			double alpha,
+			double Mx, double kerr,
+			double period,
+			double Mopt, std::optional<double> Ropt, double Topt,
+			std::optional<double> rin, std::optional<double> rout
+	):
+			alpha(alpha),
+			Mx(Mx), kerr(kerr),
+			period(period),
+			Mopt(Mopt),
+			Ropt(Ropt ? *Ropt : roptFromMxMoptPeriod(Mx, Mopt, period)),
+			Topt(Topt),
+			rin(rin ? *rin : rinFromMxKerr(Mx, kerr)),
+			rout(rout ? *rout : routFromMxMoptPeriod(Mx, Mopt, period)) {}
 	BasicDiskBinaryArguments(const BasicDiskBinaryArguments&) = default;
 	BasicDiskBinaryArguments(BasicDiskBinaryArguments&&) = default;
 	static inline double rinFromMxKerr(double Mx, double kerr) { return rISCO(Mx, kerr); }
@@ -101,50 +112,109 @@ public:
 
 
 class DiskStructureArguments {
+protected:
+	class InitialFFunction {
+	protected:
+		double F0;
+		double Mdot0;
+		double Mdisk0;
+	public:
+		InitialFFunction(double F0, double Mdot0, double Mdisk0):
+				F0(F0), Mdot0(Mdot0), Mdisk0(Mdisk0) {}
+		virtual ~InitialFFunction() = 0;
+		virtual vecd operator()(const vecd& h) const = 0;
+	};
+
+	class InitialFPowerF: public InitialFFunction {
+	protected:
+		double powerorder;
+	public:
+		InitialFPowerF(double F0, double Mdot0, double Mdisk0, double powerorder):
+				InitialFFunction(F0, Mdot0, Mdisk0),
+				powerorder(powerorder) {}
+		~InitialFPowerF() override = default;
+		vecd operator()(const vecd& h) const override;
+	};
+
+	class InitialFPowerSigma: public InitialFFunction {
+	protected:
+		double powerorder;
+		std::shared_ptr<const OpacityRelated> oprel;
+	public:
+		InitialFPowerSigma(double F0, double Mdot0, double Mdisk0, double powerorder,
+				std::shared_ptr<const OpacityRelated> oprel):
+				InitialFFunction(F0, Mdot0, Mdisk0),
+				powerorder(powerorder),
+				oprel(oprel) {}
+		~InitialFPowerSigma() override = default;
+		vecd operator()(const vecd& h) const override;
+	};
+
+	class InitialFSineF: public InitialFFunction {
+	public:
+		using InitialFFunction::InitialFFunction;
+		~InitialFSineF() override = default;
+		vecd operator()(const vecd& h) const override;
+	};
+
+	class InitialFQuasistat: public InitialFFunction {
+	protected:
+		std::shared_ptr<const OpacityRelated> oprel;
+	public:
+		InitialFQuasistat(double F0, double Mdot0, double Mdisk0, const std::shared_ptr<const OpacityRelated>& oprel):
+				InitialFFunction(F0, Mdot0, Mdisk0),
+				oprel(oprel) {}
+		~InitialFQuasistat() override = default;
+		vecd operator()(const vecd& h) const override;
+	};
+
+	class InitialFGaussF: public InitialFFunction {
+	protected:
+		double gaussmu;
+		double gausssigma;
+	public:
+		InitialFGaussF(double F0, double Mdot0, double Mdisk0, double gaussmu, double gausssigma):
+				InitialFFunction(F0, Mdot0, Mdisk0),
+				gaussmu(gaussmu), gausssigma(gausssigma) {}
+		~InitialFGaussF() override = default;
+		vecd operator()(const vecd& h) const override;
+	};
 public:
 	constexpr static const char default_opacity[] = "Kramers";
 	constexpr static const double default_Mdotout = 0.;
 	constexpr static const char default_boundcond[] = "Teff";
 	constexpr static const double default_Thot = 0.;
 	constexpr static const char default_initialcond[] = "powerF";
-	constexpr static const double default_F0 = 2e38;
-	constexpr static const double default_powerorder = 6.;
-	constexpr static const double default_gaussmu = 1.;
-	constexpr static const double default_gausssigma = 0.25;
 	constexpr static const char default_wind[] = "no";
 public:
 	constexpr static const double mu = 0.62;
 public:
-	const std::string opacity;
-	const double Mdotout;
-	const std::string boundcond;
-	const double Thot;
-	const std::string initialcond;
-	const double powerorder;
-	const double gaussmu;
-	const double gausssigma;
-	const std::string wind;
-	const pard windparams;
-	const double Mdisk0;
-	const double Mdot0;
-	const bool is_Mdisk0_specified;
-	const bool is_Mdot0_specified;
+	std::string opacity;
 	std::shared_ptr<const OpacityRelated> oprel;
-	const double F0;
+	double Mdotout;
+	std::string boundcond;
+	double Thot;
+	double F0;
+	double Mdisk0;
+	double Mdot0;
+	std::string initialcond;
+	std::string wind;
+	pard windparams;
 protected:
-	double F0Initializer(double F0_, const BasicDiskBinaryArguments& bdb_args);
+	std::unique_ptr<InitialFFunction> initial_F_function;
 public:
 	DiskStructureArguments(
 			const BasicDiskBinaryArguments &bdb_args,
 			const std::string& opacity,
 			double Mdotout,
 			const std::string& boundcond, double Thot,
-			const std::string& initialcond, double F0,
-			double powerorder, double gaussmu, double gausssigma,
-			bool is_Mdisk0_specified, bool is_Mdot0_specified,
-			double Mdisk0, double Mdot0,
+			const std::string& initialcond,
+			std::optional<double> F0,
+			std::optional<double> Mdisk0, std::optional<double> Mdot0,
+			std::optional<double> powerorder,
+			std::optional<double> gaussmu, std::optional<double> gausssigma,
 			const std::string& wind, const pard& windparams);
-	DiskStructureArguments(const DiskStructureArguments&) = default;
+	inline vecd initial_F(const vecd& h) const { return (*initial_F_function)(h); }
 };
 
 
@@ -168,20 +238,19 @@ public:
 	constexpr static const double default_emax = kevToHertz(12.);
 	constexpr static const double default_star_albedo = 0.0;
 	constexpr static const double default_inclination = 0.;  // degrees
-	constexpr static const double default_distance = kpcToCm(10.);
 	constexpr static const bool default_cold_disk = false;
 	constexpr static const bool default_star = false;
 public:
-	const double colourfactor;
-	const double emin;
-	const double emax;
-	const double star_albedo;
-	const double inclination;  // degrees
-	const double distance;
-	const bool cold_disk;
-	const bool star;
-	const vecd lambdas;
-	const std::vector<Passband> passbands;
+	double colourfactor;
+	double emin;
+	double emax;
+	double star_albedo;
+	double inclination;  // degrees
+	double distance;
+	bool cold_disk;
+	bool star;
+	vecd lambdas;
+	std::vector<Passband> passbands;
 public:
 	FluxArguments(
 			double colourfactor,
@@ -190,7 +259,7 @@ public:
 			double inclination, double distance,
 	        bool cold_disk, bool star,
 	        const vecd& lambdas,
-	        const std::vector<Passband> passbands):
+	        const std::vector<Passband>& passbands):
 			colourfactor(colourfactor),
 			emin(emin), emax(emax),
 			star_albedo(star_albedo),
@@ -203,18 +272,16 @@ public:
 
 class CalculationArguments {
 public:
-	constexpr static const double default_time = dayToS(50.);
-	constexpr static const double default_tau = dayToS(0.25);
 	constexpr static const unsigned int default_Nx = 1000;
 	constexpr static const char default_gridscale[] = "log";
 	constexpr static const unsigned short default_starlod = 3;
 public:
-	const double time;
-	const double tau;
-	const unsigned int Nx;
-	const std::string gridscale;
-	const unsigned short starlod = 3;
-	const double eps;
+	double time;
+	double tau;
+	unsigned int Nx;
+	std::string gridscale;
+	unsigned short starlod = 3;
+	double eps;
 public:
 	CalculationArguments(
 			double time, double tau, unsigned int Nx, const std::string& gridscale, const unsigned short starlod,

@@ -58,45 +58,7 @@ FreddiState::CurrentState::CurrentState(const DiskStructure& str):
 		F(initializeF(str)) {}
 
 vecd FreddiState::CurrentState::initializeF(const DiskStructure& str) {
-	const auto& disk = str.args.disk;
-	const auto& h = str.h;
-	const auto& oprel = str.oprel;
-
-	const double h_in = h.front();
-	const double h_out = h.back();
-
-	vecd F(str.Nx);
-
-	if (disk->initialcond == "power" or disk->initialcond == "powerF") {
-		for (size_t i = 0; i < str.Nx; ++i) {
-			F[i] = disk->F0 * std::pow((h[i] - h_in) / (h_out - h_in), disk->powerorder);
-		}
-	} else if (disk->initialcond == "powerSigma") {
-		for (size_t i = 0; i < str.Nx; ++i) {
-			const double Sigma_to_Sigmaout = std::pow((h[i] - h_in) / (h_out - h_in), disk->powerorder);
-			F[i] = disk->F0 * std::pow(h[i] / h_out, (3. - oprel.n) / (1. - oprel.m)) *
-					std::pow(Sigma_to_Sigmaout, 1. / (1. - oprel.m));
-		}
-	} else if (disk->initialcond == "sinusF" || disk->initialcond == "sinus") {
-		for (size_t i = 0; i < str.Nx; ++i) {
-			F[i] = disk->F0 * std::sin((h[i] - h_in) / (h_out - h_in) * M_PI_2);
-		}
-	} else if (disk->initialcond == "quasistat") {
-		for (size_t i = 0; i < str.Nx; ++i) {
-			const double xi_LS2000 = h[i] / h_out;
-			F[i] = disk->F0 * oprel.f_F(xi_LS2000) * (1. - h_in / h[i]) / (1. - h_in / h_out);
-		}
-	} else if (disk->initialcond == "gaussF") {
-		for (size_t i = 0; i < str.Nx; ++i) {
-			const double xi = (h[i] - h_in) / (h_out - h_in);
-			F[i] = disk->F0 *
-					std::exp(-m::pow<2>(xi - disk->gaussmu) / (2. * m::pow<2>(disk->gausssigma)));
-		}
-	} else {
-		throw std::logic_error("Wrong initialcond");
-	}
-
-	return F;
+	return str.args.disk->initial_F(str.h);
 }
 
 
