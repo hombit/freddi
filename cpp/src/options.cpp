@@ -16,6 +16,7 @@ po::options_description GeneralOptions::description() {
 	po::options_description od("General options");
 	od.add_options()
 			( "help,h", "Produce help message" )
+			( "config", po::value<std::string>(), "Set additional configuration filepath" )
 			( "prefix", po::value<std::string>()->default_value(default_prefix), "Set prefix for output filenames. Output file with distribution of parameters over time is PREFIX.dat" )
 			( "dir,d", po::value<std::string>()->default_value(default_dir), "Choose the directory to write output files. It should exist" )
 			( "fulldata", "Output files PREFIX_%d.dat with radial structure for every time step. Default is to output only PREFIX.dat with global disk parameters for every time step" )
@@ -148,7 +149,7 @@ SelfIrradiationOptions::SelfIrradiationOptions(const po::variables_map &vm, cons
 }
 
 po::options_description SelfIrradiationOptions::description() {
-	po::options_description od("Parameters of self-irradiatio");
+	po::options_description od("Parameters of self-irradiation");
 	od.add_options()
 			( "Cirr", po::value<double>()->default_value(default_Cirr), "Irradiation factor" )
 			( "irrfactortype", po::value<std::string>()->default_value(default_irrfactortype), "Type of irradiation factor Cirr\n\n"

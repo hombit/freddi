@@ -79,15 +79,25 @@ public:
 
 template <typename Options>
 po::variables_map parseOptions(int ac, char* av[]) {
-	const std::string config_filename = "freddi.ini";
+	const std::string default_config_filename = "freddi.ini";
+
 	const char* home = getenv("HOME");
-	const std::array<const std::string, 4> path_config_file = {".", home, INSTALLPATHPREFIX"/etc", "/etc"};
+	const std::array<std::string, 4> config_file_dirs = {".", home, INSTALLPATHPREFIX"/etc", "/etc"};
+	std::vector<std::string> config_file_paths;
+	for (const auto& dir : config_file_dirs) {
+		config_file_paths.push_back(dir + "/" + default_config_filename);
+	}
+
 	auto desc = Options::description();
 	po::variables_map vm;
 	po::store( po::parse_command_line(ac, av, desc), vm );
-	for (const auto &path : path_config_file){
-		std::ifstream config(path + "/" + config_filename);
-		po::store( po::parse_config_file(config, desc), vm );
+	if (vm.count("config") > 0) {
+		config_file_paths.insert(config_file_paths.begin(), vm["config"].as<std::string>());
+	}
+
+	for (const auto &path : config_file_paths){
+		std::ifstream config(path);
+		po::store(po::parse_config_file(config, desc), vm);
 	}
 	po::notify(vm);
 	return vm;
