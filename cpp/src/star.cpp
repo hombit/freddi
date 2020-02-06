@@ -146,7 +146,7 @@ const UnitVec3& ElementaryPlainSource::plain_normal() const {
 
 double ElementaryPlainSource::irr_dLdOmega(const UnitVec3& direction) const {
 	const double cos_source = std::abs(plain_normal().dotProduct(direction));
-	return luminosity() * 2.0 * cos_source / M_PI;
+	return luminosity() * 2.0 * cos_source;
 }
 
 
