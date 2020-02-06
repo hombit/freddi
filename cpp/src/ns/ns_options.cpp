@@ -2,6 +2,7 @@
 
 NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 		NeutronStarArguments(
+				vm["nsprop"].as<std::string>(),
 				vm["Rx"].as<double>(),
 				vm["freqx"].as<double>(),
 				vm["Bx"].as<double>(),
@@ -32,6 +33,7 @@ pard NeutronStarOptions::fpparamsInitializer(const po::variables_map& vm) {
 po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star");
 	od.add_options()
+			( "nsprop", po::value<std::string>()->default_value(default_nsprop), "Neutron star geometry and radiation properties" )
 			( "Rx", po::value<double>()->default_value(default_Rx), "Accretor radius, cm" )
 			( "freqx", po::value<double>()->default_value(default_freqx), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
 			( "Bx", po::value<double>()->default_value(default_Bx), "Accretor polar magnetic induction, G" )

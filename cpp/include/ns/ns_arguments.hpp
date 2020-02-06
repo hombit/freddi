@@ -8,6 +8,7 @@
 
 class NeutronStarArguments {
 public:
+	constexpr static const char default_nsprop[] = "dummy";
 	constexpr static const double default_Rx = 1e6;
 	constexpr static const double default_freqx = 0.;
 	constexpr static const double default_Bx = 0.;
@@ -16,22 +17,24 @@ public:
 	constexpr static const double default_inversebeta = 0.;
 	constexpr static const double default_Rdead = 0.;
 	constexpr static const char default_fptype[] = "no-outflow";
-	const pard default_fpparams = {};
 public:
-	const double Rx;
-	const double freqx;
-	const double Bx;
-	const double hotspotarea;
-	const double epsilonAlfven;
-	const double inversebeta;
-	const double Rdead;
-	const std::string fptype;
-	const pard fpparams;
+	std::string nsprop;
+	double Rx;
+	double freqx;
+	double Bx;
+	double hotspotarea;
+	double epsilonAlfven;
+	double inversebeta;
+	double Rdead;
+	std::string fptype;
+	pard fpparams;
 public:
 	NeutronStarArguments(
+			const std::string& nsprop,
 			double Rx, double freqx, double Bx, double hotspotarea,
 			double epsilonAlfven, double inversebeta, double Rdead,
 			const std::string& fptype, const pard& fpparams):
+			nsprop(nsprop),
 			Rx(Rx), freqx(freqx), Bx(Bx), hotspotarea(hotspotarea),
 			epsilonAlfven(epsilonAlfven), inversebeta(inversebeta), Rdead(Rdead),
 			fptype(fptype), fpparams(fpparams) {}

@@ -1,5 +1,6 @@
 #include <ns/ns_arguments.hpp>
 
+constexpr const char NeutronStarArguments::default_nsprop[];
 constexpr const double NeutronStarArguments::default_Rx;
 constexpr const double NeutronStarArguments::default_freqx;
 constexpr const double NeutronStarArguments::default_Bx;
