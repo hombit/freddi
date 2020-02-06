@@ -45,7 +45,7 @@ double T_GR(const double r1, const double ak, const double Mx, const double Mdot
 	const double GM = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx;
 	const double rg = GM  / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
 	const double x = std::sqrt(r1 / rg);
-	const double x0 = std::sqrt(rISCORg(ak));
+	const double x0 = std::sqrt(r_kerrISCORg(ak));
 
 	if (x < x0) {
 		return 0.;

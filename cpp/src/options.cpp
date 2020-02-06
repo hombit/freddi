@@ -35,7 +35,8 @@ BasicDiskBinaryOptions::BasicDiskBinaryOptions(const po::variables_map &vm):
 				roptInitializer(vm),
 				vm["Topt"].as<double>(),
 				rinInitializer(vm),
-				routInitializer(vm)) {
+				routInitializer(vm),
+				riscoInitializer(vm)) {
 	if (rin >= rout) {
 		throw po::invalid_option_value("rin should be smaller rout");
 	}
@@ -63,6 +64,14 @@ std::optional<double> BasicDiskBinaryOptions::roptInitializer(const po::variable
 	return {};
 }
 
+std::optional<double> BasicDiskBinaryOptions::riscoInitializer(const po::variables_map &vm) {
+	if (vm.count("risco")) {
+		const double Mx = sunToGram(vm["Mx"].as<double>());
+		return rgToCm(vm["risco"].as<double>(), Mx);
+	}
+	return {};
+}
+
 po::options_description BasicDiskBinaryOptions::description() {
 	po::options_description od("Basic binary and disk parameter");
 	od.add_options()
@@ -73,8 +82,9 @@ po::options_description BasicDiskBinaryOptions::description() {
 			( "Ropt", po::value<double>(), "Radius of the optical star, in units of solar radius" )
 			( "Topt", po::value<double>()->default_value(default_Topt), "Thermal temperature of the optical star, in units of kelvins" )
 			( "period,P", po::value<double>()->required(), "Orbital period of the binary system, in units of days" )
-			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the Schwarzschild radius of the central object 2GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
+			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the gravitational radius of the central object GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
 			( "rout,R", po::value<double>(), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used defined by --Mx, --Mopt and --period values" )
+			( "risco", po::value<double>(), "Innermost stable circular orbit, in units of gravitational radius of the central object GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
 			;
 	return od;
 }

@@ -21,13 +21,13 @@ boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(
 		double Mx, double kerr,
 		double period,
 		double Mopt, const object& Ropt, double Topt,
-		const object& rin, const object& rout) {
+		const object& rin, const object& rout, const object& risco) {
 	return boost::make_shared<BasicDiskBinaryArguments>(
 			alpha,
 			Mx, kerr,
 			period,
 			Mopt, objToOpt<double>(Ropt), Topt,
-			objToOpt<double>(rin), objToOpt<double>(rout));
+			objToOpt<double>(rin), objToOpt<double>(rout), objToOpt<double>(risco));
 }
 
 boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(

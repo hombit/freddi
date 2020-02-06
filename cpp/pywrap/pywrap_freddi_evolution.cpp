@@ -40,6 +40,7 @@ dict evolution_kwdefaults() {
 	kw["Topt"] = BasicDiskBinaryArguments::default_Topt;
 	kw["rin"] = object();
 	kw["rout"] = object();
+	kw["risco"] = object();
 
 	kw["opacity"] = DiskStructureArguments::default_opacity;
 	kw["Mdotout"] = DiskStructureArguments::default_Mdotout;
@@ -96,21 +97,25 @@ void check_kwargs(const tuple& args, const dict& kwargs, const dict& required_ar
 
 
 boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
+	static const auto None = object().ptr();
+
 	if (! extract<bool>(kw["__cgs"])) {
 		kw["Mx"] = sunToGram(extract<double>(kw["Mx"]));
 		kw["Mopt"] = sunToGram(extract<double>(kw["Mopt"]));
 		kw["period"] = dayToS(extract<double>(kw["period"]));
-		if (object(kw["rin"]).ptr() != object().ptr()) {
+		if (object(kw["rin"]).ptr() != None) {
 			kw["rin"] = rgToCm(extract<double>(kw["rin"]), extract<double>(kw["Mx"]));
 		}
-		if (object(kw["rout"]).ptr() != object().ptr()) {
+		if (object(kw["rout"]).ptr() != None) {
 			kw["rout"] = sunToCm(extract<double>(kw["rout"]));
 		}
 		kw["emin"] = kevToHertz(extract<double>(kw["emin"]));
 		kw["emax"] = kevToHertz(extract<double>(kw["emax"]));
 		kw["distance"] = kpcToCm(extract<double>(kw["distance"]));
 		kw["time"] = dayToS(extract<double>(kw["time"]));
-		kw["tau"] = dayToS(extract<double>(kw["tau"]));
+		if (object(kw["tau"]).ptr() != None) {
+			kw["tau"] = dayToS(extract<double>(kw["tau"]));
+		}
 	}
 
 	const auto general = make_general_arguments();
@@ -119,7 +124,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<double>(kw["Mx"]), extract<double>(kw["kerr"]),
 			extract<double>(kw["period"]),
 			extract<double>(kw["Mopt"]), kw["Ropt"], extract<double>(kw["Topt"]),
-			kw["rin"], kw["rout"]);
+			kw["rin"], kw["rout"], kw["risco"]);
 	const auto disk = make_disk_structure_arguments(
 			*basic,
 			extract<std::string>(kw["opacity"]),

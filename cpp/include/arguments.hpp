@@ -33,7 +33,7 @@ public:
 
 class BlackHoleFunctions {
 public:
-	static inline double rISCO(const double Mx, const double kerr) { return rgToCm(rISCORg(kerr), Mx); }
+	static inline double r_kerrISCO(const double Mx, const double kerr) { return rgToCm(r_kerrISCORg(kerr), Mx); }
 };
 
 
@@ -66,25 +66,14 @@ public:
 	double Topt;
 	double rin;
 	double rout;
+	double risco;
 public:
 	BasicDiskBinaryArguments(
 			double alpha,
 			double Mx, double kerr,
 			double period,
-			double Mopt, double Ropt, double Topt,
-			double rin, double rout
-	):
-			alpha(alpha),
-			Mx(Mx), kerr(kerr),
-			period(period),
-			Mopt(Mopt), Ropt(Ropt), Topt(Topt),
-			rin(rin), rout(rout) {}
-	BasicDiskBinaryArguments(
-			double alpha,
-			double Mx, double kerr,
-			double period,
 			double Mopt, std::optional<double> Ropt, double Topt,
-			std::optional<double> rin, std::optional<double> rout
+			std::optional<double> rin, std::optional<double> rout, std::optional<double> risco
 	):
 			alpha(alpha),
 			Mx(Mx), kerr(kerr),
@@ -93,10 +82,11 @@ public:
 			Ropt(Ropt ? *Ropt : roptFromMxMoptPeriod(Mx, Mopt, period)),
 			Topt(Topt),
 			rin(rin ? *rin : rinFromMxKerr(Mx, kerr)),
-			rout(rout ? *rout : routFromMxMoptPeriod(Mx, Mopt, period)) {}
+			rout(rout ? *rout : routFromMxMoptPeriod(Mx, Mopt, period)),
+			risco(risco ? *risco : riscoFromMxKerr(Mx, kerr)) {}
 	BasicDiskBinaryArguments(const BasicDiskBinaryArguments&) = default;
 	BasicDiskBinaryArguments(BasicDiskBinaryArguments&&) = default;
-	static inline double rinFromMxKerr(double Mx, double kerr) { return rISCO(Mx, kerr); }
+	static inline double rinFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
 	static inline double routFromMxMoptPeriod(double Mx, double Mopt, double period) {
 		// 0.9 is approximation for r_max value from Paczyncki, 1977. He used grain model of accretting matter,
 		// so his disk should be smaller than gas disk with pressure. So, probably, r_max is better approximation
@@ -106,6 +96,7 @@ public:
 	static inline double roptFromMxMoptPeriod(const double Mx, const double Mopt, const double period) {
 		return rocheLobeVolumeRadius(Mopt, Mx, period);
 	}
+	static inline double riscoFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
 	inline double h(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx * r); }
 	inline double omega(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx / r); }
 };
