@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run from test/data/ directory
+# Run from python/test/data/ directory
 # FREDDI=../../../cmake-build-debug/freddi ./generate_test_data.sh
 
 FREDDI=${FREDDI-freddi}

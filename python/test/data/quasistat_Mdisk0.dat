@@ -8,7 +8,7 @@
 # Mx=5
 # Nx=1000
 # Thot=0
-# Topt=4000
+# Topt=0
 # alpha=0.25
 # boundcond=Teff
 # colourfactor=1.7
