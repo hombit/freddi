@@ -15,8 +15,10 @@ jobs:
         run: zypper install -y --no-recommends gcc-c++ cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel libboost_python3-devel libboost_numpy3-devel python3-devel python3-numpy-devel git
       - name: Create ./cmake-build directory
         run: mkdir ./cmake-build
-      - name: Build exes
-        run: cmake $GITHUB_WORKSPACE && make VERBOSE=1
+      - name: Build and install
+        run: |
+          cmake $GITHUB_WORKSPACE
+          make VERBOSE=1 install
         working-directory: ./cmake-build
       - name: Run freddi
         run: ./freddi --fulldata --starflux
@@ -43,8 +45,10 @@ jobs:
         run: zypper install -y --no-recommends clang gcc cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel libboost_python3-devel libboost_numpy3-devel python3-devel python3-numpy-devel git
       - name: Create ./cmake-build directory
         run: mkdir ./cmake-build
-      - name: Build exes
-        run: cmake -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ .. && make VERBOSE=1
+      - name: Build and install
+        run: |
+          cmake -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ ..
+          make VERBOSE=1 install
         working-directory: ./cmake-build
       - name: Run freddi
         run: ./freddi --fulldata --starflux
