@@ -5,7 +5,7 @@
 #include <freddi_state.hpp>
 #include <util.hpp>
 
-#include "freddi_state.hpp"
+#include "pywrap_freddi_state.hpp"
 
 using namespace boost::python;
 

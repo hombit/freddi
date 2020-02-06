@@ -4,8 +4,9 @@
 
 #include <util.hpp>
 
-#include "arguments.hpp"
 #include "converters.hpp"
+#include "pywrap_arguments.hpp"
+#include "util.hpp"
 
 
 using namespace boost::python;
@@ -18,26 +19,15 @@ boost::shared_ptr<GeneralArguments> make_general_arguments() {
 boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(
 		double alpha,
 		double Mx, double kerr,
-		double Mopt, double Topt,
 		double period,
-		const object& rin_, const object& rout_) {
-	const auto None = object().ptr();
-
-	double rin;
-	if (rin_.ptr() == None) {
-		rin = BasicDiskBinaryArguments::rinFromMxKerr(Mx, kerr);
-	} else {
-		rin = extract<double>(rin_);
-	}
-
-	double rout;
-	if (rout_.ptr() == None) {
-		rout = BasicDiskBinaryArguments::routFromMxMoptPeriod(Mx, Mopt, period);
-	} else {
-		rout = extract<double>(rout_);
-	}
-
-	return boost::make_shared<BasicDiskBinaryArguments>(alpha, Mx, kerr, Mopt, Topt, period, rin, rout);
+		double Mopt, const object& Ropt, double Topt,
+		const object& rin, const object& rout) {
+	return boost::make_shared<BasicDiskBinaryArguments>(
+			alpha,
+			Mx, kerr,
+			period,
+			Mopt, objToOpt<double>(Ropt), Topt,
+			objToOpt<double>(rin), objToOpt<double>(rout));
 }
 
 boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
@@ -45,36 +35,19 @@ boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
 		const std::string& opacity,
 		double Mdotout,
 		const std::string& boundcond, double Thot,
-		const std::string& initialcond, double F0,
-		double powerorder, double gaussmu, double gausssigma,
-		const object& Mdisk0_, const object& Mdot0_,
-		const std::string& wind, const object& windparams_) {
-	const auto None = object().ptr();
-
-	double Mdisk0 = -1;
-	bool is_Mdisk0_specified = false;
-	if (Mdisk0_.ptr() != None) {
-		Mdisk0 = extract<double>(Mdisk0_);
-		is_Mdisk0_specified = true;
-	}
-
-	double Mdot0 = -1;
-	bool is_Mdot0_specified = false;
-	if (Mdot0_.ptr() != None) {
-		Mdot0 = extract<double>(Mdot0_);
-		is_Mdot0_specified = true;
-	}
-
+		const std::string& initialcond,
+		const object& F0, const object& Mdisk0, const object& Mdot0,
+		const object& powerorder, const object& gaussmu, const object& gausssigma,
+		const std::string& wind, const object& windparams) {
 	return boost::make_shared<DiskStructureArguments>(
 			basic_disk_binary_arguments,
 			opacity,
 			Mdotout,
 			boundcond, Thot,
-			initialcond, F0,
-			powerorder, gaussmu, gausssigma,
-			is_Mdisk0_specified, is_Mdot0_specified,
-			Mdisk0, Mdot0,
-			wind, mapping_to_map(windparams_));
+			initialcond,
+			objToOpt<double>(F0), objToOpt<double>(Mdisk0), objToOpt<double>(Mdot0),
+			objToOpt<double>(powerorder), objToOpt<double>(gaussmu), objToOpt<double>(gausssigma),
+			wind, mapping_to_map(windparams));
 }
 
 boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(double Cirr, const std::string& irrfactortype) {
@@ -97,12 +70,13 @@ boost::shared_ptr<FluxArguments> make_flux_arguments(
 }
 
 boost::shared_ptr<CalculationArguments> make_calculation_arguments(
-		double time, double tau, unsigned int Nx, const std::string& gridscale, const unsigned short starlod,
+		double time, const object& tau,
+		unsigned int Nx, const std::string& gridscale, const unsigned short starlod,
 		const object& eps) {
 	if (eps.ptr() == object().ptr()) {
-		return boost::make_shared<CalculationArguments>(time, tau, Nx, gridscale, starlod);
+		return boost::make_shared<CalculationArguments>(time, objToOpt<double>(tau), Nx, gridscale, starlod);
 	}
-	return boost::make_shared<CalculationArguments>(time, tau, Nx, gridscale, starlod, extract<double>(eps));
+	return boost::make_shared<CalculationArguments>(time, objToOpt<double>(tau), Nx, gridscale, starlod, extract<double>(eps));
 }
 
 boost::shared_ptr<FreddiArguments> make_freddi_arguments(
@@ -143,58 +117,57 @@ void wrap_arguments() {
 	;
 	auto _BasicDiskBinaryArguments = class_<BasicDiskBinaryArguments>("_BasicDiskBinaryArguments", no_init)
 		.def("__init__", make_constructor(make_basic_disk_binary_arguments, default_call_policies(),
-				(arg("alpha")=BasicDiskBinaryArguments::default_alpha,
-				 arg("Mx")=BasicDiskBinaryArguments::default_Mx,
-				 arg("kerr")=BasicDiskBinaryArguments::default_kerr,
-				 arg("Mopt")=BasicDiskBinaryArguments::default_Mopt,
-				 arg("Topt")=BasicDiskBinaryArguments::default_Topt,
-				 arg("period")=BasicDiskBinaryArguments::default_period,
-				 arg("rin")=object(),
-				 arg("rout")=object()))
+				(arg("alpha"),
+				 arg("Mx"),
+				 arg("kerr"),
+				 arg("Mopt"),
+				 arg("Topt"),
+				 arg("period"),
+				 arg("rin"),
+				 arg("rout")))
 			)
-		.def_readonly("default_alpha", &BasicDiskBinaryArguments::default_alpha)
 	;
 	class_<DiskStructureArguments>("_DiskStructureArguments", no_init)
 		.def("__init__", make_constructor(make_disk_structure_arguments, default_call_policies(),
 				(arg("basic_disk_binary_arguments"),
-				 arg("opacity")=DiskStructureArguments::default_opacity,
-				 arg("Mdotout")=DiskStructureArguments::default_Mdotout,
-				 arg("boundcond")=DiskStructureArguments::default_boundcond,
-				 arg("Thot")=DiskStructureArguments::default_Thot,
-				 arg("initialcond")=DiskStructureArguments::default_initialcond,
-				 arg("F0")=DiskStructureArguments::default_F0,
-				 arg("powerorder")=DiskStructureArguments::default_powerorder,
-				 arg("gaussmu")=DiskStructureArguments::default_gaussmu,
-				 arg("gausssigma")=DiskStructureArguments::default_gausssigma,
-				 arg("Mdisk0")=object(),
-				 arg("Mdot0")=object(),
-				 arg("wind")=DiskStructureArguments::default_wind,
-				 arg("windparams")=tuple()))
+				 arg("opacity"),
+				 arg("Mdotout"),
+				 arg("boundcond"),
+				 arg("Thot"),
+				 arg("initialcond"),
+				 arg("F0"),
+				 arg("powerorder"),
+				 arg("gaussmu"),
+				 arg("gausssigma"),
+				 arg("Mdisk0"),
+				 arg("Mdot0"),
+				 arg("wind"),
+				 arg("windparams")))
 			)
 	;
 	class_<SelfIrradiationArguments>("_SelfIrradiationArguments", no_init)
 		.def("__init__", make_constructor(make_self_irradiation_arguments, default_call_policies(),
-				(arg("Cirr")=SelfIrradiationArguments::default_Cirr,
-				 arg("irrfactortype")=SelfIrradiationArguments::default_irrfactortype))
+				(arg("Cirr"),
+				 arg("irrfactortype")))
 			)
 	;
 	class_<FluxArguments>("_FluxArguments", no_init)
 		.def("__init__", make_constructor(make_flux_arguments, default_call_policies(),
-				(arg("colourfactor")=FluxArguments::default_colourfactor,
-				 arg("emin")=FluxArguments::default_emin,
-				 arg("emax")=FluxArguments::default_emax,
-				 arg("inclination")=FluxArguments::default_inclination,
-				 arg("distance")=FluxArguments::default_distance))
+				(arg("colourfactor"),
+				 arg("emin"),
+				 arg("emax"),
+				 arg("inclination"),
+				 arg("distance")))
 			)
 	;
 	class_<CalculationArguments>("_CalculationArguments", no_init)
 		.def("__init__", make_constructor(make_calculation_arguments, default_call_policies(),
-				(arg("time")=CalculationArguments::default_time,
-				 arg("tau")=CalculationArguments::default_tau,
-				 arg("Nx")=CalculationArguments::default_Nx,
-				 arg("gridscale")=CalculationArguments::default_gridscale,
-				 arg("starlod")=CalculationArguments::default_starlod,
-				 arg("eps")=object()))
+				(arg("time"),
+				 arg("tau"),
+				 arg("Nx"),
+				 arg("gridscale"),
+				 arg("starlod"),
+				 arg("eps")))
 			)
 	;
 	class_<FreddiArguments>("_Arguments", no_init)
@@ -202,15 +175,15 @@ void wrap_arguments() {
 	;
 	class_<NeutronStarArguments>("_NeutronStarArguments", no_init)
 		.def("__init__", make_constructor(make_neutron_star_arguments, default_call_policies(),
-				(arg("Rx")=NeutronStarArguments::default_Rx,
-				 arg("freqx")=NeutronStarArguments::default_freqx,
-				 arg("Bx")=NeutronStarArguments::default_Bx,
-				 arg("hotspotarea")=NeutronStarArguments::default_hotspotarea,
-				 arg("epsilonAlfven")=NeutronStarArguments::default_epsilonAlfven,
-				 arg("inversebeta")=NeutronStarArguments::default_inversebeta,
-				 arg("Rdead")=NeutronStarArguments::default_Rdead,
-				 arg("fptype")=NeutronStarArguments::default_fptype,
-				 arg("fpparams")=tuple()))
+				(arg("Rx"),
+				 arg("freqx"),
+				 arg("Bx"),
+				 arg("hotspotarea"),
+				 arg("epsilonAlfven"),
+				 arg("inversebeta"),
+				 arg("Rdead"),
+				 arg("fptype"),
+				 arg("fpparams")))
 			)
 	;
 	class_< FreddiNeutronStarArguments, bases<FreddiArguments> >("_FreddiNeutronStarArguments", no_init)

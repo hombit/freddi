@@ -1,5 +1,4 @@
 #include <sstream>
-#include <string>
 
 #include <boost/python.hpp>
 #include <boost/smart_ptr.hpp>
@@ -8,37 +7,51 @@
 #include <unit_transformation.hpp>
 #include <ns/ns_evolution.hpp>
 
-#include "arguments.hpp"
-#include "freddi_evolution.hpp"
+#include "pywrap_arguments.hpp"
+#include "pywrap_freddi_evolution.hpp"
 
 using namespace boost::python;
 
+dict evolution_required_args() {
+	dict kw;
+
+	kw["alpha"] = 0.0;
+	kw["Mx"] = 0.0;
+	kw["Mopt"] = 0.0;
+	kw["period"] = 0.0;
+
+	kw["initialcond"] = "quasistat";
+	kw["F0"] = 0.0;
+
+	kw["distance"] = 0.0;
+
+	kw["time"] = 0.0;
+
+	return kw;
+}
 
 dict evolution_kwdefaults() {
 	dict kw;
 
 	kw["__cgs"] = true;
 
-	kw["alpha"] = BasicDiskBinaryArguments::default_alpha;
-	kw["Mx"] = BasicDiskBinaryArguments::default_Mx;
 	kw["kerr"] = BasicDiskBinaryArguments::default_kerr;
-	kw["Mopt"] = BasicDiskBinaryArguments::default_Mopt;
+	kw["Ropt"] = object();
 	kw["Topt"] = BasicDiskBinaryArguments::default_Topt;
-	kw["period"] = BasicDiskBinaryArguments::default_period;
 	kw["rin"] = object();
 	kw["rout"] = object();
 
 	kw["opacity"] = DiskStructureArguments::default_opacity;
 	kw["Mdotout"] = DiskStructureArguments::default_Mdotout;
 	kw["boundcond"] = DiskStructureArguments::default_boundcond;
-	kw["Thot"] = DiskStructureArguments::default_Thot;
 	kw["initialcond"] = DiskStructureArguments::default_initialcond;
-	kw["F0"] = DiskStructureArguments::default_F0;
-	kw["powerorder"] = DiskStructureArguments::default_powerorder;
-	kw["gaussmu"] = DiskStructureArguments::default_gaussmu;
-	kw["gausssigma"] = DiskStructureArguments::default_gausssigma;
+	kw["Thot"] = DiskStructureArguments::default_Thot;
+	kw["F0"] = object();
 	kw["Mdisk0"] = object();
 	kw["Mdot0"] = object();
+	kw["powerorder"] = object();
+	kw["gaussmu"] = object();
+	kw["gausssigma"] = object();
 	kw["wind"] = DiskStructureArguments::default_wind;
 	kw["windparams"] = tuple();
 
@@ -50,10 +63,8 @@ dict evolution_kwdefaults() {
 	kw["emax"] = FluxArguments::default_emax;
 	kw["staralbedo"] = FluxArguments::default_star_albedo;
 	kw["inclination"] = FluxArguments::default_inclination;
-	kw["distance"] = FluxArguments::default_distance;
 
-	kw["time"] = CalculationArguments::default_time;
-	kw["tau"] = CalculationArguments::default_tau;
+	kw["tau"] = object();
 	kw["Nx"] = CalculationArguments::default_Nx;
 	kw["gridscale"] = CalculationArguments::default_gridscale;
 	kw["starlod"] = CalculationArguments::default_starlod;
@@ -71,10 +82,10 @@ void check_args(const tuple &args) {
 }
 
 
-void check_kwargs(const tuple& args, const dict& kwargs, const dict& kwdefaults) {
+void check_kwargs(const tuple& args, const dict& kwargs, const dict& required_args, const dict& kwdefaults) {
 	stl_input_iterator<object> begin(kwargs), end;
 	for (auto key = begin; key != end; ++key) {
-		if (! kwdefaults.has_key(*key)) {
+		if (! kwdefaults.has_key(*key) && ! required_args.has_key(*key)) {
 			std::stringstream msg;
 			msg << extract<char*>(str(args[0])) << " got an unexpected keyword argument " << extract<char*>(*key);
 			PyErr_SetString(PyExc_TypeError, msg.str().data());
@@ -106,17 +117,17 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 	const auto basic = make_basic_disk_binary_arguments(
 			extract<double>(kw["alpha"]),
 			extract<double>(kw["Mx"]), extract<double>(kw["kerr"]),
-			extract<double>(kw["Mopt"]), extract<double>(kw["Topt"]),
 			extract<double>(kw["period"]),
+			extract<double>(kw["Mopt"]), kw["Ropt"], extract<double>(kw["Topt"]),
 			kw["rin"], kw["rout"]);
 	const auto disk = make_disk_structure_arguments(
 			*basic,
 			extract<std::string>(kw["opacity"]),
 			extract<double>(kw["Mdotout"]),
 			extract<std::string>(kw["boundcond"]), extract<double>(kw["Thot"]),
-			extract<std::string>(kw["initialcond"]), extract<double>(kw["F0"]),
-			extract<double>(kw["powerorder"]), extract<double>(kw["gaussmu"]), extract<double>(kw["gausssigma"]),
-			kw["Mdisk0"], kw["Mdot0"],
+			extract<std::string>(kw["initialcond"]),
+			kw["F0"], kw["Mdisk0"], kw["Mdot0"],
+			kw["powerorder"], kw["gaussmu"], kw["gausssigma"],
 			extract<std::string>(kw["wind"]), kw["windparams"]);
 	const auto irr = make_self_irradiation_arguments(
 			extract<double>(kw["Cirr"]),
@@ -127,7 +138,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<double>(kw["staralbedo"]),
 			extract<double>(kw["inclination"]), extract<double>(kw["distance"]));
 	const auto calc = make_calculation_arguments(
-			extract<double>(kw["time"]), extract<double>(kw["tau"]),
+			extract<double>(kw["time"]), kw["tau"],
 			extract<unsigned int>(kw["Nx"]), extract<std::string>(kw["gridscale"]),
 			extract<unsigned short>(kw["starlod"]),
 			kw["eps"]);
@@ -141,7 +152,7 @@ object raw_make_evolution(const tuple& args, const dict& kwargs) {
 
 	// It should be static, but segfault
 	const auto kwdefaults = evolution_kwdefaults();
-	check_kwargs(args, kwargs, kwdefaults);
+	check_kwargs(args, kwargs, evolution_required_args(), kwdefaults);
 
 	dict kw;
 	kw.update(kwdefaults);
@@ -151,6 +162,11 @@ object raw_make_evolution(const tuple& args, const dict& kwargs) {
 
 	args[0].attr("_kwargs") = kw;
 	return args[0].attr("__init__")(*freddi_args);
+}
+
+
+dict neutron_star_evolution_required_args() {
+	return evolution_required_args();
 }
 
 
@@ -185,7 +201,7 @@ object raw_make_neutron_star_evolution(const tuple& args, const dict& kwargs) {
 
 	// It should be static, but segfault
 	const auto kwdefaults = neutron_star_evolution_kwdefaults();
-	check_kwargs(args, kwargs, kwdefaults);
+	check_kwargs(args, kwargs, neutron_star_evolution_required_args(), kwdefaults);
 
 	dict kw;
 	kw.update(kwdefaults);
@@ -206,11 +222,15 @@ void wrap_evolution() {
 		.def("__init__", raw_function(&raw_make_evolution))
 		.def(init<const FreddiArguments&>())
 		.def("__iter__", iterator<FreddiEvolution>())
+		.def("_required_args", evolution_required_args, "Mock values for non-scientific calls")
+		.staticmethod("_required_args")
 	;
 	class_<FreddiNeutronStarEvolution, bases<FreddiEvolution> >("_FreddiNeutronStar", no_init)
 		.def("__init__", raw_function(&raw_make_neutron_star_evolution))
 		.def(init<const FreddiNeutronStarArguments&>())
 		.def("__iter__", iterator<FreddiNeutronStarEvolution>())
+		.def("_required_args", neutron_star_evolution_required_args, "Mock values for non-scientific calls")
+		.staticmethod("_required_args")
 		.add_property("mu_magn", &FreddiNeutronStarEvolution::mu_magn)
 		.add_property("R_dead", &FreddiNeutronStarEvolution::R_dead)
 		.add_property("F_dead", &FreddiNeutronStarEvolution::F_dead)

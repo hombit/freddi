@@ -3,15 +3,12 @@ import unittest
 import numpy as np
 from numpy.testing import assert_allclose
 
-from freddi import Freddi
+from .util import DAY, freddi_w_default
 
 try:
     import scipy.special
 except ImportError:
     scipy = None
-
-
-DAY = 86400
 
 
 class ShakuraSunyaevSubctriticalTestCase(unittest.TestCase):
@@ -25,7 +22,7 @@ class ShakuraSunyaevSubctriticalTestCase(unittest.TestCase):
 
         """
         Mdot = 1e18
-        fr = Freddi(initialcond=b'sinusF', Mdot0=Mdot/2, Mdotout=Mdot, time=1000*DAY, tau=1*DAY)
+        fr = freddi_w_default(initialcond=b'sineF', Mdot0=Mdot/2, Mdotout=Mdot, time=1000*DAY, tau=1*DAY)
         for state in fr:
             pass
         h = state.h
@@ -56,8 +53,8 @@ class ShakuraSunyaevSupercriticalTestCase(unittest.TestCase):
         Ledd = 4. * np.pi * 1.67262158e-24 * c / 6.65245893699e-25 * GM
         eta = 1 - np.sqrt(8 / 9)
         Mcrit = Ledd / (c**2 * eta)
-        fr = Freddi(wind=b'SS73C', windparams={}, Mx=Mx, Mdot0=Mcrit, Mdotout=Mcrit*Rout/Rin, initialcond=b'sinusF',
-                    time=100*DAY, tau=1*DAY, rout=Rout)
+        fr = freddi_w_default(wind=b'SS73C', windparams={}, Mx=Mx, Mdot0=Mcrit, Mdotout=Mcrit*Rout/Rin,
+                              initialcond=b'sineF', time=100*DAY, tau=1*DAY, rout=Rout)
         for state in fr:
             pass
         h = state.h
@@ -85,8 +82,8 @@ class StationaryWindATestCase(unittest.TestCase):
 
         """
         Mdot = 1e18
-        fr = Freddi(wind=b'__testA__', windparams={'kA': self._k_A0}, Mdotout=Mdot, initialcond=b'sinusF', Mdot0=Mdot,
-            time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
+        fr = freddi_w_default(wind=b'__testA__', windparams={'kA': self._k_A0}, Mdotout=Mdot, initialcond=b'sineF',
+                              Mdot0=Mdot, time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
         for state in fr:
             pass
         h = state.h
@@ -114,8 +111,8 @@ class StationaryWindBTestCase(unittest.TestCase):
 
         """
         Mdot = 1e18
-        fr = Freddi(wind=b'__testB__', windparams={'kB': self._k_B0}, Mdotout=Mdot, initialcond=b'sinusF', Mdot0=Mdot,
-                    time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
+        fr = freddi_w_default(wind=b'__testB__', windparams={'kB': self._k_B0}, Mdotout=Mdot, initialcond=b'sineF',
+                              Mdot0=Mdot, time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
         for state in fr:
             pass
         h = state.h
@@ -142,8 +139,8 @@ class StationaryWindCTestCase(unittest.TestCase):
 
         """
         Mdot = 1e18
-        fr = Freddi(wind=b'__testC__', windparams={'kC': self._k_C0}, Mdotout=Mdot, initialcond=b'sinusF', Mdot0=Mdot,
-                    time=10000*DAY, tau=10*DAY, gridscale=b'linear')
+        fr = freddi_w_default(wind=b'__testC__', windparams={'kC': self._k_C0}, Mdotout=Mdot, initialcond=b'sineF',
+                              Mdot0=Mdot, time=10000*DAY, tau=10*DAY, gridscale=b'linear')
         for state in fr:
             pass
         h = state.h
@@ -176,7 +173,7 @@ class LipunovaShakuraTestCase(unittest.TestCase):
         return f * (h - h[0]) / (h[-1] - h[0]) / xi
 
     def check_freddi(self, opacity, a, kl):
-        fr = Freddi(opacity=opacity.encode(), time=1000*DAY, tau=1*DAY)
+        fr = freddi_w_default(opacity=opacity.encode(), time=1000*DAY, tau=1*DAY)
         for state in fr:
             pass
         h = state.h
@@ -210,7 +207,7 @@ class ShieldPowerLawWindTestCase(unittest.TestCase):
         Mdotout = 1e18
         rout = 1e11
         Mdotin = Mdotout / (1 + self._k_C)
-        fr = Freddi(wind=b'__testC_q0_Shields1986__', windparams={'kC': self._k_C, 'Rwind': self._r_wind},
+        fr = freddi_w_default(wind=b'__testC_q0_Shields1986__', windparams={'kC': self._k_C, 'Rwind': self._r_wind},
                     F0=Mdotin*np.sqrt(GM*rout), Mdotout=Mdotout, rout=rout, Mx=Mx,
                     initialcond=b'powerF', powerorder=1,
                     time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')

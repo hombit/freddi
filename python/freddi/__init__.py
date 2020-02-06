@@ -9,7 +9,7 @@ from .evolution_result import EvolutionResult
 class _MetaFreddi(type(_Freddi)):
     def __new__(mcs, name, bases, attrs, boost_cls=object):
         attrs['_boost_class'] = boost_cls
-        test_obj = boost_cls()
+        test_obj = boost_cls(**boost_cls._required_args())
         for attr_name in dir(boost_cls):
             if attr_name.startswith('_'):
                 continue

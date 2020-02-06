@@ -10,8 +10,7 @@ from numpy.testing import assert_allclose, assert_equal
 
 from freddi import Freddi
 
-
-DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
+from .util import DATA_DIR
 
 
 class RegressionTestCase(unittest.TestCase):

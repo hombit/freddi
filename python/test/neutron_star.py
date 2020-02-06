@@ -5,6 +5,8 @@ from numpy.testing import assert_allclose, assert_array_equal
 
 from freddi import FreddiNeutronStar
 
+from .util import default_freddi_kwargs
+
 try:
     import scipy.interpolate
 except ImportError:
@@ -17,7 +19,7 @@ class FmagnDerivativesTestCase(unittest.TestCase):
     Bx = 1e8  # G
     freqx = 100  # Hz
     Rx = 1e6  # cm
-    freddi_kwargs = dict(inversebeta=inverse_beta, Bx=Bx, freqx=freqx, Rx=Rx)
+    freddi_kwargs = {**default_freddi_kwargs(), 'inversebeta': inverse_beta, 'Bx': Bx, 'freqx': freqx, 'Rx': Rx}
 
     @unittest.skipIf(scipy is None, 'No scipy module is available')
     def test_first_derivative(self):
@@ -40,18 +42,19 @@ class FmagnDerivativesTestCase(unittest.TestCase):
 
 class NSMdotFractionTestCase(unittest.TestCase):
     """fp(r/r_cor) function"""
-    basic_kwargs = dict(
-        Mdot0=1e16,
-        initialcond='quasistat',
-        Mx=1.4 * 2e33,  # g
-        Rx=1e6,  # cm
-        freqx=500,  # Hz
-        rout=1e11,  # cm
-        Bx=1e8,  # G
-        Rdead=5e6,  # cm
-        time=200 * 86400,  # s
-        tau=0.1 * 86400,  # s
-    )
+    basic_kwargs = {
+        **default_freddi_kwargs(),
+        'Mdot0':1e16,
+        'initialcond':'quasistat',
+        'Mx':1.4 * 2e33,  # g
+        'Rx':1e6,  # cm
+        'freqx':500,  # Hz
+        'rout':1e11,  # cm
+        'Bx':1e8,  # G
+        'Rdead':5e6,  # cm
+        'time':200 * 86400,  # s
+        'tau':0.1 * 86400,  # s
+    }
 
     def test_no_outflow(self):
         fr = FreddiNeutronStar(fptype='no-outflow', **self.basic_kwargs)
