@@ -201,7 +201,7 @@ public:
 	std::string wind;
 	pard windparams;
 protected:
-	std::unique_ptr<InitialFFunction> initial_F_function;
+	std::shared_ptr<InitialFFunction> initial_F_function;
 public:
 	DiskStructureArguments(
 			const BasicDiskBinaryArguments &bdb_args,
@@ -273,6 +273,7 @@ public:
 class CalculationArguments {
 public:
 	constexpr static const unsigned int default_Nx = 1000;
+	constexpr static const unsigned int default_Nt_for_tau = 200;
 	constexpr static const char default_gridscale[] = "log";
 	constexpr static const unsigned short default_starlod = 3;
 public:
@@ -284,9 +285,13 @@ public:
 	double eps;
 public:
 	CalculationArguments(
-			double time, double tau, unsigned int Nx, const std::string& gridscale, const unsigned short starlod,
+			double time, std::optional<double> tau,
+			unsigned int Nx, const std::string& gridscale, const unsigned short starlod,
 			double eps=1e-6):
-			time(time), tau(tau), Nx(Nx), gridscale(gridscale), starlod(starlod), eps(eps) {}
+			time(time),
+			tau(tau ? *tau : time / default_Nt_for_tau),
+			Nx(Nx), gridscale(gridscale), starlod(starlod),
+			eps(eps) {}
 };
 
 

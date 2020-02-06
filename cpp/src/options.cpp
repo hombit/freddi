@@ -220,7 +220,7 @@ po::options_description FluxOptions::description() {
 CalculationOptions::CalculationOptions(const po::variables_map &vm):
 		CalculationArguments(
 				dayToS(vm["time"].as<double>()),
-				dayToS(vm["tau"].as<double>()),
+				tauInitializer(vm),
 				vm["Nx"].as<unsigned int>(),
 				vm["gridscale"].as<std::string>(),
 				vm["starlod"].as<unsigned int>()) {
@@ -229,11 +229,18 @@ CalculationOptions::CalculationOptions(const po::variables_map &vm):
 	}
 }
 
+std::optional<double> CalculationOptions::tauInitializer(const po::variables_map& vm) {
+	if (vm.count("tau")) {
+		return dayToS(vm["tau"].as<double>());
+	}
+	return {};
+}
+
 po::options_description CalculationOptions::description() {
 	po::options_description od("Parameters of disk evolution calculation");
 	od.add_options()
 			( "time,T", po::value<double>()->required(), "Time interval to calculate evolution, days" )
-			( "tau",	po::value<double>()->required(), "Time step, days" )
+			( "tau",	po::value<double>(), "Time step, days" )
 			( "Nx",	po::value<unsigned int>()->default_value(default_Nx), "Size of calculation grid" )
 			( "gridscale", po::value<std::string>()->default_value(default_gridscale), "Type of grid for angular momentum h: log or linear" )
 			( "starlod", po::value<unsigned int>()->default_value(default_starlod), "Level of detail of the optical star 3-D model. The optical star is represented by a triangular tile, the number of tiles is 20 * 4^starlod" )

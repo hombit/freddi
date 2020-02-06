@@ -49,7 +49,7 @@ DiskStructureArguments::DiskStructureArguments(
 		initial_F_function(),
 		wind(wind),
 		windparams(windparams) {
-	initial_F_function = [&, this]() -> std::unique_ptr<InitialFFunction> {
+	initial_F_function = [&, this]() -> std::shared_ptr<InitialFFunction> {
 		if (!F0 && !Mdisk0 && !Mdot0) {
 			throw std::runtime_error("One of F0, Mdisk0 or Mdot0 must be specified");
 		}
@@ -86,7 +86,7 @@ DiskStructureArguments::DiskStructureArguments(
 				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
 			}
 
-			return std::make_unique<InitialFPowerF>(*F0, 0.0, *Mdisk0, *powerorder);
+			return std::make_shared<InitialFPowerF>(*F0, 0.0, *Mdisk0, *powerorder);
 		}
 
 		if (initialcond == "powerSigma") {
@@ -119,7 +119,7 @@ DiskStructureArguments::DiskStructureArguments(
 				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
 			}
 
-			return std::make_unique<InitialFPowerSigma>(*F0, 0.0, *Mdisk0, *powerorder, oprel);
+			return std::make_shared<InitialFPowerSigma>(*F0, 0.0, *Mdisk0, *powerorder, oprel);
 		}
 
 		if (initialcond == "sineF" || initialcond == "sine" ||
@@ -151,7 +151,7 @@ DiskStructureArguments::DiskStructureArguments(
 				throw std::logic_error("We couldn't be here");
 			}
 
-			return std::make_unique<InitialFSineF>(*F0, *Mdisk0, *Mdot0);
+			return std::make_shared<InitialFSineF>(*F0, *Mdisk0, *Mdot0);
 		}
 
 		if (initialcond == "gaussF") {
@@ -193,7 +193,7 @@ DiskStructureArguments::DiskStructureArguments(
 				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
 			}
 
-			return std::make_unique<InitialFGaussF>(*F0, 0.0, *Mdisk0, *gaussmu, *gausssigma);
+			return std::make_shared<InitialFGaussF>(*F0, 0.0, *Mdisk0, *gaussmu, *gausssigma);
 		}
 
 		if (initialcond == "quasistat") {
@@ -224,7 +224,7 @@ DiskStructureArguments::DiskStructureArguments(
 				throw std::logic_error("We couldn't be here");
 			}
 
-			return std::make_unique<InitialFQuasistat>(*F0, *Mdisk0, *Mdot0, oprel);
+			return std::make_shared<InitialFQuasistat>(*F0, *Mdisk0, *Mdot0, oprel);
 		}
 
 		throw std::runtime_error("Invalid value of initialcond");
@@ -292,5 +292,6 @@ constexpr const bool FluxArguments::default_star;
 
 
 constexpr const unsigned int CalculationArguments::default_Nx;
+constexpr const unsigned int CalculationArguments::default_Nt_for_tau;
 constexpr const char CalculationArguments::default_gridscale[];
 constexpr const unsigned short CalculationArguments::default_starlod;

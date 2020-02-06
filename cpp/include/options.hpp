@@ -62,6 +62,8 @@ public:
 
 
 class CalculationOptions: public CalculationArguments {
+protected:
+	static std::optional<double> tauInitializer(const po::variables_map& vm);
 public:
 	CalculationOptions(const po::variables_map& vm);
 	static po::options_description description();
