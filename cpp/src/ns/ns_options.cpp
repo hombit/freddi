@@ -3,8 +3,8 @@
 NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 		NeutronStarArguments(
 				vm["nsprop"].as<std::string>(),
-				vm["Rx"].as<double>(),
-				vm["freqx"].as<double>(),
+				varToOpt<double>(vm, "freqx"),
+				varToOpt<double>(vm, "Rx"),
 				vm["Bx"].as<double>(),
 				vm["hotspotarea"].as<double>(),
 				vm["epsilonAlfven"].as<double>(),
@@ -33,9 +33,12 @@ pard NeutronStarOptions::fpparamsInitializer(const po::variables_map& vm) {
 po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star");
 	od.add_options()
-			( "nsprop", po::value<std::string>()->default_value(default_nsprop), "Neutron star geometry and radiation properties" )
-			( "Rx", po::value<double>()->default_value(default_Rx), "Accretor radius, cm" )
-			( "freqx", po::value<double>()->default_value(default_freqx), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
+			( "nsprop", po::value<std::string>()->default_value(default_nsprop), "Neutron star geometry and radiation properties name and specifies default values of --Rx, --Risco and --freqx\n\n"
+																				 "Values:\n"
+																				 "  dummy: NS radiation efficiency is R_g * (1 / R_x - 1 / 2R_in), default --freqx is 0, default Rx is 1e6, default Risco is Kerr value"
+																				 "  sibatullin-sunyaev2000: NS radiation efficiency, and default values of Rx and Risco are functions of NS frequency, that's why --freqx must be specified explicitly")
+			( "freqx", po::value<double>(), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
+			( "Rx", po::value<double>(), "Accretor radius, cm" )
 			( "Bx", po::value<double>()->default_value(default_Bx), "Accretor polar magnetic induction, G" )
 			( "hotspotarea", po::value<double>()->default_value(default_hotspotarea), "??? Relative area of hot spot on the accretor" )
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Factor in Alfven radius formula" )
@@ -48,20 +51,40 @@ po::options_description NeutronStarOptions::description() {
 }
 
 
+NeutronStarBasicDiskBinaryOptions::NeutronStarBasicDiskBinaryOptions(const po::variables_map &vm, const NeutronStarArguments& args_ns):
+		NeutronStarBasicDiskBinaryArguments(
+				args_ns,
+				vm["alpha"].as<double>(),
+				sunToGram(vm["Mx"].as<double>()),
+				vm["kerr"].as<double>(),
+				dayToS(vm["period"].as<double>()),
+				sunToGram(vm["Mopt"].as<double>()),
+				BasicDiskBinaryOptions::roptInitializer(vm),
+				vm["Topt"].as<double>(),
+				BasicDiskBinaryOptions::rinInitializer(vm),
+				BasicDiskBinaryOptions::routInitializer(vm),
+				BasicDiskBinaryOptions::riscoInitializer(vm)) {}
+
+po::options_description NeutronStarBasicDiskBinaryOptions::description() {
+	return BasicDiskBinaryOptions::description();
+}
+
+
 FreddiNeutronStarOptions::FreddiNeutronStarOptions(const po::variables_map &vm) {
+	ns.reset(new NeutronStarOptions(vm));
+
 	general.reset(new GeneralOptions(vm));
-	basic.reset(new BasicDiskBinaryOptions(vm));
+	basic.reset(new NeutronStarBasicDiskBinaryOptions(vm, *ns));
 	disk.reset(new DiskStructureOptions(vm, *basic));
 	irr.reset(new SelfIrradiationOptions(vm, *disk));
 	flux.reset(new FluxOptions(vm));
 	calc.reset(new CalculationOptions(vm));
-	ns.reset(new NeutronStarOptions(vm));
 }
 
 po::options_description FreddiNeutronStarOptions::description() {
 	po::options_description desc("Freddi NS: numerical calculation of accretion disk evolution");
 	desc.add(GeneralOptions::description());
-	desc.add(BasicDiskBinaryOptions::description());
+	desc.add(NeutronStarBasicDiskBinaryOptions::description());
 	desc.add(DiskStructureOptions::description());
 	desc.add(NeutronStarOptions::description());
 	desc.add(SelfIrradiationOptions::description());

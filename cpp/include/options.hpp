@@ -27,14 +27,13 @@ public:
 
 
 class BasicDiskBinaryOptions: public BasicDiskBinaryArguments {
-protected:
+public:
+	BasicDiskBinaryOptions(const po::variables_map& vm);
+	static po::options_description description();
 	static std::optional<double> rinInitializer(const po::variables_map& vm);
 	static std::optional<double> routInitializer(const po::variables_map& vm);
 	static std::optional<double> roptInitializer(const po::variables_map& vm);
 	static std::optional<double> riscoInitializer(const po::variables_map& vm);
-public:
-	BasicDiskBinaryOptions(const po::variables_map& vm);
-	static po::options_description description();
 };
 
 

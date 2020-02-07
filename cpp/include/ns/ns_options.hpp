@@ -14,6 +14,11 @@ public:
 	static po::options_description description();
 };
 
+class NeutronStarBasicDiskBinaryOptions: public NeutronStarBasicDiskBinaryArguments {
+public:
+	NeutronStarBasicDiskBinaryOptions(const po::variables_map& vm, const NeutronStarArguments& ns_args);
+	static po::options_description description();
+};
 
 class FreddiNeutronStarOptions: public FreddiNeutronStarArguments {
 public:

@@ -67,6 +67,18 @@ public:
 	double rin;
 	double rout;
 	double risco;
+protected:
+	static inline double rinFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
+	static inline double routFromMxMoptPeriod(double Mx, double Mopt, double period) {
+		// 0.9 is approximation for r_max value from Paczyncki, 1977. He used grain model of accretting matter,
+		// so his disk should be smaller than gas disk with pressure. So, probably, r_max is better approximation
+		// than r_1 or r_2 for axial-symmetric gas disk. Also this factor is in agreement with Gilfanov & Arefiev, 2005
+		return 0.9 * rocheLobeVolumeRadius(Mx, Mopt, period);
+	}
+	static inline double roptFromMxMoptPeriod(const double Mx, const double Mopt, const double period) {
+		return rocheLobeVolumeRadius(Mopt, Mx, period);
+	}
+	static inline double riscoFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
 public:
 	BasicDiskBinaryArguments(
 			double alpha,
@@ -86,17 +98,6 @@ public:
 			risco(risco ? *risco : riscoFromMxKerr(Mx, kerr)) {}
 	BasicDiskBinaryArguments(const BasicDiskBinaryArguments&) = default;
 	BasicDiskBinaryArguments(BasicDiskBinaryArguments&&) = default;
-	static inline double rinFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
-	static inline double routFromMxMoptPeriod(double Mx, double Mopt, double period) {
-		// 0.9 is approximation for r_max value from Paczyncki, 1977. He used grain model of accretting matter,
-		// so his disk should be smaller than gas disk with pressure. So, probably, r_max is better approximation
-		// than r_1 or r_2 for axial-symmetric gas disk. Also this factor is in agreement with Gilfanov & Arefiev, 2005
-		return 0.9 * rocheLobeVolumeRadius(Mx, Mopt, period);
-	}
-	static inline double roptFromMxMoptPeriod(const double Mx, const double Mopt, const double period) {
-		return rocheLobeVolumeRadius(Mopt, Mx, period);
-	}
-	static inline double riscoFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
 	inline double h(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx * r); }
 	inline double omega(const double r) const { return std::sqrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * Mx / r); }
 };
