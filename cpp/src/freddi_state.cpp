@@ -15,6 +15,7 @@ FreddiState::DiskStructure::DiskStructure(const FreddiArguments &args, const wun
 		Nt(static_cast<size_t>(std::round(args.calc->time / args.calc->tau))),
 		Nx(args.calc->Nx),
 		GM(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * args.basic->Mx),
+		R_g(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * args.basic->Mx / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT)),
 		eta(efficiency_of_accretion(args.basic->kerr)),
 		semiaxis(args.basic->semiaxis(args.basic->Mx, args.basic->Mopt, args.basic->period)),
 		inclination(args.flux->inclination / 180.0 * M_PI),
@@ -37,7 +38,7 @@ vecd FreddiState::DiskStructure::initialize_h(const FreddiArguments& args, size_
 		} else if (args.calc->gridscale == "linear") {
 			h[i] = h_in + (h_out - h_in) * i / (Nx - 1.);
 		} else {
-			throw std::logic_error("Wrong gridscale");
+			throw std::invalid_argument("Wrong gridscale");
 		}
 	}
 	return h;
@@ -86,7 +87,7 @@ void FreddiState::initializeWind() {
 	} else if (args().disk->wind == "__testC_q0_Shields1986__") {
 		wind_.reset(static_cast<BasicWind*>(new __testC_q0_Shields1986__(*this)));
 	} else {
-		throw std::logic_error("Wrong wind");
+		throw std::invalid_argument("Wrong wind");
 	}
 }
 
@@ -213,7 +214,7 @@ const vecd& FreddiState::Cirr() {
 			}
 			opt_str_.Cirr = std::move(x);
 		} else {
-			throw std::logic_error("Wrong irrfactor");
+			throw std::invalid_argument("Wrong irrfactor");
 		}
 	}
 	return *opt_str_.Cirr;

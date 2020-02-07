@@ -46,7 +46,7 @@ void FreddiEvolution::truncateOuterRadius() {
 			ii--;
 		} while( Tirr().at(ii) < args().disk->Thot );
 	} else{
-		throw std::logic_error("Wrong boundcond");
+		throw std::invalid_argument("Wrong boundcond");
 	}
 
 	if ( ii <= last() - 1 ){

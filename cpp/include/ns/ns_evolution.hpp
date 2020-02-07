@@ -90,12 +90,49 @@ private:
 		~GeometricalNSMdotFraction() override = default;
 		virtual double operator()(double R_to_Rcor) const override;
 	};
+
+	class BasicNSAccretionEfficiency {
+	protected:
+		const FreddiNeutronStarEvolution* freddi;
+	public:
+		BasicNSAccretionEfficiency(const FreddiNeutronStarEvolution* freddi): freddi(freddi) {}
+		virtual ~BasicNSAccretionEfficiency() = 0;
+		virtual double operator()(double Rm) const;
+		virtual double RmIsFurthest(double Rm) const = 0;
+		virtual double RxIsFurthest(double Rm) const = 0;
+		virtual double RiscoIsFurthest(double Rm) const = 0;
+	};
+
+	class DummyNSAccretionEfficiency: public BasicNSAccretionEfficiency {
+	protected:
+		double newtonian(double Rm) const;
+	public:
+		using BasicNSAccretionEfficiency::BasicNSAccretionEfficiency;
+		~DummyNSAccretionEfficiency() override = default;
+		double RmIsFurthest(double Rm) const override { return newtonian(Rm); }
+		double RxIsFurthest(double Rm) const override { return newtonian(Rm); }
+		double RiscoIsFurthest(double Rm) const override { return newtonian(Rm); }
+	};
+
+	class SibgatullinSunyaev2000NSAccretionEfficiency: public BasicNSAccretionEfficiency {
+	protected:
+		double schwarzschild(double Rm) const;
+		double small_magnetosphere(double Rm) const;
+	public:
+		using BasicNSAccretionEfficiency::BasicNSAccretionEfficiency;
+		~SibgatullinSunyaev2000NSAccretionEfficiency() override = default;
+		double RmIsFurthest(double Rm) const override { return schwarzschild(Rm); }
+		double RxIsFurthest(double Rm) const override { return small_magnetosphere(Rm); }
+		double RiscoIsFurthest(double Rm) const override { return small_magnetosphere(Rm); }
+	};
 private:
 	std::shared_ptr<const NeutronStarStructure> ns_str_;
 	NeutronStarOptionalStructure ns_opt_str_;
 	std::shared_ptr<BasicNSMdotFraction> fp_;
+	std::shared_ptr<BasicNSAccretionEfficiency> eta_ns_;
 private:
-	void initializeNsMdotFraction();
+	static std::shared_ptr<BasicNSMdotFraction> initializeNsMdotFraction(const NeutronStarArguments& args_ns);
+	static std::shared_ptr<BasicNSAccretionEfficiency> initializeNsAccretionEfficiency(const NeutronStarArguments& args_ns, const FreddiNeutronStarEvolution* freddi);
 // ns_str_
 public:
 	inline double k_t() const { return ns_str_->k_t; }
@@ -122,9 +159,14 @@ public:
 public:
 	inline double fp(double radius) const { return (*fp_)(radius / R_cor()); }
 	inline double fp() const { return fp(R()[first()]); }
+// eta_ns_
+public:
+	inline double eta_ns(double Rm) const { return (*eta_ns_)(Rm); }
+	inline double eta_ns() const { return eta_ns(R()[first()]); }
 public:
 	using FreddiEvolution::step;
 	virtual double Mdot_in() const override;
+	double R_alfven() const;
 protected:
 	virtual void invalidate_optional_structure() override;
 	virtual void truncateInnerRadius() override;
@@ -140,8 +182,6 @@ public:
 	using iterator = EvolutionIterator<FreddiNeutronStarEvolution>;
 	inline iterator begin() { return {this}; }
 	inline iterator end() { return {Nt() + 1}; }
-public:
-	virtual double eta_ns() const;
 };
 
 #endif //FREDDI_NS_EVOLUTION_HPP

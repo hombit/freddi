@@ -21,7 +21,7 @@ FreddiNeutronStarEvolution::NeutronStarStructure::NeutronStarStructure(
 		dFmagn_dh(initialize_dFmagn_dh(evolution)),
 		d2Fmagn_dh2(initialize_d2Fmagn_dh2(evolution)) {
 	if (args_ns.Rdead > 0. && args_ns.Rdead < R_cor) {
-		throw std::logic_error("R_dead is positive and less than R_cor, it is obvious");
+		throw std::logic_error("R_dead is positive and less than R_cor, it is unacceptably");
 	}
 }
 
@@ -148,12 +148,58 @@ double FreddiNeutronStarEvolution::GeometricalNSMdotFraction::operator()(double 
 }
 
 
+FreddiNeutronStarEvolution::BasicNSAccretionEfficiency::~BasicNSAccretionEfficiency() {}
+
+double FreddiNeutronStarEvolution::BasicNSAccretionEfficiency::operator()(const double Rm) const {
+	const double Rx = freddi->R_x();
+	const double Risco = freddi->args().basic->risco;
+
+	if ((Rm > freddi->R_x()) && (Rm > Risco)) {
+		return RmIsFurthest(Rm);
+	}
+	if ((freddi->R_x() > Risco) && (freddi->R_x() > Rm)) {
+		return RxIsFurthest(Rm);
+	}
+	if ((Risco > freddi->R_x()) && (Risco > Rm)) {
+		return RiscoIsFurthest(Rm);
+	}
+	throw std::logic_error("Impossible relation between Rm, Rx and Risco");
+}
+
+double FreddiNeutronStarEvolution::DummyNSAccretionEfficiency::newtonian(const double Rm) const {
+	const double R_in = freddi->R()[freddi->first()];
+	const double Rg = freddi->R_g();
+	const double Rx = freddi->R_x();
+	return Rg * (1. / Rx - 0.5 / R_in);
+}
+
+double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::schwarzschild(const double Rm) const {
+	const double Rsch = 2.0 * freddi->R_g();
+	const double Rx = freddi->R_x();
+	return std::sqrt(1.0 - Rsch / Rm) - std::sqrt(1.0 - Rsch / Rx);
+}
+
+double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::small_magnetosphere(const double Rm) const {
+	const double freqx_kHz = freddi->ns_str_->args_ns.freqx / 1000.0;
+	// Eq. 1
+	const double eta_ns_plus_disk = 0.213 - 0.153 * freqx_kHz + 0.02 * m::pow<2>(freqx_kHz);
+	// Eq. 2
+	const double ns_to_ns_plus_disk = 0.737 - 0.312 * freqx_kHz - 0.19 * m::pow<2>(freqx_kHz);
+	const double eta_ns = eta_ns_plus_disk * ns_to_ns_plus_disk;
+	if (eta_ns < 0.0 && eta_ns > 1.0) {
+		throw std::logic_error("eta_ns must be in [0.0, 1.0]");
+	}
+	return eta_ns;
+}
+
+
 FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarArguments &args):
 		FreddiEvolution(args),
-		ns_str_(new NeutronStarStructure(*args.ns, this)) {
+		ns_str_(new NeutronStarStructure(*args.ns, this)),
+		fp_(initializeNsMdotFraction(*args.ns)),
+		eta_ns_(initializeNsAccretionEfficiency(*args.ns, this)) {
 	// Change initial condition due presence of magnetic field torque. It can spoil user-defined initial disk
 	// parameters, such as mass or Fout
-	initializeNsMdotFraction();
 	if (inverse_beta() <= 0.) {  // F_in is non-zero, Fmagn is zero everywhere
 		current_.F_in = k_t() * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
 		for (size_t i = 0; i < Nx(); i++) {
@@ -166,30 +212,44 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 	}
 }
 
-
-void FreddiNeutronStarEvolution::initializeNsMdotFraction() {
-	const auto fptype = ns_str_->args_ns.fptype;
-	const auto fpparams = ns_str_->args_ns.fpparams;
+std::shared_ptr<FreddiNeutronStarEvolution::BasicNSMdotFraction> FreddiNeutronStarEvolution::initializeNsMdotFraction(const NeutronStarArguments& args_ns) {
+	const auto& fptype = args_ns.fptype;
+	const auto& fpparams = args_ns.fpparams;
 	if (fptype == "no-outflow") {
-		fp_.reset(static_cast<BasicNSMdotFraction *>(new NoOutflowNSMdotFraction));
-	} else if (fptype == "propeller") {
-		fp_.reset(static_cast<BasicNSMdotFraction *>(new PropellerNSMdotFraction));
-	} else if (fptype == "corotation-block") {
-		fp_.reset(static_cast<BasicNSMdotFraction *>(new CorotationBlockNSMdotFraction));
-	} else if (fptype == "eksi-kultu2010") {
-		fp_.reset(static_cast<BasicNSMdotFraction *>(new EksiKultu2010NSMdotFraction));
-	} else if (fptype == "romanova2018") {
-		fp_.reset(static_cast<BasicNSMdotFraction *>(new Romanova2018NSMdotFraction(fpparams.at("par1"), fpparams.at("par2"))));
-	} else if (fptype == "geometrical") {
+		return std::make_shared<NoOutflowNSMdotFraction>();
+	}
+	if (fptype == "propeller") {
+		return std::make_shared<PropellerNSMdotFraction>();
+	}
+	if (fptype == "corotation-block") {
+		return std::make_shared<CorotationBlockNSMdotFraction>();
+	}
+	if (fptype == "eksi-kultu2010") {
+		return std::make_shared<EksiKultu2010NSMdotFraction>();
+	}
+	if (fptype == "romanova2018") {
+		return std::make_shared<Romanova2018NSMdotFraction>(fpparams.at("par1"), fpparams.at("par2"));
+	}
+	if (fptype == "geometrical") {
 		const double chi = fpparams.at("chi") * M_PI / 180.;
 		if (chi == 0) {
-			fp_.reset(static_cast<BasicNSMdotFraction *>(new CorotationBlockNSMdotFraction));
+			return std::make_shared<CorotationBlockNSMdotFraction>();
 		} else {
-			fp_.reset(static_cast<BasicNSMdotFraction *>(new GeometricalNSMdotFraction(chi)));
+			return std::make_shared<GeometricalNSMdotFraction>(chi);
 		}
-	} else {
-		throw std::logic_error("Wrong fptype");
 	}
+	throw std::invalid_argument("Wrong fptype");
+}
+
+std::shared_ptr<FreddiNeutronStarEvolution::BasicNSAccretionEfficiency> FreddiNeutronStarEvolution::initializeNsAccretionEfficiency(const NeutronStarArguments& args_ns, const FreddiNeutronStarEvolution* freddi) {
+	const auto& nsprop = args_ns.nsprop;
+	if (nsprop == "dummy") {
+		return std::make_shared<DummyNSAccretionEfficiency>(freddi);
+	}
+	if (nsprop == "sibgatullinsunyaev2000" || nsprop == "sibsun2000") {
+		return std::make_shared<SibgatullinSunyaev2000NSAccretionEfficiency>(freddi);
+	}
+	throw std::invalid_argument("Wrong nsprop");
 }
 
 
@@ -226,9 +286,7 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 		return;
 	}
 
-	const double R_alfven = epsilon_Alfven() *
-							std::pow(m::pow<4>(mu_magn()) / (m::pow<2>(Mdot_in()) * GM()), 1./7.);
-	double R_m = std::max(R_m_min(), R_alfven);
+	double R_m = std::max(R_m_min(), R_alfven());
 	R_m = std::min(R_m, R_dead());
 	size_t ii;
 	for (ii = first(); ii <= last() - 2; ii++) {
@@ -258,6 +316,10 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 double FreddiNeutronStarEvolution::Mdot_in() const {
 	const double dF_dh = (F()[first() + 1] - F()[first()]) / (h()[first() + 1] - h()[first()]);
 	return dF_dh + dFmagn_dh()[first()];
+}
+
+double FreddiNeutronStarEvolution::R_alfven() const {
+	return epsilon_Alfven() * std::pow(m::pow<4>(mu_magn()) / (m::pow<2>(Mdot_in()) * GM()), 1./7.);
 }
 
 IrradiatedStar::sources_t FreddiNeutronStarEvolution::star_irr_sources() {
@@ -305,13 +367,6 @@ const vecd& FreddiNeutronStarEvolution::Tph_X() {
 		opt_str_.Tph_X = std::move(x);
 	}
 	return *opt_str_.Tph_X;
-}
-
-
-double FreddiNeutronStarEvolution::eta_ns() const {
-	const double R_g = GM() / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
-	const double eta = R_g * (1. / R_x() - 0.5 / R()[first()]);
-	return eta;
 }
 
 double FreddiNeutronStarEvolution::Lbol_disk() const {

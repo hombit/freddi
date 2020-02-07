@@ -115,6 +115,7 @@ private:
 		size_t Nt;
 		size_t Nx;
 		double GM;
+		double R_g;
 		double eta;
 		double semiaxis;
 		double inclination;
@@ -175,6 +176,7 @@ public:
 	inline size_t Nt() const { return str_->Nt; }
 	inline size_t Nx() const { return str_->Nx; }
 	inline double GM() const { return str_->GM; }
+	inline double R_g() const { return str_->R_g; }
 	inline double eta() const { return str_->eta; }
 	inline double semiaxis() const { return str_->semiaxis; }
 	inline double inclination() const { return str_->inclination; }
