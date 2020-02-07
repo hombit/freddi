@@ -39,9 +39,9 @@ public:
 	virtual const vald& Qirr();
 	const vald& Teff();
 	double luminosity();
-	double dLdOmega(const UnitVec3& direction);
-	double dLdOmega(const UnitVec3& direction, double lambda);
-	double dLdOmega(const UnitVec3& direction, const Passband& passband);
+	double luminosity_direction(const UnitVec3& direction); // erg/s
+	double luminosity_direction(const UnitVec3& direction, double lambda); // erg/s/Hz
+	double luminosity_direction(const UnitVec3& direction, const Passband& passband); // erg/s/Hz
 };
 
 

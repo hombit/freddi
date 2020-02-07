@@ -290,11 +290,11 @@ IrradiatedStar::sources_t FreddiState::star_irr_sources() {
 
 
 double FreddiState::flux_star(const double lambda, const double phase) {
-	return star_.dLdOmega({inclination(), phase}, lambda) / m::pow<2>(distance());
+	return star_.luminosity_direction({inclination(), phase}, lambda) / m::pow<2>(distance());
 }
 
 double FreddiState::flux_star(const Passband& passband, const double phase) {
-	return star_.dLdOmega({inclination(), phase}, passband) / m::pow<2>(distance());
+	return star_.luminosity_direction({inclination(), phase}, passband) / m::pow<2>(distance());
 }
 
 

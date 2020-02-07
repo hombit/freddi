@@ -22,4 +22,5 @@ BOOST_AUTO_TEST_CASE(testStar_luminosity) {
 	const double solar_lum = GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * 4. * M_PI * m::pow<2>(solar_radius) * m::pow<4>(temp);
 	Star sun(temp, solar_radius, 5);
 	BOOST_CHECK_CLOSE(sun.luminosity(), solar_lum, 0.1);
+	BOOST_CHECK_CLOSE(sun.luminosity_direction({0.0, 0.0}), solar_lum / (4. * M_PI), 0.1);
 }
