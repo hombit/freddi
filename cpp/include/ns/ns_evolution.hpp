@@ -162,7 +162,7 @@ public:
 // eta_ns_
 public:
 	inline double eta_ns(double Rm) const { return (*eta_ns_)(Rm); }
-	inline double eta_ns() const { return eta_ns(R()[first()]); }
+	inline double eta_ns() const { return eta_ns(R_alfven()); }
 public:
 	using FreddiEvolution::step;
 	virtual double Mdot_in() const override;

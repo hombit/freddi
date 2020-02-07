@@ -154,14 +154,14 @@ double FreddiNeutronStarEvolution::BasicNSAccretionEfficiency::operator()(const 
 	const double Rx = freddi->R_x();
 	const double Risco = freddi->args().basic->risco;
 
-	if ((Rm > freddi->R_x()) && (Rm > Risco)) {
-		return RmIsFurthest(Rm);
-	}
-	if ((freddi->R_x() > Risco) && (freddi->R_x() > Rm)) {
+	if ((Rx >= Risco) && (Rx >= Rm)) {
 		return RxIsFurthest(Rm);
 	}
-	if ((Risco > freddi->R_x()) && (Risco > Rm)) {
+	if ((Risco >= Rx) && (Risco >= Rm)) {
 		return RiscoIsFurthest(Rm);
+	}
+	if ((Rm >= Rx) && (Rm >= Risco)) {
+		return RmIsFurthest(Rm);
 	}
 	throw std::logic_error("Impossible relation between Rm, Rx and Risco");
 }
