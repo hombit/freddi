@@ -160,10 +160,9 @@ double FreddiNeutronStarEvolution::BasicNSAccretionEfficiency::operator()(const 
 	if ((Risco >= Rx) && (Risco >= Rm)) {
 		return RiscoIsFurthest(Rm);
 	}
-	if ((Rm >= Rx) && (Rm >= Risco)) {
-		return RmIsFurthest(Rm);
-	}
-	throw std::logic_error("Impossible relation between Rm, Rx and Risco");
+	// ((Rm >= Rx) && (Rm >= Risco))
+	// Rm could be NaN
+	return RmIsFurthest(Rm);
 }
 
 double FreddiNeutronStarEvolution::DummyNSAccretionEfficiency::newtonian(const double Rm) const {
