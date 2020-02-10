@@ -92,38 +92,34 @@ private:
 	};
 
 	class BasicNSAccretionEfficiency {
-	protected:
-		const FreddiNeutronStarEvolution* freddi;
 	public:
-		BasicNSAccretionEfficiency(const FreddiNeutronStarEvolution* freddi): freddi(freddi) {}
 		virtual ~BasicNSAccretionEfficiency() = 0;
-		virtual double operator()(double Rm) const;
-		virtual double RmIsFurthest(double Rm) const = 0;
-		virtual double RxIsFurthest(double Rm) const = 0;
-		virtual double RiscoIsFurthest(double Rm) const = 0;
+		virtual double operator()(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+		virtual double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const = 0;
+		virtual double RxIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const = 0;
+		virtual double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const = 0;
 	};
 
 	class DummyNSAccretionEfficiency: public BasicNSAccretionEfficiency {
 	protected:
-		double newtonian(double Rm) const;
+		double newtonian(const FreddiNeutronStarEvolution& freddi, double Rm) const;
 	public:
-		using BasicNSAccretionEfficiency::BasicNSAccretionEfficiency;
 		~DummyNSAccretionEfficiency() override = default;
-		double RmIsFurthest(double Rm) const override { return newtonian(Rm); }
-		double RxIsFurthest(double Rm) const override { return newtonian(Rm); }
-		double RiscoIsFurthest(double Rm) const override { return newtonian(Rm); }
+		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return newtonian(freddi, Rm); }
+		double RxIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return newtonian(freddi, Rm); }
+		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return newtonian(freddi, Rm); }
 	};
 
 	class SibgatullinSunyaev2000NSAccretionEfficiency: public BasicNSAccretionEfficiency {
 	protected:
-		double schwarzschild(double Rm) const;
-		double small_magnetosphere(double Rm) const;
+		double schwarzschild(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+		double small_magnetosphere(const FreddiNeutronStarEvolution& freddi, double Rm) const;
 	public:
 		using BasicNSAccretionEfficiency::BasicNSAccretionEfficiency;
 		~SibgatullinSunyaev2000NSAccretionEfficiency() override = default;
-		double RmIsFurthest(double Rm) const override { return schwarzschild(Rm); }
-		double RxIsFurthest(double Rm) const override { return small_magnetosphere(Rm); }
-		double RiscoIsFurthest(double Rm) const override { return small_magnetosphere(Rm); }
+		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return schwarzschild(freddi, Rm); }
+		double RxIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
+		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
 	};
 private:
 	std::shared_ptr<const NeutronStarStructure> ns_str_;
@@ -161,7 +157,7 @@ public:
 	inline double fp() const { return fp(R()[first()]); }
 // eta_ns_
 public:
-	inline double eta_ns(double Rm) const { return (*eta_ns_)(Rm); }
+	inline double eta_ns(double Rm) const { return (*eta_ns_)(*this, Rm); }
 	inline double eta_ns() const { return eta_ns(R_alfven()); }
 public:
 	using FreddiEvolution::step;

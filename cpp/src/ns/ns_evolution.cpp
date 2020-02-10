@@ -150,36 +150,36 @@ double FreddiNeutronStarEvolution::GeometricalNSMdotFraction::operator()(double 
 
 FreddiNeutronStarEvolution::BasicNSAccretionEfficiency::~BasicNSAccretionEfficiency() {}
 
-double FreddiNeutronStarEvolution::BasicNSAccretionEfficiency::operator()(const double Rm) const {
-	const double Rx = freddi->R_x();
-	const double Risco = freddi->args().basic->risco;
+double FreddiNeutronStarEvolution::BasicNSAccretionEfficiency::operator()(const FreddiNeutronStarEvolution& freddi, const double Rm) const {
+	const double Rx = freddi.R_x();
+	const double Risco = freddi.args().basic->risco;
 
 	if ((Rx >= Risco) && (Rx >= Rm)) {
-		return RxIsFurthest(Rm);
+		return RxIsFurthest(freddi, Rm);
 	}
 	if ((Risco >= Rx) && (Risco >= Rm)) {
-		return RiscoIsFurthest(Rm);
+		return RiscoIsFurthest(freddi, Rm);
 	}
 	// ((Rm >= Rx) && (Rm >= Risco))
 	// Rm could be NaN
-	return RmIsFurthest(Rm);
+	return RmIsFurthest(freddi, Rm);
 }
 
-double FreddiNeutronStarEvolution::DummyNSAccretionEfficiency::newtonian(const double Rm) const {
-	const double R_in = freddi->R()[freddi->first()];
-	const double Rg = freddi->R_g();
-	const double Rx = freddi->R_x();
+double FreddiNeutronStarEvolution::DummyNSAccretionEfficiency::newtonian(const FreddiNeutronStarEvolution& freddi, const double Rm) const {
+	const double R_in = freddi.R()[freddi.first()];
+	const double Rg = freddi.R_g();
+	const double Rx = freddi.R_x();
 	return Rg * (1. / Rx - 0.5 / R_in);
 }
 
-double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::schwarzschild(const double Rm) const {
-	const double Rsch = 2.0 * freddi->R_g();
-	const double Rx = freddi->R_x();
+double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::schwarzschild(const FreddiNeutronStarEvolution& freddi, const double Rm) const {
+	const double Rsch = 2.0 * freddi.R_g();
+	const double Rx = freddi.R_x();
 	return std::sqrt(1.0 - Rsch / Rm) - std::sqrt(1.0 - Rsch / Rx);
 }
 
-double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::small_magnetosphere(const double Rm) const {
-	const double freqx_kHz = freddi->ns_str_->args_ns.freqx / 1000.0;
+double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::small_magnetosphere(const FreddiNeutronStarEvolution& freddi, const double Rm) const {
+	const double freqx_kHz = freddi.ns_str_->args_ns.freqx / 1000.0;
 	// Eq. 1
 	const double eta_ns_plus_disk = 0.213 - 0.153 * freqx_kHz + 0.02 * m::pow<2>(freqx_kHz);
 	// Eq. 2
@@ -243,10 +243,10 @@ std::shared_ptr<FreddiNeutronStarEvolution::BasicNSMdotFraction> FreddiNeutronSt
 std::shared_ptr<FreddiNeutronStarEvolution::BasicNSAccretionEfficiency> FreddiNeutronStarEvolution::initializeNsAccretionEfficiency(const NeutronStarArguments& args_ns, const FreddiNeutronStarEvolution* freddi) {
 	const auto& nsprop = args_ns.nsprop;
 	if (nsprop == "dummy") {
-		return std::make_shared<DummyNSAccretionEfficiency>(freddi);
+		return std::make_shared<DummyNSAccretionEfficiency>();
 	}
 	if (nsprop == "sibgatullinsunyaev2000" || nsprop == "sibsun2000") {
-		return std::make_shared<SibgatullinSunyaev2000NSAccretionEfficiency>(freddi);
+		return std::make_shared<SibgatullinSunyaev2000NSAccretionEfficiency>();
 	}
 	throw std::invalid_argument("Wrong nsprop");
 }
