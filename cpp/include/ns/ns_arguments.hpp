@@ -86,8 +86,6 @@ public:
 	std::shared_ptr<NeutronStarArguments> ns;
 public:
 	FreddiNeutronStarArguments() = default;
-	FreddiNeutronStarArguments(const FreddiArguments& freddi_args, NeutronStarArguments* ns):
-			FreddiArguments(freddi_args), ns(ns) {}
 	FreddiNeutronStarArguments(
 			GeneralArguments* general,
 			NeutronStarBasicDiskBinaryArguments* basic,

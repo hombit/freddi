@@ -55,12 +55,27 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(
 		const CalculationArguments& calc);
 
 boost::shared_ptr<NeutronStarArguments> make_neutron_star_arguments(
-		double Rx, double freqx, double Bx, double hotspotarea,
+		const std::string& nsprop,
+		const object& freqx, const object& Rx, double Bx, double hotspotarea,
 		double epsilonAlfven, double inversebeta, double Rdead,
 		const std::string& fptype, const object& fpparams_);
 
+boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_disk_binary_arguments(
+		const NeutronStarArguments& ns_args,
+		double alpha,
+		double Mx, double kerr,
+		double period,
+		double Mopt, const object& Ropt, double Topt,
+		const object& rin, const object& rout, const object& risco);
+
 boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments(
-		const FreddiArguments& freddi_args, const NeutronStarArguments& ns);
+		const GeneralArguments& general,
+		const NeutronStarBasicDiskBinaryArguments& basic,
+		const DiskStructureArguments& disk,
+		const SelfIrradiationArguments& irr,
+		const FluxArguments& flux,
+		const CalculationArguments& calc,
+		const NeutronStarArguments& ns);
 
 
 #endif //FREDDI_PYTHON_ARGUMENTS_HPP

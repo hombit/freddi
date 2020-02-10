@@ -96,18 +96,49 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(
 }
 
 boost::shared_ptr<NeutronStarArguments> make_neutron_star_arguments(
-		double Rx, double freqx, double Bx, double hotspotarea,
+		const std::string& nsprop,
+		const object& freqx, const object& Rx, double Bx, double hotspotarea,
 		double epsilonAlfven, double inversebeta, double Rdead,
 		const std::string& fptype, const object& fpparams_) {
 	return boost::make_shared<NeutronStarArguments>(
-			Rx, freqx, Bx, hotspotarea,
+			nsprop,
+			objToOpt<double>(freqx), objToOpt<double>(Rx), Bx, hotspotarea,
 			epsilonAlfven, inversebeta, Rdead,
 			fptype, mapping_to_map(fpparams_));
 }
 
+boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_disk_binary_arguments(
+		const NeutronStarArguments& ns_args,
+		double alpha,
+		double Mx, double kerr,
+		double period,
+		double Mopt, const object& Ropt, double Topt,
+		const object& rin, const object& rout, const object& risco) {
+	return boost::make_shared<NeutronStarBasicDiskBinaryArguments>(
+			ns_args,
+			alpha,
+			Mx, kerr,
+			period,
+			Mopt, objToOpt<double>(Ropt), Topt,
+			objToOpt<double>(rin), objToOpt<double>(rout), objToOpt<double>(risco));
+}
+
 boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments(
-		const FreddiArguments& freddi_args, const NeutronStarArguments& ns) {
-	return boost::make_shared<FreddiNeutronStarArguments>(freddi_args, new NeutronStarArguments(ns));
+		const GeneralArguments& general,
+		const NeutronStarBasicDiskBinaryArguments& basic,
+		const DiskStructureArguments& disk,
+		const SelfIrradiationArguments& irr,
+		const FluxArguments& flux,
+		const CalculationArguments& calc,
+		const NeutronStarArguments& ns) {
+	return boost::make_shared<FreddiNeutronStarArguments>(
+			new GeneralArguments(general),
+			new NeutronStarBasicDiskBinaryArguments(basic),
+			new DiskStructureArguments(disk),
+			new SelfIrradiationArguments(irr),
+			new FluxArguments(flux),
+			new CalculationArguments(calc),
+			new NeutronStarArguments(ns));
 }
 
 
@@ -175,7 +206,8 @@ void wrap_arguments() {
 	;
 	class_<NeutronStarArguments>("_NeutronStarArguments", no_init)
 		.def("__init__", make_constructor(make_neutron_star_arguments, default_call_policies(),
-				(arg("Rx"),
+				(arg("nsprop"),
+				 arg("Rx"),
 				 arg("freqx"),
 				 arg("Bx"),
 				 arg("hotspotarea"),
