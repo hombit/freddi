@@ -177,7 +177,11 @@ object raw_make_evolution(const tuple& args, const dict& kwargs) {
 
 
 dict neutron_star_evolution_required_args() {
-	return evolution_required_args();
+	auto kw = evolution_required_args();
+
+	kw["Bx"] = 0.0;
+
+	return kw;
 }
 
 
@@ -188,7 +192,6 @@ dict neutron_star_evolution_kwdefaults() {
 	kw["nsprop"] = NeutronStarArguments::default_nsprop;
 	kw["freqx"] = object();
 	kw["Rx"] = object();
-	kw["Bx"] = NeutronStarArguments::default_Bx;
 	kw["hotspotarea"] = NeutronStarArguments::default_hotspotarea;
 	kw["epsilonAlfven"] = NeutronStarArguments::default_epsilonAlfven;
 	kw["inversebeta"] = NeutronStarArguments::default_inversebeta;

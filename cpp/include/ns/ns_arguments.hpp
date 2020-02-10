@@ -15,7 +15,6 @@ namespace SibgatullinSunyaev2000Geometry {
 class NeutronStarArguments {
 public:
 	constexpr static const char default_nsprop[] = "dummy";
-	constexpr static const double default_Bx = 0.;
 	constexpr static const double default_hotspotarea = 1.;
 	constexpr static const double default_epsilonAlfven = 1.;
 	constexpr static const double default_inversebeta = 0.;

@@ -24,7 +24,7 @@ jobs:
         run: ./freddi --fulldata --starflux
         working-directory: ./cmake-build
       - name: Run freddi-ns
-        run: ./freddi-ns --fulldata --starflux
+        run: ./freddi-ns --Bx=1e8 --fulldata --starflux
         working-directory: ./cmake-build
       - name: Unit tests
         run: ctest -V

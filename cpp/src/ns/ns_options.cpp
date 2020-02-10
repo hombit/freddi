@@ -39,7 +39,7 @@ po::options_description NeutronStarOptions::description() {
 																				 "  sibatullin-sunyaev2000: NS radiation efficiency, and default values of Rx and Risco are functions of NS frequency, that's why --freqx must be specified explicitly")
 			( "freqx", po::value<double>(), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
 			( "Rx", po::value<double>(), "Accretor radius, cm" )
-			( "Bx", po::value<double>()->default_value(default_Bx), "Accretor polar magnetic induction, G" )
+			( "Bx", po::value<double>()->required(), "Accretor polar magnetic induction, G" )
 			( "hotspotarea", po::value<double>()->default_value(default_hotspotarea), "??? Relative area of hot spot on the accretor" )
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Factor in Alfven radius formula" )
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "???" )
