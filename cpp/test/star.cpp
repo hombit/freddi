@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(testStar_luminosity_passband) {
 }
 
 
-BOOST_AUTO_TEST_CASE(testIrrPoint_Star_luminosity) {
+BOOST_AUTO_TEST_CASE(testIrrStar_point_source) {
 	const double temp = 5000;
 	const double radius = 5e10;
 	const double Lx = 1e36;
@@ -67,10 +67,31 @@ BOOST_AUTO_TEST_CASE(testIrrPoint_Star_luminosity) {
 
 	const double lum_cold = GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * 4. * M_PI * m::pow<2>(radius) * m::pow<4>(temp);
 	// https://en.wikipedia.org/wiki/Solid_angle#Cone,_spherical_cap,_hemisphere
-	const double omega_star = 4.0 * M_PI * m::pow<2>(radius / (2.0 * semiaxis));
+	// theta = arcsin(R / a)
+	const double omega_star = 2.0 * M_PI * (1.0 - std::sqrt(1.0 - m::pow<2>(radius / semiaxis)));
 	const double lum_irr = Lx * omega_star / (4.0 * M_PI);
 
-	BOOST_CHECK_CLOSE(star.luminosity(), lum_cold + lum_irr, 1.0);
+	BOOST_CHECK_CLOSE(star.luminosity(), lum_cold + lum_irr, 1);
+}
+
+
+BOOST_AUTO_TEST_CASE(testIrrStar_shadowed_source) {
+	const double temp = 5000;
+	const double radius = 5e10;
+	const double Lx = 1e100;
+	const double semiaxis = 1e12;
+
+	const Vec3 position(-semiaxis, 0.0, 0.0);
+	const double sin = radius / semiaxis;
+	// disk h/r = tg = sin / sqrt(1 - sin^2)
+	const double height2radius = sin / std::sqrt(1.0 - m::pow<2>(sin));
+	IrradiatedStar::sources_t sources;
+	sources.push_back(std::make_unique<PointAccretorSource>(position, Lx, height2radius));
+	IrradiatedStar star(std::move(sources), temp, radius, 3);
+
+	const double lum_cold = GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * 4. * M_PI * m::pow<2>(radius) * m::pow<4>(temp);
+
+	BOOST_CHECK_CLOSE(star.luminosity(), lum_cold, 1);
 }
 
 
@@ -81,7 +102,8 @@ constexpr static const std::array<std::array<double, 101>, 3> discostar_lum_dir 
 }};
 constexpr static const std::array<double, 3> discostar_lambdas = {{angstromToCm(6410.0), angstromToCm(5510.0), angstromToCm(3465)}};
 
-#include <fstream>
+/*
+//#include <fstream>
 BOOST_AUTO_TEST_CASE(discostar_comparison) {
 	const double Mx = sunToGram(1.4);
 	const double Mopt = sunToGram(0.55);
@@ -105,14 +127,15 @@ BOOST_AUTO_TEST_CASE(discostar_comparison) {
 
 	for (size_t i_lambda = 0; i_lambda < discostar_lambdas.size(); ++i_lambda) {
 		const double lambda = discostar_lambdas[i_lambda];
-		std::ofstream file("/Users/hombit/tmp/" + std::to_string(cmToAngstrom(lambda)) + ".dat");
+//		std::ofstream file("/Users/hombit/tmp/" + std::to_string(cmToAngstrom(lambda)) + ".dat");
 		const size_t n = discostar_lum_dir[i_lambda].size();
 		for (size_t i = 0; i < n; ++i) {
 			const double phase = 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(n - 1);
 			const double value = delta_lambda * GSL_CONST_CGSM_SPEED_OF_LIGHT / m::pow<2>(lambda)
 								 * star.luminosity({inclination, phase}, lambda);
-			file << phase << "\t" << value << std::endl;
+//			file << phase << "\t" << value << std::endl;
 			BOOST_CHECK_CLOSE(value, 4.0 * M_PI * discostar_lum_dir[i_lambda][i], 15);
 		}
 	}
 }
+*/
