@@ -70,23 +70,24 @@ double Star::luminosity() {
 	return *irr_.luminosity;
 }
 
-double Star::luminosity_direction(const UnitVec3& direction) {
+double Star::luminosity(const UnitVec3& direction) {
 	const double integral = integrate([this](size_t i) -> double {
 			return m::pow<4>(Teff()[i]);
 		}, direction);
-	return GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT / M_PI * integral;
+	// 4 = 4 pi / pi; 1/pi = intensity / flux
+	return 4.0 * GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * integral;
 }
 
-double Star::luminosity_direction(const UnitVec3& direction, double lambda) {
+double Star::luminosity(const UnitVec3& direction, double lambda) {
 	return integrate([this, lambda](size_t i) -> double {
 			return Spectrum::Planck_lambda(Teff()[i], lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT;
 		},
-			direction);
+			direction) * FOUR_M_PI;
 }
 
-double Star::luminosity_direction(const UnitVec3& direction, const Passband& passband) {
+double Star::luminosity(const UnitVec3& direction, const Passband& passband) {
 	return integrate([this, &passband](size_t i) -> double { return passband.bb_nu(Teff()[i]); },
-			direction);
+			direction) * FOUR_M_PI;
 }
 
 IrrSource::IrrSource(const Vec3& position):
@@ -100,7 +101,7 @@ double IrrSource::irr_flux(const Vec3& coord, const UnitVec3& normal) const {
 	if (shadow(direction)) {
 		return 0;
 	}
-	return irr_dLdOmega(direction) / m::pow<2>(distance.length()) * cos_object(direction, normal);
+	return irr_luminosity(direction) / (FOUR_M_PI * m::pow<2>(distance.length())) * cos_object(direction, normal);
 }
 
 const Vec3& IrrSource::position() const {
@@ -127,8 +128,8 @@ double PointLikeSource::luminosity() const {
 }
 
 
-double PointSource::irr_dLdOmega(const UnitVec3& direction) const {
-	return luminosity() / FOUR_M_PI;
+double PointSource::irr_luminosity(const UnitVec3& direction) const {
+	return luminosity();
 }
 
 PointSource::~PointSource() {}
@@ -144,7 +145,7 @@ const UnitVec3& ElementaryPlainSource::plain_normal() const {
 	return plain_normal_;
 }
 
-double ElementaryPlainSource::irr_dLdOmega(const UnitVec3& direction) const {
+double ElementaryPlainSource::irr_luminosity(const UnitVec3& direction) const {
 	const double cos_source = std::abs(plain_normal().dotProduct(direction));
 	return luminosity() * 2.0 * cos_source;
 }

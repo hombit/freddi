@@ -39,9 +39,11 @@ public:
 	virtual const vald& Qirr();
 	const vald& Teff();
 	double luminosity();
-	double luminosity_direction(const UnitVec3& direction); // erg/s
-	double luminosity_direction(const UnitVec3& direction, double lambda); // erg/s/Hz
-	double luminosity_direction(const UnitVec3& direction, const Passband& passband); // erg/s/Hz
+	// "Luminosity in direction" is luminosity of isotropic source with given 4\pi $\int \dS I$, where I is intensity
+	// for given direction. Observable flux is "luminosity in direction" / (4 \pi d^2)
+	double luminosity(const UnitVec3& direction); // erg/s
+	double luminosity(const UnitVec3& direction, double lambda); // erg/s/Hz
+	double luminosity(const UnitVec3& direction, const Passband& passband); // erg/s/Hz
 };
 
 
@@ -55,7 +57,8 @@ public:
 	virtual IrrSource* clone() const = 0;
 	const Vec3& position() const;
 	double irr_flux(const Vec3& coord, const UnitVec3& normal) const;
-	virtual double irr_dLdOmega(const UnitVec3& direction) const = 0;
+	// "Luminosity in direction"
+	virtual double irr_luminosity(const UnitVec3& direction) const = 0;
 	virtual bool shadow(const UnitVec3& direction) const = 0; // true for shadowed direction
 protected:
 	static double cos_object(const UnitVec3& unit_distance, const UnitVec3& normal);
@@ -78,7 +81,7 @@ public:
 	using PointLikeSource::PointLikeSource;
 	~PointSource() override = 0;
 public:
-	double irr_dLdOmega(const UnitVec3& direction) const override;
+	double irr_luminosity(const UnitVec3& direction) const override;
 };
 
 
@@ -90,7 +93,7 @@ public:
 	~ElementaryPlainSource() override = 0;
 public:
 	const UnitVec3& plain_normal() const;
-	double irr_dLdOmega(const UnitVec3& direction) const override;
+	double irr_luminosity(const UnitVec3& direction) const override;
 };
 
 
