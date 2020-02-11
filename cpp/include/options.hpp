@@ -8,6 +8,7 @@
 
 #include <array>
 #include <fstream>
+#include <iostream>
 #include <string>
 
 #include <boost/program_options.hpp>
@@ -85,7 +86,7 @@ std::optional<T> varToOpt(const po::variables_map& vm, const std::string& name) 
 }
 
 template <typename Options>
-po::variables_map parseOptions(int ac, char* av[]) {
+bool parseOptions(po::variables_map& vm, int ac, char* av[]) {
 	const std::string default_config_filename = "freddi.ini";
 
 	const char* home = getenv("HOME");
@@ -96,18 +97,30 @@ po::variables_map parseOptions(int ac, char* av[]) {
 	}
 
 	auto desc = Options::description();
-	po::variables_map vm;
-	po::store( po::parse_command_line(ac, av, desc), vm );
+	po::store(po::parse_command_line(ac, av, desc), vm);
+
+	if (vm.count("help") > 0) {
+		std::cout << desc << std::endl;
+		return false;
+	}
+
 	if (vm.count("config") > 0) {
 		config_file_paths.insert(config_file_paths.begin(), vm["config"].as<std::string>());
 	}
 
-	for (const auto &path : config_file_paths){
+	for (const auto &path : config_file_paths) {
 		std::ifstream config(path);
 		po::store(po::parse_config_file(config, desc), vm);
 	}
-	po::notify(vm);
-	return vm;
+
+	try {
+		po::notify(vm);
+	} catch(po::error& e) {
+		std::cerr << "Error: " << e.what() << std::endl;
+		return false;
+	}
+
+	return true;
 }
 
 #endif //FREDDI_OPTIONS_HPP

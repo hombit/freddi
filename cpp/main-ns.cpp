@@ -5,6 +5,8 @@
 
 
 int main(int ac, char *av[]) {
-	run_application< FreddiNeutronStarFileOutput, FreddiNeutronStarOptions, FreddiNeutronStarEvolution>(ac, av);
+	if (! run_application< FreddiNeutronStarFileOutput, FreddiNeutronStarOptions, FreddiNeutronStarEvolution>(ac, av)){
+		return 1;
+	}
 	return 0;
 }
