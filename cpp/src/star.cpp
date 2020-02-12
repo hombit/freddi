@@ -94,23 +94,7 @@ double Star::luminosity(const UnitVec3& direction, const Passband& passband) {
 			direction) * FOUR_M_PI;
 }
 
-IrrSource::IrrSource(const Vec3& position):
-		position_(position) {}
-
 IrrSource::~IrrSource()	{}
-
-double IrrSource::irr_flux(const Vec3& coord, const UnitVec3& normal) const {
-	const auto distance = coord - position();
-	const UnitVec3 direction(distance);
-	if (shadow(direction)) {
-		return 0;
-	}
-	return irr_luminosity(direction) / (FOUR_M_PI * m::pow<2>(distance.length())) * cos_object(direction, normal);
-}
-
-const Vec3& IrrSource::position() const {
-	return position_;
-}
 
 double IrrSource::cos_object(const UnitVec3& unit_distance, const UnitVec3& normal) {
 	double cos = -unit_distance.dotProduct(normal);
@@ -122,10 +106,23 @@ double IrrSource::cos_object(const UnitVec3& unit_distance, const UnitVec3& norm
 
 
 PointLikeSource::PointLikeSource(const Vec3& position, const double luminosity):
-		IrrSource(position),
+		position_(position),
 		luminosity_(luminosity) {}
 
 PointLikeSource::~PointLikeSource() {}
+
+double PointLikeSource::irr_flux(const Vec3& coord, const UnitVec3& normal) const {
+	const auto distance = coord - position();
+	const UnitVec3 direction(distance);
+	if (shadow(direction)) {
+		return 0;
+	}
+	return irr_luminosity(direction) / (FOUR_M_PI * m::pow<2>(distance.length())) * cos_object(direction, normal);
+}
+
+const Vec3& PointLikeSource::position() const {
+	return position_;
+}
 
 double PointLikeSource::luminosity() const {
 	return luminosity_;
@@ -155,8 +152,7 @@ double ElementaryPlainSource::irr_luminosity(const UnitVec3& direction) const {
 }
 
 
-DiskShadowSource::DiskShadowSource(const Vec3& position, double relative_semiheight):
-		IrrSource(position),
+DiskShadowSource::DiskShadowSource(double relative_semiheight):
 		relative_semiheight_squared_(m::pow<2>(relative_semiheight)) {}
 
 DiskShadowSource::~DiskShadowSource() {}
@@ -172,9 +168,8 @@ double DiskShadowSource::relative_semiheight_squared() const {
 
 
 PointAccretorSource::PointAccretorSource(const Vec3& position, double luminosity, double relative_semiheight):
-		IrrSource(position),
 		PointSource(position, luminosity),
-		DiskShadowSource(position, relative_semiheight) {}
+		DiskShadowSource(relative_semiheight) {}
 
 PointAccretorSource* PointAccretorSource::clone() const {
 	return new PointAccretorSource(*this);
@@ -182,9 +177,8 @@ PointAccretorSource* PointAccretorSource::clone() const {
 
 CentralDiskSource::CentralDiskSource(const Vec3& position, const UnitVec3& plain_normal,
 									 const double luminosity, const double relative_semiheight):
-		IrrSource(position),
 		ElementaryPlainSource(position, plain_normal, luminosity),
-		DiskShadowSource(position, relative_semiheight) {}
+		DiskShadowSource(relative_semiheight) {}
 
 CentralDiskSource* CentralDiskSource::clone() const {
 	return new CentralDiskSource(*this);

@@ -49,17 +49,11 @@ public:
 
 
 class IrrSource {
-protected:
-	Vec3 position_;
 public:
-	IrrSource(const Vec3& position);
 	virtual ~IrrSource() = 0;
 public:
 	virtual IrrSource* clone() const = 0;
-	const Vec3& position() const;
-	double irr_flux(const Vec3& coord, const UnitVec3& normal) const;
-	// "Luminosity in direction"
-	virtual double irr_luminosity(const UnitVec3& direction) const = 0;
+	virtual double irr_flux(const Vec3& coord, const UnitVec3& normal) const = 0;
 	virtual bool shadow(const UnitVec3& direction) const = 0; // true for shadowed direction
 protected:
 	static double cos_object(const UnitVec3& unit_distance, const UnitVec3& normal);
@@ -68,11 +62,15 @@ protected:
 
 class PointLikeSource: virtual public IrrSource {
 protected:
+	Vec3 position_;
 	double luminosity_;
 public:
 	PointLikeSource(const Vec3& position, double luminosity);
 	~PointLikeSource() override = 0;
+	double irr_flux(const Vec3& coord, const UnitVec3& normal) const override;
+	virtual double irr_luminosity(const UnitVec3& direction) const = 0; // "Luminosity in direction"
 public:
+	const Vec3& position() const;
 	double luminosity() const;
 };
 
@@ -102,7 +100,7 @@ class DiskShadowSource: virtual public IrrSource {
 protected:
 	double relative_semiheight_squared_;
 public:
-	DiskShadowSource(const Vec3& position, double relative_semiheight);
+	DiskShadowSource(double relative_semiheight);
 	~DiskShadowSource() override = 0;
 public:
 	double relative_semiheight_squared() const;
