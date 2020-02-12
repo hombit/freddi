@@ -78,6 +78,10 @@ double Star::luminosity(const UnitVec3& direction) {
 	return 4.0 * GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * integral;
 }
 
+// "Luminosity in direction" is luminosity of isotropic spherical source of radius R with luminosity given by
+// 4\pi R^2 \pi B_\nu. "Luminosity in direction" = 4 \pi \int \dS cos{n} B_nu. Observable flux is
+// "luminosity in direction" / (4 \pi d^2)
+
 double Star::luminosity(const UnitVec3& direction, double lambda) {
 	return integrate([this, lambda](size_t i) -> double {
 			return Spectrum::Planck_lambda(Teff()[i], lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT;
@@ -159,7 +163,7 @@ DiskShadowSource::~DiskShadowSource() {}
 
 bool DiskShadowSource::shadow(const UnitVec3& direction) const {
 	const double rho2 = m::pow<2>(direction.x()) + m::pow<2>(direction.y());
-	return m::pow<2>(direction.z()) / rho2 < relative_semiheight_squared();
+	return (m::pow<2>(direction.z()) / rho2) < relative_semiheight_squared();
 }
 
 double DiskShadowSource::relative_semiheight_squared() const {

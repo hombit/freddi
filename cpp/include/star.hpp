@@ -39,9 +39,10 @@ public:
 	virtual const vald& Qirr();
 	const vald& Teff();
 	double luminosity();
-	// "Luminosity in direction" is luminosity of isotropic source with given 4\pi $\int \dS I$, where I is intensity
-	// for given direction. Observable flux is "luminosity in direction" / (4 \pi d^2)
 	double luminosity(const UnitVec3& direction); // erg/s
+	// "Luminosity in direction" is luminosity of isotropic spherical source of radius R with luminosity given by
+	// 4\pi R^2 \pi B_\nu. "Luminosity in direction" = 4 \pi \int \dS cos{n} B_nu. Observable flux is
+	// "luminosity in direction" / (4 \pi d^2)
 	double luminosity(const UnitVec3& direction, double lambda); // erg/s/Hz
 	double luminosity(const UnitVec3& direction, const Passband& passband); // erg/s/Hz
 };
