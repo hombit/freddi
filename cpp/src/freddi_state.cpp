@@ -280,11 +280,10 @@ double FreddiState::Luminosity(const vecd& T, double nu1, double nu2) const {
 IrradiatedStar::sources_t FreddiState::star_irr_sources() {
 	const Vec3 position(-semiaxis(), 0.0, 0.0);
 	const UnitVec3 normal(0.0, 0.0);
-	const double luminosity = (1.0 - args().flux->star_albedo) * Lbol_disk();
 	const double Height2R = Height()[last()] / R()[last()];
 
 	IrradiatedStar::sources_t sources;
-	sources.push_back(std::make_unique<CentralDiskSource>(position, normal, luminosity, Height2R));
+	sources.push_back(std::make_unique<CentralDiskSource>(position, normal, Lbol_disk(), args().flux->star_albedo, Height2R));
 	return sources;
 }
 

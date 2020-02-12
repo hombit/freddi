@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(testIrrStar_point_source) {
 
 	const Vec3 position(-semiaxis, 0.0, 0.0);
 	IrradiatedStar::sources_t sources;
-	sources.push_back(std::make_unique<PointAccretorSource>(position, Lx, 0.0));
+	sources.push_back(std::make_unique<PointAccretorSource>(position, Lx, 0.0, 0.0));
 	IrradiatedStar star(std::move(sources), temp, radius, 3);
 
 	const double lum_th = GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * 4. * M_PI * m::pow<2>(radius) * m::pow<4>(temp);
@@ -73,6 +73,30 @@ BOOST_AUTO_TEST_CASE(testIrrStar_point_source) {
 	const double lum_irr = Lx * omega_star / (4.0 * M_PI);
 
 	BOOST_CHECK_CLOSE(star.luminosity(), lum_th + lum_irr, 1);
+}
+
+
+BOOST_AUTO_TEST_CASE(testIrrStar_albedo) {
+	const double radius = 5e10;
+	const double semiaxis = 1e12;
+	const double Lx = 1e36;
+
+	const Vec3 position(-semiaxis, 0.0, 0.0);
+	IrradiatedStar star({}, 0, radius, 3);
+
+	const double albedo0 = 0.0;
+	IrradiatedStar::sources_t sources0;
+	sources0.push_back(std::make_unique<PointAccretorSource>(position, Lx, albedo0, 0.0));
+	star.set_sources(std::move(sources0));
+	const double lum0 = star.luminosity();
+
+	const double albedo1 = 0.37;
+	IrradiatedStar::sources_t sources1;
+	sources1.push_back(std::make_unique<PointAccretorSource>(position, Lx, albedo1, 0.0));
+	star.set_sources(std::move(sources1));
+	const double lum1 = star.luminosity();
+
+	BOOST_CHECK_CLOSE(lum0 / (1.0 - albedo0), lum1 / (1.0 - albedo1), 1e-6);
 }
 
 
@@ -87,7 +111,7 @@ BOOST_AUTO_TEST_CASE(testIrrStar_shadowed_source) {
 	// disk h/r = tg = sin / sqrt(1 - sin^2)
 	const double height2radius = sin / std::sqrt(1.0 - m::pow<2>(sin));
 	IrradiatedStar::sources_t sources;
-	sources.push_back(std::make_unique<PointAccretorSource>(position, Lx, height2radius));
+	sources.push_back(std::make_unique<PointAccretorSource>(position, Lx, 0.0, height2radius));
 	IrradiatedStar star(std::move(sources), temp, radius, 3);
 
 	const double lum_th = GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * 4. * M_PI * m::pow<2>(radius) * m::pow<4>(temp);

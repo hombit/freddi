@@ -55,8 +55,9 @@ public:
 	virtual IrrSource* clone() const = 0;
 	virtual double irr_flux(const Vec3& coord, const UnitVec3& normal) const = 0;
 	virtual bool shadow(const UnitVec3& direction) const = 0; // true for shadowed direction
+	virtual double albedo(double cos_object) const = 0; // A part of irradiation reflected by an object
 protected:
-	static double cos_object(const UnitVec3& unit_distance, const UnitVec3& normal);
+	static double cos_object(const UnitVec3& direction, const UnitVec3& normal);
 };
 
 
@@ -96,6 +97,17 @@ public:
 };
 
 
+class ConstantAlbedoSource: virtual public IrrSource {
+protected:
+	double albedo_;
+public:
+	ConstantAlbedoSource(double albedo);
+	virtual ~ConstantAlbedoSource() = 0;
+public:
+	double albedo(double cos_object) const override;
+};
+
+
 class DiskShadowSource: virtual public IrrSource {
 protected:
 	double relative_semiheight_squared_;
@@ -108,19 +120,19 @@ public:
 };
 
 
-class PointAccretorSource: public PointSource, public DiskShadowSource {
+class PointAccretorSource: public PointSource, public ConstantAlbedoSource, public DiskShadowSource {
 public:
-	PointAccretorSource(const Vec3& position, double luminosity, double relative_semiheight);
+	PointAccretorSource(const Vec3& position, double luminosity, double albedo, double relative_semiheight);
 	~PointAccretorSource() override = default;
 public:
 	PointAccretorSource* clone() const override;
 };
 
 
-class CentralDiskSource: public ElementaryPlainSource, public DiskShadowSource {
+class CentralDiskSource: public ElementaryPlainSource, public ConstantAlbedoSource, public DiskShadowSource {
 public:
 	CentralDiskSource(const Vec3& position, const UnitVec3& plain_normal,
-					  double luminosity, double relative_semiheight);
+					  double luminosity, double albedo, double relative_semiheight);
 	~CentralDiskSource() override = default;
 public:
 	CentralDiskSource* clone() const override;

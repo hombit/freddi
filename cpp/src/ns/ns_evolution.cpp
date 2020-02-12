@@ -323,11 +323,10 @@ double FreddiNeutronStarEvolution::R_alfven() const {
 
 IrradiatedStar::sources_t FreddiNeutronStarEvolution::star_irr_sources() {
 	const Vec3 position(-semiaxis(), 0.0, 0.0);
-	const double luminosity = (1.0 - args().flux->star_albedo) * Lbol_ns();
 	const double Height2R = Height()[last()] / R()[last()];
 
 	auto sources = FreddiEvolution::star_irr_sources();
-	sources.push_back(std::make_unique<PointAccretorSource>(position, luminosity, Height2R));
+	sources.push_back(std::make_unique<PointAccretorSource>(position, Lbol_ns(), args().flux->star_albedo, Height2R));
 	return sources;
 }
 

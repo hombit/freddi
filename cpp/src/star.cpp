@@ -96,8 +96,8 @@ double Star::luminosity(const UnitVec3& direction, const Passband& passband) {
 
 IrrSource::~IrrSource()	{}
 
-double IrrSource::cos_object(const UnitVec3& unit_distance, const UnitVec3& normal) {
-	double cos = -unit_distance.dotProduct(normal);
+double IrrSource::cos_object(const UnitVec3& direction, const UnitVec3& normal) {
+	double cos = -direction.dotProduct(normal);
 	if (cos <= 0.0) {
 		return 0.0;
 	}
@@ -117,7 +117,8 @@ double PointLikeSource::irr_flux(const Vec3& coord, const UnitVec3& normal) cons
 	if (shadow(direction)) {
 		return 0;
 	}
-	return irr_luminosity(direction) / (FOUR_M_PI * m::pow<2>(distance.length())) * cos_object(direction, normal);
+	const double cos_obj = cos_object(direction, normal);
+	return irr_luminosity(direction) * (1.0 - albedo(cos_obj)) / (FOUR_M_PI * m::pow<2>(distance.length())) * cos_obj;
 }
 
 const Vec3& PointLikeSource::position() const {
@@ -152,6 +153,16 @@ double ElementaryPlainSource::irr_luminosity(const UnitVec3& direction) const {
 }
 
 
+ConstantAlbedoSource::ConstantAlbedoSource(double albedo):
+		albedo_(albedo) {}
+
+ConstantAlbedoSource::~ConstantAlbedoSource() {}
+
+double ConstantAlbedoSource::albedo(const double cos_object) const {
+	return albedo_;
+}
+
+
 DiskShadowSource::DiskShadowSource(double relative_semiheight):
 		relative_semiheight_squared_(m::pow<2>(relative_semiheight)) {}
 
@@ -167,8 +178,10 @@ double DiskShadowSource::relative_semiheight_squared() const {
 }
 
 
-PointAccretorSource::PointAccretorSource(const Vec3& position, double luminosity, double relative_semiheight):
+PointAccretorSource::PointAccretorSource(const Vec3& position, const double luminosity, const double albedo,
+										 const double relative_semiheight):
 		PointSource(position, luminosity),
+		ConstantAlbedoSource(albedo),
 		DiskShadowSource(relative_semiheight) {}
 
 PointAccretorSource* PointAccretorSource::clone() const {
@@ -176,8 +189,9 @@ PointAccretorSource* PointAccretorSource::clone() const {
 }
 
 CentralDiskSource::CentralDiskSource(const Vec3& position, const UnitVec3& plain_normal,
-									 const double luminosity, const double relative_semiheight):
+									 const double luminosity, const double albedo, const double relative_semiheight):
 		ElementaryPlainSource(position, plain_normal, luminosity),
+		ConstantAlbedoSource(albedo),
 		DiskShadowSource(relative_semiheight) {}
 
 CentralDiskSource* CentralDiskSource::clone() const {
