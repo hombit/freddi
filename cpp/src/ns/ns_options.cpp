@@ -70,13 +70,36 @@ po::options_description NeutronStarBasicDiskBinaryOptions::description() {
 }
 
 
+NeutronStarSelfIrradiationOptions::NeutronStarSelfIrradiationOptions(const po::variables_map& vm, const DiskStructureArguments& dsa_args):
+		NeutronStarSelfIrradiationArguments(
+				vm["Cirr"].as<double>(),
+				vm["irrindex"].as<double>(),
+				vm["Cirrcold"].as<double>(),
+				vm["irrindexcold"].as<double>(),
+				vm["angulardistdisk"].as<std::string>(),
+				vm["angulardistns"].as<std::string>()) {
+	if (Cirr <= 0. && dsa_args.boundcond == "Tirr") {
+		throw po::error("Set positive --Cirr when --boundcond=Tirr");
+	}
+}
+
+po::options_description NeutronStarSelfIrradiationOptions::description() {
+	auto od = SelfIrradiationOptions::description();
+	od.add_options()
+			( "angulardistns", po::value<std::string>()->default_value(default_angular_dist_ns), "Angular distribution type of the neutron star X-ray radiation. Values: isotropic, plane" )
+			;
+	return od;
+}
+
+
 FreddiNeutronStarOptions::FreddiNeutronStarOptions(const po::variables_map &vm) {
 	ns.reset(new NeutronStarOptions(vm));
 
 	general.reset(new GeneralOptions(vm));
 	basic.reset(new NeutronStarBasicDiskBinaryOptions(vm, *ns));
 	disk.reset(new DiskStructureOptions(vm, *basic));
-	irr.reset(new SelfIrradiationOptions(vm, *disk));
+	irr_ns.reset(new NeutronStarSelfIrradiationOptions(vm, *disk));
+	irr = irr_ns;
 	flux.reset(new FluxOptions(vm));
 	calc.reset(new CalculationOptions(vm));
 }
@@ -87,7 +110,7 @@ po::options_description FreddiNeutronStarOptions::description() {
 	desc.add(NeutronStarBasicDiskBinaryOptions::description());
 	desc.add(DiskStructureOptions::description());
 	desc.add(NeutronStarOptions::description());
-	desc.add(SelfIrradiationOptions::description());
+	desc.add(NeutronStarSelfIrradiationOptions::description());
 	desc.add(FluxOptions::description());
 	desc.add(CalculationOptions::description());
 	return desc;

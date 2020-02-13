@@ -212,14 +212,23 @@ public:
 
 class SelfIrradiationArguments {
 public:
-	constexpr static const double default_Cirr = 0.;
-	constexpr static const char default_irrfactortype[] = "const";
+	constexpr static const double default_Cirr = 0.0;
+	constexpr static const double default_irrindex = 0.0;
+	constexpr static const double default_Cirr_cold = 0.0;
+	constexpr static const double default_irrindex_cold = 0.0;
+	constexpr static const char default_angular_dist_disk[] = "plane";
 public:
-	const double Cirr;
-	const std::string irrfactortype;
+	double Cirr;
+	double irrindex;
+	double Cirr_cold;
+	double irrindex_cold;
+	std::string angular_dist_disk;
 public:
-	SelfIrradiationArguments(double Cirr, const std::string& irrfactortype):
-			Cirr(Cirr), irrfactortype(irrfactortype) {}
+	SelfIrradiationArguments(
+			double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+			const std::string& angular_dist_disk):
+			Cirr(Cirr), irrindex(irrindex), Cirr_cold(Cirr_cold), irrindex_cold(irrindex_cold),
+			angular_dist_disk(angular_dist_disk) {}
 };
 
 

@@ -20,6 +20,12 @@ public:
 	static po::options_description description();
 };
 
+class NeutronStarSelfIrradiationOptions: public NeutronStarSelfIrradiationArguments {
+public:
+	NeutronStarSelfIrradiationOptions(const po::variables_map& vm, const DiskStructureArguments& dsa_args);
+	static po::options_description description();
+};
+
 class FreddiNeutronStarOptions: public FreddiNeutronStarArguments {
 public:
 	FreddiNeutronStarOptions(const po::variables_map& vm);

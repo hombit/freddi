@@ -279,7 +279,10 @@ vecd DiskStructureArguments::InitialFGaussF::operator()(const vecd& h) const {
 
 
 constexpr const double SelfIrradiationArguments::default_Cirr;
-constexpr const char SelfIrradiationArguments::default_irrfactortype[];
+constexpr const double SelfIrradiationArguments::default_irrindex;
+constexpr const double SelfIrradiationArguments::default_Cirr_cold;
+constexpr const double SelfIrradiationArguments::default_irrindex_cold;
+constexpr const char SelfIrradiationArguments::default_angular_dist_disk[];
 
 
 constexpr const double FluxArguments::default_colourfactor;

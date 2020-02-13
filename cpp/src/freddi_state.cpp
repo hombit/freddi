@@ -66,6 +66,7 @@ vecd FreddiState::CurrentState::initializeF(const DiskStructure& str) {
 FreddiState::FreddiState(const FreddiArguments& args, const wunc_t& wunc):
 		 str_(new DiskStructure(args, wunc)),
 		 current_(*str_),
+		 angular_dist_disk_(initializeAngularDist(args.irr->angular_dist_disk)),
 		 star_({}, args.basic->Topt, args.basic->Ropt, args.calc->starlod) {
 	initializeWind();
 }
@@ -89,6 +90,17 @@ void FreddiState::initializeWind() {
 	} else {
 		throw std::invalid_argument("Wrong wind");
 	}
+}
+
+
+std::shared_ptr<FreddiState::BasicRadiationAngularDistribution> FreddiState::initializeAngularDist(const std::string& angular_dist_type) {
+	if (angular_dist_type == "isotropic") {
+		return std::make_shared<IsotropicRadiationAngularDistribution>();
+	}
+	if (angular_dist_type == "plane") {
+		return std::make_shared<PlaneRadiationAngularDistribution>();
+	}
+	throw std::invalid_argument("Wrong angular distribution type");
 }
 
 
@@ -191,10 +203,11 @@ const vecd& FreddiState::Tirr() {
 const vecd& FreddiState::Qx() {
 	if (!opt_str_.Qx) {
 		vecd x(Nx());
-		const vecd& CirrCirr = Cirr();
+		const vecd& K = Kirr();
+		const vecd& H = Height();
 		const double Lbol = Lbol_disk();
 		for (size_t i = first(); i < Nx(); i++) {
-			x[i] = CirrCirr[i] * Lbol / (4. * M_PI * m::pow<2>(R()[i]));
+			x[i] = K[i] * Lbol * angular_dist_disk(H[i] / R()[i]) / (4. * M_PI * m::pow<2>(R()[i]));
 		}
 		opt_str_.Qx = std::move(x);
 	}
@@ -202,22 +215,20 @@ const vecd& FreddiState::Qx() {
 }
 
 
-const vecd& FreddiState::Cirr() {
-	if (!opt_str_.Cirr) {
-		if (args().irr->irrfactortype == "const") {
-			opt_str_.Cirr = vecd(Nx(), args().irr->Cirr);
-		} else if (args().irr->irrfactortype == "square") {
-			vecd x(Nx());
-			const vecd& H = Height();
-			for (size_t i = first(); i < Nx(); i++) {
-				x[i] = args().irr->Cirr * (H[i] / R()[i]) * (H[i] / R()[i]);
-			}
-			opt_str_.Cirr = std::move(x);
-		} else {
-			throw std::invalid_argument("Wrong irrfactor");
+const vecd& FreddiState::Kirr() {
+	if(!opt_str_.Kirr) {
+		vecd x(Nx());
+		const vecd& H = Height();
+		for (size_t i = first(); i <= last(); i++) {
+			x[i] = args().irr->Cirr * std::pow(H[i] / (R()[i] * 0.05), args().irr->irrindex);
 		}
+		for (size_t i = last() + 1; i < Nx(); i++) {
+			// Height is given by formula for C zone, cold disk can be thinner
+			x[i] = args().irr->Cirr_cold * std::pow(H[i] / (R()[i] * 0.05), args().irr->irrindex_cold);
+		}
+		opt_str_.Kirr = std::move(x);
 	}
-	return *opt_str_.Cirr;
+	return *opt_str_.Kirr;
 }
 
 
@@ -378,4 +389,15 @@ void FreddiState::__testC_q0_Shields1986__::update(const FreddiState& state) {
 					(4 * M_PI * m::pow<3>(state.h()[i])) / m::pow<2>(state.GM());
 		}
 	}
+}
+
+
+FreddiState::BasicRadiationAngularDistribution::~BasicRadiationAngularDistribution() {}
+
+double FreddiState::IsotropicRadiationAngularDistribution::operator()(const double mu) const {
+	return 1.0;
+}
+
+double FreddiState::PlaneRadiationAngularDistribution::operator()(const double mu) const {
+	return 2.0 * mu;
 }

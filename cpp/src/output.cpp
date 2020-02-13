@@ -171,7 +171,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Mdot", "g/s",  [freddi]() {return freddi->Mdot_in();}},
 			{"Mdisk", "g", [freddi]() {return freddi->Mdisk();}},
 			{"Rhot", "Rsun", [freddi]() {return cmToSun(freddi->R()[freddi->last()]);}},
-			{"Cirrout", "float", [freddi]() {return freddi->Cirr()[freddi->last()];}},
+			{"Kirrout", "float", [freddi]() {return freddi->Kirr()[freddi->last()];}},
 			{"H2R", "float", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
 			{"Teffout", "K", [freddi]() {return freddi->Tph()[freddi->last()];}},
 			{"Tirrout", "K", [freddi]() {return freddi->Tirr()[freddi->last()];}},

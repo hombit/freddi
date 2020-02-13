@@ -54,7 +54,6 @@ public:
 };
 
 
-
 class NeutronStarBasicDiskBinaryArguments: public BasicDiskBinaryArguments {
 protected:
 	static std::optional<double> initializeRisco(const NeutronStarArguments& ns_args, std::optional<double> risco);
@@ -80,20 +79,42 @@ public:
 };
 
 
+class NeutronStarSelfIrradiationArguments: public SelfIrradiationArguments {
+public:
+	constexpr static const char default_angular_dist_ns[] = "isotropic";
+public:
+	std::string angular_dist_ns;
+public:
+	NeutronStarSelfIrradiationArguments(
+			double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+			const std::string& angular_dist_disk, const std::string& angular_dist_ns):
+			SelfIrradiationArguments(Cirr, irrindex, Cirr_cold, irrindex_cold, angular_dist_disk),
+			angular_dist_ns(angular_dist_ns) {}
+};
+
+
 class FreddiNeutronStarArguments: public FreddiArguments {
 public:
 	std::shared_ptr<NeutronStarArguments> ns;
+	std::shared_ptr<NeutronStarSelfIrradiationArguments> irr_ns;
 public:
 	FreddiNeutronStarArguments() = default;
 	FreddiNeutronStarArguments(
-			GeneralArguments* general,
-			NeutronStarBasicDiskBinaryArguments* basic,
-			DiskStructureArguments* disk,
-			SelfIrradiationArguments* irr,
-			FluxArguments* flux,
-			CalculationArguments* calc,
-			NeutronStarArguments* ns):
-			FreddiArguments(general, basic, disk, irr, flux, calc), ns(ns) {}
+			GeneralArguments* general_,
+			NeutronStarBasicDiskBinaryArguments* basic_,
+			DiskStructureArguments* disk_,
+			NeutronStarSelfIrradiationArguments* irr_,
+			FluxArguments* flux_,
+			CalculationArguments* calc_,
+			NeutronStarArguments* ns_):
+			ns(ns_), irr_ns(irr_) {
+		general.reset(general_);
+		basic.reset(basic_);
+		disk.reset(disk_);
+		irr = irr_ns;
+		flux.reset(flux_);
+		calc.reset(calc_);
+	}
 };
 
 

@@ -124,6 +124,7 @@ private:
 private:
 	std::shared_ptr<const NeutronStarStructure> ns_str_;
 	NeutronStarOptionalStructure ns_opt_str_;
+	std::shared_ptr<BasicRadiationAngularDistribution> angular_dist_ns_;
 	std::shared_ptr<BasicNSMdotFraction> fp_;
 	std::shared_ptr<BasicNSAccretionEfficiency> eta_ns_;
 private:
@@ -151,6 +152,9 @@ public:
 	double Lbol_ns() const;
 	double T_hot_spot() const;
 	double Lx_ns();
+// angular_dist_ns_
+public:
+	inline double angular_dist_ns(const double mu) { return (*angular_dist_ns_)(mu); }
 // fp_
 public:
 	inline double fp(double radius) const { return (*fp_)(radius / R_cor()); }

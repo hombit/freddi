@@ -148,24 +148,23 @@ po::options_description DiskStructureOptions::description() {
 SelfIrradiationOptions::SelfIrradiationOptions(const po::variables_map &vm, const DiskStructureArguments &dsa_args):
 		SelfIrradiationArguments(
 				vm["Cirr"].as<double>(),
-				vm["irrfactortype"].as<std::string>()) {
+				vm["irrindex"].as<double>(),
+				vm["Cirrcold"].as<double>(),
+				vm["irrindexcold"].as<double>(),
+				vm["angulardistdisk"].as<std::string>()) {
 	if (Cirr <= 0. && dsa_args.boundcond == "Tirr") {
-		throw po::error("Set positive --Cirr when --boundcond=Tirr !");
-	}
-	if (irrfactortype != "const" && irrfactortype != "square") {
-		throw po::invalid_option_value("--irrfactortype has invalid value");
+		throw po::error("Set positive --Cirr when --boundcond=Tirr");
 	}
 }
 
 po::options_description SelfIrradiationOptions::description() {
-	po::options_description od("Parameters of self-irradiation");
+	po::options_description od("Parameters of self-irradiation.\nQirr = Cirr * (H/r / 0.05)^irrindex * L * psi / (4 pi R^2), where psi is angular distrbution of X-ray radiation");
 	od.add_options()
-			( "Cirr", po::value<double>()->default_value(default_Cirr), "Irradiation factor" )
-			( "irrfactortype", po::value<std::string>()->default_value(default_irrfactortype), "Type of irradiation factor Cirr\n\n"
-																							   "Values:\n"
-																							   "  const: doesn't depend on disk shape:\n[rad. flux] = Cirr  L / (4 pi r^2)\n"
-																							   "  square: Cirr depends on the disk relative half-thickness:\n[rad. flux] = Cirr (z/r)^2 L / (4 pi r^2)\n\n"
-																							   "Here L is bolometric Luminosity:\nL = eta Mdot c^2" )
+			( "Cirr", po::value<double>()->default_value(default_Cirr), "Irradiation factor for the hot disk" )
+			( "irrindex", po::value<double>()->default_value(default_irrindex), "Irradiation index for the hot disk" )
+			( "Cirrcold", po::value<double>()->default_value(default_Cirr_cold), "Irradiation factor for the cold disk" )
+			( "irrindexcold", po::value<double>()->default_value(default_irrindex_cold), "Irradiation index for the cold disk" )
+			( "angulardistdisk", po::value<std::string>()->default_value(default_angular_dist_disk), "Angular distribution of the disk X-ray radiation. Values: isotropic, plane" )
 			;
 	return od;
 }

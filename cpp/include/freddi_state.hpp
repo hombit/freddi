@@ -109,6 +109,26 @@ private:
 		virtual void update(const FreddiState&) override;
 	};
 
+protected:
+	class BasicRadiationAngularDistribution {
+	public:
+		virtual ~BasicRadiationAngularDistribution() = 0;
+		virtual double operator()(double mu) const = 0; // mu = cos(angle between ray and normal)
+	};
+
+	class IsotropicRadiationAngularDistribution: public BasicRadiationAngularDistribution {
+	public:
+		~IsotropicRadiationAngularDistribution() override = default;
+		double operator()(double mu) const override;
+	};
+
+	class PlaneRadiationAngularDistribution: public BasicRadiationAngularDistribution {
+	public:
+		~PlaneRadiationAngularDistribution() override = default;
+		double operator()(double mu) const override;
+	};
+
+private:
 	class DiskStructure {
 	public:
 		FreddiArguments args;
@@ -153,7 +173,7 @@ private:
 		boost::optional<double> Mdisk;
 		boost::optional<double> Lx;
 		boost::optional<double> mU, mB, mV, mR, mI, mJ;
-		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Cirr, Sigma, Height;
+		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height;
 	};
 
 protected:
@@ -161,6 +181,7 @@ protected:
 	CurrentState current_;
 	DiskOptionalStructure opt_str_;
 	std::unique_ptr<BasicWind> wind_;
+	std::shared_ptr<BasicRadiationAngularDistribution> angular_dist_disk_;
 	IrradiatedStar star_;
 public:
 	FreddiState(const FreddiArguments& args, const wunc_t& wunc);
@@ -215,6 +236,11 @@ protected:
 	virtual vecd windA() const { return wind_->A(); }
 	virtual vecd windB() const { return wind_->B(); }
 	virtual vecd windC() const { return wind_->C(); }
+// angular_dist_disk_
+protected:
+	static std::shared_ptr<BasicRadiationAngularDistribution> initializeAngularDist(const std::string& angular_dist_type);
+public:
+	inline double angular_dist_disk(const double mu) const { return (*angular_dist_disk_)(mu); }
 // opt_str_
 protected:
 	virtual void invalidate_optional_structure();
@@ -270,7 +296,7 @@ public:
 	const vecd& Tph();
 	const vecd& Tph_vis();
 	const vecd& Tirr();
-	const vecd& Cirr();
+	const vecd& Kirr();
 	const vecd& Height();
 	double Luminosity(const vecd& T, double nu1, double nu2) const;
 	inline double magnitude(const double lambda, const double F0) {

@@ -62,3 +62,6 @@ std::optional<double> NeutronStarBasicDiskBinaryArguments::initializeRisco(const
 	}
 	throw std::invalid_argument("Wrong nsprop value");
 }
+
+
+constexpr const char NeutronStarSelfIrradiationArguments::default_angular_dist_ns[];

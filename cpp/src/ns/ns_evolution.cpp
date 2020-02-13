@@ -195,6 +195,7 @@ double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::
 FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarArguments &args):
 		FreddiEvolution(args),
 		ns_str_(new NeutronStarStructure(*args.ns, this)),
+		angular_dist_ns_(initializeAngularDist(args.irr_ns->angular_dist_ns)),
 		fp_(initializeNsMdotFraction(*args.ns)),
 		eta_ns_(initializeNsAccretionEfficiency(*args.ns, this)) {
 	// Change initial condition due presence of magnetic field torque. It can spoil user-defined initial disk
@@ -344,11 +345,13 @@ const vecd& FreddiNeutronStarEvolution::Qx() {
 	// TODO: do all
 	if (!opt_str_.Qx) {
 		vecd x(Nx());
-		const vecd& CirrCirr = Cirr();
+		const vecd& K = Kirr();
+		const vecd& H = Height();
 		const double L_disk = Lbol_disk();
 		const double L_ns = Lbol_ns();
 		for (size_t i = first(); i < Nx(); i++) {
-			x[i] = CirrCirr[i] * (L_ns + L_disk) / (4. * M_PI * m::pow<2>(R()[i]));
+			const double mu = H[i] / R()[i];
+			x[i] = K[i] * (L_disk * angular_dist_disk(mu) + L_ns * angular_dist_ns(mu)) / (4. * M_PI * m::pow<2>(R()[i]));
 		}
 		opt_str_.Qx = std::move(x);
 	}
