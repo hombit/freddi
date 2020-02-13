@@ -180,7 +180,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"TphXmax", "keV", [freddi]() {return kToKev(*std::max_element(freddi->Tph_X().begin(), freddi->Tph_X().end()));}},
 			{"Lx", "erg/s", [freddi]() {return freddi->Lx();}},
 			{"Lbol", "erg/s", [freddi]() {return freddi->Lbol_disk();}},
-			{"Fx", "erg/s", [freddi]() {return freddi->Lx() * 2.0 * freddi->cosiOverD2() / FOUR_M_PI;}},
+			{"Fx", "erg/s", [freddi]() {return freddi->Lx() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
 			{"mU", "mag", [freddi]() {return freddi->mU();}},
 			{"mB", "mag", [freddi]() {return freddi->mB();}},
 			{"mV", "mag", [freddi]() {return freddi->mV();}},
