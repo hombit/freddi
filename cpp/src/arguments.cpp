@@ -290,8 +290,6 @@ constexpr const double FluxArguments::default_emin;
 constexpr const double FluxArguments::default_emax;
 constexpr const double FluxArguments::default_star_albedo;
 constexpr const double FluxArguments::default_inclination;
-constexpr const bool FluxArguments::default_cold_disk;
-constexpr const bool FluxArguments::default_star;
 
 
 constexpr const unsigned int CalculationArguments::default_Nx;

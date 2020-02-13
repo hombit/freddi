@@ -239,8 +239,6 @@ public:
 	constexpr static const double default_emax = kevToHertz(12.);
 	constexpr static const double default_star_albedo = 0.0;
 	constexpr static const double default_inclination = 0.;  // degrees
-	constexpr static const bool default_cold_disk = false;
-	constexpr static const bool default_star = false;
 public:
 	double colourfactor;
 	double emin;

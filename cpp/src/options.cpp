@@ -92,16 +92,6 @@ po::options_description BasicDiskBinaryOptions::description() {
 
 DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const BasicDiskBinaryArguments& bdb_args):
 		DiskStructureArguments(
-				// const BasicDiskBinaryArguments &bdb_args,
-				//			const std::string& opacity,
-				//			double Mdotout,
-				//			const std::string& boundcond, double Thot,
-				//			const std::string& initialcond,
-				//			std::optional<double> F0,
-				//			std::optional<double> Mdisk0, std::optional<double> Mdot0,
-				//			std::optional<double> powerorder,
-				//			std::optional<double> gaussmu, std::optional<double> gausssigma,
-				//			const std::string& wind, const pard& windparams
 				bdb_args,
 				vm["opacity"].as<std::string>(),
 				vm["Mdotout"].as<double>(),
