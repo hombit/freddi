@@ -30,14 +30,12 @@ protected:
 	void invalidate_irradiated_properties();
 public:
 	Star(double temp, double radius, unsigned short lod);
-protected:
-	double integrate(std::function<double (size_t)>&& func) const;
-	double integrate(std::function<double (size_t)>&& func, const UnitVec3& direction) const;
-public:
 	const std::vector<Triangle>& triangles() const;
 	const vald& Tth() const;
 	virtual const vald& Qirr();
 	const vald& Teff();
+	double integrate(std::function<double (size_t)>&& func) const;
+	double integrate(std::function<double (size_t)>&& func, const UnitVec3& direction) const;
 	double luminosity();
 	double luminosity(const UnitVec3& direction); // erg/s
 	// "Luminosity in direction" is luminosity of isotropic spherical source of radius R with luminosity given by
