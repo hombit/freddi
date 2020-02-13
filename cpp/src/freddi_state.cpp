@@ -258,7 +258,30 @@ const vecd& FreddiState::Tph_vis() {
 	return *opt_str_.Tph_vis;
 }
 
+const vecd& FreddiState::Tph_X() {
+	if (!opt_str_.Tph_X) {
+		vecd x(Nx());
+		const double Mdot = (F()[first()+1] - F()[first()]) / (h()[first()+1] - h()[first()]);
+		for (size_t i = first(); i < Nx(); i++) {
+			//
 
+			// Qvis due to non-zero Fin:
+			x[i] =  3. / (8. * M_PI) * m::pow<4>(GM()) / m::pow<7>(h()[i]) * F()[first()];
+
+			// Qvis due to non-zero Mdot:  = sigma * Trel(dotM)^4
+			//      assume that Mdot ~= const where X-rays are generated
+			//      dotM = dF/dh
+			x[i] += m::pow<4>(Spectrum::T_GR(R()[i], args().basic->kerr, args().basic->Mx, Mdot)) * GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT;
+
+			x[i] = args().flux->colourfactor * std::pow( x[i] / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT , 0.25);
+		}
+		opt_str_.Tph_X = std::move(x);
+	}
+	return *opt_str_.Tph_X;
+}
+
+
+/*
 const vecd& FreddiState::Tph_X() {
 	if (!opt_str_.Tph_X) {
 		vecd x(Nx());
@@ -271,6 +294,7 @@ const vecd& FreddiState::Tph_X() {
 	}
 	return *opt_str_.Tph_X;
 }
+*/
 
 
 double FreddiState::lazy_magnitude(boost::optional<double>& m, double lambda, double F0) {

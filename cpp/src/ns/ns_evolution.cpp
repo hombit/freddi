@@ -358,6 +358,7 @@ const vecd& FreddiNeutronStarEvolution::Qx() {
 	return *opt_str_.Qx;
 }
 
+/*
 const vecd& FreddiNeutronStarEvolution::Tph_X() {
 	if (!opt_str_.Tph_X) {
 		vecd x(Nx());
@@ -369,6 +370,7 @@ const vecd& FreddiNeutronStarEvolution::Tph_X() {
 	}
 	return *opt_str_.Tph_X;
 }
+*/
 
 double FreddiNeutronStarEvolution::Lbol_disk() const {
 	return (F()[first()] + 0.5 * Mdot_in() * h()[first()]) * omega_i(first());
