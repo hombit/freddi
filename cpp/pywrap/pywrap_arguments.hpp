@@ -33,7 +33,9 @@ boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
 		const object& powerorder, const object& gaussmu, const object& gausssigma,
 		const std::string& wind, const object& windparams);
 
-boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(double Cirr, const std::string& irrfactortype);
+boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(
+		double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+		const std::string& angular_dist_disk);
 
 boost::shared_ptr<FluxArguments> make_flux_arguments(
 			double colourfactor,
@@ -68,11 +70,15 @@ boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_d
 		double Mopt, const object& Ropt, double Topt,
 		const object& rin, const object& rout, const object& risco);
 
+boost::shared_ptr<NeutronStarSelfIrradiationArguments> make_neutron_star_self_irradiation_arguments(
+		double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+		const std::string& angular_dist_disk, const std::string& angular_dist_ns);
+
 boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments(
 		const GeneralArguments& general,
 		const NeutronStarBasicDiskBinaryArguments& basic,
 		const DiskStructureArguments& disk,
-		const SelfIrradiationArguments& irr,
+		const NeutronStarSelfIrradiationArguments& irr,
 		const FluxArguments& flux,
 		const CalculationArguments& calc,
 		const NeutronStarArguments& ns);

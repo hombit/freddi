@@ -109,6 +109,7 @@ FreddiState::FreddiState(const FreddiState& other):
 		current_(other.current_),
 		opt_str_(other.opt_str_),
 		wind_(other.wind_->clone()),
+		angular_dist_disk_(other.angular_dist_disk_),
 		star_(other.star_) {}
 
 
@@ -200,6 +201,7 @@ const vecd& FreddiState::Tirr() {
 }
 
 
+#include <iostream>
 const vecd& FreddiState::Qx() {
 	if (!opt_str_.Qx) {
 		vecd x(Nx());

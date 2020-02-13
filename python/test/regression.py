@@ -65,7 +65,7 @@ class RegressionTestCase(unittest.TestCase):
     def test(self):
         columns_to_compare = ('Mdot', 'Mdisk', 'Lx', 'mU', 'mB', 'mV', 'mR', 'mI', 'mJ')
         for data_file in self.data_files:
-            config = self.load_config(data_file, ('dir', 'prefix', 'fulldata'))
+            config = self.load_config(data_file, ('dir', 'prefix', 'fulldata', 'config'))
             lmbd_ = np.array(config.pop('lambda', [])) * 1e-8
             f = Freddi(**config)
             result = f.evolve()

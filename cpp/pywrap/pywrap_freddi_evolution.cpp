@@ -57,7 +57,10 @@ dict evolution_kwdefaults() {
 	kw["windparams"] = tuple();
 
 	kw["Cirr"] = SelfIrradiationArguments::default_Cirr;
-	kw["irrfactortype"] = SelfIrradiationArguments::default_irrfactortype;
+	kw["irrindex"] = SelfIrradiationArguments::default_irrindex;
+	kw["Cirrcold"] = SelfIrradiationArguments::default_Cirr_cold;
+	kw["irrindexcold"] = SelfIrradiationArguments::default_irrindex_cold;
+	kw["angulardistdisk"] = SelfIrradiationArguments::default_angular_dist_disk;
 
 	kw["colourfactor"] = FluxArguments::default_colourfactor;
 	kw["emin"] = FluxArguments::default_emin;
@@ -142,7 +145,10 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<std::string>(kw["wind"]), kw["windparams"]);
 	const auto irr = make_self_irradiation_arguments(
 			extract<double>(kw["Cirr"]),
-			extract<std::string>(kw["irrfactortype"]));
+			extract<double>(kw["irrindex"]),
+			extract<double>(kw["Cirrcold"]),
+			extract<double>(kw["irrindexcold"]),
+			extract<std::string>(kw["angulardistdisk"]));
 	const auto flux = make_flux_arguments(
 			extract<double>(kw["colourfactor"]),
 			extract<double>(kw["emin"]), extract<double>(kw["emax"]),
@@ -189,6 +195,8 @@ dict neutron_star_evolution_kwdefaults() {
 	dict kw;
 	kw.update(evolution_kwdefaults());
 
+	kw["angulardistns"] = NeutronStarSelfIrradiationArguments::default_angular_dist_ns;
+
 	kw["nsprop"] = NeutronStarArguments::default_nsprop;
 	kw["freqx"] = object();
 	kw["Rx"] = object();
@@ -228,9 +236,13 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			kw["F0"], kw["Mdisk0"], kw["Mdot0"],
 			kw["powerorder"], kw["gaussmu"], kw["gausssigma"],
 			extract<std::string>(kw["wind"]), kw["windparams"]);
-	const auto irr = make_self_irradiation_arguments(
+	const auto irr = make_neutron_star_self_irradiation_arguments(
 			extract<double>(kw["Cirr"]),
-			extract<std::string>(kw["irrfactortype"]));
+			extract<double>(kw["irrindex"]),
+			extract<double>(kw["Cirrcold"]),
+			extract<double>(kw["irrindexcold"]),
+			extract<std::string>(kw["angulardistdisk"]),
+			extract<std::string>(kw["angulardistns"]));
 	const auto flux = make_flux_arguments(
 			extract<double>(kw["colourfactor"]),
 			extract<double>(kw["emin"]), extract<double>(kw["emax"]),

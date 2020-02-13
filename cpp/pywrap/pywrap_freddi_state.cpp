@@ -44,7 +44,7 @@ void wrap_state() {
 		.add_property("Tph", make_function(&FreddiState::Tph, return_value_policy<copy_const_reference>()))
 		.add_property("Tph_vis", make_function(&FreddiState::Tph_vis, return_value_policy<copy_const_reference>()))
 		.add_property("Tirr", make_function(&FreddiState::Tirr, return_value_policy<copy_const_reference>()))
-		.add_property("Cirr", make_function(&FreddiState::Cirr, return_value_policy<copy_const_reference>()))
+		.add_property("Kirr", make_function(&FreddiState::Kirr, return_value_policy<copy_const_reference>()))
 		.add_property("Sigma", make_function(&FreddiState::Sigma, return_value_policy<copy_const_reference>()))
 		.add_property("Height", make_function(&FreddiState::Height, return_value_policy<copy_const_reference>()))
 		.add_property("lambdas", make_function(&FreddiState::lambdas, return_value_policy<copy_const_reference>()))

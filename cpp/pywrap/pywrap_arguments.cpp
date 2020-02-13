@@ -50,8 +50,11 @@ boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
 			wind, mapping_to_map(windparams));
 }
 
-boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(double Cirr, const std::string& irrfactortype) {
-	return boost::make_shared<SelfIrradiationArguments>(Cirr, irrfactortype);
+boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(
+		double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+		const std::string& angular_dist_disk
+		) {
+	return boost::make_shared<SelfIrradiationArguments>(Cirr, irrindex, Cirr_cold, irrindex_cold, angular_dist_disk);
 }
 
 boost::shared_ptr<FluxArguments> make_flux_arguments(
@@ -123,11 +126,19 @@ boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_d
 			objToOpt<double>(rin), objToOpt<double>(rout), objToOpt<double>(risco));
 }
 
+boost::shared_ptr<NeutronStarSelfIrradiationArguments> make_neutron_star_self_irradiation_arguments(
+		double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+		const std::string& angular_dist_disk, const std::string& angular_dist_ns) {
+	return boost::make_shared<NeutronStarSelfIrradiationArguments>(
+			Cirr, irrindex, Cirr_cold, irrindex_cold,
+			angular_dist_disk, angular_dist_ns);
+}
+
 boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments(
 		const GeneralArguments& general,
 		const NeutronStarBasicDiskBinaryArguments& basic,
 		const DiskStructureArguments& disk,
-		const SelfIrradiationArguments& irr,
+		const NeutronStarSelfIrradiationArguments& irr,
 		const FluxArguments& flux,
 		const CalculationArguments& calc,
 		const NeutronStarArguments& ns) {
@@ -135,7 +146,7 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			new GeneralArguments(general),
 			new NeutronStarBasicDiskBinaryArguments(basic),
 			new DiskStructureArguments(disk),
-			new SelfIrradiationArguments(irr),
+			new NeutronStarSelfIrradiationArguments(irr),
 			new FluxArguments(flux),
 			new CalculationArguments(calc),
 			new NeutronStarArguments(ns));
@@ -147,76 +158,25 @@ void wrap_arguments() {
 		.def("__init__", make_constructor(make_general_arguments))
 	;
 	auto _BasicDiskBinaryArguments = class_<BasicDiskBinaryArguments>("_BasicDiskBinaryArguments", no_init)
-		.def("__init__", make_constructor(make_basic_disk_binary_arguments, default_call_policies(),
-				(arg("alpha"),
-				 arg("Mx"),
-				 arg("kerr"),
-				 arg("Mopt"),
-				 arg("Topt"),
-				 arg("period"),
-				 arg("rin"),
-				 arg("rout")))
-			)
+		.def("__init__", make_constructor(make_basic_disk_binary_arguments))
 	;
 	class_<DiskStructureArguments>("_DiskStructureArguments", no_init)
-		.def("__init__", make_constructor(make_disk_structure_arguments, default_call_policies(),
-				(arg("basic_disk_binary_arguments"),
-				 arg("opacity"),
-				 arg("Mdotout"),
-				 arg("boundcond"),
-				 arg("Thot"),
-				 arg("initialcond"),
-				 arg("F0"),
-				 arg("powerorder"),
-				 arg("gaussmu"),
-				 arg("gausssigma"),
-				 arg("Mdisk0"),
-				 arg("Mdot0"),
-				 arg("wind"),
-				 arg("windparams")))
-			)
+		.def("__init__", make_constructor(make_disk_structure_arguments))
 	;
 	class_<SelfIrradiationArguments>("_SelfIrradiationArguments", no_init)
-		.def("__init__", make_constructor(make_self_irradiation_arguments, default_call_policies(),
-				(arg("Cirr"),
-				 arg("irrfactortype")))
-			)
+		.def("__init__", make_constructor(make_self_irradiation_arguments))
 	;
 	class_<FluxArguments>("_FluxArguments", no_init)
-		.def("__init__", make_constructor(make_flux_arguments, default_call_policies(),
-				(arg("colourfactor"),
-				 arg("emin"),
-				 arg("emax"),
-				 arg("inclination"),
-				 arg("distance")))
-			)
+		.def("__init__", make_constructor(make_flux_arguments))
 	;
 	class_<CalculationArguments>("_CalculationArguments", no_init)
-		.def("__init__", make_constructor(make_calculation_arguments, default_call_policies(),
-				(arg("time"),
-				 arg("tau"),
-				 arg("Nx"),
-				 arg("gridscale"),
-				 arg("starlod"),
-				 arg("eps")))
-			)
+		.def("__init__", make_constructor(make_calculation_arguments))
 	;
 	class_<FreddiArguments>("_Arguments", no_init)
 		.def("__init__", make_constructor(make_freddi_arguments))
 	;
 	class_<NeutronStarArguments>("_NeutronStarArguments", no_init)
-		.def("__init__", make_constructor(make_neutron_star_arguments, default_call_policies(),
-				(arg("nsprop"),
-				 arg("Rx"),
-				 arg("freqx"),
-				 arg("Bx"),
-				 arg("hotspotarea"),
-				 arg("epsilonAlfven"),
-				 arg("inversebeta"),
-				 arg("Rdead"),
-				 arg("fptype"),
-				 arg("fpparams")))
-			)
+		.def("__init__", make_constructor(make_neutron_star_arguments))
 	;
 	class_< FreddiNeutronStarArguments, bases<FreddiArguments> >("_FreddiNeutronStarArguments", no_init)
 		.def("__init__", make_constructor(make_freddi_neutron_star_arguments))
