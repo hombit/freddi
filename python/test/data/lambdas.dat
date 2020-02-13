@@ -1,6 +1,7 @@
-#t	Mdot	Mdisk	Rhot	Cirrout	H2R	Teffout	Tirrout	Qiir2Qvisout	Lx	Lbol	Fx	mU	mB	mV	mR	mI	mJ	Fnu0	Fnu1	Fnu2
+#t	Mdot	Mdisk	Rhot	Kirrout	H2R	Teffout	Tirrout	Qiir2Qvisout	Lx	Lbol	Fx	mU	mB	mV	mR	mI	mJ	Fnu0	Fnu1	Fnu2
 #days	g/s	g	Rsun	float	float	K	K	float	erg/s	erg/s	erg/s	mag	mag	mag	mag	mag	mag	erg/s/cm^2/Hz	erg/s/cm^2/Hz	erg/s/cm^2/Hz
 # Cirr=0
+# Cirrcold=0
 # F0=2e+38
 # Mdotout=0
 # Mopt=0.5
@@ -9,6 +10,7 @@
 # Thot=0
 # Topt=0
 # alpha=0.25
+# angulardistdisk=plane
 # boundcond=Teff
 # colourfactor=1.7
 # dir=.
@@ -20,7 +22,8 @@
 # gridscale=log
 # inclination=0
 # initialcond=powerF
-# irrfactortype=const
+# irrindex=0
+# irrindexcold=0
 # kerr=0
 # lambda=8000  # 0
 # lambda=5000  # 1
