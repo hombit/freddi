@@ -287,7 +287,6 @@ protected:
 		return integrate<Region>([T, lambda](const size_t i) -> double { return Spectrum::Planck_lambda((*T)[i], lambda); });
 	}
 	double lazy_magnitude(boost::optional<double>& m, double lambda, double F0);
-	const vecd& Tph_X();
 	virtual const vecd& Qx();
 public:
 	double Lx();
@@ -295,6 +294,7 @@ public:
 	const vecd& Sigma();
 	const vecd& Tph();
 	const vecd& Tph_vis();
+	const vecd& Tph_X();
 	const vecd& Tirr();
 	const vecd& Kirr();
 	const vecd& Height();

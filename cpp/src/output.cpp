@@ -1,5 +1,6 @@
 #include "output.hpp"
 
+#include <algorithm>  // max_element
 #include <sstream>
 
 #include "unit_transformation.hpp"
@@ -175,7 +176,8 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"H2R", "float", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
 			{"Teffout", "K", [freddi]() {return freddi->Tph()[freddi->last()];}},
 			{"Tirrout", "K", [freddi]() {return freddi->Tirr()[freddi->last()];}},
-			{"Qiir2Qvisout", "float", [freddi]() {return pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
+			{"Qiir2Qvisout", "float", [freddi]() {return std::pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
+			{"TphXmax", "keV", [freddi]() {return kToKev(*std::max_element(freddi->Tph_X().begin(), freddi->Tph_X().end()));}},
 			{"Lx", "erg/s", [freddi]() {return freddi->Lx();}},
 			{"Lbol", "erg/s", [freddi]() {return freddi->Lbol_disk();}},
 			{"Fx", "erg/s", [freddi]() {return freddi->Lx() * 2.0 * freddi->cosiOverD2() / FOUR_M_PI;}},
