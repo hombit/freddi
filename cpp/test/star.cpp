@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(discostar_comparison) {
 	IrradiatedStar::sources_t sources;
 	sources.push_back(std::make_unique<CentralDiskSource>(position, normal, Ldisk, albedo, Height2R));
 	sources.push_back(std::make_unique<PointAccretorSource>(position, Lns, albedo, Height2R));
-	IrradiatedStar star(std::move(sources), Topt, Ropt, 4);
+	IrradiatedStar star(std::move(sources), Topt, Ropt, 3);
 
 	for (size_t i_lambda = 0; i_lambda < discostar_lambdas.size(); ++i_lambda) {
 		const double lambda = discostar_lambdas[i_lambda];
