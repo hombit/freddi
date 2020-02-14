@@ -177,7 +177,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Teffout", "K", [freddi]() {return freddi->Tph()[freddi->last()];}},
 			{"Tirrout", "K", [freddi]() {return freddi->Tirr()[freddi->last()];}},
 			{"Qiir2Qvisout", "float", [freddi]() {return std::pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
-			{"TphXmax", "keV", [freddi]() {return kToKev(*std::max_element(freddi->Tph_X().begin(), freddi->Tph_X().end()));}},
+			{"TphXmax", "keV", [freddi]() {return kToKev(*std::max_element(freddi->Tph_X().begin() + freddi->first(), freddi->Tph_X().begin() + freddi->last() + 1));}},
 			{"Lx", "erg/s", [freddi]() {return freddi->Lx();}},
 			{"Lbol", "erg/s", [freddi]() {return freddi->Lbol_disk();}},
 			{"Fx", "erg/s", [freddi]() {return freddi->Lx() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
