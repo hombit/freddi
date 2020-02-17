@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE(discostar_comparison_full_roche) {
 	IrradiatedStar::sources_t sources;
 	sources.push_back(std::make_unique<CentralDiskSource>(position, normal, Ldisk, albedo, Height2R));
 	sources.push_back(std::make_unique<PointAccretorSource>(position, Lns, albedo, Height2R));
-	IrradiatedStar star(std::move(sources), Topt, roche_lobe, 3);
+	IrradiatedStar star(std::move(sources), Topt, roche_lobe, 4);
 
 	compareWithDiscostar(std::move(star), discostar_lum_dir_full_roche);
 }
