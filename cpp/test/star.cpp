@@ -60,37 +60,6 @@ BOOST_AUTO_TEST_CASE(testStar_luminosity_passband) {
 }
 
 
-BOOST_AUTO_TEST_CASE(testStar_Roche_vs_spherical_huge_mass_ratio) {
-	const double temp = 5772;
-	const double solar_lum = GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * 4. * M_PI * m::pow<2>(solar_radius) * m::pow<4>(temp);
-	const double radius = solar_radius;
-
-	const RocheLobe roche_lobe(radius, 1e9, 1.0);
-
-	Star sphere(temp, radius, 5);
-	Star roche(temp, roche_lobe, 5);
-
-	BOOST_CHECK_CLOSE(sphere.luminosity(), roche.luminosity(), 1);
-}
-
-
-BOOST_AUTO_TEST_CASE(testStar_Roche_vs_spherical_tiny_mass_ratio) {
-	const double temp = 5772;
-	const double solar_lum =
-			GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * 4. * M_PI * m::pow<2>(solar_radius) * m::pow<4>(temp);
-	const double radius = solar_radius;
-	const double mass_ratio = 1e-9;
-
-	const double semiaxis = radius * std::cbrt(3.0 / mass_ratio);
-	const RocheLobe roche_lobe(semiaxis, mass_ratio, 1.0);
-
-	Star sphere(temp, radius, 5);
-	Star roche(temp, roche_lobe, 5);
-
-	BOOST_CHECK_CLOSE(sphere.luminosity(), roche.luminosity(), 1);
-}
-
-
 BOOST_AUTO_TEST_CASE(testStar_Roche_vs_spherical_small_roche_fill) {
 	const double temp = 5772;
 	const double solar_lum =
