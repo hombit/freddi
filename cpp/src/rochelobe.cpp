@@ -97,22 +97,31 @@ double CriticalRocheLobe::initializePolarRadius(const RochePotential& roche_pote
 }
 
 
-RocheLobe::RocheLobe(const double mass_ratio, const double fill_factor):
+DimensionlessRocheLobe::DimensionlessRocheLobe(const double mass_ratio, const double fill_factor):
 		mass_ratio(mass_ratio),
 		fill_factor(fill_factor),
 		critical(mass_ratio),
-		polar_radius(fill_factor * critical.lagrangian_point),
+		polar_radius(fill_factor * critical.polar_radius),
 		omega(critical.roche_potential.omega(polar_radius, 0.0, 1.0)) {}
 
-double RocheLobe::r(const double lambda, const double nu) const {
+double DimensionlessRocheLobe::r(const double lambda, const double nu) const {
 	const double r0 = polar_radius;
 	const double rmin = 0.5 * r0;
 	const double rmax = std::min(2.0 * r0, critical.lagrangian_point);
 	return critical.roche_potential.find_r(omega, lambda, nu, r0, rmin, rmax);
 }
 
-double RocheLobe::r(const Vec3& vec) const {
+double DimensionlessRocheLobe::r(const Vec3& vec) const {
 	const double lambda = -vec.x() / vec.length();
 	const double nu = vec.z() / vec.length();
 	return r(lambda, nu);
+}
+
+
+RocheLobe::RocheLobe(const double semiaxis, double mass_ratio, double fill_factor):
+		semiaxis(semiaxis),
+		dimensionless(mass_ratio, fill_factor) {}
+
+double RocheLobe::r(const Vec3& vec) const {
+	return semiaxis * dimensionless.r(vec);
 }

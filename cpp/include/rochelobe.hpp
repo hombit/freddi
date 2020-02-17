@@ -33,7 +33,7 @@ public:
 };
 
 
-class RocheLobe {
+class DimensionlessRocheLobe {
 public:
 	const double mass_ratio;
 	const double fill_factor;
@@ -41,8 +41,19 @@ public:
 	const double polar_radius;
 	const double omega;
 public:
-	RocheLobe(double mass_ratio, double fill_factor);
+	DimensionlessRocheLobe(double mass_ratio, double fill_factor);
 	double r(double lambda, double nu) const;
+	double r(const Vec3& vec) const;
+};
+
+
+class RocheLobe {
+public:
+	const double semiaxis;
+protected:
+	const DimensionlessRocheLobe dimensionless;
+public:
+	RocheLobe(const double semiaxis, double mass_ratio, double fill_factor);
 	double r(const Vec3& vec) const;
 };
 

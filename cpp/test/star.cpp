@@ -12,6 +12,7 @@
 #include <constants.hpp>
 #include <geometry.hpp>
 #include <passband.hpp>
+#include <rochelobe.hpp>
 #include <star.hpp>
 #include <unit_transformation.hpp>
 
@@ -56,6 +57,56 @@ BOOST_AUTO_TEST_CASE(testStar_luminosity_passband) {
 	const double lambda_V = angstromToCm(5510);
 	const Passband narrow_filter("V", {{lambda_V, 1.0}, {lambda_V * 1.0001, 1.0}});
 	BOOST_CHECK_CLOSE(sun.luminosity({0.0, 0.0}, narrow_filter), sun.luminosity({0.0, 0.0}, lambda_V), 0.01);
+}
+
+
+BOOST_AUTO_TEST_CASE(testStar_Roche_vs_spherical_huge_mass_ratio) {
+	const double temp = 5772;
+	const double solar_lum = GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * 4. * M_PI * m::pow<2>(solar_radius) * m::pow<4>(temp);
+	const double radius = solar_radius;
+
+	const RocheLobe roche_lobe(radius, 1e9, 1.0);
+
+	Star sphere(temp, radius, 5);
+	Star roche(temp, roche_lobe, 5);
+
+	BOOST_CHECK_CLOSE(sphere.luminosity(), roche.luminosity(), 1);
+}
+
+
+BOOST_AUTO_TEST_CASE(testStar_Roche_vs_spherical_tiny_mass_ratio) {
+	const double temp = 5772;
+	const double solar_lum =
+			GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * 4. * M_PI * m::pow<2>(solar_radius) * m::pow<4>(temp);
+	const double radius = solar_radius;
+	const double mass_ratio = 1e-9;
+
+	const double semiaxis = radius * std::cbrt(3.0 / mass_ratio);
+	const RocheLobe roche_lobe(semiaxis, mass_ratio, 1.0);
+
+	Star sphere(temp, radius, 5);
+	Star roche(temp, roche_lobe, 5);
+
+	BOOST_CHECK_CLOSE(sphere.luminosity(), roche.luminosity(), 1);
+}
+
+
+BOOST_AUTO_TEST_CASE(testStar_Roche_vs_spherical_small_roche_fill) {
+	const double temp = 5772;
+	const double solar_lum =
+			GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * 4. * M_PI * m::pow<2>(solar_radius) * m::pow<4>(temp);
+	const double radius = solar_radius;
+	const double mass_ratio = 1.0;
+	const double roche_fill = 0.1;
+
+	const double critical_polar_radius_semiaxis = CriticalRocheLobe(mass_ratio).polar_radius;
+	const double semiaxis = radius / critical_polar_radius_semiaxis / roche_fill;
+	const RocheLobe roche_lobe(semiaxis, mass_ratio, roche_fill);
+
+	Star sphere(temp, radius, 5);
+	Star roche(temp, roche_lobe, 5);
+
+	BOOST_CHECK_CLOSE(sphere.luminosity(), roche.luminosity(), 1);
 }
 
 
@@ -159,37 +210,16 @@ constexpr static const std::array<std::array<double, 101>, 3> discostar_lum_dir_
 }};
 constexpr static const std::array<double, 3> discostar_lambdas = {{angstromToCm(6410.0), angstromToCm(5510.0), angstromToCm(3465)}};
 
-void compareWithDiscostar(
-		const std::array<std::array<double, 101>, 3>& discostar_data,
-		const double roche_lobe_fill) {
-	const double Mx = sunToGram(1.4);
-	const double Mopt = sunToGram(0.55);
-	const double Topt = 4000.0;
-	const double semiaxis =  3.126121552e11;
-	const double polar_radius_semiaxis = 0.2812;
-	const double Height2R = 0.05;
-	const double Lns = 7e36;
-	const double Ldisk = 1e37;
-	const double albedo = 0.9;
+void compareWithDiscostar(IrradiatedStar&& star, const std::array<std::array<double, 101>, 3>& discostar_lum_dir) {
 	const double inclination = 40.0 / 180.0 * M_PI;
 	const double delta_lambda = angstromToCm(1.0);
-
-//	const double Ropt = semiaxis * BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(Mopt / Mx);
-	const double Ropt = roche_lobe_fill * polar_radius_semiaxis * semiaxis;
-	const Vec3 position = {-semiaxis, 0.0, 0.0};
-	const UnitVec3 normal(0.0, 0.0);
-
-	IrradiatedStar::sources_t sources;
-	sources.push_back(std::make_unique<CentralDiskSource>(position, normal, Ldisk, albedo, Height2R));
-	sources.push_back(std::make_unique<PointAccretorSource>(position, Lns, albedo, Height2R));
-	IrradiatedStar star(std::move(sources), Topt, Ropt, 3);
 
 	for (size_t i_lambda = 0; i_lambda < discostar_lambdas.size(); ++i_lambda) {
 		const double lambda = discostar_lambdas[i_lambda];
 #ifdef OUTPUT
 		std::ofstream file("/Users/hombit/tmp/" + std::to_string(cmToAngstrom(lambda)) + ".dat");
 #endif
-		const size_t n = discostar_lum_dir_half_roche[i_lambda].size();
+		const size_t n = discostar_lum_dir[i_lambda].size();
 		for (size_t i = 0; i < n; ++i) {
 			const double phase = 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(n - 1);
 			const UnitVec3 direction(inclination, phase);
@@ -199,7 +229,7 @@ void compareWithDiscostar(
 			const double irr_area = star.integrate([&](size_t i_tr) { return static_cast<double>(star.Qirr()[i_tr] > 0.0); }, direction);
 			file << phase << "\t" << value << "\t" << irr_area << std::endl;
 #endif
-			BOOST_CHECK_CLOSE(value, 4.0 * M_PI * discostar_lum_dir_half_roche[i_lambda][i], 5);
+			BOOST_CHECK_CLOSE(value, 4.0 * M_PI * discostar_lum_dir[i_lambda][i], 5);
 		}
 	}
 
@@ -218,12 +248,72 @@ void compareWithDiscostar(
 #endif
 }
 
-BOOST_AUTO_TEST_CASE(discostar_comparison_half_roche) {
-	compareWithDiscostar(discostar_lum_dir_half_roche, 0.5);
+BOOST_AUTO_TEST_CASE(discostar_comparison_spherical_geometry_half_roche) {
+	const double Mx = sunToGram(1.4);
+	const double Mopt = sunToGram(0.55);
+	const double Topt = 4000.0;
+	const double semiaxis =  3.126121552e11;
+	const double polar_radius_semiaxis = 0.2812;
+	const double roche_lobe_fill = 0.5;
+	const double Height2R = 0.05;
+	const double Lns = 7e36;
+	const double Ldisk = 1e37;
+	const double albedo = 0.9;
+
+	const double Ropt = roche_lobe_fill * polar_radius_semiaxis * semiaxis;
+	const Vec3 position = {-semiaxis, 0.0, 0.0};
+	const UnitVec3 normal(0.0, 0.0);
+
+	IrradiatedStar::sources_t sources;
+	sources.push_back(std::make_unique<CentralDiskSource>(position, normal, Ldisk, albedo, Height2R));
+	sources.push_back(std::make_unique<PointAccretorSource>(position, Lns, albedo, Height2R));
+	IrradiatedStar star(std::move(sources), Topt, Ropt, 3);
+
+	compareWithDiscostar(std::move(star), discostar_lum_dir_half_roche);
 }
 
-/*
-BOOST_AUTO_TEST_CASE(discostar_comparison_full_roche) {
-	compareWithDiscostar(discostar_lum_dir_full_roche, 1.0);
+BOOST_AUTO_TEST_CASE(discostar_comparison_roche_half_roche) {
+	const double Mx = sunToGram(1.4);
+	const double Mopt = sunToGram(0.55);
+	const double Topt = 4000.0;
+	const double semiaxis =  3.126121552e11;
+	const double roche_lobe_fill = 0.5;
+	const double Height2R = 0.05;
+	const double Lns = 7e36;
+	const double Ldisk = 1e37;
+	const double albedo = 0.9;
+
+	const RocheLobe roche_lobe(semiaxis, Mopt / Mx, roche_lobe_fill);
+	const Vec3 position = {-semiaxis, 0.0, 0.0};
+	const UnitVec3 normal(0.0, 0.0);
+
+	IrradiatedStar::sources_t sources;
+	sources.push_back(std::make_unique<CentralDiskSource>(position, normal, Ldisk, albedo, Height2R));
+	sources.push_back(std::make_unique<PointAccretorSource>(position, Lns, albedo, Height2R));
+	IrradiatedStar star(std::move(sources), Topt, roche_lobe, 3);
+
+	compareWithDiscostar(std::move(star), discostar_lum_dir_half_roche);
 }
-*/
+
+BOOST_AUTO_TEST_CASE(discostar_comparison_full_roche) {
+	const double Mx = sunToGram(1.4);
+	const double Mopt = sunToGram(0.55);
+	const double Topt = 4000.0;
+	const double semiaxis =  3.126121552e11;
+	const double roche_lobe_fill = 1.0;
+	const double Height2R = 0.05;
+	const double Lns = 7e36;
+	const double Ldisk = 1e37;
+	const double albedo = 0.9;
+
+	const RocheLobe roche_lobe(semiaxis, Mopt / Mx, roche_lobe_fill);
+	const Vec3 position = {-semiaxis, 0.0, 0.0};
+	const UnitVec3 normal(0.0, 0.0);
+
+	IrradiatedStar::sources_t sources;
+	sources.push_back(std::make_unique<CentralDiskSource>(position, normal, Ldisk, albedo, Height2R));
+	sources.push_back(std::make_unique<PointAccretorSource>(position, Lns, albedo, Height2R));
+	IrradiatedStar star(std::move(sources), Topt, roche_lobe, 3);
+
+	compareWithDiscostar(std::move(star), discostar_lum_dir_full_roche);
+}

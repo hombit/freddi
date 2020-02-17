@@ -7,14 +7,32 @@
 
 
 Star::Star(const double temp, const double radius, const unsigned short lod):
-		triangles_(initializeTriangles(radius, lod)),
+		triangles_(initializeSphereTriangles(radius, lod)),
 		Tth_(temp, triangles_.size()),
 		irr_() {}
 
-std::vector<Triangle> Star::initializeTriangles(const double radius, const unsigned short grid_scale) {
+Star::Star(const double temp, const RocheLobe& roche_lobe, const unsigned short lod):
+		triangles_(initializeRocheTriangles(roche_lobe, lod)),
+		Tth_(temp, triangles_.size()),
+		irr_() {}
+
+std::vector<Triangle> Star::initializeSphereTriangles(const double radius, const unsigned short grid_scale) {
 	auto triangles = unit_sphere_triangles(grid_scale);
 	for (auto& tr : triangles) {
 		tr *= radius;
+	}
+	return triangles;
+}
+
+std::vector<Triangle> Star::initializeRocheTriangles(const RocheLobe& roche_lobe, const unsigned short grid_scale) {
+	const auto sphere_triangles = unit_sphere_triangles(grid_scale);
+	std::vector<Triangle> triangles;
+	for (const auto& sph_tr : sphere_triangles) {
+		auto vertices = sph_tr.vertices();
+		for (auto& vertex : vertices) {
+			vertex *= roche_lobe.r(vertex);
+		}
+		triangles.emplace_back(vertices);
 	}
 	return triangles;
 }
@@ -200,6 +218,10 @@ CentralDiskSource* CentralDiskSource::clone() const {
 
 IrradiatedStar::IrradiatedStar(sources_t&& sources, const double temp, const double radius, const unsigned short lod):
 		Star(temp, radius, lod),
+		sources_(std::move(sources)) {}
+
+IrradiatedStar::IrradiatedStar(sources_t&& sources, const double temp, const RocheLobe& roche_lobe, const unsigned short lod):
+		Star(temp, roche_lobe, lod),
 		sources_(std::move(sources)) {}
 
 IrradiatedStar::IrradiatedStar(const IrradiatedStar& other):
