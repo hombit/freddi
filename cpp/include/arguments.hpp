@@ -8,7 +8,6 @@
 
 #include <gsl_const_cgsm.h>
 #include <constants.hpp>
-#include <functions.hpp>
 #include <opacity_related.hpp>
 #include <orbit.hpp>
 #include <passband.hpp>
