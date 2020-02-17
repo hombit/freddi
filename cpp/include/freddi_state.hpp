@@ -142,6 +142,19 @@ private:
         virtual void update(const FreddiState&) override;
     };
 
+    class __Woods_Which_Shields__ : public BasicWind {
+    private:
+        // windparams
+        const double Xi_max;
+        const double T_iC;
+    public:
+        explicit __Woods_Which_Shields__(const FreddiState& state);
+        ~__Woods_Which_Shields__() override = default;
+        __Woods_Which_Shields__(const __Woods_Which_Shields__&) = default;
+        virtual __Woods_Which_Shields__* clone() const override { return new __Woods_Which_Shields__(*this); }
+        virtual void update(const FreddiState&) override;
+    };
+
 	class DiskStructure {
 	public:
 		FreddiArguments args;
