@@ -6,13 +6,14 @@
 #include <optional>
 #include <string>
 
-#include "gsl_const_cgsm.h"
-#include "constants.hpp"
-#include "opacity_related.hpp"
-#include "orbit.hpp"
-#include "passband.hpp"
-#include "util.hpp"
-#include "unit_transformation.hpp"
+#include <gsl_const_cgsm.h>
+#include <constants.hpp>
+#include <functions.hpp>
+#include <opacity_related.hpp>
+#include <orbit.hpp>
+#include <passband.hpp>
+#include <util.hpp>
+#include <unit_transformation.hpp>
 
 
 class GeneralArguments {
@@ -28,27 +29,6 @@ public:
 			prefix(prefix),
 			dir(dir),
 			fulldata(fulldata) {}
-};
-
-
-class BlackHoleFunctions {
-public:
-	static inline double r_kerrISCO(const double Mx, const double kerr) { return rgToCm(r_kerrISCORg(kerr), Mx); }
-};
-
-
-class BinaryFunctions {
-public:
-	static double rocheLobeVolumeRadiusSemiaxis(double mass_ratio);
-	static inline double semiaxis(const double total_mass, const double period) {
-		return std::cbrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * total_mass * m::pow<2>(period) / (4. * m::pow<2>(M_PI)));
-	}
-	static inline double semiaxis(const double mass1, const double mass2, const double period) {
-		return semiaxis(mass1 + mass2, period);
-	}
-	static inline double rocheLobeVolumeRadius(const double mass1, const double mass2, const double period) {
-		return rocheLobeVolumeRadiusSemiaxis(mass1 / mass2) * semiaxis(mass1, mass2, period);
-	}
 };
 
 
