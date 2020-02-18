@@ -66,7 +66,7 @@ vecd FreddiState::CurrentState::initializeF(const DiskStructure& str) {
 FreddiState::FreddiState(const FreddiArguments& args, const wunc_t& wunc):
 		str_(new DiskStructure(args, wunc)),
 		current_(*str_),
-		disk_irr_source_(initializeAngularDist(args.irr->angular_dist_disk)),
+		disk_irr_source_(initializeFreddiIrradiationSource(args.irr->angular_dist_disk)),
 		star_roche_lobe_(str_->semiaxis, args.basic->Mopt / args.basic->Mx, args.basic->roche_lobe_fill),
 		star_({}, args.basic->Topt, star_roche_lobe_, args.calc->starlod) {
 	initializeWind();
@@ -104,7 +104,7 @@ void FreddiState::initializeWind() {
 }
 
 
-std::shared_ptr<FreddiState::BasicFreddiIrradiationSource> FreddiState::initializeAngularDist(const std::string& angular_dist_type) {
+std::shared_ptr<FreddiState::BasicFreddiIrradiationSource> FreddiState::initializeFreddiIrradiationSource(const std::string& angular_dist_type) {
 	if (angular_dist_type == "isotropic") {
 		return std::make_shared<IsotropicFreddiIrradiationSource>();
 	}
@@ -317,12 +317,8 @@ double FreddiState::Luminosity(const vecd& T, double nu1, double nu2) const {
 
 
 IrradiatedStar::sources_t FreddiState::star_irr_sources() {
-	const Vec3 position(-semiaxis(), 0.0, 0.0);
-	const UnitVec3 normal(0.0, 0.0);
-	const double Height2R = Height()[last()] / R()[last()];
-
 	IrradiatedStar::sources_t sources;
-	sources.push_back(std::make_unique<CentralDiskSource>(position, normal, Lbol_disk(), args().flux->star_albedo, Height2R));
+	sources.push_back(disk_irr_source_->irr_source(*this, Lbol_disk()));
 	return sources;
 }
 
@@ -422,10 +418,29 @@ void FreddiState::__testC_q0_Shields1986__::update(const FreddiState& state) {
 
 FreddiState::BasicFreddiIrradiationSource::~BasicFreddiIrradiationSource() {}
 
+Vec3 FreddiState::BasicFreddiIrradiationSource::position(const FreddiState& state) const {
+	return {-state.semiaxis(), 0.0, 0.0};
+}
+
+double FreddiState::BasicFreddiIrradiationSource::Height2R(FreddiState& state) const {
+	return state.Height()[state.last()] / state.R()[state.last()];
+}
+
 double FreddiState::IsotropicFreddiIrradiationSource::angular_dist(const double mu) const {
 	return 1.0;
 }
 
+std::unique_ptr<IrrSource> FreddiState::IsotropicFreddiIrradiationSource::irr_source(FreddiState& state, const double luminosity) const {
+	return std::make_unique<PointAccretorSource>(position(state), luminosity, state.args().flux->star_albedo, Height2R(state));
+}
+
+FreddiState::PlaneFreddiIrradiationSource::PlaneFreddiIrradiationSource():
+		normal(0.0, 0.0) {}
+
 double FreddiState::PlaneFreddiIrradiationSource::angular_dist(const double mu) const {
 	return 2.0 * mu;
+}
+
+std::unique_ptr<IrrSource> FreddiState::PlaneFreddiIrradiationSource::irr_source(FreddiState& state, const double luminosity) const {
+	return std::make_unique<CentralDiskSource>(position(state), normal, luminosity, state.args().flux->star_albedo, Height2R(state));
 }

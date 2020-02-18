@@ -115,18 +115,27 @@ protected:
 	public:
 		virtual ~BasicFreddiIrradiationSource() = 0;
 		virtual double angular_dist(double mu) const = 0; // mu = cos(angle between ray and normal)
+		virtual std::unique_ptr<IrrSource> irr_source(FreddiState& state, double luminosity) const = 0;
+	protected:
+		Vec3 position(const FreddiState& state) const;
+		double Height2R(FreddiState& state) const;
 	};
 
 	class IsotropicFreddiIrradiationSource: public BasicFreddiIrradiationSource {
 	public:
 		~IsotropicFreddiIrradiationSource() override = default;
 		double angular_dist(double mu) const override;
+		std::unique_ptr<IrrSource> irr_source(FreddiState& state, double luminosity) const override;
 	};
 
 	class PlaneFreddiIrradiationSource: public BasicFreddiIrradiationSource {
+	protected:
+		const UnitVec3 normal;
 	public:
+		PlaneFreddiIrradiationSource();
 		~PlaneFreddiIrradiationSource() override = default;
 		double angular_dist(double mu) const override;
+		std::unique_ptr<IrrSource> irr_source(FreddiState& state, double luminosity) const override;
 	};
 
 private:
@@ -147,10 +156,11 @@ private:
 		vecd h;
 		vecd R;
 		wunc_t wunc;
-		DiskStructure(const FreddiArguments& args, const wunc_t& wunc);
 	private:
 		static vecd initialize_h(const FreddiArguments& args, size_t Nx);
 		static vecd initialize_R(const vecd& h, double GM);
+	public:
+		DiskStructure(const FreddiArguments& args, const wunc_t& wunc);
 	};
 
 	class CurrentState {
@@ -238,9 +248,9 @@ protected:
 	virtual vecd windA() const { return wind_->A(); }
 	virtual vecd windB() const { return wind_->B(); }
 	virtual vecd windC() const { return wind_->C(); }
-// angular_dist_disk_
+// disk_irr_source_
 protected:
-	static std::shared_ptr<BasicFreddiIrradiationSource> initializeAngularDist(const std::string& angular_dist_type);
+	static std::shared_ptr<BasicFreddiIrradiationSource> initializeFreddiIrradiationSource(const std::string& angular_dist_type);
 public:
 	inline double angular_dist_disk(const double mu) const { return disk_irr_source_->angular_dist(mu); }
 // opt_str_
