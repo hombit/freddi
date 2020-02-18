@@ -60,22 +60,12 @@ protected:
 public:
 	NeutronStarBasicDiskBinaryArguments(
 			const NeutronStarArguments& ns_args,
-			double alpha,
-			double Mx, double kerr,
-			double period,
-			double Mopt, double roche_lobe_fill, double Topt,
-			std::optional<double> rin, std::optional<double> rout, std::optional<double> risco
-	):
-			BasicDiskBinaryArguments(
-				alpha,
-				Mx, kerr,
-				period,
-				Mopt,
-				roche_lobe_fill,
-				Topt,
-				rin,
-				rout,
-				initializeRisco(ns_args, risco)) {}
+			double alpha_,
+			double Mx_, double kerr_,
+			double period_,
+			double Mopt_, double roche_lobe_fill_, double Topt_,
+			std::optional<double> rin_, std::optional<double> rout_, std::optional<double> risco_
+	);
 };
 
 
