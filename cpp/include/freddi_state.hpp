@@ -111,22 +111,22 @@ private:
 	};
 
 protected:
-	class BasicRadiationAngularDistribution {
+	class BasicFreddiIrradiationSource {
 	public:
-		virtual ~BasicRadiationAngularDistribution() = 0;
-		virtual double operator()(double mu) const = 0; // mu = cos(angle between ray and normal)
+		virtual ~BasicFreddiIrradiationSource() = 0;
+		virtual double angular_dist(double mu) const = 0; // mu = cos(angle between ray and normal)
 	};
 
-	class IsotropicRadiationAngularDistribution: public BasicRadiationAngularDistribution {
+	class IsotropicFreddiIrradiationSource: public BasicFreddiIrradiationSource {
 	public:
-		~IsotropicRadiationAngularDistribution() override = default;
-		double operator()(double mu) const override;
+		~IsotropicFreddiIrradiationSource() override = default;
+		double angular_dist(double mu) const override;
 	};
 
-	class PlaneRadiationAngularDistribution: public BasicRadiationAngularDistribution {
+	class PlaneFreddiIrradiationSource: public BasicFreddiIrradiationSource {
 	public:
-		~PlaneRadiationAngularDistribution() override = default;
-		double operator()(double mu) const override;
+		~PlaneFreddiIrradiationSource() override = default;
+		double angular_dist(double mu) const override;
 	};
 
 private:
@@ -182,7 +182,7 @@ protected:
 	CurrentState current_;
 	DiskOptionalStructure opt_str_;
 	std::unique_ptr<BasicWind> wind_;
-	std::shared_ptr<BasicRadiationAngularDistribution> angular_dist_disk_;
+	std::shared_ptr<BasicFreddiIrradiationSource> disk_irr_source_;
 	RocheLobe star_roche_lobe_;
 	IrradiatedStar star_;
 public:
@@ -240,9 +240,9 @@ protected:
 	virtual vecd windC() const { return wind_->C(); }
 // angular_dist_disk_
 protected:
-	static std::shared_ptr<BasicRadiationAngularDistribution> initializeAngularDist(const std::string& angular_dist_type);
+	static std::shared_ptr<BasicFreddiIrradiationSource> initializeAngularDist(const std::string& angular_dist_type);
 public:
-	inline double angular_dist_disk(const double mu) const { return (*angular_dist_disk_)(mu); }
+	inline double angular_dist_disk(const double mu) const { return disk_irr_source_->angular_dist(mu); }
 // opt_str_
 protected:
 	virtual void invalidate_optional_structure();

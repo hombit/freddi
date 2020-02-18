@@ -66,7 +66,7 @@ vecd FreddiState::CurrentState::initializeF(const DiskStructure& str) {
 FreddiState::FreddiState(const FreddiArguments& args, const wunc_t& wunc):
 		str_(new DiskStructure(args, wunc)),
 		current_(*str_),
-		angular_dist_disk_(initializeAngularDist(args.irr->angular_dist_disk)),
+		disk_irr_source_(initializeAngularDist(args.irr->angular_dist_disk)),
 		star_roche_lobe_(str_->semiaxis, args.basic->Mopt / args.basic->Mx, args.basic->roche_lobe_fill),
 		star_({}, args.basic->Topt, star_roche_lobe_, args.calc->starlod) {
 	initializeWind();
@@ -78,7 +78,7 @@ FreddiState::FreddiState(const FreddiState& other):
 		current_(other.current_),
 		opt_str_(other.opt_str_),
 		wind_(other.wind_->clone()),
-		angular_dist_disk_(other.angular_dist_disk_),
+		disk_irr_source_(other.disk_irr_source_),
 		star_roche_lobe_(other.star_roche_lobe_),
 		star_(other.star_) {}
 
@@ -104,12 +104,12 @@ void FreddiState::initializeWind() {
 }
 
 
-std::shared_ptr<FreddiState::BasicRadiationAngularDistribution> FreddiState::initializeAngularDist(const std::string& angular_dist_type) {
+std::shared_ptr<FreddiState::BasicFreddiIrradiationSource> FreddiState::initializeAngularDist(const std::string& angular_dist_type) {
 	if (angular_dist_type == "isotropic") {
-		return std::make_shared<IsotropicRadiationAngularDistribution>();
+		return std::make_shared<IsotropicFreddiIrradiationSource>();
 	}
 	if (angular_dist_type == "plane") {
-		return std::make_shared<PlaneRadiationAngularDistribution>();
+		return std::make_shared<PlaneFreddiIrradiationSource>();
 	}
 	throw std::invalid_argument("Wrong angular distribution type");
 }
@@ -420,12 +420,12 @@ void FreddiState::__testC_q0_Shields1986__::update(const FreddiState& state) {
 }
 
 
-FreddiState::BasicRadiationAngularDistribution::~BasicRadiationAngularDistribution() {}
+FreddiState::BasicFreddiIrradiationSource::~BasicFreddiIrradiationSource() {}
 
-double FreddiState::IsotropicRadiationAngularDistribution::operator()(const double mu) const {
+double FreddiState::IsotropicFreddiIrradiationSource::angular_dist(const double mu) const {
 	return 1.0;
 }
 
-double FreddiState::PlaneRadiationAngularDistribution::operator()(const double mu) const {
+double FreddiState::PlaneFreddiIrradiationSource::angular_dist(const double mu) const {
 	return 2.0 * mu;
 }

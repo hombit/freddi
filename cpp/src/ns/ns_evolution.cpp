@@ -195,7 +195,7 @@ double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::
 FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarArguments &args):
 		FreddiEvolution(args),
 		ns_str_(new NeutronStarStructure(*args.ns, this)),
-		angular_dist_ns_(initializeAngularDist(args.irr_ns->angular_dist_ns)),
+		ns_irr_source_(initializeAngularDist(args.irr_ns->angular_dist_ns)),
 		fp_(initializeNsMdotFraction(*args.ns)),
 		eta_ns_(initializeNsAccretionEfficiency(*args.ns, this)) {
 	// Change initial condition due presence of magnetic field torque. It can spoil user-defined initial disk
