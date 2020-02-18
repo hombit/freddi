@@ -1,10 +1,15 @@
 //#define OUTPUT
+#define BENCH
 
 #include <array>
 #include <memory>
 #include <vector>
 #ifdef OUTPUT
 #include <fstream>
+#endif
+#ifdef BENCH
+#include <chrono>
+#include <iostream>
 #endif
 
 #include <boost/math/special_functions/pow.hpp>
@@ -180,6 +185,10 @@ constexpr static const std::array<std::array<double, 101>, 3> discostar_lum_dir_
 constexpr static const std::array<double, 3> discostar_lambdas = {{angstromToCm(6410.0), angstromToCm(5510.0), angstromToCm(3465)}};
 
 void compareWithDiscostar(IrradiatedStar&& star, const std::array<std::array<double, 101>, 3>& discostar_lum_dir) {
+#ifdef BENCH
+	const auto start = std::chrono::high_resolution_clock::now();
+#endif
+
 	const double inclination = 40.0 / 180.0 * M_PI;
 	const double delta_lambda = angstromToCm(1.0);
 
@@ -215,9 +224,20 @@ void compareWithDiscostar(IrradiatedStar&& star, const std::array<std::array<dou
 		file << star.Teff()[i_tr] << std::endl;
 	}
 #endif
+
+#ifdef BENCH
+	const auto end = std::chrono::high_resolution_clock::now();
+	std::cout << "BENCH. Light curves computation time for discostar comparison, without star initialisation (N triangles = " << star.triangles().size() << ")"
+#ifdef OUTPUT
+		<< " (including time of file output)"
+#endif // OUTPUT
+		<< ": "
+		<< std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.0 << " ms"
+		<< std::endl;
+#endif // BENCH
 }
 
-BOOST_AUTO_TEST_CASE(discostar_comparison_spherical_geometry_half_roche) {
+BOOST_AUTO_TEST_CASE(testDiscostar_comparison_spherical_geometry_half_roche) {
 	const double Mx = sunToGram(1.4);
 	const double Mopt = sunToGram(0.55);
 	const double Topt = 4000.0;
@@ -241,7 +261,7 @@ BOOST_AUTO_TEST_CASE(discostar_comparison_spherical_geometry_half_roche) {
 	compareWithDiscostar(std::move(star), discostar_lum_dir_half_roche);
 }
 
-BOOST_AUTO_TEST_CASE(discostar_comparison_roche_half_roche) {
+BOOST_AUTO_TEST_CASE(testDiscostar_comparison_roche_half_roche) {
 	const double Mx = sunToGram(1.4);
 	const double Mopt = sunToGram(0.55);
 	const double Topt = 4000.0;
@@ -264,7 +284,7 @@ BOOST_AUTO_TEST_CASE(discostar_comparison_roche_half_roche) {
 	compareWithDiscostar(std::move(star), discostar_lum_dir_half_roche);
 }
 
-BOOST_AUTO_TEST_CASE(discostar_comparison_full_roche) {
+BOOST_AUTO_TEST_CASE(testDiscostar_comparison_full_roche) {
 	const double Mx = sunToGram(1.4);
 	const double Mopt = sunToGram(0.55);
 	const double Topt = 4000.0;
@@ -286,3 +306,29 @@ BOOST_AUTO_TEST_CASE(discostar_comparison_full_roche) {
 
 	compareWithDiscostar(std::move(star), discostar_lum_dir_full_roche);
 }
+
+#ifdef BENCH
+const size_t bench_duration_ms = 3000;
+
+BOOST_AUTO_TEST_CASE(benchRoche_star5) {
+	const auto start = std::chrono::high_resolution_clock::now();
+	size_t count = 0;
+
+	for (; std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() < bench_duration_ms; ++count) {
+		const double temp = 5000;
+		const double mass_ratio = 0.1;
+		const double roche_fill = 0.8;
+		const double semiaxis = 1e12;
+
+		const RocheLobe roche_lobe(semiaxis, mass_ratio, roche_fill);
+		Star roche(temp, roche_lobe, 5);
+	}
+
+	const auto end = std::chrono::high_resolution_clock::now();
+
+	std::cout
+		<< "BENCH. Roche lobe star initialisation time (lod=5): "
+		<< std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / (1000.0 * count) << " ms"
+		<< std::endl;
+}
+#endif
