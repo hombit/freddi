@@ -67,9 +67,20 @@ FreddiState::FreddiState(const FreddiArguments& args, const wunc_t& wunc):
 		 str_(new DiskStructure(args, wunc)),
 		 current_(*str_),
 		 angular_dist_disk_(initializeAngularDist(args.irr->angular_dist_disk)),
-		 star_({}, args.basic->Topt, args.basic->Ropt, args.calc->starlod) {
+		 roche_lobe_(str_->semiaxis, args.basic->Mopt / args.basic->Mx, 1.0),
+		 star_({}, args.basic->Topt, roche_lobe_, args.calc->starlod) {
 	initializeWind();
 }
+
+
+FreddiState::FreddiState(const FreddiState& other):
+		str_(other.str_),
+		current_(other.current_),
+		opt_str_(other.opt_str_),
+		wind_(other.wind_->clone()),
+		angular_dist_disk_(other.angular_dist_disk_),
+		roche_lobe_(other.roche_lobe_),
+		star_(other.star_) {}
 
 
 void FreddiState::initializeWind() {
@@ -102,15 +113,6 @@ std::shared_ptr<FreddiState::BasicRadiationAngularDistribution> FreddiState::ini
 	}
 	throw std::invalid_argument("Wrong angular distribution type");
 }
-
-
-FreddiState::FreddiState(const FreddiState& other):
-		str_(other.str_),
-		current_(other.current_),
-		opt_str_(other.opt_str_),
-		wind_(other.wind_->clone()),
-		angular_dist_disk_(other.angular_dist_disk_),
-		star_(other.star_) {}
 
 
 void FreddiState::invalidate_optional_structure() {

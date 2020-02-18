@@ -8,6 +8,7 @@
 
 #include <arguments.hpp>
 #include <passband.hpp>
+#include <rochelobe.hpp>
 #include <spectrum.hpp>
 #include <star.hpp>
 #include <util.hpp>
@@ -182,6 +183,7 @@ protected:
 	DiskOptionalStructure opt_str_;
 	std::unique_ptr<BasicWind> wind_;
 	std::shared_ptr<BasicRadiationAngularDistribution> angular_dist_disk_;
+	RocheLobe roche_lobe_;
 	IrradiatedStar star_;
 public:
 	FreddiState(const FreddiArguments& args, const wunc_t& wunc);
