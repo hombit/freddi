@@ -64,11 +64,11 @@ vecd FreddiState::CurrentState::initializeF(const DiskStructure& str) {
 
 
 FreddiState::FreddiState(const FreddiArguments& args, const wunc_t& wunc):
-		 str_(new DiskStructure(args, wunc)),
-		 current_(*str_),
-		 angular_dist_disk_(initializeAngularDist(args.irr->angular_dist_disk)),
-		 roche_lobe_(str_->semiaxis, args.basic->Mopt / args.basic->Mx, 1.0),
-		 star_({}, args.basic->Topt, roche_lobe_, args.calc->starlod) {
+		str_(new DiskStructure(args, wunc)),
+		current_(*str_),
+		angular_dist_disk_(initializeAngularDist(args.irr->angular_dist_disk)),
+		star_roche_lobe_(str_->semiaxis, args.basic->Mopt / args.basic->Mx, args.basic->roche_lobe_fill),
+		star_({}, args.basic->Topt, star_roche_lobe_, args.calc->starlod) {
 	initializeWind();
 }
 
@@ -79,7 +79,7 @@ FreddiState::FreddiState(const FreddiState& other):
 		opt_str_(other.opt_str_),
 		wind_(other.wind_->clone()),
 		angular_dist_disk_(other.angular_dist_disk_),
-		roche_lobe_(other.roche_lobe_),
+		star_roche_lobe_(other.star_roche_lobe_),
 		star_(other.star_) {}
 
 

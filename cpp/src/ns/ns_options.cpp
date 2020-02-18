@@ -59,7 +59,7 @@ NeutronStarBasicDiskBinaryOptions::NeutronStarBasicDiskBinaryOptions(const po::v
 				vm["kerr"].as<double>(),
 				dayToS(vm["period"].as<double>()),
 				sunToGram(vm["Mopt"].as<double>()),
-				BasicDiskBinaryOptions::roptInitializer(vm),
+				vm["rochelobefill"].as<double>(),
 				vm["Topt"].as<double>(),
 				BasicDiskBinaryOptions::rinInitializer(vm),
 				BasicDiskBinaryOptions::routInitializer(vm),

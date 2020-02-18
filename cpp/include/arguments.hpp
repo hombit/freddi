@@ -33,15 +33,16 @@ public:
 
 class BasicDiskBinaryArguments: public BlackHoleFunctions, public BinaryFunctions {
 public:
-	constexpr static const double default_kerr = 0.;
-	constexpr static const double default_Topt = 0.;
+	constexpr static const double default_kerr = 0.0;
+	constexpr static const double default_roche_lobe_fill = 1.0;
+	constexpr static const double default_Topt = 0.0;
 public:
 	double alpha;
 	double Mx;
 	double kerr;
 	double period;
 	double Mopt;
-	double Ropt;
+	double roche_lobe_fill;
 	double Topt;
 	double rin;
 	double rout;
@@ -54,23 +55,20 @@ protected:
 		// than r_1 or r_2 for axial-symmetric gas disk. Also this factor is in agreement with Gilfanov & Arefiev, 2005
 		return 0.9 * rocheLobeVolumeRadius(Mx, Mopt, period);
 	}
-	static inline double roptFromMxMoptPeriod(const double Mx, const double Mopt, const double period) {
-		return rocheLobeVolumeRadius(Mopt, Mx, period);
-	}
 	static inline double riscoFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
 public:
 	BasicDiskBinaryArguments(
 			double alpha,
 			double Mx, double kerr,
 			double period,
-			double Mopt, std::optional<double> Ropt, double Topt,
+			double Mopt, double roche_lobe_fill, double Topt,
 			std::optional<double> rin, std::optional<double> rout, std::optional<double> risco
 	):
 			alpha(alpha),
 			Mx(Mx), kerr(kerr),
 			period(period),
 			Mopt(Mopt),
-			Ropt(Ropt ? *Ropt : roptFromMxMoptPeriod(Mx, Mopt, period)),
+			roche_lobe_fill(roche_lobe_fill),
 			Topt(Topt),
 			rin(rin ? *rin : rinFromMxKerr(Mx, kerr)),
 			rout(rout ? *rout : routFromMxMoptPeriod(Mx, Mopt, period)),

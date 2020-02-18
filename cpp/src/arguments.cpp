@@ -12,13 +12,9 @@ constexpr const char GeneralArguments::default_dir[];
 
 
 constexpr const double BasicDiskBinaryArguments::default_kerr;
+constexpr const double BasicDiskBinaryArguments::default_roche_lobe_fill;
 constexpr const double BasicDiskBinaryArguments::default_Topt;
 
-
-double BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(const double mass_ratio) { // Eggleton, P. P. 1983, ApJ, 268, 368
-	const double q = std::cbrt(mass_ratio);
-	return 0.49 * m::pow<2>(q) / (0.6 * m::pow<2>(q) + std::log(1. + q));
-}
 
 constexpr const char DiskStructureArguments::default_opacity[];
 constexpr const double DiskStructureArguments::default_Mdotout;

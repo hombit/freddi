@@ -20,7 +20,7 @@ boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(
 		double alpha,
 		double Mx, double kerr,
 		double period,
-		double Mopt, const object& Ropt, double Topt,
+		double Mopt, double roche_lobe_fill, double Topt,
 		const object& rin, const object& rout, const object& risco);
 
 boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
@@ -67,7 +67,7 @@ boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_d
 		double alpha,
 		double Mx, double kerr,
 		double period,
-		double Mopt, const object& Ropt, double Topt,
+		double Mopt, double roche_lobe_fill, double Topt,
 		const object& rin, const object& rout, const object& risco);
 
 boost::shared_ptr<NeutronStarSelfIrradiationArguments> make_neutron_star_self_irradiation_arguments(

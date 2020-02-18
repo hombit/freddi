@@ -32,7 +32,7 @@ BasicDiskBinaryOptions::BasicDiskBinaryOptions(const po::variables_map &vm):
 				vm["kerr"].as<double>(),
 				dayToS(vm["period"].as<double>()),
 				sunToGram(vm["Mopt"].as<double>()),
-				roptInitializer(vm),
+				vm["rochelobefill"].as<double>(),
 				vm["Topt"].as<double>(),
 				rinInitializer(vm),
 				routInitializer(vm),
@@ -57,13 +57,6 @@ std::optional<double> BasicDiskBinaryOptions::routInitializer(const po::variable
 	return {};
 }
 
-std::optional<double> BasicDiskBinaryOptions::roptInitializer(const po::variables_map &vm) {
-	if (vm.count("Ropt")) {
-		return sunToCm(vm["Ropt"].as<double>());
-	}
-	return {};
-}
-
 std::optional<double> BasicDiskBinaryOptions::riscoInitializer(const po::variables_map &vm) {
 	if (vm.count("risco")) {
 		const double Mx = sunToGram(vm["Mx"].as<double>());
@@ -79,7 +72,7 @@ po::options_description BasicDiskBinaryOptions::description() {
 			( "Mx,M", po::value<double>()->required(), "Mass of the central object, in the units of solar masses" )
 			( "kerr", po::value<double>()->default_value(default_kerr), "Dimensionless Kerr parameter of the black hole" )
 			( "Mopt",	po::value<double>()->required(), "Mass of the optical star, in units of solar masses" )
-			( "Ropt", po::value<double>(), "Radius of the optical star, in units of solar radius" )
+			( "rochelobefill", po::value<double>()->default_value(default_roche_lobe_fill), "Dimensionless factor describing a size of the optical star. Polar radius of the star is rochelobefill * (polar radius of critical Roche lobe)" )
 			( "Topt", po::value<double>()->default_value(default_Topt), "Thermal temperature of the optical star, in units of kelvins" )
 			( "period,P", po::value<double>()->required(), "Orbital period of the binary system, in units of days" )
 			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the gravitational radius of the central object GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )

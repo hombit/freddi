@@ -20,13 +20,13 @@ boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(
 		double alpha,
 		double Mx, double kerr,
 		double period,
-		double Mopt, const object& Ropt, double Topt,
+		double Mopt, double roche_lobe_fill, double Topt,
 		const object& rin, const object& rout, const object& risco) {
 	return boost::make_shared<BasicDiskBinaryArguments>(
 			alpha,
 			Mx, kerr,
 			period,
-			Mopt, objToOpt<double>(Ropt), Topt,
+			Mopt, roche_lobe_fill, Topt,
 			objToOpt<double>(rin), objToOpt<double>(rout), objToOpt<double>(risco));
 }
 
@@ -115,14 +115,14 @@ boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_d
 		double alpha,
 		double Mx, double kerr,
 		double period,
-		double Mopt, const object& Ropt, double Topt,
+		double Mopt, double roche_lobe_fill, double Topt,
 		const object& rin, const object& rout, const object& risco) {
 	return boost::make_shared<NeutronStarBasicDiskBinaryArguments>(
 			ns_args,
 			alpha,
 			Mx, kerr,
 			period,
-			Mopt, objToOpt<double>(Ropt), Topt,
+			Mopt, roche_lobe_fill, Topt,
 			objToOpt<double>(rin), objToOpt<double>(rout), objToOpt<double>(risco));
 }
 

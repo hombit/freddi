@@ -63,7 +63,7 @@ public:
 			double alpha,
 			double Mx, double kerr,
 			double period,
-			double Mopt, std::optional<double> Ropt, double Topt,
+			double Mopt, double roche_lobe_fill, double Topt,
 			std::optional<double> rin, std::optional<double> rout, std::optional<double> risco
 	):
 			BasicDiskBinaryArguments(
@@ -71,7 +71,7 @@ public:
 				Mx, kerr,
 				period,
 				Mopt,
-				Ropt,
+				roche_lobe_fill,
 				Topt,
 				rin,
 				rout,
