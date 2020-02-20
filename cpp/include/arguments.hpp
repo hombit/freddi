@@ -254,11 +254,13 @@ public:
 
 class CalculationArguments {
 public:
+	constexpr static const double default_t0 = 0;
 	constexpr static const unsigned int default_Nx = 1000;
 	constexpr static const unsigned int default_Nt_for_tau = 200;
 	constexpr static const char default_gridscale[] = "log";
 	constexpr static const unsigned short default_starlod = 3;
 public:
+	double t0;
 	double time;
 	double tau;
 	unsigned int Nx;
@@ -267,9 +269,11 @@ public:
 	double eps;
 public:
 	CalculationArguments(
+			double t0,
 			double time, std::optional<double> tau,
 			unsigned int Nx, const std::string& gridscale, const unsigned short starlod,
 			double eps=1e-6):
+			t0(t0),
 			time(time),
 			tau(tau ? *tau : time / default_Nt_for_tau),
 			Nx(Nx), gridscale(gridscale), starlod(starlod),

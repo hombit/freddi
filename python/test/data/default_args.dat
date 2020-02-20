@@ -32,6 +32,7 @@
 # rochelobefill=1
 # staralbedo=0
 # starlod=3
+# t0=0
 # tau=0.25
 # time=50
 # --rout hadn't been specified, tidal radius 1.53444 Rsun was used

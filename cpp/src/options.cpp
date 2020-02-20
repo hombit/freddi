@@ -212,6 +212,7 @@ po::options_description FluxOptions::description() {
 
 CalculationOptions::CalculationOptions(const po::variables_map &vm):
 		CalculationArguments(
+				dayToS(vm["t0"].as<double>()),
 				dayToS(vm["time"].as<double>()),
 				tauInitializer(vm),
 				vm["Nx"].as<unsigned int>(),
@@ -232,6 +233,7 @@ std::optional<double> CalculationOptions::tauInitializer(const po::variables_map
 po::options_description CalculationOptions::description() {
 	po::options_description od("Parameters of disk evolution calculation");
 	od.add_options()
+			( "t0", po::value<double>()->default_value(default_t0), "Initial time moment, days" )
 			( "time,T", po::value<double>()->required(), "Time interval to calculate evolution, days" )
 			( "tau",	po::value<double>(), "Time step, days" )
 			( "Nx",	po::value<unsigned int>()->default_value(default_Nx), "Size of calculation grid" )

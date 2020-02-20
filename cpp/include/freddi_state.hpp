@@ -165,14 +165,14 @@ private:
 
 	class CurrentState {
 	public:
-		double F_in = 0;
 		double Mdot_out;
 		double Mdot_in_prev = -INFINITY;
-		double t = 0;
-		size_t i_t = 0;
-		size_t first = 0;
+		double t;
+		size_t i_t;
+		size_t first;
 		size_t last;
 		vecd F;
+		double F_in;
 		explicit CurrentState(const DiskStructure& str);
 		CurrentState(const CurrentState&) = default;
 		CurrentState& operator=(const CurrentState&) = default;

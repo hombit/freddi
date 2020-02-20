@@ -318,6 +318,7 @@ constexpr const double FluxArguments::default_star_albedo;
 constexpr const double FluxArguments::default_inclination;
 
 
+constexpr const double CalculationArguments::default_t0;
 constexpr const unsigned int CalculationArguments::default_Nx;
 constexpr const unsigned int CalculationArguments::default_Nt_for_tau;
 constexpr const char CalculationArguments::default_gridscale[];

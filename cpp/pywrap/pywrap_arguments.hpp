@@ -44,6 +44,7 @@ boost::shared_ptr<FluxArguments> make_flux_arguments(
 			double inclination, double distance);
 
 boost::shared_ptr<CalculationArguments> make_calculation_arguments(
+		double t0,
 		double time, const object& tau,
 		unsigned int Nx, const std::string& gridscale, unsigned short starlod,
 		const object& eps);
