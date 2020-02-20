@@ -17,6 +17,7 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 		disk_structure_header(initializeFulldataHeader(disk_structure_fields)),
 		star_fields(star_fields),
 		star_header(initializeFulldataHeader(star_fields)) {
+	output.precision(precision);
 	output << "#" << short_fields.at(0).name;
 	for (size_t i = 1; i < short_fields.size(); ++i) {
 		output << "\t" << short_fields[i].name;
@@ -76,7 +77,6 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 					   << "\n";
 			}
 		} else {
-//			output << "error\n";
 			throw boost::program_options::invalid_option_value(it.first.c_str());
 		}
 	}
@@ -118,6 +118,7 @@ void BasicFreddiFileOutput::diskStructureDump() {
 	auto filename = (freddi->args().general->dir + "/" + freddi->args().general->prefix
 			+ "_" + std::to_string(freddi->i_t()) + ".dat");
 	FstreamWithPath full_output(filename);
+	full_output.precision(precision);
 
 	full_output << disk_structure_header
 			<< "# Time = " << sToDay(freddi->t())
@@ -138,6 +139,7 @@ void BasicFreddiFileOutput::starDump() {
 	auto filename = (freddi->args().general->dir + "/" + freddi->args().general->prefix
 					 + "_" + std::to_string(freddi->i_t()) + "_star.dat");
 	FstreamWithPath full_output(filename);
+	full_output.precision(precision);
 
 	full_output << star_header
 				<< "# Time = " << sToDay(freddi->t())
