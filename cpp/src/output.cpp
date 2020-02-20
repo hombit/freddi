@@ -11,6 +11,7 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 											 std::vector<FileOutputLongField>&& disk_structure_fields,
 											 std::vector<FileOutputLongField>&& star_fields):
 		freddi(freddi),
+		precision(freddi->args().general->output_precision),
 		output(freddi->args().general->dir + "/" + freddi->args().general->prefix + ".dat"),
 		short_fields(short_fields),
 		disk_structure_fields(disk_structure_fields),

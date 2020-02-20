@@ -39,15 +39,16 @@ struct FileOutputLongField {
 
 class BasicFreddiFileOutput {
 protected:
-	constexpr static const int precision = 12;
 	std::shared_ptr<FreddiEvolution> freddi;
-	void shortDump();
-	void diskStructureDump();
-	void starDump();
 	const std::vector<FileOutputShortField> short_fields;
 	const std::vector<FileOutputLongField> disk_structure_fields;
 	const std::vector<FileOutputLongField> star_fields;
+protected:
+	void shortDump();
+	void diskStructureDump();
+	void starDump();
 private:
+	const unsigned short precision;
 	FstreamWithPath output;
 	std::string disk_structure_header;
 	std::string star_header;

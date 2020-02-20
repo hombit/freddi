@@ -19,14 +19,17 @@ class GeneralArguments {
 public:
 	constexpr static const char default_prefix[] = "freddi";
 	constexpr static const char default_dir[] = ".";
+	constexpr static const unsigned short default_output_precision = 12;
 public:
 	std::string prefix;
 	std::string dir;
+	unsigned short output_precision;
 	bool fulldata;
 public:
-	GeneralArguments(const std::string& prefix, const std::string& dir, bool fulldata=false):
+	GeneralArguments(const std::string& prefix, const std::string& dir, unsigned short output_precision, bool fulldata):
 			prefix(prefix),
 			dir(dir),
+			output_precision(output_precision),
 			fulldata(fulldata) {}
 };
 

@@ -10,6 +10,7 @@ GeneralOptions::GeneralOptions(const po::variables_map& vm):
 		GeneralArguments(
 				vm["prefix"].as<std::string>(),
 				vm["dir"].as<std::string>(),
+				vm["precision"].as<unsigned int>(),
 				(vm.count("fulldata") > 0)) {}
 
 po::options_description GeneralOptions::description() {
@@ -19,6 +20,7 @@ po::options_description GeneralOptions::description() {
 			( "config", po::value<std::string>(), "Set additional configuration filepath" )
 			( "prefix", po::value<std::string>()->default_value(default_prefix), "Set prefix for output filenames. Output file with distribution of parameters over time is PREFIX.dat" )
 			( "dir,d", po::value<std::string>()->default_value(default_dir), "Choose the directory to write output files. It should exist" )
+			( "precision", po::value<unsigned int>()->default_value(default_output_precision), "Number of digits to print into output files" )
 			( "fulldata", "Output files PREFIX_%d.dat with radial structure for every time step. Default is to output only PREFIX.dat with global disk parameters for every time step" )
 			;
 	return od;
