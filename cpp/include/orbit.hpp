@@ -2,7 +2,7 @@
 #define _ORBIT_HPP
 
 
-double rISCORg(double kerr);
+double r_kerrISCORg(double kerr);
 
 double efficiency_of_accretion(double kerr);
 

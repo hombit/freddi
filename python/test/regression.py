@@ -11,8 +11,7 @@ from parameterized import parameterized
 
 from freddi import Freddi
 
-
-DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
+from .util import DATA_DIR
 
 
 class RegressionTestCase(unittest.TestCase):
@@ -36,9 +35,12 @@ class RegressionTestCase(unittest.TestCase):
         if isinstance(value, tuple):
             return [self.convert_config_value(v) for v in value]
         try:
-            return float(value)
+            return int(value)
         except ValueError:
-            return value.encode()
+            try:
+                return float(value)
+            except ValueError:
+                return value.encode()
 
     def load_config(self, data_file, arguments_to_remove=()):
         section = 'section'
@@ -55,16 +57,15 @@ class RegressionTestCase(unittest.TestCase):
             config.pop(kwarg, None)
         for name, value in config.items():
             config[name] = self.convert_config_value(value)
-        if 'lambda' in config:
-            config['lambdas'] = config.pop('lambda')
-        config['cgs'] = False
+        config['__cgs'] = False
         return config
 
     columns_to_compare = ('Mdot', 'Mdisk', 'Lx', 'mU', 'mB', 'mV', 'mR', 'mI', 'mJ')
 
     @parameterized.expand(glob.glob(os.path.join(DATA_DIR, '*.dat')))
     def test(self, data_file):
-        config = self.load_config(data_file, ('dir', 'prefix', 'fulldata'))
+        config = self.load_config(data_file, ('dir', 'prefix', 'fulldata', 'config'))
+        lmbd_ = np.array(config.pop('lambda', [])) * 1e-8
         f = Freddi(**config)
         result = f.evolve()
         data = np.genfromtxt(data_file, names=True)
@@ -74,11 +75,13 @@ class RegressionTestCase(unittest.TestCase):
             assert_equal(result.t, data['t'] * 86400)
         for column in self.columns_to_compare:
             with self.subTest(column):
-                assert_allclose(getattr(result, column), data[column], rtol=1e-4)
-        for i_lmbd, lmbd in enumerate(f.lambdas):
+                assert_allclose(getattr(result, column), data[column], rtol=1e-4,
+                                err_msg='File: {}, column {}:'.format(data_file, column))
+        for i_lmbd, lmbd in enumerate(lmbd_):
             column = 'Fnu{}'.format(i_lmbd)
             if column in data.dtype.names:
                 with self.subTest(column):
-                    assert_allclose(result.flux(lmbd), data[column], rtol=1e-4)
+                    assert_allclose(result.flux(lmbd), data[column], rtol=1e-4,
+                                    err_msg='File: {}, lambda {}, column {}:'.format(data_file, lmbd, column))
             else:
                 break

@@ -21,7 +21,7 @@ double Planck_lambda(double T, double lambda);
 
 double Planck_nu1_nu2(double T, double nu1, double nu2, double tol=std::sqrt(std::numeric_limits<double>::epsilon()));
 
-double T_GR(double r1, double ak, double Mx, double Mdot, double r_in);
+double T_GR(double r1, double ak, double Mx, double Mdot);
 } // namespace Spectrum
 
 

@@ -1,0 +1,80 @@
+name: Main CI
+
+on: [push, pull_request]
+
+jobs:
+  gcc:
+    runs-on: ubuntu-latest
+
+    container:
+      image: opensuse/tumbleweed
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: zypper install -y --no-recommends gcc-c++ cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel libboost_python3-devel libboost_numpy3-devel python3-devel python3-numpy-devel git
+      - name: Create ./cmake-build directory
+        run: mkdir ./cmake-build
+      - name: Build and install
+        run: |
+          cmake $GITHUB_WORKSPACE
+          make VERBOSE=1 install
+        working-directory: ./cmake-build
+      - name: Run freddi
+        run: ./freddi --fulldata --starflux
+        working-directory: ./cmake-build
+      - name: Run freddi-ns
+        run: ./freddi-ns --Mx=1.4 --alpha=0.25 --Mopt=0.5 period=1 --Mdot0=1e17 --initialcond=quasistat --Bx=1e8 --fulldata --starflux
+        working-directory: ./cmake-build
+      - name: Unit tests
+        run: ctest -V
+        working-directory: ./cmake-build
+      - name: Regression test
+        run: FREDDI=../../../cmake-build/freddi ./generate_test_data.sh && git diff --word-diff --exit-code
+        working-directory: ./python/test/data
+  
+  clang:
+    runs-on: ubuntu-latest
+
+    container:
+      image: opensuse/tumbleweed
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: zypper install -y --no-recommends clang gcc cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel libboost_python3-devel libboost_numpy3-devel python3-devel python3-numpy-devel git
+      - name: Create ./cmake-build directory
+        run: mkdir ./cmake-build
+      - name: Build and install
+        run: |
+          cmake -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ ..
+          make VERBOSE=1 install
+        working-directory: ./cmake-build
+      - name: Run freddi
+        run: ./freddi --fulldata --starflux
+        working-directory: ./cmake-build
+      - name: Run freddi-ns
+        run: ./freddi-ns --Mx=1.4 --alpha=0.25 --Mopt=0.5 period=1 --Mdot0=1e17 --initialcond=quasistat --Bx=1e8 --fulldata --starflux
+        working-directory: ./cmake-build
+      - name: Unit tests
+        run: ctest -V
+        working-directory: ./cmake-build  
+      - name: Regression test
+        run: FREDDI=../../../cmake-build/freddi ./generate_test_data.sh && git diff --word-diff --exit-code
+        working-directory: ./python/test/data
+
+
+  cpython:
+    runs-on: ubuntu-latest
+
+    container:
+      image: opensuse/tumbleweed
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: zypper install -y --no-recommends gcc-c++ cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel libboost_python3-devel libboost_numpy3-devel python3-devel python3-numpy-devel python3-scipy python3-setuptools
+      - name: Install package
+        run: python3 setup.py install
+      - name: Test package
+        run: python3 setup.py test

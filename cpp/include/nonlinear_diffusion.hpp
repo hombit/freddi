@@ -6,7 +6,6 @@
 #include <csignal>		// sig_atomic_t
 #include <exception>	// std::exception
 #include <functional>	// std::function
-#include <iostream>		// Could be removed
 #include <vector>
 
 

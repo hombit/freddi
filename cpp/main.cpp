@@ -1,8 +1,12 @@
-#include "application.hpp"
-#include "freddi_evolution.hpp"
+#include <application.hpp>
+#include <freddi_evolution.hpp>
+#include <options.hpp>
+#include <output.hpp>
 
 
 int main(int ac, char *av[]) {
-	run_application<FreddiOptions, FreddiEvolution>(ac, av);
+	if (! run_application<FreddiFileOutput, FreddiOptions, FreddiEvolution>(ac, av)){
+		return 1;
+	}
 	return 0;
 }

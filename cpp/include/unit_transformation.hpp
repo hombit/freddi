@@ -46,4 +46,12 @@ constexpr inline double hertzToKev(const double nu_hertz) {
 	return nu_hertz * GSL_CONST_CGSM_PLANCKS_CONSTANT_H / (1000. * GSL_CONST_CGSM_ELECTRON_VOLT);
 }
 
+
+constexpr inline double kevToK(const double temperature_kev) {
+	return temperature_kev * 1000. * GSL_CONST_CGSM_ELECTRON_VOLT / GSL_CONST_CGSM_BOLTZMANN;
+}
+constexpr inline double kToKev(const double temperature_k) {
+	return temperature_k * GSL_CONST_CGSM_BOLTZMANN / (1000. * GSL_CONST_CGSM_ELECTRON_VOLT);
+}
+
 #endif //FREDDI_UNIT_TRANSFOMATION_H

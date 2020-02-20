@@ -1,25 +1,57 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
+message("CMake version: ${CMAKE_VERSION}")
 project(freddi)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
-set(STATIC_LINKING FALSE CACHE BOOL "Build a static binary?")
-if(STATIC_LINKING)
-    set(CMAKE_EXE_LINKER_FLAGS "-static")
-endif(STATIC_LINKING)
+include_directories("${PROJECT_SOURCE_DIR}/cpp/include")
 
-include_directories ("${PROJECT_SOURCE_DIR}/cpp/include")
 
-find_package(Boost 1.57.0 COMPONENTS program_options unit_test_framework REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
-link_directories ( ${Boost_LIBRARY_DIRS} )
+function(CREATE_SHARED)
+    set(TARGET freddi-dll)
+    find_package(Boost 1.57.0 COMPONENTS program_options filesystem REQUIRED)
+
+    file(GLOB_RECURSE SOURCES
+            cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
+    add_library(${TARGET} SHARED ${SOURCES})
+    set_property(TARGET ${TARGET} PROPERTY OUTPUT_NAME freddi)
+
+    target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIR})
+    target_compile_definitions(${TARGET} PUBLIC INSTALLPATHPREFIX="${CMAKE_INSTALL_PREFIX}")
+    target_link_libraries(${TARGET} ${Boost_LIBRARIES})
+    install(TARGETS ${TARGET} DESTINATION lib)
+endfunction()
+
+CREATE_SHARED()
+
 
 function(CREATE_EXE targ)
-    set(TARGET freddi${targ})
-    file(GLOB_RECURSE SOURCES cpp/main${targ}.cpp cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
-    add_executable(${TARGET} ${SOURCES})
+    set(TARGET freddi${targ}-exe)
+    set(EXE freddi${targ})
+
+    set(STATIC_LINKING FALSE CACHE BOOL "Build a static binary?")
+    if(STATIC_LINKING)
+        set(Boost_USE_STATIC_LIBS "ON")
+    endif(STATIC_LINKING)
+
+    find_package(Boost 1.57.0 COMPONENTS program_options filesystem REQUIRED)
+
+    file(GLOB SOURCES
+            cpp/main${targ}.cpp
+            cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
+    set(SOURCES_NS "")
+    if (targ STREQUAL "-ns")
+        file(GLOB SOURCES_NS cpp/src/ns/*.cpp cpp/include/ns/*.hpp)
+    endif()
+
+    add_executable(${TARGET} ${SOURCES} ${SOURCES_NS})
+    set_property(TARGET ${TARGET} PROPERTY OUTPUT_NAME ${EXE})
+
+    target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIR})
+
     target_compile_definitions(${TARGET} PUBLIC INSTALLPATHPREFIX="${CMAKE_INSTALL_PREFIX}")
-    target_link_libraries(${TARGET} LINK_PUBLIC ${Boost_LIBRARIES})
+    target_link_libraries(${TARGET} ${Boost_LIBRARIES})
     install(TARGETS ${TARGET} DESTINATION bin)
     install(FILES ${PROJECT_SOURCE_DIR}/freddi.ini DESTINATION etc)
 endfunction()
@@ -27,11 +59,80 @@ endfunction()
 CREATE_EXE("")
 CREATE_EXE("-ns")
 
+
+function(CREATE_UNIT_TEST targ)
+    set(TARGET test_${targ})
+
+    find_package(Boost 1.57.0 COMPONENTS unit_test_framework program_options filesystem REQUIRED)
+
+    file(GLOB_RECURSE SOURCES
+            cpp/test/${targ}.cpp
+            cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h)
+
+    add_executable(${TARGET} ${SOURCES})
+
+    target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIR})
+    target_link_libraries(${TARGET} ${Boost_LIBRARIES})
+
+    add_test(${TARGET} ${TARGET})
+endfunction()
+
+function(CREATE_TESTS)
+    file(GLOB TEST_SOURCES cpp/test/*.cpp)
+
+    foreach(SOURCE_PATH IN LISTS TEST_SOURCES)
+        get_filename_component(TEST_NAME ${SOURCE_PATH} NAME_WE)
+        CREATE_UNIT_TEST(${TEST_NAME})
+    endforeach()
+endfunction()
+
+CREATE_TESTS()
 enable_testing()
 
-add_executable(test_util cpp/test/util.cpp cpp/src/util.cpp)
-if(NOT ${STATIC_LINKING})
-    target_compile_definitions(test_util PUBLIC BOOST_TEST_DYN_LINK)
+
+function(CREATE_PY_MODULE)
+    find_package(Python3 COMPONENTS Development Interpreter)
+    message("Python3_LIBRARIES: ${Python3_LIBRARIES}")
+    
+    function(LOCATE_BOOST_PYTHON Boost_Python3_VERSION_TAG)
+        foreach(TAG
+                "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
+                "${Python3_VERSION_MAJOR}"
+                "-py${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
+                "-${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
+                "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
+                "-${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
+            find_package(Boost QUIET COMPONENTS "python${TAG}")
+            if(${Boost_FOUND})
+                message("Boost_Python3_VERSION_TAG: ${TAG}")
+                set(Boost_Python3_VERSION_TAG ${TAG} PARENT_SCOPE)
+                break()
+            endif()
+        endforeach()
+    endfunction(LOCATE_BOOST_PYTHON)
+
+    find_package(Python3 COMPONENTS Development Interpreter)
+
+    LOCATE_BOOST_PYTHON(Boost_Python3_VERSION_TAG)
+    find_package(Boost COMPONENTS program_options filesystem "python${Boost_Python3_VERSION_TAG}" "numpy${Boost_Python3_VERSION_TAG}")
+    message("Boost_LIBRARIES: ${Boost_LIBRARIES}")
+
+    if (${Python3_FOUND} AND ${Boost_FOUND})
+        set(TARGET _freddi)
+        file(GLOB_RECURSE SOURCES cpp/src/*.cpp cpp/include/*.hpp cpp/include/*.h cpp/pywrap/*.cpp cpp/pywrap/*.hpp)
+        Python3_add_library(${TARGET} MODULE ${SOURCES})
+        if (MODULE_OUTPUT_NAME)
+            set_property(TARGET ${TARGET} PROPERTY LIBRARY_OUTPUT_NAME ${MODULE_OUTPUT_NAME})
+        endif()
+        if (MODULE_OUTPUT_SUFFIX)
+            set_property(TARGET ${TARGET} PROPERTY SUFFIX ${MODULE_OUTPUT_SUFFIX})
+        endif()
+        execute_process(COMMAND ${Python3_EXECUTABLE} -c "import numpy; print(numpy.get_include(), end='')" OUTPUT_VARIABLE NumPy_INCLUDE_DIR)
+        target_include_directories(${TARGET} PUBLIC ${Python3_INCLUDE_DIRS} ${NumPy_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
+        target_link_libraries(${TARGET} LINK_PUBLIC ${Boost_LIBRARIES} ${Python3_LIBRARIES})
+    endif()
+endfunction(CREATE_PY_MODULE)
+
+if (NOT NO_PYTHON_MODULE)
+    CREATE_PY_MODULE()
 endif()
-target_link_libraries(test_util LINK_PUBLIC ${Boost_LIBRARIES})
-add_test(test_util test_util)

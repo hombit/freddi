@@ -1,0 +1,6 @@
+#ifndef FREDDI_PYTHON_STATE_HPP
+#define FREDDI_PYTHON_STATE_HPP
+
+void wrap_state();
+
+#endif //FREDDI_PYTHON_STATE_HPP

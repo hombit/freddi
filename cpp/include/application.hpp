@@ -3,24 +3,28 @@
 
 #include <iostream>
 
+#include <boost/program_options.hpp>
+
 #include "options.hpp"
 #include "output.hpp"
 
+namespace po = boost::program_options;
 
-template <typename Options, typename Evolution>
-void run_application(int ac, char *av[]) {
-	auto vm = parseOptions<Options>(ac, av);
-	if (vm.count("help") > 0) {
-		std::cout << Options::description() << std::endl;
-		return;
+
+template <typename Output, typename Options, typename Evolution>
+bool run_application(int ac, char *av[]) {
+	po::variables_map vm;
+	if (! parseOptions<Options>(vm, ac, av)){
+		return false;
 	}
 	Options opts(vm);
-	Evolution freddi(opts);
-	FreddiFileOutput output(freddi, vm);
-	for (int i_t = 0; i_t <= static_cast<int>(freddi.args().calc->time / freddi.args().calc->tau); i_t++) {
+	std::shared_ptr<Evolution> freddi{new Evolution(opts)};
+	Output output(freddi, vm);
+	for (int i_t = 0; i_t <= static_cast<int>(freddi->args().calc->time / freddi->args().calc->tau); i_t++) {
 		output.dump();
-		freddi.step();
+		freddi->step();
 	}
+	return true;
 }
 
 #endif //FREDDI_APPLICATION_H

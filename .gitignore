@@ -5,14 +5,12 @@ __pycache__/
 build/
 dist/
 .ipynb_checkpoints/
-cython/*.html
 .pytest_cache/
 
 ### C++ ###
 *.a
 *.so
 *.o
-freddi
 
 ### cmake ###
 cmake-build*/
