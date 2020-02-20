@@ -184,6 +184,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Lx", "erg/s", [freddi]() {return freddi->Lx();}},
 			{"Lbol", "erg/s", [freddi]() {return freddi->Lbol_disk();}},
 			{"Fx", "erg/s", [freddi]() {return freddi->Lx() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
+			{"Fbol", "erg/s", [freddi]() {return freddi->Lbol_disk() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
 			{"mU", "mag", [freddi]() {return freddi->mU();}},
 			{"mB", "mag", [freddi]() {return freddi->mB();}},
 			{"mV", "mag", [freddi]() {return freddi->mV();}},
