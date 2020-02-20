@@ -53,6 +53,36 @@ DiskStructureArguments::DiskStructureArguments(
 		const double h_in = bdb_args.h(bdb_args.rin);
 		const double h_out = bdb_args.h(bdb_args.rout);
 
+		if (initialcond == "linearF" || initialcond == "linear") {
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = 1. - oprel->m;
+			const double b = oprel->n;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+					stepper,
+					[a, b, x0](const double &y, double &dydx, double x) {
+						dydx = pow(x, a) * pow(x + x0, b);
+					},
+					integral, 0., 1., 0.01
+			);
+			const double coeff = std::pow(h_out - h_in, oprel->n + 1.) * integral / ((1. - oprel->m) * oprel->D);
+
+			if (Mdot0) {
+				F0 = *Mdot0 * (h_out - h_in);
+				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+			} else if (Mdisk0) {
+				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel->m));
+				Mdot0 = *F0 / (h_out - h_in);
+			} else if (F0) {
+				Mdot0 = *F0 / (h_out - h_in);
+				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+			} else {
+				throw std::logic_error("We couldn't be here");
+			}
+
+			return std::make_shared<InitialFLinearF>(*F0, *Mdisk0, *Mdot0);
+		}
 		if (initialcond == "powerF" || initialcond == "power") {
 			if (!powerorder) {
 				throw std::runtime_error("powerorder must be specified for the case of initialcond=powerF");

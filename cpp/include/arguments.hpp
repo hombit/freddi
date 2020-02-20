@@ -105,6 +105,12 @@ protected:
 		vecd operator()(const vecd& h) const override;
 	};
 
+	class InitialFLinearF: public InitialFPowerF {
+	public:
+		InitialFLinearF(double F0, double Mdot0, double Mdisk0):
+				InitialFPowerF(F0, Mdot0, Mdisk0, 1.0) {}
+	};
+
 	class InitialFPowerSigma: public InitialFFunction {
 	protected:
 		double powerorder;
