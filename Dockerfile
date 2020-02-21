@@ -13,7 +13,8 @@ COPY cpp ${SOURCE}/cpp
 RUN mkdir -p ${BUILD} &&\
     cd ${BUILD} &&\
     cmake ${SOURCE} -DSTATIC_LINKING=TRUE -DNO_PYTHON_MODULE=TRUE &&\
-    make install VERBOSE=1
+    make -j4 install VERBOSE=1 &&\
+    ctest -V
 
 
 
@@ -23,6 +24,7 @@ LABEL maintainer="Konstantin Malanchev <malanchev@sai.msu.ru>"
 
 COPY --from=builder /usr/local/bin/freddi /bin/freddi
 COPY --from=builder /usr/local/bin/freddi-ns /bin/freddi-ns
+COPY --from=builder /usr/local/etc/freddi.ini /etc/freddi.ini
 
 VOLUME /data
 WORKDIR /
