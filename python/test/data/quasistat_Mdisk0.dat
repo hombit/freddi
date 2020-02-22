@@ -18,11 +18,13 @@
 # distance=10
 # emax=12
 # emin=1
+# ephemerist0=0
 # gaussmu=1
 # gausssigma=0.25
 # gridscale=log
 # inclination=0
 # initialcond=quasistat
+# inittime=0
 # irrindex=0
 # irrindexcold=0
 # kerr=0
@@ -34,7 +36,6 @@
 # rochelobefill=1
 # staralbedo=0
 # starlod=3
-# t0=0
 # tau=0.25
 # time=50
 # --rout hadn't been specified, tidal radius 1.53444 Rsun was used
