@@ -149,6 +149,11 @@ double FreddiState::Lbol_disk() const {
 }
 
 
+double FreddiState::phase_opt() const {
+	return 2.0 * M_PI * (t() - args().flux->ephemeris_t0) / args().basic->period;
+}
+
+
 double FreddiState::Lx() {
 	if (!opt_str_.Lx) {
 		opt_str_.Lx = Luminosity(Tph_X(), args().flux->emin, args().flux->emax) / m::pow<4>(args().flux->colourfactor);

@@ -317,6 +317,7 @@ constexpr const double FluxArguments::default_emin;
 constexpr const double FluxArguments::default_emax;
 constexpr const double FluxArguments::default_star_albedo;
 constexpr const double FluxArguments::default_inclination;
+constexpr const double FluxArguments::default_ephemeris_t0;
 
 
 constexpr const double CalculationArguments::default_init_time;

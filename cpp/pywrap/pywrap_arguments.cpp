@@ -61,12 +61,12 @@ boost::shared_ptr<FluxArguments> make_flux_arguments(
 		double colourfactor,
 		double emin, double emax,
 		double star_albedo,
-		double inclination, double distance) {
+		double inclination, double ephemeris_t0, double distance) {
 	return boost::make_shared<FluxArguments>(
 			colourfactor,
 			emin, emax,
 			star_albedo,
-			inclination, distance,
+			inclination, ephemeris_t0, distance,
 			false, false,
 			vecd(),
 			std::vector<Passband>());

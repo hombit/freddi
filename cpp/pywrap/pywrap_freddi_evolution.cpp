@@ -67,6 +67,7 @@ dict evolution_kwdefaults() {
 	kw["emax"] = FluxArguments::default_emax;
 	kw["staralbedo"] = FluxArguments::default_star_albedo;
 	kw["inclination"] = FluxArguments::default_inclination;
+	kw["ephemerist0"] = FluxArguments::default_ephemeris_t0;
 
 	kw["inittime"] = CalculationArguments::default_init_time;
 	kw["tau"] = object();
@@ -155,7 +156,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<double>(kw["colourfactor"]),
 			extract<double>(kw["emin"]), extract<double>(kw["emax"]),
 			extract<double>(kw["staralbedo"]),
-			extract<double>(kw["inclination"]), extract<double>(kw["distance"]));
+			extract<double>(kw["inclination"]), extract<double>(kw["ephemerist0"]), extract<double>(kw["distance"]));
 	const auto calc = make_calculation_arguments(
 			extract<double>(kw["inittime"]),
 			extract<double>(kw["time"]), kw["tau"],
@@ -250,7 +251,7 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			extract<double>(kw["colourfactor"]),
 			extract<double>(kw["emin"]), extract<double>(kw["emax"]),
 			extract<double>(kw["staralbedo"]),
-			extract<double>(kw["inclination"]), extract<double>(kw["distance"]));
+			extract<double>(kw["inclination"]), extract<double>(kw["ephemerist0"]), extract<double>(kw["distance"]));
 	const auto calc = make_calculation_arguments(
 			extract<double>(kw["inittime"]),
 			extract<double>(kw["time"]), kw["tau"],

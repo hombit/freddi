@@ -225,12 +225,14 @@ public:
 	constexpr static const double default_emax = kevToHertz(12.);
 	constexpr static const double default_star_albedo = 0.0;
 	constexpr static const double default_inclination = 0.;  // degrees
+	constexpr static const double default_ephemeris_t0 = 0.0;
 public:
 	double colourfactor;
 	double emin;
 	double emax;
 	double star_albedo;
 	double inclination;  // degrees
+	double ephemeris_t0;
 	double distance;
 	bool cold_disk;
 	bool star;
@@ -241,14 +243,14 @@ public:
 			double colourfactor,
 			double emin, double emax,
 			double star_albedo,
-			double inclination, double distance,
+			double inclination, double ephemeris_t0, double distance,
 	        bool cold_disk, bool star,
 	        const vecd& lambdas,
 	        const std::vector<Passband>& passbands):
 			colourfactor(colourfactor),
 			emin(emin), emax(emax),
 			star_albedo(star_albedo),
-			inclination(inclination), distance(distance),
+			inclination(inclination), ephemeris_t0(ephemeris_t0), distance(distance),
 			cold_disk(cold_disk), star(star),
 			lambdas(lambdas),
 			passbands(passbands) {}

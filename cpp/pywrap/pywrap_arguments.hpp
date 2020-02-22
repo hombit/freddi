@@ -41,7 +41,7 @@ boost::shared_ptr<FluxArguments> make_flux_arguments(
 			double colourfactor,
 			double emin, double emax,
 			double star_albedo,
-			double inclination, double distance);
+			double inclination, double ephemeris_t0, double distance);
 
 boost::shared_ptr<CalculationArguments> make_calculation_arguments(
 		double inittime,

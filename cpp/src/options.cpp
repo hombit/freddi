@@ -163,6 +163,7 @@ FluxOptions::FluxOptions(const po::variables_map &vm):
 				kevToHertz(vm["emax"].as<double>()),
 				vm["staralbedo"].as<double>(),
 				vm["inclination"].as<double>(),
+				dayToS(vm["ephemerist0"].as<double>()),
 				kpcToCm(vm["distance"].as<double>()),
 				vm.count("colddiskflux") > 0,
 				vm.count("starflux") > 0,
@@ -202,6 +203,7 @@ po::options_description FluxOptions::description() {
 			( "emax", po::value<double>()->default_value(hertzToKev(default_emax)), "Maximum energy of X-ray band, keV" )
 			( "staralbedo", po::value<double>()->default_value(default_star_albedo), "Part of X-ray radiation reflected by optical star, (1 - albedo) heats star's photosphere. Used only when --starflux is specified" )
 			( "inclination,i", po::value<double>()->default_value(default_inclination), "Inclination of the system, degrees" )
+			( "ephemerist0", po::value<double>()->default_value(default_ephemeris_t0), "Ephemeris for the time of the minimum of the orbital light curve T0, phase zero corresponds to inferior conjunction of the optical star, days" )
 			( "distance", po::value<double>()->required(), "Distance to the system, kpc" )
 			( "colddiskflux", "Add Fnu for cold disk into output file. Default output is for hot disk only" )
 			( "starflux", "Add Fnu for optical star into output file. Mx, Mopt and period must be specified, see also Topt and starlod options. Default output is for hot disk only" )

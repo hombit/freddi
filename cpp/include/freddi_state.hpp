@@ -243,6 +243,7 @@ public:
 	inline double omega_i(size_t i) const { return omega_R(R()[i]); }
 	virtual double Mdot_in() const;
 	virtual double Lbol_disk() const;
+	double phase_opt() const;
 // wind_
 protected:
 	virtual vecd windA() const { return wind_->A(); }
@@ -331,6 +332,8 @@ public:
 	inline double flux(const Passband& passband) { return flux_region<HotRegion>(passband); }
 	double flux_star(double lambda, double phase);
 	double flux_star(const Passband& passband, double phase);
+	inline double flux_star(double lambda) { return flux_star(lambda, phase_opt()); }
+	inline double flux_star(const Passband& passband) { return flux_star(passband, phase_opt()); }
 	inline double mU() { return lazy_magnitude(opt_str_.mU, lambdaU, irr0U); }
 	inline double mB() { return lazy_magnitude(opt_str_.mB, lambdaB, irr0B); }
 	inline double mV() { return lazy_magnitude(opt_str_.mV, lambdaV, irr0V); }
