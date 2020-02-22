@@ -55,7 +55,7 @@ vecd FreddiState::DiskStructure::initialize_R(const vecd& h, double GM) {
 
 FreddiState::CurrentState::CurrentState(const DiskStructure& str):
 		Mdot_out(str.args.disk->Mdotout),
-		t(str.args.calc->t0),
+		t(str.args.calc->init_time),
 		i_t(0),
 		first(0),
 		last(str.Nx - 1),

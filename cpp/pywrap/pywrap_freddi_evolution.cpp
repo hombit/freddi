@@ -68,7 +68,7 @@ dict evolution_kwdefaults() {
 	kw["staralbedo"] = FluxArguments::default_star_albedo;
 	kw["inclination"] = FluxArguments::default_inclination;
 
-	kw["t0"] = CalculationArguments::default_t0;
+	kw["inittime"] = CalculationArguments::default_init_time;
 	kw["tau"] = object();
 	kw["Nx"] = CalculationArguments::default_Nx;
 	kw["gridscale"] = CalculationArguments::default_gridscale;
@@ -118,7 +118,7 @@ void update_no_cgs_kwargs(dict& kw) {
 	kw["emax"] = kevToHertz(extract<double>(kw["emax"]));
 	kw["distance"] = kpcToCm(extract<double>(kw["distance"]));
 
-	kw["t0"] = dayToS(extract<double>(kw["t0"]));
+	kw["inittime"] = dayToS(extract<double>(kw["inittime"]));
 	kw["time"] = dayToS(extract<double>(kw["time"]));
 	if (object(kw["tau"]).ptr() != None) {
 		kw["tau"] = dayToS(extract<double>(kw["tau"]));
@@ -157,7 +157,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<double>(kw["staralbedo"]),
 			extract<double>(kw["inclination"]), extract<double>(kw["distance"]));
 	const auto calc = make_calculation_arguments(
-			extract<double>(kw["t0"]),
+			extract<double>(kw["inittime"]),
 			extract<double>(kw["time"]), kw["tau"],
 			extract<unsigned int>(kw["Nx"]), extract<std::string>(kw["gridscale"]),
 			extract<unsigned short>(kw["starlod"]),
@@ -252,7 +252,7 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			extract<double>(kw["staralbedo"]),
 			extract<double>(kw["inclination"]), extract<double>(kw["distance"]));
 	const auto calc = make_calculation_arguments(
-			extract<double>(kw["t0"]),
+			extract<double>(kw["inittime"]),
 			extract<double>(kw["time"]), kw["tau"],
 			extract<unsigned int>(kw["Nx"]), extract<std::string>(kw["gridscale"]),
 			extract<unsigned short>(kw["starlod"]),
