@@ -18,7 +18,7 @@ jobs:
       - name: Build and install
         run: |
           cmake $GITHUB_WORKSPACE
-          make VERBOSE=1 install
+          make -j2 VERBOSE=1 install
         working-directory: ./cmake-build
       - name: Run freddi
         run: ./freddi --fulldata --starflux
@@ -48,7 +48,7 @@ jobs:
       - name: Build and install
         run: |
           cmake -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ ..
-          make VERBOSE=1 install
+          make -j2 VERBOSE=1 install
         working-directory: ./cmake-build
       - name: Run freddi
         run: ./freddi --fulldata --starflux
