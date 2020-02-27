@@ -8,6 +8,7 @@ FreddiNeutronStarEvolution::NeutronStarStructure::NeutronStarStructure(
 		args_ns(args_ns),
 //		xi_pow_minus_7_2(std::pow(xi, -3.5)),
 		R_x(args_ns.Rx),
+		redshift(1.0 - 2.0 * evolution->R_g() / args_ns.Rx),
 		R_m_min(std::max(R_x, evolution->R()[evolution->first()])),
 		mu_magn(0.5 * args_ns.Bx * m::pow<3>(R_x)),
 		R_dead(args_ns.Rdead > 0. ? args_ns.Rdead : INFINITY),
@@ -275,21 +276,33 @@ std::shared_ptr<FreddiNeutronStarEvolution::BasicNSAccretionEfficiency> FreddiNe
 
 
 double FreddiNeutronStarEvolution::Lbol_ns() const {
+	return redshift() * Lbol_ns_rest_frame();
+}
+
+
+double FreddiNeutronStarEvolution::Lbol_ns_rest_frame() const {
 	return eta_ns() * fp() * Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
 }
 
 
 double FreddiNeutronStarEvolution::T_hot_spot() const {
-	return std::pow(Lbol_ns() / (4*M_PI * hot_spot_area() * m::pow<2>(R_x()) * GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT), 0.25);
+	return std::pow(Lbol_ns_rest_frame() / (4*M_PI * hot_spot_area() * m::pow<2>(R_x()) * GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT), 0.25);
 }
 
 
 double FreddiNeutronStarEvolution::Lx_ns() {
-	if (!ns_opt_str_.Lx_ns) {
-		const double intensity = Spectrum::Planck_nu1_nu2(T_hot_spot(), args().flux->emin, args().flux->emax, 1e-4);
-		ns_opt_str_.Lx_ns = 4*M_PI * hot_spot_area() * m::pow<2>(R_x()) * M_PI * intensity;
+	return redshift() * Lx_ns_rest_frame();
+}
+
+
+double FreddiNeutronStarEvolution::Lx_ns_rest_frame() {
+	if (!ns_opt_str_.Lx_ns_rest_frame) {
+		const double nu_min = args().flux->emin / redshift();
+		const double nu_max = args().flux->emax / redshift();
+		const double intensity = Spectrum::Planck_nu1_nu2(T_hot_spot(), nu_min, nu_max, 1e-4);
+		ns_opt_str_.Lx_ns_rest_frame = 4*M_PI * hot_spot_area() * m::pow<2>(R_x()) * M_PI * intensity;
 	}
-	return *ns_opt_str_.Lx_ns;
+	return *ns_opt_str_.Lx_ns_rest_frame;
 }
 
 

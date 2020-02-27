@@ -14,6 +14,7 @@ private:
 //		double xi = 1.0;
 //		double xi_pow_minus_7_2;
 		double R_x;
+		double redshift;
 		double R_m_min;
 		double mu_magn;
 		double R_dead;
@@ -33,7 +34,7 @@ private:
 	};
 
 	struct NeutronStarOptionalStructure {
-		boost::optional<double> Lx_ns;
+		boost::optional<double> Lx_ns_rest_frame;
 	};
 
 	class BasicNSMdotFraction {
@@ -150,6 +151,7 @@ public:
 //	inline double xi() const { return ns_str_->xi; }
 //	inline double xi_pow_minus_7_2() const { return ns_str_->xi_pow_minus_7_2; }
 	inline double R_x() const { return ns_str_->R_x; }
+	inline double redshift() const { return ns_str_->redshift; }
 	inline double R_m_min() const { return ns_str_->R_m_min; }
 	inline double mu_magn() const { return ns_str_->mu_magn; }
 	inline double R_dead() const { return ns_str_->R_dead; }
@@ -164,8 +166,10 @@ public:
 // ns_opt_str_
 public:
 	double Lbol_ns() const;
+	double Lbol_ns_rest_frame() const;
 	double T_hot_spot() const;
 	double Lx_ns();
+	double Lx_ns_rest_frame();
 // angular_dist_ns_
 public:
 	inline double angular_dist_ns(const double mu) { return ns_irr_source_->angular_dist(mu); }
