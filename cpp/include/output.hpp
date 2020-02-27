@@ -23,17 +23,19 @@ public:
 struct FileOutputShortField {
 	std::string name;
 	std::string unit;
+	std::string description;
 	std::function<double ()> func;
-	FileOutputShortField(const std::string&& name, const std::string&& unit, const std::function<double ()>&& func):
-			name(name), unit(unit), func(func) {};
+	FileOutputShortField(const std::string&& name, const std::string&& unit, const std::string&& description, const std::function<double ()>&& func):
+			name(name), unit(unit), description(description), func(func) {};
 };
 
 struct FileOutputLongField {
 	std::string name;
 	std::string unit;
+	std::string description;
 	std::function<const double (size_t)> func;
-	FileOutputLongField(const std::string&& name, const std::string&& unit, const std::function<const double (size_t)>&& func):
-			name(name), unit(unit), func(func) {};
+	FileOutputLongField(const std::string&& name, const std::string&& unit, const std::string&& description, const std::function<const double (size_t)>&& func):
+			name(name), unit(unit), description(description), func(func) {};
 };
 
 
