@@ -6,6 +6,7 @@
 std::vector<FileOutputShortField> FreddiNeutronStarFileOutput::initializeShortFields(const std::shared_ptr<FreddiNeutronStarEvolution>& freddi) {
 	auto fields = FreddiFileOutput::initializeShortFields(freddi);
 	fields.emplace_back("Rin", "cm", [freddi]() {return freddi->R()[freddi->first()];});
+        fields.emplace_back("etans", "float", [freddi]() {return freddi->eta_ns();});
 	fields.emplace_back("Lxns", "erg/s", [freddi]() {return freddi->Lx_ns();});
 	fields.emplace_back("Lbolns", "erg/s", [freddi]() {return freddi->Lbol_ns();});
 	fields.emplace_back("Fxns", "erg/s", [freddi]() {return freddi->Lx_ns() * freddi->angular_dist_ns(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}),

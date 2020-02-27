@@ -178,6 +178,27 @@ double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::
 	return std::sqrt(1.0 - Rsch / Rm) - std::sqrt(1.0 - Rsch / Rx);
 }
 
+double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::rotating_magnetosphere_sibsun(const FreddiNeutronStarEvolution& freddi, const double Rm)
+const {
+    const double Rsch = 2.0 * freddi.R_g();
+    const double Rx = freddi.R_x();
+    const double Rcor = freddi.R_cor();
+    const double omega_ns = freddi.ns_str_->args_ns.freqx * 2 * M_PI;
+    const double omega_Kepl_Rx  = std::sqrt(freddi.GM() / m::pow<3>(Rx)); 
+    const double etaSS2000 = small_magnetosphere(freddi, Rm);
+    const double k = etaSS2000 / m::pow<2>(1.0 - omega_ns/omega_Kepl_Rx);
+    // k =0.014 for Aql X-1
+    
+    double Reff = Rm;
+    // if the inner disc radius > Rcor, return efficiency calculated at R=Rcor:
+    if (Rm > Rcor) Reff = Rcor;
+    const double omega_Kepl_Rin = std::sqrt(freddi.GM() / m::pow<3>(Reff)); 
+    
+    return std::sqrt(1.0 - Rsch / Reff) - std::sqrt(1.0 - Rsch / Rx)  
+    + m::pow<2>(omega_ns) / 2.0 / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT)  * (Rx-Reff) * (Rx+Reff)  
+    + k * m::pow<2>(1.0 - omega_ns/omega_Kepl_Rin);
+}
+
 double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::small_magnetosphere(const FreddiNeutronStarEvolution& freddi, const double Rm) const {
 	const double freqx_kHz = freddi.ns_str_->args_ns.freqx / 1000.0;
 	// Eq. 1

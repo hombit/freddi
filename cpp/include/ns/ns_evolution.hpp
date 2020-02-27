@@ -110,15 +110,29 @@ private:
 		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return newtonian(freddi, Rm); }
 	};
 
-	class SibgatullinSunyaev2000NSAccretionEfficiency: public BasicNSAccretionEfficiency {
+// 	class SibgatullinSunyaev2000NSAccretionEfficiency: public BasicNSAccretionEfficiency {
+// 	protected:
+// 		double schwarzschild(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+// 		double small_magnetosphere(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+// 	public:
+// 		using BasicNSAccretionEfficiency::BasicNSAccretionEfficiency;
+// 		~SibgatullinSunyaev2000NSAccretionEfficiency() override = default;
+// 		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return schwarzschild(freddi, Rm); }
+// 		double RxIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
+// 		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
+// 	};
+        class SibgatullinSunyaev2000NSAccretionEfficiency: public BasicNSAccretionEfficiency {
 	protected:
-		double schwarzschild(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+                double schwarzschild(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+		double rotating_magnetosphere_sibsun(const FreddiNeutronStarEvolution& freddi, double Rm) const;
 		double small_magnetosphere(const FreddiNeutronStarEvolution& freddi, double Rm) const;
 	public:
 		using BasicNSAccretionEfficiency::BasicNSAccretionEfficiency;
 		~SibgatullinSunyaev2000NSAccretionEfficiency() override = default;
-		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return schwarzschild(freddi, Rm); }
+// 		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return schwarzschild(freddi, Rm); }
+		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return rotating_magnetosphere_sibsun(freddi, Rm); }
 		double RxIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
+		//TODO double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return fall_from_isco(freddi, Rm); }
 		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
 	};
 private:
