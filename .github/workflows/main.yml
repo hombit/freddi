@@ -63,7 +63,6 @@ jobs:
         run: FREDDI=../../../cmake-build/freddi ./generate_test_data.sh && git diff --word-diff --exit-code
         working-directory: ./python/test/data
 
-
   cpython:
     runs-on: ubuntu-latest
 
@@ -78,3 +77,25 @@ jobs:
         run: python3 setup.py install
       - name: Test package
         run: python3 setup.py test
+
+  docker-exe:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build container
+        run: docker build -t freddi .
+      - name: Run freddi
+        run: docker run --rm -t freddi freddi --fulldata --starflux
+      - name: Run freddi-ns
+        run: docker run --rm -t freddi freddi-ns --fulldata --starflux
+
+  docker-python:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build container
+        run: docker build -f Dockerfile.python -t freddi:python .
+      - name: Run sample Python script
+        run: docker run --rm -t freddi:python python -c "import freddi; freddi.Freddi(**freddi._freddi._Freddi._required_args())"
