@@ -5,6 +5,29 @@
 
 #include "unit_transformation.hpp"
 
+
+template <class T>
+void outputHeader(std::basic_ostream<char>& os, const T& fields) {
+	os << "#" << fields.at(0).name;
+	for (size_t i = 1; i < fields.size(); ++i) {
+		os << "\t" << fields[i].name;
+	}
+	os << "\n";
+
+	os << "#" << fields.at(0).unit;
+	for (size_t i = 1; i < fields.size(); ++i) {
+		os << "\t" << fields[i].unit;
+	}
+	os << "\n";
+
+	os << "### Columns description\n";
+	for (size_t i = 0; i < fields.size(); ++i) {
+		const auto& field = fields[i];
+		os << "# " << i + 1 << "=" << field.name << " [" << field.unit << "] : " << field.description << "\n";
+	}
+}
+
+
 BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvolution>& freddi,
 											 const boost::program_options::variables_map& vm,
 											 std::vector<FileOutputShortField>&& short_fields,
@@ -19,18 +42,10 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 		star_fields(star_fields),
 		star_header(initializeFulldataHeader(star_fields)) {
 	output.precision(precision);
-	output << "#" << short_fields.at(0).name;
-	for (size_t i = 1; i < short_fields.size(); ++i) {
-		output << "\t" << short_fields[i].name;
-	}
-	output << "\n";
 
-	output << "#" << short_fields.at(0).unit;
-	for (size_t i = 1; i < short_fields.size(); ++i) {
-		output << "\t" << short_fields[i].unit;
-	}
-	output << "\n";
+	outputHeader(output, short_fields);
 
+	output << "### Parameters\n";
 	for (const auto &it : vm) {
 		auto &value = it.second.value();
 		if (auto v = boost::any_cast<uint32_t>(&value)) {
@@ -81,30 +96,14 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 			throw boost::program_options::invalid_option_value(it.first.c_str());
 		}
 	}
-	if (vm.count("rout") == 0) {
-		output << "# --rout hadn't been specified, tidal radius " << freddi->args().basic->rout / solar_radius << " Rsun was used"
-			   << std::endl;
-	}
 	output << std::flush;
 }
 
 
 std::string BasicFreddiFileOutput::initializeFulldataHeader(const std::vector<FileOutputLongField>& fields) {
-	std::string s;
-
-	s += "#" + fields.at(0).name;
-	for (size_t i = 1; i < fields.size(); ++i) {
-		s += "\t" + fields[i].name;
-	}
-	s += "\n";
-
-	s += "#" + fields.at(0).unit;
-	for (size_t i = 1; i < fields.size(); ++i) {
-		 s += "\t" + fields[i].unit;
-	}
-	s += "\n";
-
-	return s;
+	std::ostringstream oss;
+	outputHeader(oss, fields);
+	return oss.str();
 }
 
 void BasicFreddiFileOutput::shortDump() {
@@ -122,8 +121,7 @@ void BasicFreddiFileOutput::diskStructureDump() {
 	full_output.precision(precision);
 
 	full_output << disk_structure_header
-			<< "# Time = " << sToDay(freddi->t())
-			<< " Mdot_in = " << freddi->Mdot_in()
+			<< "### t = " << sToDay(freddi->t()) << " days"
 			<< std::endl;
 
 	for ( int i = freddi->first(); i <= freddi->last(); ++i ){
@@ -143,7 +141,7 @@ void BasicFreddiFileOutput::starDump() {
 	full_output.precision(precision);
 
 	full_output << star_header
-				<< "# Time = " << sToDay(freddi->t())
+				<< "### t = " << sToDay(freddi->t()) << " days"
 				<< std::endl;
 
 	for (size_t i = 0; i < freddi->star().triangles().size(); ++i){

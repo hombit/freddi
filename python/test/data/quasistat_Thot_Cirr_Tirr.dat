@@ -1,5 +1,27 @@
 #t	Mdot	Mdisk	Rhot	Kirrout	H2R	Teffout	Tirrout	Qiir2Qvisout	TphXmax	Lx	Lbol	Fx	Fbol	mU	mB	mV	mR	mI	mJ
 #days	g/s	g	Rsun	float	float	K	K	float	keV	erg/s	erg/s	erg/s/cm^2	erg/s/cm^2	mag	mag	mag	mag	mag	mag
+### Columns description
+# 1=t [days] : Time moment
+# 2=Mdot [g/s] : Accretion rate onto central object
+# 3=Mdisk [g] : Mass of the hot disk
+# 4=Rhot [Rsun] : Radius of the hot disk
+# 5=Kirrout [float] : Irradiation coefficient Kirr on the outer radius of the hot disk
+# 6=H2R [float] : Relative semiheight on the outer radius of the hot disk
+# 7=Teffout [K] : Effective tempreture on the outer radius of the hot disk
+# 8=Tirrout [K] : Irradiation temperature (Qirr / sigma_SB)^1/4 on the outer radius of the hot disk
+# 9=Qiir2Qvisout [float] : Irradiation flux to viscous flux ratio on the outer radius of the hot disk
+# 10=TphXmax [keV] : Maximum effective temperature of the disk
+# 11=Lx [erg/s] : X-ray luminosity of the disk in the given energy range [emin, emax]
+# 12=Lbol [erg/s] : Bolometric luminosity of the disk
+# 13=Fx [erg/s/cm^2] : X-ray flux of the disk in the given energy range [emin, emax]
+# 14=Fbol [erg/s/cm^2] : Bolometric flux of the disk
+# 15=mU [mag] : TO BE REMOVED
+# 16=mB [mag] : TO BE REMOVED
+# 17=mV [mag] : TO BE REMOVED
+# 18=mR [mag] : TO BE REMOVED
+# 19=mI [mag] : TO BE REMOVED
+# 20=mJ [mag] : TO BE REMOVED
+### Parameters
 # Cirr=0.001
 # Cirrcold=0
 # F0=2e+38
@@ -37,7 +59,6 @@
 # starlod=3
 # tau=0.25
 # time=50
-# --rout hadn't been specified, tidal radius 1.53444 Rsun was used
 0	3.42054e+19	8.00857e+25	1.53444	0.001	0.0996553	22224.3	21574.3	7.93156	1.58207	1.47776e+39	1.75818e+39	1.23507e-07	1.46944e-07	12.904	14.0868	14.3503	14.5205	14.9779	14.9411
 0.25	3.37589e+19	7.93583e+25	1.53444	0.001	0.0994585	22151.4	21503.5	7.93185	1.57688	1.45774e+39	1.73523e+39	1.21834e-07	1.45026e-07	12.9101	14.0924	14.3555	14.5253	14.9823	14.9454
 0.5	3.33221e+19	7.86403e+25	1.53444	0.001	0.0992642	22079.4	21433.6	7.93198	1.57176	1.43816e+39	1.71278e+39	1.20197e-07	1.4315e-07	12.9162	14.098	14.3606	14.5301	14.9867	14.9496

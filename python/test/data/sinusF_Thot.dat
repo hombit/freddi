@@ -1,5 +1,27 @@
 #t	Mdot	Mdisk	Rhot	Kirrout	H2R	Teffout	Tirrout	Qiir2Qvisout	TphXmax	Lx	Lbol	Fx	Fbol	mU	mB	mV	mR	mI	mJ
 #days	g/s	g	Rsun	float	float	K	K	float	keV	erg/s	erg/s	erg/s/cm^2	erg/s/cm^2	mag	mag	mag	mag	mag	mag
+### Columns description
+# 1=t [days] : Time moment
+# 2=Mdot [g/s] : Accretion rate onto central object
+# 3=Mdisk [g] : Mass of the hot disk
+# 4=Rhot [Rsun] : Radius of the hot disk
+# 5=Kirrout [float] : Irradiation coefficient Kirr on the outer radius of the hot disk
+# 6=H2R [float] : Relative semiheight on the outer radius of the hot disk
+# 7=Teffout [K] : Effective tempreture on the outer radius of the hot disk
+# 8=Tirrout [K] : Irradiation temperature (Qirr / sigma_SB)^1/4 on the outer radius of the hot disk
+# 9=Qiir2Qvisout [float] : Irradiation flux to viscous flux ratio on the outer radius of the hot disk
+# 10=TphXmax [keV] : Maximum effective temperature of the disk
+# 11=Lx [erg/s] : X-ray luminosity of the disk in the given energy range [emin, emax]
+# 12=Lbol [erg/s] : Bolometric luminosity of the disk
+# 13=Fx [erg/s/cm^2] : X-ray flux of the disk in the given energy range [emin, emax]
+# 14=Fbol [erg/s/cm^2] : Bolometric flux of the disk
+# 15=mU [mag] : TO BE REMOVED
+# 16=mB [mag] : TO BE REMOVED
+# 17=mV [mag] : TO BE REMOVED
+# 18=mR [mag] : TO BE REMOVED
+# 19=mI [mag] : TO BE REMOVED
+# 20=mJ [mag] : TO BE REMOVED
+### Parameters
 # Cirr=0
 # Cirrcold=0
 # F0=2e+38
@@ -37,7 +59,6 @@
 # starlod=3
 # tau=0.25
 # time=50
-# --rout hadn't been specified, tidal radius 1.53444 Rsun was used
 0	3.75733e+19	8.15314e+25	1.53444	0	0.0996553	12855.7	0	0	1.61965	1.62873e+39	1.93129e+39	2.72251e-07	3.22825e-07	13.5908	14.7288	14.9472	15.0737	15.4891	15.4256
 0.25	3.65444e+19	8.07435e+25	1.53444	0	0.0994952	12821.3	0	0	1.60845	1.58261e+39	1.87841e+39	2.64542e-07	3.13985e-07	13.5983	14.7357	14.9534	15.0793	15.4942	15.4304
 0.5	3.57346e+19	7.99731e+25	1.53444	0	0.0993301	12785.9	0	0	1.59946	1.54631e+39	1.83678e+39	2.58474e-07	3.07027e-07	13.6056	14.7424	14.9595	15.0849	15.4993	15.4351
