@@ -36,7 +36,7 @@ void wrap_state() {
 		.add_property("mI", &FreddiState::mI)
 		.add_property("mJ", &FreddiState::mJ)
 		.add_property("Mdisk", &FreddiState::Mdisk)
-		.add_property("Mdisk", &FreddiState::Mdisk)
+		.add_property("Mdot_wind", &FreddiState::Mdot_wind)
 		.add_property("h", make_function(&FreddiState::h, return_value_policy<copy_const_reference>()))
 		.add_property("R", make_function(&FreddiState::R, return_value_policy<copy_const_reference>()))
 		.add_property("F", make_function(&FreddiState::F, return_value_policy<copy_const_reference>()))
