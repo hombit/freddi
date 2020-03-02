@@ -592,15 +592,18 @@ void FreddiState::__Woods_Which_Shields__::update(const FreddiState& state) {
             const double xi1 = R_iC / state.R()[i];
             const double T_ch = T_iC * std::pow(el, 2.0 / 3.0) * std::pow(xi, -2.0 / 3.0);
             const double C_ch = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_ch) / (disk->mu * GSL_CONST_CGSM_MASS_PROTON));
-            const double C0 = (4.0 * M_PI * state.h()[i] * state.h()[i] * state.h()[i]) / (state.GM() * state.GM());
+            const double C0 = (4.0 * M_PI * m::pow<3>(state.h()[i])) / (state.GM() * state.GM());
             const double Fr =
-                    L / (4.0 * M_PI * state.R()[i] * state.R()[i] * Xi_max * C_ch * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+                    L / (4.0 * M_PI * m::pow<2>(state.R()[i]) * Xi_max * C_ch * GSL_CONST_CGSM_SPEED_OF_LIGHT);
 //const double Fc = std::pow(((1.0 + ( ((0.125 * el + 0.00382)/ xi) *((0.125 * el + 0.00382)/ xi) ))/( 1 + 1/( (el*el*el*el*(1 + 262.0*xi*xi))*(el*el*el*el*(1 + 262.0*xi*xi)) ) ) ), 1.0/6.0) ;
-            const double Fc = ((std::pow(1 + std::pow(((0.125 * el + 0.00382) * xi1), 2.0), (1.0 / 6.0))) /
-                               std::pow((1 + std::pow((el * el * el * el * (1.0 + 262.0 * xi * xi)), -2.0)),
+            const double Fc = ((std::pow((1 + m::pow<2>(((0.125 * el + 0.00382) * xi1))), (1.0 / 6.0))) /
+                               std::pow((1 + m::pow<-2>((m::pow<4>(el)* (1.0 + 262.0 * m::pow<2>(xi))))),
                                         (1.0 / 6.0)));
-            const double Expo = std::exp(-(((1.0 - (1 / std::sqrt(1.0 + 0.25 * xi1 * xi1))) *
-                                            (1.0 - (1 / std::sqrt(1.0 + 0.25 * xi1 * xi1)))) / (2.0 * xi)));
+	    //const double Fc = ((std::pow((1 + std::pow(((0.125 * el + 0.00382) * xi1), 2.0)), (1.0 / 6.0))) /
+              //                 std::pow((1 + std::pow((el * el * el * el * (1.0 + 262.0 * xi * xi)), -2.0)),
+                //                        (1.0 / 6.0)));
+            const double Expo = std::exp(-(((1.0 - (1 / std::sqrt(1.0 + 0.25 * m::pow<2>(xi1)))) *
+                                            (1.0 - (1 / std::sqrt(1.0 + 0.25 * m::pow<2>(xi1))))) / (2.0 * xi)));
             C_[i] = -2.0 * C0 * Fr * Fc * Expo;
         }
 
