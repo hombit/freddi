@@ -281,7 +281,9 @@ double FreddiNeutronStarEvolution::Lbol_ns() const {
 
 
 double FreddiNeutronStarEvolution::Lbol_ns_rest_frame() const {
-	return eta_ns() * fp() * Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
+        double Mdot = Mdot_in();
+        if (Mdot < 0.0) Mdot = 0.0;
+	return eta_ns() * fp() * Mdot * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
 }
 
 

@@ -272,7 +272,7 @@ const vecd& FreddiState::Tph_vis() {
 const vecd& FreddiState::Tph_X() {
 	if (!opt_str_.Tph_X) {
 		vecd x(Nx());
-		const double Mdot = (F()[first()+1] - F()[first()]) / (h()[first()+1] - h()[first()]);
+		const double Mdot = std::fabs((F()[first()+1] - F()[first()]) / (h()[first()+1] - h()[first()]));
 		for (size_t i = first(); i < Nx(); i++) {
 			//
 
