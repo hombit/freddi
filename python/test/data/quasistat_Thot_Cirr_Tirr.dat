@@ -1,5 +1,5 @@
 #t	Mdot	Mdisk	Rhot	Kirrout	H2R	Teffout	Tirrout	Qiir2Qvisout	TphXmax	Lx	Lbol	Fx	Fbol	mU	mB	mV	mR	mI	mJ
-#days	g/s	g	Rsun	float	float	K	K	float	keV	erg/s	erg/s	erg/s	erg/s	mag	mag	mag	mag	mag	mag
+#days	g/s	g	Rsun	float	float	K	K	float	keV	erg/s	erg/s	erg/s/cm^2	erg/s/cm^2	mag	mag	mag	mag	mag	mag
 # Cirr=0.001
 # Cirrcold=0
 # F0=2e+38

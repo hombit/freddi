@@ -9,8 +9,8 @@ std::vector<FileOutputShortField> FreddiNeutronStarFileOutput::initializeShortFi
         fields.emplace_back("etans", "float", [freddi]() {return freddi->eta_ns();});
 	fields.emplace_back("Lxns", "erg/s", [freddi]() {return freddi->Lx_ns();});
 	fields.emplace_back("Lbolns", "erg/s", [freddi]() {return freddi->Lbol_ns();});
-	fields.emplace_back("Fxns", "erg/s", [freddi]() {return freddi->Lx_ns() * freddi->angular_dist_ns(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}),
-	fields.emplace_back("Fbolns", "erg/s", [freddi]() {return freddi->Lbol_ns() * freddi->angular_dist_ns(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}),
+	fields.emplace_back("Fxns", "erg/s/cm^2", [freddi]() {return freddi->Lx_ns() * freddi->angular_dist_ns(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}),
+	fields.emplace_back("Fbolns", "erg/s/cm^2", [freddi]() {return freddi->Lbol_ns() * freddi->angular_dist_ns(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}),
 	fields.emplace_back("Thotspot", "keV", [freddi]() {return kToKev(freddi->T_hot_spot());});
 	fields.emplace_back("fpin", "float", [freddi]() {return freddi->fp();});
 	fields.emplace_back("Fmagnin", "dyn*cm", [freddi]() {return freddi->Fmagn()[freddi->first()];});
