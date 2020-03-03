@@ -13,8 +13,8 @@ std::vector<FileOutputShortField> FreddiNeutronStarFileOutput::initializeShortFi
 	fields.emplace_back("Fbolns", "erg/s/cm^2", "Bolometric flux of the neutron star", [freddi]() {return freddi->Lbol_ns() * freddi->angular_dist_ns(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}),
 	fields.emplace_back("Thotspot", "keV", "Temperature of the neutron star 'hot spot'", [freddi]() {return kToKev(freddi->T_hot_spot());});
 	fields.emplace_back("fpin", "float", "Part of accreting matter falling onto the neutron star", [freddi]() {return freddi->fp();});
-	fields.emplace_back("Fmagnin", "dyn*cm", "Magnetic torque on the inner radius of the disk", [freddi]() {return freddi->Fmagn()[freddi->first()];});
-	fields.emplace_back("Fin", "dyn*cm", "Viscous torque on the inner radius of the disk", [freddi]() {return freddi->F()[freddi->first()];});
+	fields.emplace_back("Fmagnin", "dyn*cm", "Magnetic torque at the inner radius of the disk", [freddi]() {return freddi->Fmagn()[freddi->first()];});
+	fields.emplace_back("Fin", "dyn*cm", "Viscous torque at the inner radius of the disk", [freddi]() {return freddi->F()[freddi->first()];});
 	return fields;
 }
 

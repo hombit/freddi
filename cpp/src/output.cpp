@@ -173,11 +173,11 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Mdot", "g/s", "Accretion rate onto central object",  [freddi]() {return freddi->Mdot_in();}},
 			{"Mdisk", "g", "Mass of the hot disk", [freddi]() {return freddi->Mdisk();}},
 			{"Rhot", "Rsun", "Radius of the hot disk", [freddi]() {return cmToSun(freddi->R()[freddi->last()]);}},
-			{"Kirrout", "float", "Irradiation coefficient Kirr on the outer radius of the hot disk", [freddi]() {return freddi->Kirr()[freddi->last()];}},
-			{"H2R", "float", "Relative semiheight on the outer radius of the hot disk", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
-			{"Teffout", "K", "Effective tempreture on the outer radius of the hot disk", [freddi]() {return freddi->Tph()[freddi->last()];}},
-			{"Tirrout", "K", "Irradiation temperature (Qirr / sigma_SB)^1/4 on the outer radius of the hot disk", [freddi]() {return freddi->Tirr()[freddi->last()];}},
-			{"Qiir2Qvisout", "float", "Irradiation flux to viscous flux ratio on the outer radius of the hot disk", [freddi]() {return std::pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
+			{"Kirrout", "float", "Irradiation coefficient Kirr at the outer radius of the hot disk", [freddi]() {return freddi->Kirr()[freddi->last()];}},
+			{"H2R", "float", "Relative semiheight at the outer radius of the hot disk", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
+			{"Teffout", "K", "Effective tempreture at the outer radius of the hot disk", [freddi]() {return freddi->Tph()[freddi->last()];}},
+			{"Tirrout", "K", "Irradiation temperature (Qirr / sigma_SB)^1/4 at the outer radius of the hot disk", [freddi]() {return freddi->Tirr()[freddi->last()];}},
+			{"Qiir2Qvisout", "float", "Irradiation flux to viscous flux ratio at the outer radius of the hot disk", [freddi]() {return std::pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
 			{"TphXmax", "keV", "Maximum effective temperature of the disk", [freddi]() {return kToKev(*std::max_element(freddi->Tph_X().begin() + freddi->first(), freddi->Tph_X().begin() + freddi->last() + 1));}},
 			{"Lx", "erg/s", "X-ray luminosity of the disk in the given energy range [emin, emax]", [freddi]() {return freddi->Lx();}},
 			{"Lbol", "erg/s", "Bolometric luminosity of the disk", [freddi]() {return freddi->Lbol_disk();}},
@@ -198,14 +198,14 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 		fields.emplace_back(
 				std::string("Fnu") + std::to_string(i),
 				"erg/s/cm^2/Hz",
-				"Spectral flux density of the hot disk on wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA",
+				"Spectral flux density of the hot disk at wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA",
 				[freddi, lambda]() { return freddi->flux(lambda); }
 		);
 		if (cold_disk) {
 			fields.emplace_back(
 					std::string("Fnu") + std::to_string(i) + "_cold",
 					"erg/s/cm^2/Hz",
-					"Spectral flux density of the cold disk on wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA",
+					"Spectral flux density of the cold disk at wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA",
 					[freddi, lambda]() { return freddi->flux_region<FreddiState::ColdRegion>(lambda); }
 			);
 		}
@@ -213,19 +213,19 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			fields.emplace_back(
 					"Fnu" + std::to_string(i) + "_star",
 					"erg/s/cm^2/Hz",
-					"Spectral flux density of the optical star on wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA with respect to an orbital phase",
+					"Spectral flux density of the optical star at wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA with respect to an orbital phase",
 					[freddi, lambda]() { return freddi->flux_star(lambda); }
 			);
 			fields.emplace_back(
 					"Fnu" + std::to_string(i) + "_star_min",
 					"erg/s/cm^2/Hz",
-					"Spectral flux density of the optical star on wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA on the phase of inferior conjunction of the star",
+					"Spectral flux density of the optical star at wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA on the phase of inferior conjunction of the star",
 					[freddi, lambda]() { return freddi->flux_star(lambda, 0.0); }
 			);
 			fields.emplace_back(
 					"Fnu" + std::to_string(i) + "_star_max",
 					"erg/s/cm^2/Hz",
-					"Spectral flux density of the optical star on wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA on the phase of superior conjunction of the star",
+					"Spectral flux density of the optical star at wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA on the phase of superior conjunction of the star",
 					[freddi, lambda]() { return freddi->flux_star(lambda, M_PI); }
 			);
 		}

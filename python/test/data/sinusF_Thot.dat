@@ -5,11 +5,11 @@
 # 2=Mdot [g/s] : Accretion rate onto central object
 # 3=Mdisk [g] : Mass of the hot disk
 # 4=Rhot [Rsun] : Radius of the hot disk
-# 5=Kirrout [float] : Irradiation coefficient Kirr on the outer radius of the hot disk
-# 6=H2R [float] : Relative semiheight on the outer radius of the hot disk
-# 7=Teffout [K] : Effective tempreture on the outer radius of the hot disk
-# 8=Tirrout [K] : Irradiation temperature (Qirr / sigma_SB)^1/4 on the outer radius of the hot disk
-# 9=Qiir2Qvisout [float] : Irradiation flux to viscous flux ratio on the outer radius of the hot disk
+# 5=Kirrout [float] : Irradiation coefficient Kirr at the outer radius of the hot disk
+# 6=H2R [float] : Relative semiheight at the outer radius of the hot disk
+# 7=Teffout [K] : Effective tempreture at the outer radius of the hot disk
+# 8=Tirrout [K] : Irradiation temperature (Qirr / sigma_SB)^1/4 at the outer radius of the hot disk
+# 9=Qiir2Qvisout [float] : Irradiation flux to viscous flux ratio at the outer radius of the hot disk
 # 10=TphXmax [keV] : Maximum effective temperature of the disk
 # 11=Lx [erg/s] : X-ray luminosity of the disk in the given energy range [emin, emax]
 # 12=Lbol [erg/s] : Bolometric luminosity of the disk
