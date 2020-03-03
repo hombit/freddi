@@ -1,5 +1,30 @@
 #t	Mdot	Mdisk	Rhot	Kirrout	H2R	Teffout	Tirrout	Qiir2Qvisout	TphXmax	Lx	Lbol	Fx	Fbol	mU	mB	mV	mR	mI	mJ	Fnu0	Fnu1	Fnu2
 #days	g/s	g	Rsun	float	float	K	K	float	keV	erg/s	erg/s	erg/s/cm^2	erg/s/cm^2	mag	mag	mag	mag	mag	mag	erg/s/cm^2/Hz	erg/s/cm^2/Hz	erg/s/cm^2/Hz
+### Columns description
+# 1=t [days] : Time moment
+# 2=Mdot [g/s] : Accretion rate onto central object
+# 3=Mdisk [g] : Mass of the hot disk
+# 4=Rhot [Rsun] : Radius of the hot disk
+# 5=Kirrout [float] : Irradiation coefficient Kirr at the outer radius of the hot disk
+# 6=H2R [float] : Relative semiheight at the outer radius of the hot disk
+# 7=Teffout [K] : Effective tempreture at the outer radius of the hot disk
+# 8=Tirrout [K] : Irradiation temperature (Qirr / sigma_SB)^1/4 at the outer radius of the hot disk
+# 9=Qiir2Qvisout [float] : Irradiation flux to viscous flux ratio at the outer radius of the hot disk
+# 10=TphXmax [keV] : Maximum effective temperature of the disk
+# 11=Lx [erg/s] : X-ray luminosity of the disk in the given energy range [emin, emax]
+# 12=Lbol [erg/s] : Bolometric luminosity of the disk
+# 13=Fx [erg/s/cm^2] : X-ray flux of the disk in the given energy range [emin, emax]
+# 14=Fbol [erg/s/cm^2] : Bolometric flux of the disk
+# 15=mU [mag] : TO BE REMOVED
+# 16=mB [mag] : TO BE REMOVED
+# 17=mV [mag] : TO BE REMOVED
+# 18=mR [mag] : TO BE REMOVED
+# 19=mI [mag] : TO BE REMOVED
+# 20=mJ [mag] : TO BE REMOVED
+# 21=Fnu0 [erg/s/cm^2/Hz] : Spectral flux density of the hot disk at wavelength of 8000.000000 AA
+# 22=Fnu1 [erg/s/cm^2/Hz] : Spectral flux density of the hot disk at wavelength of 5000.000000 AA
+# 23=Fnu2 [erg/s/cm^2/Hz] : Spectral flux density of the hot disk at wavelength of 3000.000000 AA
+### Parameters
 # Cirr=0
 # Cirrcold=0
 # F0=2e+38
@@ -40,7 +65,6 @@
 # starlod=3
 # tau=0.25
 # time=50
-# --rout hadn't been specified, tidal radius 1.53444 Rsun was used
 0	0.000912194	2.91708e+25	1.53444	0	0.0996553	12855.7	0	0	3.59521e-06	0	4.68874e+16	0	7.83746e-30	14.9981	15.9213	15.9654	15.9506	16.2487	16.1178	1.06938e-26	1.66031e-26	1.7237e-26
 0.25	1.12139e+14	2.92042e+25	1.53444	0	0.094847	11838.6	0	0	0.0673196	1.86142e+29	5.76402e+33	3.11145e-17	9.63485e-13	14.9302	15.8669	15.9213	15.9143	16.2186	16.091	1.10297e-26	1.73539e-26	1.86489e-26
 0.5	1.22005e+15	2.92186e+25	1.53444	0	0.0926747	11390.2	0	0	0.122263	4.77037e+32	6.27113e+34	7.9739e-14	1.04825e-11	14.87	15.8198	15.8839	15.8841	16.1939	16.0692	1.13152e-26	1.80218e-26	2.00382e-26

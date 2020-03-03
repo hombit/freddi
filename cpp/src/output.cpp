@@ -5,6 +5,29 @@
 
 #include "unit_transformation.hpp"
 
+
+template <class T>
+void outputHeader(std::basic_ostream<char>& os, const T& fields) {
+	os << "#" << fields.at(0).name;
+	for (size_t i = 1; i < fields.size(); ++i) {
+		os << "\t" << fields[i].name;
+	}
+	os << "\n";
+
+	os << "#" << fields.at(0).unit;
+	for (size_t i = 1; i < fields.size(); ++i) {
+		os << "\t" << fields[i].unit;
+	}
+	os << "\n";
+
+	os << "### Columns description\n";
+	for (size_t i = 0; i < fields.size(); ++i) {
+		const auto& field = fields[i];
+		os << "# " << i + 1 << "=" << field.name << " [" << field.unit << "] : " << field.description << "\n";
+	}
+}
+
+
 BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvolution>& freddi,
 											 const boost::program_options::variables_map& vm,
 											 std::vector<FileOutputShortField>&& short_fields,
@@ -19,18 +42,10 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 		star_fields(star_fields),
 		star_header(initializeFulldataHeader(star_fields)) {
 	output.precision(precision);
-	output << "#" << short_fields.at(0).name;
-	for (size_t i = 1; i < short_fields.size(); ++i) {
-		output << "\t" << short_fields[i].name;
-	}
-	output << "\n";
 
-	output << "#" << short_fields.at(0).unit;
-	for (size_t i = 1; i < short_fields.size(); ++i) {
-		output << "\t" << short_fields[i].unit;
-	}
-	output << "\n";
+	outputHeader(output, short_fields);
 
+	output << "### Parameters\n";
 	for (const auto &it : vm) {
 		auto &value = it.second.value();
 		if (auto v = boost::any_cast<uint32_t>(&value)) {
@@ -81,30 +96,14 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 			throw boost::program_options::invalid_option_value(it.first.c_str());
 		}
 	}
-	if (vm.count("rout") == 0) {
-		output << "# --rout hadn't been specified, tidal radius " << freddi->args().basic->rout / solar_radius << " Rsun was used"
-			   << std::endl;
-	}
 	output << std::flush;
 }
 
 
 std::string BasicFreddiFileOutput::initializeFulldataHeader(const std::vector<FileOutputLongField>& fields) {
-	std::string s;
-
-	s += "#" + fields.at(0).name;
-	for (size_t i = 1; i < fields.size(); ++i) {
-		s += "\t" + fields[i].name;
-	}
-	s += "\n";
-
-	s += "#" + fields.at(0).unit;
-	for (size_t i = 1; i < fields.size(); ++i) {
-		 s += "\t" + fields[i].unit;
-	}
-	s += "\n";
-
-	return s;
+	std::ostringstream oss;
+	outputHeader(oss, fields);
+	return oss.str();
 }
 
 void BasicFreddiFileOutput::shortDump() {
@@ -122,8 +121,7 @@ void BasicFreddiFileOutput::diskStructureDump() {
 	full_output.precision(precision);
 
 	full_output << disk_structure_header
-			<< "# Time = " << sToDay(freddi->t())
-			<< " Mdot_in = " << freddi->Mdot_in()
+			<< "### t = " << sToDay(freddi->t()) << " days"
 			<< std::endl;
 
 	for ( int i = freddi->first(); i <= freddi->last(); ++i ){
@@ -143,7 +141,7 @@ void BasicFreddiFileOutput::starDump() {
 	full_output.precision(precision);
 
 	full_output << star_header
-				<< "# Time = " << sToDay(freddi->t())
+				<< "### t = " << sToDay(freddi->t()) << " days"
 				<< std::endl;
 
 	for (size_t i = 0; i < freddi->star().triangles().size(); ++i){
@@ -171,26 +169,26 @@ void BasicFreddiFileOutput::dump() {
 
 std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const std::shared_ptr<FreddiEvolution>& freddi) {
 	std::vector<FileOutputShortField> fields {
-			{"t", "days", [freddi]() {return sToDay(freddi->t());}},
-			{"Mdot", "g/s",  [freddi]() {return freddi->Mdot_in();}},
-			{"Mdisk", "g", [freddi]() {return freddi->Mdisk();}},
-			{"Rhot", "Rsun", [freddi]() {return cmToSun(freddi->R()[freddi->last()]);}},
-			{"Kirrout", "float", [freddi]() {return freddi->Kirr()[freddi->last()];}},
-			{"H2R", "float", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
-			{"Teffout", "K", [freddi]() {return freddi->Tph()[freddi->last()];}},
-			{"Tirrout", "K", [freddi]() {return freddi->Tirr()[freddi->last()];}},
-			{"Qiir2Qvisout", "float", [freddi]() {return std::pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
-			{"TphXmax", "keV", [freddi]() {return kToKev(*std::max_element(freddi->Tph_X().begin() + freddi->first(), freddi->Tph_X().begin() + freddi->last() + 1));}},
-			{"Lx", "erg/s", [freddi]() {return freddi->Lx();}},
-			{"Lbol", "erg/s", [freddi]() {return freddi->Lbol_disk();}},
-			{"Fx", "erg/s/cm^2", [freddi]() {return freddi->Lx() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
-			{"Fbol", "erg/s/cm^2", [freddi]() {return freddi->Lbol_disk() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
-			{"mU", "mag", [freddi]() {return freddi->mU();}},
-			{"mB", "mag", [freddi]() {return freddi->mB();}},
-			{"mV", "mag", [freddi]() {return freddi->mV();}},
-			{"mR", "mag", [freddi]() {return freddi->mR();}},
-			{"mI", "mag", [freddi]() {return freddi->mI();}},
-			{"mJ", "mag", [freddi]() {return freddi->mJ();}},
+			{"t", "days", "Time moment", [freddi]() {return sToDay(freddi->t());}},
+			{"Mdot", "g/s", "Accretion rate onto central object",  [freddi]() {return freddi->Mdot_in();}},
+			{"Mdisk", "g", "Mass of the hot disk", [freddi]() {return freddi->Mdisk();}},
+			{"Rhot", "Rsun", "Radius of the hot disk", [freddi]() {return cmToSun(freddi->R()[freddi->last()]);}},
+			{"Kirrout", "float", "Irradiation coefficient Kirr at the outer radius of the hot disk", [freddi]() {return freddi->Kirr()[freddi->last()];}},
+			{"H2R", "float", "Relative semiheight at the outer radius of the hot disk", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
+			{"Teffout", "K", "Effective tempreture at the outer radius of the hot disk", [freddi]() {return freddi->Tph()[freddi->last()];}},
+			{"Tirrout", "K", "Irradiation temperature (Qirr / sigma_SB)^1/4 at the outer radius of the hot disk", [freddi]() {return freddi->Tirr()[freddi->last()];}},
+			{"Qiir2Qvisout", "float", "Irradiation flux to viscous flux ratio at the outer radius of the hot disk", [freddi]() {return std::pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
+			{"TphXmax", "keV", "Maximum effective temperature of the disk", [freddi]() {return kToKev(*std::max_element(freddi->Tph_X().begin() + freddi->first(), freddi->Tph_X().begin() + freddi->last() + 1));}},
+			{"Lx", "erg/s", "X-ray luminosity of the disk in the given energy range [emin, emax]", [freddi]() {return freddi->Lx();}},
+			{"Lbol", "erg/s", "Bolometric luminosity of the disk", [freddi]() {return freddi->Lbol_disk();}},
+			{"Fx", "erg/s/cm^2", "X-ray flux of the disk in the given energy range [emin, emax]", [freddi]() {return freddi->Lx() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
+			{"Fbol", "erg/s/cm^2", "Bolometric flux of the disk", [freddi]() {return freddi->Lbol_disk() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
+			{"mU", "mag", "TO BE REMOVED", [freddi]() {return freddi->mU();}},
+			{"mB", "mag", "TO BE REMOVED", [freddi]() {return freddi->mB();}},
+			{"mV", "mag", "TO BE REMOVED", [freddi]() {return freddi->mV();}},
+			{"mR", "mag", "TO BE REMOVED", [freddi]() {return freddi->mR();}},
+			{"mI", "mag", "TO BE REMOVED", [freddi]() {return freddi->mI();}},
+			{"mJ", "mag", "TO BE REMOVED", [freddi]() {return freddi->mJ();}},
 	};
 	const bool cold_disk = freddi->args().flux->cold_disk;
 	const bool star = freddi->args().flux->star;
@@ -200,12 +198,14 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 		fields.emplace_back(
 				std::string("Fnu") + std::to_string(i),
 				"erg/s/cm^2/Hz",
+				"Spectral flux density of the hot disk at wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA",
 				[freddi, lambda]() { return freddi->flux(lambda); }
 		);
 		if (cold_disk) {
 			fields.emplace_back(
 					std::string("Fnu") + std::to_string(i) + "_cold",
 					"erg/s/cm^2/Hz",
+					"Spectral flux density of the cold disk at wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA",
 					[freddi, lambda]() { return freddi->flux_region<FreddiState::ColdRegion>(lambda); }
 			);
 		}
@@ -213,16 +213,19 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			fields.emplace_back(
 					"Fnu" + std::to_string(i) + "_star",
 					"erg/s/cm^2/Hz",
+					"Spectral flux density of the optical star at wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA with respect to an orbital phase",
 					[freddi, lambda]() { return freddi->flux_star(lambda); }
 			);
 			fields.emplace_back(
 					"Fnu" + std::to_string(i) + "_star_min",
 					"erg/s/cm^2/Hz",
+					"Spectral flux density of the optical star at wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA on the phase of inferior conjunction of the star",
 					[freddi, lambda]() { return freddi->flux_star(lambda, 0.0); }
 			);
 			fields.emplace_back(
 					"Fnu" + std::to_string(i) + "_star_max",
 					"erg/s/cm^2/Hz",
+					"Spectral flux density of the optical star at wavelength of " + std::to_string(cmToAngstrom(lambda)) + " AA on the phase of superior conjunction of the star",
 					[freddi, lambda]() { return freddi->flux_star(lambda, M_PI); }
 			);
 		}
@@ -231,11 +234,13 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 		fields.emplace_back(
 				"Fnu" + pb.name,
 				"erg/s/cm^2/Hz",
+				"Spectral flux density of the hot disk in passband " + pb.name,
 				[freddi, &pb]() { return freddi->flux(pb); }
 		);
 		if (cold_disk) {
 			fields.emplace_back(
 					std::string("Fnu") + pb.name + "_cold",
+					"Spectral flux density of the cold disk in passband " + pb.name,
 					"erg/s/cm^2/Hz",
 					[freddi, &pb]() { return freddi->flux_region<FreddiState::ColdRegion>(pb); }
 			);
@@ -244,16 +249,19 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			fields.emplace_back(
 					"Fnu" + pb.name + "_star",
 					"erg/s/cm^2/Hz",
+					"Spectral flux density of the optical star in passband " + pb.name + " with respect to an orbital phase",
 					[freddi, &pb]() { return freddi->flux_star(pb); }
 			);
 			fields.emplace_back(
 					"Fnu" + pb.name + "_star_min",
 					"erg/s/cm^2/Hz",
+					"Spectral flux density of the optical star in passband " + pb.name + " on the phase of inferior conjunction of the star",
 					[freddi, &pb]() { return freddi->flux_star(pb, 0.0); }
 			);
 			fields.emplace_back(
 					"Fnu" + pb.name + "_star_max",
 					"erg/s/cm^2/Hz",
+					"Spectral flux density of the optical star in passband " + pb.name + " on the phase of superior conjunction of the star",
 					[freddi, &pb]() { return freddi->flux_star(pb, M_PI); }
 			);
 		}
@@ -263,14 +271,14 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 
 std::vector<FileOutputLongField> FreddiFileOutput::initializeDiskStructureFields(const std::shared_ptr<FreddiEvolution>& freddi) {
 	return {
-			{"h", "cm^2/s", [freddi](size_t i) {return freddi->h()[i];}},
-			{"R", "cm", [freddi](size_t i) {return freddi->R()[i];}},
-			{"F", "dyn*cm", [freddi](size_t i) {return freddi->F()[i];}},
-			{"Sigma", "g/cm^2", [freddi](size_t i) {return freddi->Sigma()[i];}},
-			{"Teff", "K", [freddi](size_t i) {return freddi->Tph()[i];}},
-			{"Tvis", "K", [freddi](size_t i) {return freddi->Tph_vis()[i];}},
-			{"Tirr", "K", [freddi](size_t i) {return freddi->Tirr()[i];}},
-			{"Height", "cm", [freddi](size_t i) {return freddi->Height()[i];}},
+			{"h", "cm^2/s", "Keplerian specific angular momentum", [freddi](size_t i) {return freddi->h()[i];}},
+			{"R", "cm", "Radius", [freddi](size_t i) {return freddi->R()[i];}},
+			{"F", "dyn*cm", "Viscous torque", [freddi](size_t i) {return freddi->F()[i];}},
+			{"Sigma", "g/cm^2", "Surface density", [freddi](size_t i) {return freddi->Sigma()[i];}},
+			{"Teff", "K", "Effective temperature", [freddi](size_t i) {return freddi->Tph()[i];}},
+			{"Tvis", "K", "Viscous temperature (Qvis / sigma_SB)^1/4", [freddi](size_t i) {return freddi->Tph_vis()[i];}},
+			{"Tirr", "K", "Irradiation temperature (Qirr / sigma_SB)^1/4", [freddi](size_t i) {return freddi->Tirr()[i];}},
+			{"Height", "cm", "Semiheight", [freddi](size_t i) {return freddi->Height()[i];}},
 	};
 }
 
@@ -281,18 +289,19 @@ std::vector<FileOutputLongField> FreddiFileOutput::initializeStarFields(const st
 	std::vector<FileOutputLongField> fields;
 
 	for (size_t i_vertex = 0; i_vertex < 3; ++i_vertex) {
-		const auto prefix = "vertex" + std::to_string(i_vertex) + "_";
-		fields.emplace_back(prefix + "x", "cm", [triangles, i_vertex](size_t i) {return triangles[i].vertices()[i_vertex].x();});
-		fields.emplace_back(prefix + "y", "cm", [triangles, i_vertex](size_t i) {return triangles[i].vertices()[i_vertex].y();});
-		fields.emplace_back(prefix + "z", "cm", [triangles, i_vertex](size_t i) {return triangles[i].vertices()[i_vertex].z();});
+		const auto name_prefix = "vertex" + std::to_string(i_vertex) + "_";
+		const auto desc_suffix = "-coordinate" + std::to_string(i_vertex) + " triangle vertex";
+		fields.emplace_back(name_prefix + "x", "cm", "x" + desc_suffix, [triangles, i_vertex](size_t i) {return triangles[i].vertices()[i_vertex].x();});
+		fields.emplace_back(name_prefix + "y", "cm", "y" + desc_suffix, [triangles, i_vertex](size_t i) {return triangles[i].vertices()[i_vertex].y();});
+		fields.emplace_back(name_prefix + "z", "cm", "z" + desc_suffix, [triangles, i_vertex](size_t i) {return triangles[i].vertices()[i_vertex].z();});
 	}
 
-	fields.emplace_back("center_x", "cm", [triangles](size_t i) {return triangles[i].center().x();});
-	fields.emplace_back("center_y", "cm", [triangles](size_t i) {return triangles[i].center().y();});
-	fields.emplace_back("center_z", "cm", [triangles](size_t i) {return triangles[i].center().z();});
+	fields.emplace_back("center_x", "cm", "x-coordinate of triangle center", [triangles](size_t i) {return triangles[i].center().x();});
+	fields.emplace_back("center_y", "cm", "y-coordinate of triangle center", [triangles](size_t i) {return triangles[i].center().y();});
+	fields.emplace_back("center_z", "cm", "z-coordinate of triangle center", [triangles](size_t i) {return triangles[i].center().z();});
 
-	fields.emplace_back("Tth", "K", [freddi](size_t i) {return freddi->star().Tth()[i];});
-	fields.emplace_back("Teff", "K", [freddi](size_t i) {return freddi->star().Teff()[i];});
+	fields.emplace_back("Tth", "K", "'Thermal' temperature, i.e. temperature of the star without irradiation", [freddi](size_t i) {return freddi->star().Tth()[i];});
+	fields.emplace_back("Teff", "K", "'Effective' temperature, i.e. temperature of the star with respect to irradiation", [freddi](size_t i) {return freddi->star().Teff()[i];});
 
 	return fields;
 }
