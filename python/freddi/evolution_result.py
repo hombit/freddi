@@ -54,9 +54,10 @@ class EvolutionResult:
             return arr
         elif first_val.ndim == 1:
             arr = np.full((self.__len_states, self.__states[0].Nx), np.nan, dtype=first_val.dtype)
-            for i in range(self.__len_states):
-                value = np.asarray(getattr(self.__states[i], attr))
-                arr[i, self.__states[i].first:self.__states[i].last+1] = value
+            for i, state in enumerate(self.__states):
+                value = np.asarray(getattr(state, attr))
+                idx = slice(state.first, state.last + 1)
+                arr[i, idx] = value[idx]
             return arr
         else:
             raise ValueError("{}.ndim > 1 ({})".format(attr, first_val.ndim))
