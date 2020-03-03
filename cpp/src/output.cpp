@@ -124,7 +124,9 @@ void BasicFreddiFileOutput::diskStructureDump() {
 			<< "### t = " << sToDay(freddi->t()) << " days"
 			<< std::endl;
 
-	for ( int i = freddi->first(); i <= freddi->last(); ++i ){
+	const size_t last = freddi->args().flux->cold_disk ? freddi->Nx() - 1 : freddi->last();
+
+	for ( int i = freddi->first(); i <= last; ++i ){
 		full_output << disk_structure_fields.at(0).func(i);
 		for (size_t j = 1; j < disk_structure_fields.size(); ++j) {
 			full_output << "\t" << disk_structure_fields[j].func(i);

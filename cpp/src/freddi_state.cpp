@@ -165,7 +165,7 @@ double FreddiState::Lx() {
 const vecd& FreddiState::W() {
 	if (!opt_str_.W) {
 		auto x = wunc()(h(), F(), first(), last());
-		x.resize(Nx());
+		x.resize(Nx(), 0.0);
 		opt_str_.W = std::move(x);
 	}
 	return *opt_str_.W;
@@ -259,8 +259,8 @@ const vecd& FreddiState::Height() {
 
 const vecd& FreddiState::Tph_vis() {
 	if (!opt_str_.Tph_vis) {
-		vecd x(Nx());
-		for (size_t i = first(); i < Nx(); i++) {
+		vecd x(Nx(), 0.0);
+		for (size_t i = first(); i <= last(); i++) {
 			x[i] = (GM() * std::pow(h()[i], -1.75)
 					* std::pow(3. / (8. * M_PI) * F()[i] / GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT, 0.25));
 		}
@@ -271,9 +271,9 @@ const vecd& FreddiState::Tph_vis() {
 
 const vecd& FreddiState::Tph_X() {
 	if (!opt_str_.Tph_X) {
-		vecd x(Nx());
+		vecd x(Nx(), 0.0);
 		const double Mdot = std::fabs((F()[first()+1] - F()[first()]) / (h()[first()+1] - h()[first()]));
-		for (size_t i = first(); i < Nx(); i++) {
+		for (size_t i = first(); i <= last(); i++) {
 			//
 
 			// Qvis due to non-zero Fin:
