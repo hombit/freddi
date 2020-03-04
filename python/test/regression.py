@@ -47,13 +47,11 @@ class RegressionTestCase(unittest.TestCase):
     def load_config(self, data_file, arguments_to_remove=()):
         section = 'section'
         section_str = '[{}]\n'.format(section)
-        regexp = re.compile(r'^# ([^-])')
         with open(data_file) as f:
-            for row in f:
-                if row.startswith('### Parameters'):
-                    break
-            lines = (regexp.sub(r'\1', line) for line in f if regexp.match(line))
-            config_str = section_str + ''.join(lines)
+            content = f.read()
+        parameters = re.search('### Parameters.+?###', content, flags=re.MULTILINE | re.DOTALL).group()
+        parameters = re.sub('^# ', '', parameters, flags=re.MULTILINE)
+        config_str = section_str + parameters
         config = RawConfigParser(strict=False, dict_type=self.MultiDict, inline_comment_prefixes=('#', ';'))
         config.optionxform = str
         config.read_string(config_str)
