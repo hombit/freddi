@@ -96,6 +96,10 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 			throw boost::program_options::invalid_option_value(it.first.c_str());
 		}
 	}
+
+	output << "### Derived values\n"
+		<< "# Tidal radius = " << freddi->args().basic->rout / solar_radius << " Rsun\n";
+
 	output << std::flush;
 }
 
