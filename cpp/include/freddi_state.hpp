@@ -109,56 +109,56 @@ private:
 		virtual void update(const FreddiState&) override;
 	};
 
-	class __Unstedy_Test_Hunter__: public BasicWind {
+	class Shields_Wind_1986: public BasicWind {
 	private:
 		// windparams
 		const double f_X;
 		const double X_f;
 		const double T_iC;
 	public:
-		explicit __Unstedy_Test_Hunter__(const FreddiState& state);
-		~__Unstedy_Test_Hunter__() override = default;
-		__Unstedy_Test_Hunter__(const __Unstedy_Test_Hunter__&) = default;
-		virtual __Unstedy_Test_Hunter__* clone() const override { return new __Unstedy_Test_Hunter__(*this); }
+		explicit Shields_Wind_1986(const FreddiState& state);
+		~Shields_Wind_1986() override = default;
+		Shields_Wind_1986(const Shields_Wind_1986&) = default;
+		virtual Shields_Wind_1986* clone() const override { return new Shields_Wind_1986(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 
-	class  __Agnieszka_Wind_Paper__: public BasicWind {
+	class  Agnieszka_Wind_2016: public BasicWind {
 	private:
 		// windparams
 		const double A_0;
 		const double B_1;
 	public:
-		explicit  __Agnieszka_Wind_Paper__(const FreddiState& state);
-		~__Agnieszka_Wind_Paper__() override = default;
-		__Agnieszka_Wind_Paper__(const  __Agnieszka_Wind_Paper__&) = default;
-		virtual  __Agnieszka_Wind_Paper__* clone() const override { return new  __Agnieszka_Wind_Paper__(*this); }
+		explicit  Agnieszka_Wind_2016(const FreddiState& state);
+		~Agnieszka_Wind_2016() override = default;
+		Agnieszka_Wind_2016(const  Agnieszka_Wind_2016&) = default;
+		virtual  Agnieszka_Wind_2016* clone() const override { return new  Agnieszka_Wind_2016(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 
-	class __Woods_McKee_Klein__: public BasicWind {
+	class Woods_McKee_Klein_1996: public BasicWind {
 	private:
 		// windparams
 		const double C_0;
 		const double T_iC;
 	public:
-		explicit __Woods_McKee_Klein__(const FreddiState& state);
-		~__Woods_McKee_Klein__() override = default;
-		__Woods_McKee_Klein__(const __Woods_McKee_Klein__&) = default;
-		virtual __Woods_McKee_Klein__* clone() const override { return new __Woods_McKee_Klein__(*this); }
+		explicit Woods_McKee_Klein_1996(const FreddiState& state);
+		~Woods_McKee_Klein_1996() override = default;
+		Woods_McKee_Klein_1996(const Woods_McKee_Klein_1996&) = default;
+		virtual Woods_McKee_Klein_1996* clone() const override { return new Woods_McKee_Klein_1996(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 
-	class __Woods_Which_Shields__ : public BasicWind {
+	class Woods_ShieldsApprox_1996 : public BasicWind {
 	private:
 		// windparams
 		const double Xi_max;
 		const double T_iC;
 	public:
-		explicit __Woods_Which_Shields__(const FreddiState& state);
-		~__Woods_Which_Shields__() override = default;
-		__Woods_Which_Shields__(const __Woods_Which_Shields__&) = default;
-		virtual __Woods_Which_Shields__* clone() const override { return new __Woods_Which_Shields__(*this); }
+		explicit Woods_ShieldsApprox_1996(const FreddiState& state);
+		~Woods_ShieldsApprox_1996() override = default;
+		Woods_ShieldsApprox_1996(const Woods_ShieldsApprox_1996&) = default;
+		virtual Woods_ShieldsApprox_1996* clone() const override { return new Woods_ShieldsApprox_1996(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 
