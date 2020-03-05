@@ -385,7 +385,7 @@ FreddiState::Cambier2013Wind::Cambier2013Wind(const FreddiState& state):
 		kC(state.args().disk->windparams.at("kC")),
 		R_IC2out(state.args().disk->windparams.at("RIC")) {
 	const auto disk = state.args().disk;
-	const double m_ch0 = -kC * disk->Mdot0 / (M_PI * state.R().back()*state.R().back());  // dM / dA
+	const double m_ch0 = -kC * disk->Mdot0 / (M_PI * m::pow<2>(*state.R().back()));  // dM / dA
 	const double L_edd = 4. * M_PI * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION;;
 	const double Mdot_crit = L_edd / (m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta());
 	const double eta = 0.025 * 33 * disk->Mdot0 / Mdot_crit;
