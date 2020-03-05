@@ -7,6 +7,7 @@ from configparser import ConfigParser, RawConfigParser
 
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
+from parameterized import parameterized
 
 from freddi import Freddi
 
@@ -14,9 +15,6 @@ from .util import DATA_DIR
 
 
 class RegressionTestCase(unittest.TestCase):
-    def setUp(self):
-        self.data_files = glob.glob(os.path.join(DATA_DIR, '*.dat'))
-
     class MultiDict(UserDict):
         def __setitem__(self, key, value):
             if isinstance(value, list):
@@ -63,23 +61,28 @@ class RegressionTestCase(unittest.TestCase):
         config['__cgs'] = False
         return config
 
-    def test(self):
-        columns_to_compare = ('Mdot', 'Mdisk', 'Lx', 'mU', 'mB', 'mV', 'mR', 'mI', 'mJ')
-        for data_file in self.data_files:
-            config = self.load_config(data_file, ('dir', 'prefix', 'fulldata', 'precision', 'config'))
-            lmbd_ = np.array(config.pop('lambda', [])) * 1e-8
-            f = Freddi(**config)
-            result = f.evolve()
-            data = np.genfromtxt(data_file, names=True)
+    columns_to_compare = ('Mdot', 'Mdisk', 'Lx', 'mU', 'mB', 'mV', 'mR', 'mI', 'mJ')
+
+    @parameterized.expand(glob.glob(os.path.join(DATA_DIR, '*.dat')))
+    def test(self, data_file):
+        config = self.load_config(data_file, ('dir', 'prefix', 'fulldata', 'precision', 'config'))
+        lmbd_ = np.array(config.pop('lambda', [])) * 1e-8
+        f = Freddi(**config)
+        result = f.evolve()
+        data = np.genfromtxt(data_file, names=True)
+        with self.subTest('Number of lines'):
             assert_equal(result.i_t, np.arange(f.Nt + 1))
+        with self.subTest('Time'):
             assert_equal(result.t, data['t'] * 86400)
-            for column in columns_to_compare:
+        for column in self.columns_to_compare:
+            with self.subTest(column):
                 assert_allclose(getattr(result, column), data[column], rtol=1e-4,
                                 err_msg='File: {}, column {}:'.format(data_file, column))
-            for i_lmbd, lmbd in enumerate(lmbd_):
-                column = 'Fnu{}'.format(i_lmbd)
-                if column in data.dtype.names:
+        for i_lmbd, lmbd in enumerate(lmbd_):
+            column = 'Fnu{}'.format(i_lmbd)
+            if column in data.dtype.names:
+                with self.subTest(column):
                     assert_allclose(result.flux(lmbd), data[column], rtol=1e-4,
                                     err_msg='File: {}, lambda {}, column {}:'.format(data_file, lmbd, column))
-                else:
-                    break
+            else:
+                break

@@ -64,49 +64,110 @@ private:
 		virtual Cambier2013Wind* clone() const override { return new Cambier2013Wind(*this); }
 	};
 
-	class __testA__Wind: public BasicWind {
+	class testAWind: public BasicWind {
 	private:
 		// windparams
 		const double kA;
 	public:
-		explicit __testA__Wind(const FreddiState& state);
-		~__testA__Wind() override = default;
-		__testA__Wind(const __testA__Wind&) = default;
-		virtual __testA__Wind* clone() const override { return new __testA__Wind(*this); }
+		explicit testAWind(const FreddiState& state);
+		~testAWind() override = default;
+		testAWind(const testAWind&) = default;
+		virtual testAWind* clone() const override { return new testAWind(*this); }
 	};
 
-	class __testB__Wind: public BasicWind {
+	class testBWind: public BasicWind {
 	private:
 		// windparams
 		const double kB;
 	public:
-		explicit __testB__Wind(const FreddiState& state);
-		~__testB__Wind() override = default;
-		__testB__Wind(const __testB__Wind&) = default;
-		virtual __testB__Wind* clone() const override { return new __testB__Wind(*this); }
+		explicit testBWind(const FreddiState& state);
+		~testBWind() override = default;
+		testBWind(const testBWind&) = default;
+		virtual testBWind* clone() const override { return new testBWind(*this); }
 	};
 
-	class __testC__Wind: public BasicWind {
+	class testCWind: public BasicWind {
 	private:
 		// windparams
 		const double kC;
 	public:
-		explicit __testC__Wind(const FreddiState& state);
-		~__testC__Wind() override = default;
-		__testC__Wind(const __testC__Wind&) = default;
-		virtual __testC__Wind* clone() const override { return new __testC__Wind(*this); }
+		explicit testCWind(const FreddiState& state);
+		~testCWind() override = default;
+		testCWind(const testCWind&) = default;
+		virtual testCWind* clone() const override { return new testCWind(*this); }
 	};
 
-	class __testC_q0_Shields1986__: public BasicWind {
+	class testCq0Shields1986Wind: public BasicWind {
 	private:
 		// windparams
 		const double kC;
 		const double R_windmin2out;
 	public:
-		explicit __testC_q0_Shields1986__(const FreddiState& state);
-		~__testC_q0_Shields1986__() override = default;
-		__testC_q0_Shields1986__(const __testC_q0_Shields1986__&) = default;
-		virtual __testC_q0_Shields1986__* clone() const override { return new __testC_q0_Shields1986__(*this); }
+		explicit testCq0Shields1986Wind(const FreddiState& state);
+		~testCq0Shields1986Wind() override = default;
+		testCq0Shields1986Wind(const testCq0Shields1986Wind&) = default;
+		virtual testCq0Shields1986Wind* clone() const override { return new testCq0Shields1986Wind(*this); }
+		virtual void update(const FreddiState&) override;
+	};
+
+	class Shields1986Wind: public BasicWind {
+	//G. A. Shields, C. F. McKee, D. N. C. Lin, and M. C. Begelman. Compton-heated winds andcoronae above accretion disks. II - Instability and oscillations. ApJ, 306:90–106, July 1986.
+	//doi:10.1086/164322
+	private:
+		// windparams
+		const double f_X;
+		const double X_f;
+		const double T_iC;
+	public:
+		explicit Shields1986Wind(const FreddiState& state);
+		~Shields1986Wind() override = default;
+		Shields1986Wind(const Shields1986Wind&) = default;
+		virtual Shields1986Wind* clone() const override { return new Shields1986Wind(*this); }
+		virtual void update(const FreddiState&) override;
+	};
+
+	class Agnieszka2015Wind: public BasicWind {
+	//Janiuk A., Grzedzielski M., Capitanio F., Bianchi S., 2015, Interplay between heartbeat oscillations and wind outflow in microquasar IGR J17091-3624 A&A, 574, A92
+	//doi:10.1051/0004-6361/201425003
+	private:
+		// windparams
+		const double A_0;
+		const double B_1;
+	public:
+		explicit Agnieszka2015Wind(const FreddiState& state);
+		~Agnieszka2015Wind() override = default;
+		Agnieszka2015Wind(const  Agnieszka2015Wind&) = default;
+		virtual Agnieszka2015Wind* clone() const override { return new Agnieszka2015Wind(*this); }
+		virtual void update(const FreddiState&) override;
+	};
+
+	class Woods1996Wind: public BasicWind {
+	//D. T. Woods, R. I. Klein, J. I. Castor, C. F. McKee, and J. B. Bell. X-Ray–heated Coronae andWinds from Accretion Disks: Time-dependent Two-dimensional Hydrodynamics with AdaptiveMesh Refinement. ApJ, 461:767, April 1996
+	//doi:10.1086/177101
+	private:
+		// windparams
+		const double C_0;
+		const double T_iC;
+	public:
+		explicit Woods1996Wind(const FreddiState& state);
+		~Woods1996Wind() override = default;
+		Woods1996Wind(const Woods1996Wind&) = default;
+		virtual Woods1996Wind* clone() const override { return new Woods1996Wind(*this); }
+		virtual void update(const FreddiState&) override;
+	};
+
+	class Woods1996ShieldsApproxWind : public BasicWind {
+	//D. T. Woods, R. I. Klein, J. I. Castor, C. F. McKee, and J. B. Bell. X-Ray–heated Coronae andWinds from Accretion Disks: Time-dependent Two-dimensional Hydrodynamics with AdaptiveMesh Refinement. ApJ, 461:767, April 1996
+	//doi:10.1086/177101
+	private:
+		// windparams
+		const double Xi_max;
+		const double T_iC;
+	public:
+		explicit Woods1996ShieldsApproxWind(const FreddiState& state);
+		~Woods1996ShieldsApproxWind() override = default;
+		Woods1996ShieldsApproxWind(const Woods1996ShieldsApproxWind&) = default;
+		virtual Woods1996ShieldsApproxWind* clone() const override { return new Woods1996ShieldsApproxWind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 
@@ -183,6 +244,7 @@ private:
 	struct DiskOptionalStructure {
 		boost::optional<double> Mdisk;
 		boost::optional<double> Lx;
+		boost::optional<double> Mdot_wind;
 		boost::optional<double> mU, mB, mV, mR, mI, mJ;
 		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height;
 	};
@@ -245,7 +307,7 @@ public:
 	virtual double Lbol_disk() const;
 	double phase_opt() const;
 // wind_
-protected:
+public:
 	virtual vecd windA() const { return wind_->A(); }
 	virtual vecd windB() const { return wind_->B(); }
 	virtual vecd windC() const { return wind_->C(); }
@@ -282,11 +344,20 @@ protected:
 	template <DiskIntegrationRegion Region> double integrate(const std::function<double (size_t)>& func) const {
 		return disk_radial_trapz(R(), func, region_first<Region>(), region_last<Region>());
 	}
+	template <DiskIntegrationRegion Region> double integrate(const vecd& x, const std::function<double (size_t)>& func) const {
+		return trapz(x, func, region_first<Region>(), region_last<Region>());
+	}
 	template <DiskIntegrationRegion Region> double lazy_integrate(boost::optional<double>& x, const vecd& values) {
 		if (!x) {
 			x = integrate<Region>(values);
 		}
 		return *x;
+	}
+	template<DiskIntegrationRegion Region> double lazy_integrate(boost::optional<double> &opt, const vecd& x, const std::function<double (size_t)>& values) {
+		if (!opt) {
+			opt = integrate<Region>(x, values);
+		}
+		return *opt;
 	}
 	template <DiskIntegrationRegion Region> double I_lambda(double lambda) {
 		const vecd* T;
@@ -341,6 +412,7 @@ public:
 	inline double mI() { return lazy_magnitude(opt_str_.mI, lambdaI, irr0I); }
 	inline double mJ() { return lazy_magnitude(opt_str_.mJ, lambdaJ, irr0J); }
 	inline double Mdisk() { return lazy_integrate<HotRegion>(opt_str_.Mdisk, Sigma()); }
+	double Mdot_wind();
 };
 
 #endif //FREDDI_FREDDI_STATE_HPP

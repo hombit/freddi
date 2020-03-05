@@ -62,6 +62,7 @@ setup(
     packages=['freddi'],
     cmdclass={'build_ext': BuildExt},
     install_requires=['numpy'],
+    tests_require=['parameterized'],
     python_requires='>=3.5',
     test_suite='test',
     classifiers=[
