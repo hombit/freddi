@@ -10,7 +10,7 @@ constexpr const double NeutronStarArguments::default_Rdead;
 constexpr const char NeutronStarArguments::default_fptype[];
 constexpr const char NeutronStarArguments::default_kappat_type[];
 const std::map<std::string, pard> NeutronStarArguments::default_kappat_params{
-		{"const", {{"t", 1. / 3.}}},
+		{"const", {{"value", 1. / 3.}}},
 		{"corstep", {{"in", 1. / 3.}, {"out", 1. / 3.}}}
 };
 constexpr const double NeutronStarArguments::default_Rx_dummy;
