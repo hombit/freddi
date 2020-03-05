@@ -1,10 +1,13 @@
 #include <cmath>
 #include <vector>
 
+#include <util.hpp>
+
+#define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE test_util
+
 #include <boost/test/unit_test.hpp>
 
-#include "util.hpp"
 
 std::vector<double> get_x(size_t N) {
 	const double x_min = 2 * M_PI;
