@@ -283,7 +283,7 @@ pard multitoken_string_option_to_map(const po::variables_map& vm, const std::str
 		return default_value;
 	}
 	pard m;
-	const auto tokens = vm["fpparams"].as<std::vector<std::string>>();
+	const auto tokens = vm[name].as<std::vector<std::string>>();
 	for (const auto& token : tokens) {
 		std::vector<std::string> parts;
 		boost::split(parts, token, boost::is_any_of(separators.c_str()));
