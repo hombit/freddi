@@ -1,6 +1,8 @@
 #include <algorithm>  // transform
 #include <vector>
 
+#include <boost/algorithm/string.hpp> // split is_any_of
+
 #include "options.hpp"
 
 namespace po = boost::program_options;
@@ -10,6 +12,7 @@ GeneralOptions::GeneralOptions(const po::variables_map& vm):
 		GeneralArguments(
 				vm["prefix"].as<std::string>(),
 				vm["dir"].as<std::string>(),
+				vm["precision"].as<unsigned int>(),
 				(vm.count("fulldata") > 0)) {}
 
 po::options_description GeneralOptions::description() {
@@ -19,6 +22,7 @@ po::options_description GeneralOptions::description() {
 			( "config", po::value<std::string>(), "Set additional configuration filepath" )
 			( "prefix", po::value<std::string>()->default_value(default_prefix), "Set prefix for output filenames. Output file with distribution of parameters over time is PREFIX.dat" )
 			( "dir,d", po::value<std::string>()->default_value(default_dir), "Choose the directory to write output files. It should exist" )
+			( "precision", po::value<unsigned int>()->default_value(default_output_precision), "Number of digits to print into output files" )
 			( "fulldata", "Output files PREFIX_%d.dat with radial structure for every time step. Default is to output only PREFIX.dat with global disk parameters for every time step" )
 			;
 	return od;
@@ -32,7 +36,7 @@ BasicDiskBinaryOptions::BasicDiskBinaryOptions(const po::variables_map &vm):
 				vm["kerr"].as<double>(),
 				dayToS(vm["period"].as<double>()),
 				sunToGram(vm["Mopt"].as<double>()),
-				roptInitializer(vm),
+				vm["rochelobefill"].as<double>(),
 				vm["Topt"].as<double>(),
 				rinInitializer(vm),
 				routInitializer(vm),
@@ -57,13 +61,6 @@ std::optional<double> BasicDiskBinaryOptions::routInitializer(const po::variable
 	return {};
 }
 
-std::optional<double> BasicDiskBinaryOptions::roptInitializer(const po::variables_map &vm) {
-	if (vm.count("Ropt")) {
-		return sunToCm(vm["Ropt"].as<double>());
-	}
-	return {};
-}
-
 std::optional<double> BasicDiskBinaryOptions::riscoInitializer(const po::variables_map &vm) {
 	if (vm.count("risco")) {
 		const double Mx = sunToGram(vm["Mx"].as<double>());
@@ -79,7 +76,7 @@ po::options_description BasicDiskBinaryOptions::description() {
 			( "Mx,M", po::value<double>()->required(), "Mass of the central object, in the units of solar masses" )
 			( "kerr", po::value<double>()->default_value(default_kerr), "Dimensionless Kerr parameter of the black hole" )
 			( "Mopt",	po::value<double>()->required(), "Mass of the optical star, in units of solar masses" )
-			( "Ropt", po::value<double>(), "Radius of the optical star, in units of solar radius" )
+			( "rochelobefill", po::value<double>()->default_value(default_roche_lobe_fill), "Dimensionless factor describing a size of the optical star. Polar radius of the star is rochelobefill * (polar radius of critical Roche lobe)" )
 			( "Topt", po::value<double>()->default_value(default_Topt), "Thermal temperature of the optical star, in units of kelvins" )
 			( "period,P", po::value<double>()->required(), "Orbital period of the binary system, in units of days" )
 			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the gravitational radius of the central object GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
@@ -118,7 +115,8 @@ po::options_description DiskStructureOptions::description() {
 			( "Thot", po::value<double>()->default_value(default_Thot), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description" )
 			( "initialcond", po::value<std::string>()->default_value(default_initialcond), "Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 																						   "Values:\n"
-																						   "  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power option does the same
+																						   "  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power does the same
+						 																   "  linearF: F ~ xi, specific case of powerF but can be normalised by --Mdot0, see its description for details" // linear does the same
 																						   "  powerSigma: Sigma ~ xi^powerorder, powerorder is specified by --powerorder option\n"
 																						   "  sineF: F ~ sin( xi * pi/2 )\n" // sinus option does the same
 																						   "  gaussF: F ~ exp(-(xi-mu)**2 / 2 sigma**2), mu and sigma are specified by --gaussmu and --gausssigma options\n"
@@ -126,7 +124,7 @@ po::options_description DiskStructureOptions::description() {
 																						   "Here xi is (h - h_in) / (h_out - h_in)\n")
 			( "F0", po::value<double>(), "Initial maximum viscous torque in the disk, dyn*cm. Can be overwritten via --Mdisk0 and --Mdot0" )
 			( "Mdisk0", po::value<double>(), "Initial disk mass, g. If both --F0 and --Mdisk0 are specified then --Mdisk0 is used. If both --Mdot0 and --Mdisk0 are specified then --Mdot0 is used" )
-			( "Mdot0", po::value<double>(), "Initial mass accretion rate through the inner radius, g/s. If --F0, --Mdisk0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to sinusF or quasistat" )
+			( "Mdot0", po::value<double>(), "Initial mass accretion rate through the inner radius, g/s. If --F0, --Mdisk0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to linearF, sinusF or quasistat" )
 			( "powerorder", po::value<double>(), "Parameter for the powerlaw initial condition distribution. This option works only with --initialcond=powerF or powerSigma" )
 			( "gaussmu", po::value<double>(), "Position of the maximum for Gauss distribution, positive number not greater than unity. This option works only with --initialcond=gaussF" )
 			( "gausssigma", po::value<double>(), "Width of for Gauss distribution. This option works only with --initialcond=gaussF" )
@@ -167,6 +165,7 @@ FluxOptions::FluxOptions(const po::variables_map &vm):
 				kevToHertz(vm["emax"].as<double>()),
 				vm["staralbedo"].as<double>(),
 				vm["inclination"].as<double>(),
+				dayToS(vm["ephemerist0"].as<double>()),
 				kpcToCm(vm["distance"].as<double>()),
 				vm.count("colddiskflux") > 0,
 				vm.count("starflux") > 0,
@@ -206,6 +205,7 @@ po::options_description FluxOptions::description() {
 			( "emax", po::value<double>()->default_value(hertzToKev(default_emax)), "Maximum energy of X-ray band, keV" )
 			( "staralbedo", po::value<double>()->default_value(default_star_albedo), "Part of X-ray radiation reflected by optical star, (1 - albedo) heats star's photosphere. Used only when --starflux is specified" )
 			( "inclination,i", po::value<double>()->default_value(default_inclination), "Inclination of the system, degrees" )
+			( "ephemerist0", po::value<double>()->default_value(default_ephemeris_t0), "Ephemeris for the time of the minimum of the orbital light curve T0, phase zero corresponds to inferior conjunction of the optical star, days" )
 			( "distance", po::value<double>()->required(), "Distance to the system, kpc" )
 			( "colddiskflux", "Add Fnu for cold disk into output file. Default output is for hot disk only" )
 			( "starflux", "Add Fnu for optical star into output file. Mx, Mopt and period must be specified, see also Topt and starlod options. Default output is for hot disk only" )
@@ -218,6 +218,7 @@ po::options_description FluxOptions::description() {
 
 CalculationOptions::CalculationOptions(const po::variables_map &vm):
 		CalculationArguments(
+				dayToS(vm["inittime"].as<double>()),
 				dayToS(vm["time"].as<double>()),
 				tauInitializer(vm),
 				vm["Nx"].as<unsigned int>(),
@@ -238,6 +239,7 @@ std::optional<double> CalculationOptions::tauInitializer(const po::variables_map
 po::options_description CalculationOptions::description() {
 	po::options_description od("Parameters of disk evolution calculation");
 	od.add_options()
+			("inittime", po::value<double>()->default_value(default_init_time), "Initial time moment, days" )
 			( "time,T", po::value<double>()->required(), "Time interval to calculate evolution, days" )
 			( "tau",	po::value<double>(), "Time step, days" )
 			( "Nx",	po::value<unsigned int>()->default_value(default_Nx), "Size of calculation grid" )
@@ -272,4 +274,23 @@ po::options_description FreddiOptions::description() {
 	desc.add(FluxOptions::description());
 	desc.add(CalculationOptions::description());
 	return desc;
+}
+
+
+pard multitoken_string_option_to_map(const po::variables_map& vm, const std::string& name,
+		const std::string& separators, const pard& default_value){
+	if (vm.count(name) == 0) {
+		return default_value;
+	}
+	pard m;
+	const auto tokens = vm["fpparams"].as<std::vector<std::string>>();
+	for (const auto& token : tokens) {
+		std::vector<std::string> parts;
+		boost::split(parts, token, boost::is_any_of(separators.c_str()));
+		if (parts.size() != 2) {
+			throw po::validation_error(po::validation_error::invalid_option_value);
+		}
+		m[parts[0]] = std::stod(parts[1]);
+	}
+	return m;
 }

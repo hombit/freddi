@@ -23,30 +23,34 @@ public:
 struct FileOutputShortField {
 	std::string name;
 	std::string unit;
+	std::string description;
 	std::function<double ()> func;
-	FileOutputShortField(const std::string&& name, const std::string&& unit, const std::function<double ()>&& func):
-			name(name), unit(unit), func(func) {};
+	FileOutputShortField(const std::string&& name, const std::string&& unit, const std::string&& description, const std::function<double ()>&& func):
+			name(name), unit(unit), description(description), func(func) {};
 };
 
 struct FileOutputLongField {
 	std::string name;
 	std::string unit;
+	std::string description;
 	std::function<const double (size_t)> func;
-	FileOutputLongField(const std::string&& name, const std::string&& unit, const std::function<const double (size_t)>&& func):
-			name(name), unit(unit), func(func) {};
+	FileOutputLongField(const std::string&& name, const std::string&& unit, const std::string&& description, const std::function<const double (size_t)>&& func):
+			name(name), unit(unit), description(description), func(func) {};
 };
 
 
 class BasicFreddiFileOutput {
 protected:
 	std::shared_ptr<FreddiEvolution> freddi;
-	void shortDump();
-	void diskStructureDump();
-	void starDump();
 	const std::vector<FileOutputShortField> short_fields;
 	const std::vector<FileOutputLongField> disk_structure_fields;
 	const std::vector<FileOutputLongField> star_fields;
+protected:
+	void shortDump();
+	void diskStructureDump();
+	void starDump();
 private:
+	const unsigned short precision;
 	FstreamWithPath output;
 	std::string disk_structure_header;
 	std::string star_header;

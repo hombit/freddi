@@ -2,18 +2,49 @@
 
 #include "ns/ns_evolution.hpp"
 
+
+FreddiNeutronStarEvolution::ConstKappaT::ConstKappaT(double value):
+		value(value) {}
+
+double FreddiNeutronStarEvolution::ConstKappaT::operator()(double R_to_Rcor) const {
+	return value;
+}
+
+FreddiNeutronStarEvolution::CorotationStepKappaT::CorotationStepKappaT(double in, double out):
+		in(in), out(out) {}
+
+double FreddiNeutronStarEvolution::CorotationStepKappaT::operator()(double R_to_Rcor) const {
+	if (R_to_Rcor > 1.0) {
+		return out;
+	}
+	return in;
+}
+
+
+std::shared_ptr<FreddiNeutronStarEvolution::BasicKappaT> FreddiNeutronStarEvolution::NeutronStarStructure::initialize_kappa_t(const NeutronStarArguments& args_ns) {
+	const auto& type = args_ns.kappat_type;
+	const auto& params = args_ns.kappat_params;
+
+	if (type == "const") {
+		return std::make_shared<ConstKappaT>(params.at("value"));
+	} else if (type == "corstep") {
+		return std::make_shared<CorotationStepKappaT>(params.at("in"), params.at("out"));
+	}
+	throw std::invalid_argument("Wrong kappattype");
+}
+
+
 FreddiNeutronStarEvolution::NeutronStarStructure::NeutronStarStructure(
 		const NeutronStarArguments &args_ns, FreddiEvolution* evolution):
-
 		args_ns(args_ns),
-//		xi_pow_minus_7_2(std::pow(xi, -3.5)),
+		kappa_t(initialize_kappa_t(args_ns)),
 		R_x(args_ns.Rx),
+		redshift(1.0 - 2.0 * evolution->R_g() / args_ns.Rx),
 		R_m_min(std::max(R_x, evolution->R()[evolution->first()])),
 		mu_magn(0.5 * args_ns.Bx * m::pow<3>(R_x)),
-		R_dead(args_ns.Rdead > 0. ? args_ns.Rdead : INFINITY),
-//		F_dead(k_t * xi_pow_minus_7_2 * m::pow<2>(mu_magn) / m::pow<3>(R_dead)),
-		F_dead(k_t * m::pow<2>(mu_magn) / m::pow<3>(R_dead)),
 		R_cor(std::cbrt(evolution->GM() / m::pow<2>(2*M_PI * args_ns.freqx))),
+		R_dead(args_ns.Rdead > 0. ? args_ns.Rdead : INFINITY),
+//		F_dead((*kappa_t)(R_dead / R_cor) * m::pow<2>(mu_magn) / m::pow<3>(R_dead)),
 		inverse_beta(args_ns.inversebeta),
 		epsilon_Alfven(args_ns.epsilonAlfven),
 		hot_spot_area(args_ns.hotspotarea),
@@ -178,6 +209,27 @@ double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::
 	return std::sqrt(1.0 - Rsch / Rm) - std::sqrt(1.0 - Rsch / Rx);
 }
 
+double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::rotating_magnetosphere_sibsun(const FreddiNeutronStarEvolution& freddi, const double Rm)
+const {
+    const double Rsch = 2.0 * freddi.R_g();
+    const double Rx = freddi.R_x();
+    const double Rcor = freddi.R_cor();
+    const double omega_ns = freddi.ns_str_->args_ns.freqx * 2 * M_PI;
+    const double omega_Kepl_Rx  = std::sqrt(freddi.GM() / m::pow<3>(Rx)); 
+    const double etaSS2000 = small_magnetosphere(freddi, Rm);
+    const double k = etaSS2000 / m::pow<2>(1.0 - omega_ns/omega_Kepl_Rx);
+    // k =0.014 for Aql X-1
+    
+    double Reff = Rm;
+    // if the inner disc radius > Rcor, return efficiency calculated at R=Rcor:
+    if (Rm > Rcor) Reff = Rcor;
+    const double omega_Kepl_Rin = std::sqrt(freddi.GM() / m::pow<3>(Reff)); 
+    
+    return std::sqrt(1.0 - Rsch / Reff) - std::sqrt(1.0 - Rsch / Rx)  
+    + m::pow<2>(omega_ns) / 2.0 / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT)  * (Rx-Reff) * (Rx+Reff)  
+    + k * m::pow<2>(1.0 - omega_ns/omega_Kepl_Rin);
+}
+
 double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::small_magnetosphere(const FreddiNeutronStarEvolution& freddi, const double Rm) const {
 	const double freqx_kHz = freddi.ns_str_->args_ns.freqx / 1000.0;
 	// Eq. 1
@@ -195,13 +247,13 @@ double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::
 FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarArguments &args):
 		FreddiEvolution(args),
 		ns_str_(new NeutronStarStructure(*args.ns, this)),
-		angular_dist_ns_(initializeAngularDist(args.irr_ns->angular_dist_ns)),
+		ns_irr_source_(initializeFreddiIrradiationSource(args.irr_ns->angular_dist_ns)),
 		fp_(initializeNsMdotFraction(*args.ns)),
 		eta_ns_(initializeNsAccretionEfficiency(*args.ns, this)) {
 	// Change initial condition due presence of magnetic field torque. It can spoil user-defined initial disk
 	// parameters, such as mass or Fout
 	if (inverse_beta() <= 0.) {  // F_in is non-zero, Fmagn is zero everywhere
-		current_.F_in = k_t() * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
+		current_.F_in = kappa_t(str_->R[0] / R_cor()) * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
 		for (size_t i = 0; i < Nx(); i++) {
 			current_.F[i] += current_.F_in;
 		}
@@ -254,21 +306,35 @@ std::shared_ptr<FreddiNeutronStarEvolution::BasicNSAccretionEfficiency> FreddiNe
 
 
 double FreddiNeutronStarEvolution::Lbol_ns() const {
-	return eta_ns() * fp() * Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
+	return redshift() * Lbol_ns_rest_frame();
+}
+
+
+double FreddiNeutronStarEvolution::Lbol_ns_rest_frame() const {
+        double Mdot = Mdot_in();
+        if (Mdot < 0.0) Mdot = 0.0;
+	return eta_ns() * fp() * Mdot * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
 }
 
 
 double FreddiNeutronStarEvolution::T_hot_spot() const {
-	return std::pow(Lbol_ns() / (4*M_PI * hot_spot_area() * m::pow<2>(R_x()) * GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT), 0.25);
+	return std::pow(Lbol_ns_rest_frame() / (4*M_PI * hot_spot_area() * m::pow<2>(R_x()) * GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT), 0.25);
 }
 
 
 double FreddiNeutronStarEvolution::Lx_ns() {
-	if (!ns_opt_str_.Lx_ns) {
-		const double intensity = Spectrum::Planck_nu1_nu2(T_hot_spot(), args().flux->emin, args().flux->emax, 1e-4);
-		ns_opt_str_.Lx_ns = 4*M_PI * hot_spot_area() * m::pow<2>(R_x()) * M_PI * intensity;
+	return redshift() * Lx_ns_rest_frame();
+}
+
+
+double FreddiNeutronStarEvolution::Lx_ns_rest_frame() {
+	if (!ns_opt_str_.Lx_ns_rest_frame) {
+		const double nu_min = args().flux->emin / redshift();
+		const double nu_max = args().flux->emax / redshift();
+		const double intensity = Spectrum::Planck_nu1_nu2(T_hot_spot(), nu_min, nu_max, 1e-4);
+		ns_opt_str_.Lx_ns_rest_frame = 4*M_PI * hot_spot_area() * m::pow<2>(R_x()) * M_PI * intensity;
 	}
-	return *ns_opt_str_.Lx_ns;
+	return *ns_opt_str_.Lx_ns_rest_frame;
 }
 
 
@@ -303,10 +369,10 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	double new_F_in = 0;
 	if (inverse_beta() <= 0.) {
 		if (R_m <= R_cor()) {
-//			new_F_in = k_t() * xi_pow_minus_7_2() * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
-			new_F_in = k_t() * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
+			new_F_in = kappa_t(R_m / R_cor()) * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
 		} else {
-			new_F_in = F_dead() * m::pow<3>(R_dead() / R_m);
+//			new_F_in = F_dead() * m::pow<3>(R_dead() / R_m);
+			new_F_in = kappa_t(R_m / R_cor()) * m::pow<2>(mu_magn()) / m::pow<3>(R_m);
 		}
 	}
 	current_.F_in = new_F_in;
@@ -323,11 +389,8 @@ double FreddiNeutronStarEvolution::R_alfven() const {
 }
 
 IrradiatedStar::sources_t FreddiNeutronStarEvolution::star_irr_sources() {
-	const Vec3 position(-semiaxis(), 0.0, 0.0);
-	const double Height2R = Height()[last()] / R()[last()];
-
 	auto sources = FreddiEvolution::star_irr_sources();
-	sources.push_back(std::make_unique<PointAccretorSource>(position, Lbol_ns(), args().flux->star_albedo, Height2R));
+	sources.push_back(ns_irr_source_->irr_source(*this, Lbol_ns()));
 	return sources;
 }
 
@@ -342,7 +405,6 @@ vecd FreddiNeutronStarEvolution::windC() const {
 
 
 const vecd& FreddiNeutronStarEvolution::Qx() {
-	// TODO: do all
 	if (!opt_str_.Qx) {
 		vecd x(Nx());
 		const vecd& K = Kirr();

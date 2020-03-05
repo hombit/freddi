@@ -13,20 +13,20 @@ using namespace boost::python;
 
 
 boost::shared_ptr<GeneralArguments> make_general_arguments() {
-	return boost::make_shared<GeneralArguments>("", "", false);
+	return boost::make_shared<GeneralArguments>("", "", 0, false);
 }
 
 boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(
 		double alpha,
 		double Mx, double kerr,
 		double period,
-		double Mopt, const object& Ropt, double Topt,
+		double Mopt, double roche_lobe_fill, double Topt,
 		const object& rin, const object& rout, const object& risco) {
 	return boost::make_shared<BasicDiskBinaryArguments>(
 			alpha,
 			Mx, kerr,
 			period,
-			Mopt, objToOpt<double>(Ropt), Topt,
+			Mopt, roche_lobe_fill, Topt,
 			objToOpt<double>(rin), objToOpt<double>(rout), objToOpt<double>(risco));
 }
 
@@ -61,25 +61,26 @@ boost::shared_ptr<FluxArguments> make_flux_arguments(
 		double colourfactor,
 		double emin, double emax,
 		double star_albedo,
-		double inclination, double distance) {
+		double inclination, double ephemeris_t0, double distance) {
 	return boost::make_shared<FluxArguments>(
 			colourfactor,
 			emin, emax,
 			star_albedo,
-			inclination, distance,
+			inclination, ephemeris_t0, distance,
 			false, false,
 			vecd(),
 			std::vector<Passband>());
 }
 
 boost::shared_ptr<CalculationArguments> make_calculation_arguments(
+		double inittime,
 		double time, const object& tau,
 		unsigned int Nx, const std::string& gridscale, const unsigned short starlod,
 		const object& eps) {
 	if (eps.ptr() == object().ptr()) {
-		return boost::make_shared<CalculationArguments>(time, objToOpt<double>(tau), Nx, gridscale, starlod);
+		return boost::make_shared<CalculationArguments>(inittime, time, objToOpt<double>(tau), Nx, gridscale, starlod);
 	}
-	return boost::make_shared<CalculationArguments>(time, objToOpt<double>(tau), Nx, gridscale, starlod, extract<double>(eps));
+	return boost::make_shared<CalculationArguments>(inittime, time, objToOpt<double>(tau), Nx, gridscale, starlod, extract<double>(eps));
 }
 
 boost::shared_ptr<FreddiArguments> make_freddi_arguments(
@@ -102,12 +103,14 @@ boost::shared_ptr<NeutronStarArguments> make_neutron_star_arguments(
 		const std::string& nsprop,
 		const object& freqx, const object& Rx, double Bx, double hotspotarea,
 		double epsilonAlfven, double inversebeta, double Rdead,
-		const std::string& fptype, const object& fpparams_) {
+		const std::string& fptype, const object& fpparams_,
+		const std::string& kappat_type, const object& kappat_params_) {
 	return boost::make_shared<NeutronStarArguments>(
 			nsprop,
 			objToOpt<double>(freqx), objToOpt<double>(Rx), Bx, hotspotarea,
 			epsilonAlfven, inversebeta, Rdead,
-			fptype, mapping_to_map(fpparams_));
+			fptype, mapping_to_map(fpparams_),
+			kappat_type, mapping_to_map(kappat_params_));
 }
 
 boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_disk_binary_arguments(
@@ -115,14 +118,14 @@ boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_d
 		double alpha,
 		double Mx, double kerr,
 		double period,
-		double Mopt, const object& Ropt, double Topt,
+		double Mopt, double roche_lobe_fill, double Topt,
 		const object& rin, const object& rout, const object& risco) {
 	return boost::make_shared<NeutronStarBasicDiskBinaryArguments>(
 			ns_args,
 			alpha,
 			Mx, kerr,
 			period,
-			Mopt, objToOpt<double>(Ropt), Topt,
+			Mopt, roche_lobe_fill, Topt,
 			objToOpt<double>(rin), objToOpt<double>(rout), objToOpt<double>(risco));
 }
 

@@ -36,7 +36,7 @@ dict evolution_kwdefaults() {
 	kw["__cgs"] = true;
 
 	kw["kerr"] = BasicDiskBinaryArguments::default_kerr;
-	kw["Ropt"] = object();
+	kw["rochelobefill"] = BasicDiskBinaryArguments::default_roche_lobe_fill;
 	kw["Topt"] = BasicDiskBinaryArguments::default_Topt;
 	kw["rin"] = object();
 	kw["rout"] = object();
@@ -67,7 +67,9 @@ dict evolution_kwdefaults() {
 	kw["emax"] = FluxArguments::default_emax;
 	kw["staralbedo"] = FluxArguments::default_star_albedo;
 	kw["inclination"] = FluxArguments::default_inclination;
+	kw["ephemerist0"] = FluxArguments::default_ephemeris_t0;
 
+	kw["inittime"] = CalculationArguments::default_init_time;
 	kw["tau"] = object();
 	kw["Nx"] = CalculationArguments::default_Nx;
 	kw["gridscale"] = CalculationArguments::default_gridscale;
@@ -117,6 +119,7 @@ void update_no_cgs_kwargs(dict& kw) {
 	kw["emax"] = kevToHertz(extract<double>(kw["emax"]));
 	kw["distance"] = kpcToCm(extract<double>(kw["distance"]));
 
+	kw["inittime"] = dayToS(extract<double>(kw["inittime"]));
 	kw["time"] = dayToS(extract<double>(kw["time"]));
 	if (object(kw["tau"]).ptr() != None) {
 		kw["tau"] = dayToS(extract<double>(kw["tau"]));
@@ -132,7 +135,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<double>(kw["alpha"]),
 			extract<double>(kw["Mx"]), extract<double>(kw["kerr"]),
 			extract<double>(kw["period"]),
-			extract<double>(kw["Mopt"]), kw["Ropt"], extract<double>(kw["Topt"]),
+			extract<double>(kw["Mopt"]), extract<double>(kw["rochelobefill"]), extract<double>(kw["Topt"]),
 			kw["rin"], kw["rout"], kw["risco"]);
 	const auto disk = make_disk_structure_arguments(
 			*basic,
@@ -153,8 +156,9 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<double>(kw["colourfactor"]),
 			extract<double>(kw["emin"]), extract<double>(kw["emax"]),
 			extract<double>(kw["staralbedo"]),
-			extract<double>(kw["inclination"]), extract<double>(kw["distance"]));
+			extract<double>(kw["inclination"]), extract<double>(kw["ephemerist0"]), extract<double>(kw["distance"]));
 	const auto calc = make_calculation_arguments(
+			extract<double>(kw["inittime"]),
 			extract<double>(kw["time"]), kw["tau"],
 			extract<unsigned int>(kw["Nx"]), extract<std::string>(kw["gridscale"]),
 			extract<unsigned short>(kw["starlod"]),
@@ -206,6 +210,8 @@ dict neutron_star_evolution_kwdefaults() {
 	kw["Rdead"] = NeutronStarArguments::default_Rdead;
 	kw["fptype"] = NeutronStarArguments::default_fptype;
 	kw["fpparams"] = tuple();
+	kw["kappattype"] = NeutronStarArguments::default_kappat_type;
+	kw["kappatparams"] = NeutronStarArguments::default_kappat_params.at(NeutronStarArguments::default_kappat_type);
 
 	return kw;
 }
@@ -217,7 +223,8 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			extract<std::string>(kw["nsprop"]),
 			kw["freqx"], kw["Rx"], extract<double>(kw["Bx"]), extract<double>(kw["hotspotarea"]),
 			extract<double>(kw["epsilonAlfven"]), extract<double>(kw["inversebeta"]), extract<double>(kw["Rdead"]),
-			extract<std::string>(kw["fptype"]), kw["fpparams"]);
+			extract<std::string>(kw["fptype"]), kw["fpparams"],
+			extract<std::string>(kw["kappattype"]), kw["kappatparams"]);
 
 	const auto general = make_general_arguments();
 	const auto basic = make_neutron_star_basic_disk_binary_arguments(
@@ -225,7 +232,7 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			extract<double>(kw["alpha"]),
 			extract<double>(kw["Mx"]), extract<double>(kw["kerr"]),
 			extract<double>(kw["period"]),
-			extract<double>(kw["Mopt"]), kw["Ropt"], extract<double>(kw["Topt"]),
+			extract<double>(kw["Mopt"]), extract<double>(kw["rochelobefill"]), extract<double>(kw["Topt"]),
 			kw["rin"], kw["rout"], kw["risco"]);
 	const auto disk = make_disk_structure_arguments(
 			*basic,
@@ -247,8 +254,9 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			extract<double>(kw["colourfactor"]),
 			extract<double>(kw["emin"]), extract<double>(kw["emax"]),
 			extract<double>(kw["staralbedo"]),
-			extract<double>(kw["inclination"]), extract<double>(kw["distance"]));
+			extract<double>(kw["inclination"]), extract<double>(kw["ephemerist0"]), extract<double>(kw["distance"]));
 	const auto calc = make_calculation_arguments(
+			extract<double>(kw["inittime"]),
 			extract<double>(kw["time"]), kw["tau"],
 			extract<unsigned int>(kw["Nx"]), extract<std::string>(kw["gridscale"]),
 			extract<unsigned short>(kw["starlod"]),
@@ -293,9 +301,8 @@ void wrap_evolution() {
 		.def("_required_args", neutron_star_evolution_required_args, "Mock values for non-scientific calls")
 		.staticmethod("_required_args")
 		.add_property("mu_magn", &FreddiNeutronStarEvolution::mu_magn)
-		.add_property("R_dead", &FreddiNeutronStarEvolution::R_dead)
-		.add_property("F_dead", &FreddiNeutronStarEvolution::F_dead)
 		.add_property("R_cor", &FreddiNeutronStarEvolution::R_cor)
+		.add_property("R_dead", &FreddiNeutronStarEvolution::R_dead)
 		.add_property("inverse_beta", &FreddiNeutronStarEvolution::inverse_beta)
 		.add_property("Fmagn", make_function(&FreddiNeutronStarEvolution::Fmagn, return_value_policy<copy_const_reference>()))
 		.add_property("dFmagn_dh", make_function(&FreddiNeutronStarEvolution::dFmagn_dh, return_value_policy<copy_const_reference>()))

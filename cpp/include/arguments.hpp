@@ -6,63 +6,46 @@
 #include <optional>
 #include <string>
 
-#include "gsl_const_cgsm.h"
-#include "constants.hpp"
-#include "opacity_related.hpp"
-#include "orbit.hpp"
-#include "passband.hpp"
-#include "util.hpp"
-#include "unit_transformation.hpp"
+#include <gsl_const_cgsm.h>
+#include <constants.hpp>
+#include <opacity_related.hpp>
+#include <orbit.hpp>
+#include <passband.hpp>
+#include <util.hpp>
+#include <unit_transformation.hpp>
 
 
 class GeneralArguments {
 public:
 	constexpr static const char default_prefix[] = "freddi";
 	constexpr static const char default_dir[] = ".";
+	constexpr static const unsigned short default_output_precision = 12;
 public:
 	std::string prefix;
 	std::string dir;
+	unsigned short output_precision;
 	bool fulldata;
 public:
-	GeneralArguments(const std::string& prefix, const std::string& dir, bool fulldata=false):
+	GeneralArguments(const std::string& prefix, const std::string& dir, unsigned short output_precision, bool fulldata):
 			prefix(prefix),
 			dir(dir),
+			output_precision(output_precision),
 			fulldata(fulldata) {}
-};
-
-
-class BlackHoleFunctions {
-public:
-	static inline double r_kerrISCO(const double Mx, const double kerr) { return rgToCm(r_kerrISCORg(kerr), Mx); }
-};
-
-
-class BinaryFunctions {
-public:
-	static double rocheLobeVolumeRadiusSemiaxis(double mass_ratio);
-	static inline double semiaxis(const double total_mass, const double period) {
-		return std::cbrt(GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT * total_mass * m::pow<2>(period) / (4. * m::pow<2>(M_PI)));
-	}
-	static inline double semiaxis(const double mass1, const double mass2, const double period) {
-		return semiaxis(mass1 + mass2, period);
-	}
-	static inline double rocheLobeVolumeRadius(const double mass1, const double mass2, const double period) {
-		return rocheLobeVolumeRadiusSemiaxis(mass1 / mass2) * semiaxis(mass1, mass2, period);
-	}
 };
 
 
 class BasicDiskBinaryArguments: public BlackHoleFunctions, public BinaryFunctions {
 public:
-	constexpr static const double default_kerr = 0.;
-	constexpr static const double default_Topt = 0.;
+	constexpr static const double default_kerr = 0.0;
+	constexpr static const double default_roche_lobe_fill = 1.0;
+	constexpr static const double default_Topt = 0.0;
 public:
 	double alpha;
 	double Mx;
 	double kerr;
 	double period;
 	double Mopt;
-	double Ropt;
+	double roche_lobe_fill;
 	double Topt;
 	double rin;
 	double rout;
@@ -75,23 +58,20 @@ protected:
 		// than r_1 or r_2 for axial-symmetric gas disk. Also this factor is in agreement with Gilfanov & Arefiev, 2005
 		return 0.9 * rocheLobeVolumeRadius(Mx, Mopt, period);
 	}
-	static inline double roptFromMxMoptPeriod(const double Mx, const double Mopt, const double period) {
-		return rocheLobeVolumeRadius(Mopt, Mx, period);
-	}
 	static inline double riscoFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
 public:
 	BasicDiskBinaryArguments(
 			double alpha,
 			double Mx, double kerr,
 			double period,
-			double Mopt, std::optional<double> Ropt, double Topt,
+			double Mopt, double roche_lobe_fill, double Topt,
 			std::optional<double> rin, std::optional<double> rout, std::optional<double> risco
 	):
 			alpha(alpha),
 			Mx(Mx), kerr(kerr),
 			period(period),
 			Mopt(Mopt),
-			Ropt(Ropt ? *Ropt : roptFromMxMoptPeriod(Mx, Mopt, period)),
+			roche_lobe_fill(roche_lobe_fill),
 			Topt(Topt),
 			rin(rin ? *rin : rinFromMxKerr(Mx, kerr)),
 			rout(rout ? *rout : routFromMxMoptPeriod(Mx, Mopt, period)),
@@ -126,6 +106,12 @@ protected:
 				powerorder(powerorder) {}
 		~InitialFPowerF() override = default;
 		vecd operator()(const vecd& h) const override;
+	};
+
+	class InitialFLinearF: public InitialFPowerF {
+	public:
+		InitialFLinearF(double F0, double Mdot0, double Mdisk0):
+				InitialFPowerF(F0, Mdot0, Mdisk0, 1.0) {}
 	};
 
 	class InitialFPowerSigma: public InitialFFunction {
@@ -239,12 +225,14 @@ public:
 	constexpr static const double default_emax = kevToHertz(12.);
 	constexpr static const double default_star_albedo = 0.0;
 	constexpr static const double default_inclination = 0.;  // degrees
+	constexpr static const double default_ephemeris_t0 = 0.0;
 public:
 	double colourfactor;
 	double emin;
 	double emax;
 	double star_albedo;
 	double inclination;  // degrees
+	double ephemeris_t0;
 	double distance;
 	bool cold_disk;
 	bool star;
@@ -255,14 +243,14 @@ public:
 			double colourfactor,
 			double emin, double emax,
 			double star_albedo,
-			double inclination, double distance,
+			double inclination, double ephemeris_t0, double distance,
 	        bool cold_disk, bool star,
 	        const vecd& lambdas,
 	        const std::vector<Passband>& passbands):
 			colourfactor(colourfactor),
 			emin(emin), emax(emax),
 			star_albedo(star_albedo),
-			inclination(inclination), distance(distance),
+			inclination(inclination), ephemeris_t0(ephemeris_t0), distance(distance),
 			cold_disk(cold_disk), star(star),
 			lambdas(lambdas),
 			passbands(passbands) {}
@@ -271,11 +259,13 @@ public:
 
 class CalculationArguments {
 public:
+	constexpr static const double default_init_time = 0;
 	constexpr static const unsigned int default_Nx = 1000;
 	constexpr static const unsigned int default_Nt_for_tau = 200;
 	constexpr static const char default_gridscale[] = "log";
 	constexpr static const unsigned short default_starlod = 3;
 public:
+	double init_time;
 	double time;
 	double tau;
 	unsigned int Nx;
@@ -284,9 +274,11 @@ public:
 	double eps;
 public:
 	CalculationArguments(
+			double inittime,
 			double time, std::optional<double> tau,
 			unsigned int Nx, const std::string& gridscale, const unsigned short starlod,
 			double eps=1e-6):
+			init_time(inittime),
 			time(time),
 			tau(tau ? *tau : time / default_Nt_for_tau),
 			Nx(Nx), gridscale(gridscale), starlod(starlod),

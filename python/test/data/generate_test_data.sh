@@ -2,7 +2,7 @@
 # Run from python/test/data/ directory
 # FREDDI=../../../cmake-build-debug/freddi ./generate_test_data.sh
 
-FREDDI=${FREDDI-freddi}
+FREDDI="${FREDDI-freddi} --precision=6"
 
 $FREDDI --prefix=default_args
 

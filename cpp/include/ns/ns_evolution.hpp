@@ -6,19 +6,39 @@
 
 class FreddiNeutronStarEvolution: public FreddiEvolution {
 private:
+	class BasicKappaT {
+	public:
+		virtual double operator()(double R_to_Rcor) const = 0;
+	};
+
+	class ConstKappaT: public BasicKappaT {
+	public:
+		const double value;
+	public:
+		ConstKappaT(double value);
+		double operator()(double R_to_Rcor) const override;
+	};
+
+	class CorotationStepKappaT: public BasicKappaT {
+	public:
+		const double in;
+		const double out;
+	public:
+		CorotationStepKappaT(double in, double out);
+		double operator()(double R_to_Rcor) const override;
+	};
+
 	class NeutronStarStructure {
 	public:
 		NeutronStarArguments args_ns;
-		double k_t = 1. / 3.;
-//      Factor previously used changing initial radius of the disk
-//		double xi = 1.0;
-//		double xi_pow_minus_7_2;
+		std::shared_ptr<BasicKappaT> kappa_t;
 		double R_x;
+		double redshift;
 		double R_m_min;
 		double mu_magn;
-		double R_dead;
-		double F_dead;
 		double R_cor;
+		double R_dead;
+//		double F_dead;
 		double inverse_beta;
 		double epsilon_Alfven;
 		double hot_spot_area;
@@ -27,13 +47,14 @@ private:
 		vecd d2Fmagn_dh2;
 		NeutronStarStructure(const NeutronStarArguments& args_ns, FreddiEvolution* evolution);
 	protected:
+		static std::shared_ptr<BasicKappaT> initialize_kappa_t(const NeutronStarArguments& args_ns);
 		vecd initialize_Fmagn(FreddiEvolution* evolution) const;
 		vecd initialize_dFmagn_dh(FreddiEvolution* evolution) const;
 		vecd initialize_d2Fmagn_dh2(FreddiEvolution* evolution) const;
 	};
 
 	struct NeutronStarOptionalStructure {
-		boost::optional<double> Lx_ns;
+		boost::optional<double> Lx_ns_rest_frame;
 	};
 
 	class BasicNSMdotFraction {
@@ -110,21 +131,35 @@ private:
 		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return newtonian(freddi, Rm); }
 	};
 
-	class SibgatullinSunyaev2000NSAccretionEfficiency: public BasicNSAccretionEfficiency {
+// 	class SibgatullinSunyaev2000NSAccretionEfficiency: public BasicNSAccretionEfficiency {
+// 	protected:
+// 		double schwarzschild(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+// 		double small_magnetosphere(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+// 	public:
+// 		using BasicNSAccretionEfficiency::BasicNSAccretionEfficiency;
+// 		~SibgatullinSunyaev2000NSAccretionEfficiency() override = default;
+// 		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return schwarzschild(freddi, Rm); }
+// 		double RxIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
+// 		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
+// 	};
+        class SibgatullinSunyaev2000NSAccretionEfficiency: public BasicNSAccretionEfficiency {
 	protected:
-		double schwarzschild(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+                double schwarzschild(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+		double rotating_magnetosphere_sibsun(const FreddiNeutronStarEvolution& freddi, double Rm) const;
 		double small_magnetosphere(const FreddiNeutronStarEvolution& freddi, double Rm) const;
 	public:
 		using BasicNSAccretionEfficiency::BasicNSAccretionEfficiency;
 		~SibgatullinSunyaev2000NSAccretionEfficiency() override = default;
-		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return schwarzschild(freddi, Rm); }
+// 		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return schwarzschild(freddi, Rm); }
+		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return rotating_magnetosphere_sibsun(freddi, Rm); }
 		double RxIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
+		//TODO double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return fall_from_isco(freddi, Rm); }
 		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
 	};
 private:
 	std::shared_ptr<const NeutronStarStructure> ns_str_;
 	NeutronStarOptionalStructure ns_opt_str_;
-	std::shared_ptr<BasicRadiationAngularDistribution> angular_dist_ns_;
+	std::shared_ptr<BasicFreddiIrradiationSource> ns_irr_source_;
 	std::shared_ptr<BasicNSMdotFraction> fp_;
 	std::shared_ptr<BasicNSAccretionEfficiency> eta_ns_;
 private:
@@ -132,14 +167,13 @@ private:
 	static std::shared_ptr<BasicNSAccretionEfficiency> initializeNsAccretionEfficiency(const NeutronStarArguments& args_ns, const FreddiNeutronStarEvolution* freddi);
 // ns_str_
 public:
-	inline double k_t() const { return ns_str_->k_t; }
-//	inline double xi() const { return ns_str_->xi; }
-//	inline double xi_pow_minus_7_2() const { return ns_str_->xi_pow_minus_7_2; }
+	inline double kappa_t(double R_to_Rcor) const { return (*ns_str_->kappa_t)(R_to_Rcor); }
 	inline double R_x() const { return ns_str_->R_x; }
+	inline double redshift() const { return ns_str_->redshift; }
 	inline double R_m_min() const { return ns_str_->R_m_min; }
 	inline double mu_magn() const { return ns_str_->mu_magn; }
 	inline double R_dead() const { return ns_str_->R_dead; }
-	inline double F_dead() const { return ns_str_->F_dead; }
+//	inline double F_dead() const { return ns_str_->F_dead; }
 	inline double R_cor() const { return ns_str_->R_cor; }
 	inline double inverse_beta() const { return ns_str_->inverse_beta; }
 	inline double epsilon_Alfven() const { return ns_str_->epsilon_Alfven; }
@@ -150,11 +184,13 @@ public:
 // ns_opt_str_
 public:
 	double Lbol_ns() const;
+	double Lbol_ns_rest_frame() const;
 	double T_hot_spot() const;
 	double Lx_ns();
+	double Lx_ns_rest_frame();
 // angular_dist_ns_
 public:
-	inline double angular_dist_ns(const double mu) { return (*angular_dist_ns_)(mu); }
+	inline double angular_dist_ns(const double mu) { return ns_irr_source_->angular_dist(mu); }
 // fp_
 public:
 	inline double fp(double radius) const { return (*fp_)(radius / R_cor()); }

@@ -8,6 +8,7 @@
 
 #include <arguments.hpp>
 #include <passband.hpp>
+#include <rochelobe.hpp>
 #include <spectrum.hpp>
 #include <star.hpp>
 #include <util.hpp>
@@ -171,22 +172,31 @@ private:
 	};
 
 protected:
-	class BasicRadiationAngularDistribution {
+	class BasicFreddiIrradiationSource {
 	public:
-		virtual ~BasicRadiationAngularDistribution() = 0;
-		virtual double operator()(double mu) const = 0; // mu = cos(angle between ray and normal)
+		virtual ~BasicFreddiIrradiationSource() = 0;
+		virtual double angular_dist(double mu) const = 0; // mu = cos(angle between ray and normal)
+		virtual std::unique_ptr<IrrSource> irr_source(FreddiState& state, double luminosity) const = 0;
+	protected:
+		Vec3 position(const FreddiState& state) const;
+		double Height2R(FreddiState& state) const;
 	};
 
-	class IsotropicRadiationAngularDistribution: public BasicRadiationAngularDistribution {
+	class IsotropicFreddiIrradiationSource: public BasicFreddiIrradiationSource {
 	public:
-		~IsotropicRadiationAngularDistribution() override = default;
-		double operator()(double mu) const override;
+		~IsotropicFreddiIrradiationSource() override = default;
+		double angular_dist(double mu) const override;
+		std::unique_ptr<IrrSource> irr_source(FreddiState& state, double luminosity) const override;
 	};
 
-	class PlaneRadiationAngularDistribution: public BasicRadiationAngularDistribution {
+	class PlaneFreddiIrradiationSource: public BasicFreddiIrradiationSource {
+	protected:
+		const UnitVec3 normal;
 	public:
-		~PlaneRadiationAngularDistribution() override = default;
-		double operator()(double mu) const override;
+		PlaneFreddiIrradiationSource();
+		~PlaneFreddiIrradiationSource() override = default;
+		double angular_dist(double mu) const override;
+		std::unique_ptr<IrrSource> irr_source(FreddiState& state, double luminosity) const override;
 	};
 
 private:
@@ -207,22 +217,23 @@ private:
 		vecd h;
 		vecd R;
 		wunc_t wunc;
-		DiskStructure(const FreddiArguments& args, const wunc_t& wunc);
 	private:
 		static vecd initialize_h(const FreddiArguments& args, size_t Nx);
 		static vecd initialize_R(const vecd& h, double GM);
+	public:
+		DiskStructure(const FreddiArguments& args, const wunc_t& wunc);
 	};
 
 	class CurrentState {
 	public:
-		double F_in = 0;
 		double Mdot_out;
 		double Mdot_in_prev = -INFINITY;
-		double t = 0;
-		size_t i_t = 0;
-		size_t first = 0;
+		double t;
+		size_t i_t;
+		size_t first;
 		size_t last;
 		vecd F;
+		double F_in;
 		explicit CurrentState(const DiskStructure& str);
 		CurrentState(const CurrentState&) = default;
 		CurrentState& operator=(const CurrentState&) = default;
@@ -243,7 +254,8 @@ protected:
 	CurrentState current_;
 	DiskOptionalStructure opt_str_;
 	std::unique_ptr<BasicWind> wind_;
-	std::shared_ptr<BasicRadiationAngularDistribution> angular_dist_disk_;
+	std::shared_ptr<BasicFreddiIrradiationSource> disk_irr_source_;
+	RocheLobe star_roche_lobe_;
 	IrradiatedStar star_;
 public:
 	FreddiState(const FreddiArguments& args, const wunc_t& wunc);
@@ -293,16 +305,17 @@ public:
 	inline double omega_i(size_t i) const { return omega_R(R()[i]); }
 	virtual double Mdot_in() const;
 	virtual double Lbol_disk() const;
+	double phase_opt() const;
 // wind_
 public:
 	virtual vecd windA() const { return wind_->A(); }
 	virtual vecd windB() const { return wind_->B(); }
 	virtual vecd windC() const { return wind_->C(); }
-// angular_dist_disk_
+// disk_irr_source_
 protected:
-	static std::shared_ptr<BasicRadiationAngularDistribution> initializeAngularDist(const std::string& angular_dist_type);
+	static std::shared_ptr<BasicFreddiIrradiationSource> initializeFreddiIrradiationSource(const std::string& angular_dist_type);
 public:
-	inline double angular_dist_disk(const double mu) const { return (*angular_dist_disk_)(mu); }
+	inline double angular_dist_disk(const double mu) const { return disk_irr_source_->angular_dist(mu); }
 // opt_str_
 protected:
 	virtual void invalidate_optional_structure();
@@ -390,6 +403,8 @@ public:
 	inline double flux(const Passband& passband) { return flux_region<HotRegion>(passband); }
 	double flux_star(double lambda, double phase);
 	double flux_star(const Passband& passband, double phase);
+	inline double flux_star(double lambda) { return flux_star(lambda, phase_opt()); }
+	inline double flux_star(const Passband& passband) { return flux_star(passband, phase_opt()); }
 	inline double mU() { return lazy_magnitude(opt_str_.mU, lambdaU, irr0U); }
 	inline double mB() { return lazy_magnitude(opt_str_.mB, lambdaB, irr0B); }
 	inline double mV() { return lazy_magnitude(opt_str_.mV, lambdaV, irr0V); }

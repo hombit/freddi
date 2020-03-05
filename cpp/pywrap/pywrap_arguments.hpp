@@ -20,7 +20,7 @@ boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(
 		double alpha,
 		double Mx, double kerr,
 		double period,
-		double Mopt, const object& Ropt, double Topt,
+		double Mopt, double roche_lobe_fill, double Topt,
 		const object& rin, const object& rout, const object& risco);
 
 boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
@@ -41,9 +41,10 @@ boost::shared_ptr<FluxArguments> make_flux_arguments(
 			double colourfactor,
 			double emin, double emax,
 			double star_albedo,
-			double inclination, double distance);
+			double inclination, double ephemeris_t0, double distance);
 
 boost::shared_ptr<CalculationArguments> make_calculation_arguments(
+		double inittime,
 		double time, const object& tau,
 		unsigned int Nx, const std::string& gridscale, unsigned short starlod,
 		const object& eps);
@@ -60,14 +61,15 @@ boost::shared_ptr<NeutronStarArguments> make_neutron_star_arguments(
 		const std::string& nsprop,
 		const object& freqx, const object& Rx, double Bx, double hotspotarea,
 		double epsilonAlfven, double inversebeta, double Rdead,
-		const std::string& fptype, const object& fpparams_);
+		const std::string& fptype, const object& fpparams_,
+		const std::string& kappat_type, const object& kappat_params_);
 
 boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_disk_binary_arguments(
 		const NeutronStarArguments& ns_args,
 		double alpha,
 		double Mx, double kerr,
 		double period,
-		double Mopt, const object& Ropt, double Topt,
+		double Mopt, double roche_lobe_fill, double Topt,
 		const object& rin, const object& rout, const object& risco);
 
 boost::shared_ptr<NeutronStarSelfIrradiationArguments> make_neutron_star_self_irradiation_arguments(

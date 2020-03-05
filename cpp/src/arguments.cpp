@@ -9,16 +9,13 @@ namespace odeint = boost::numeric::odeint;
 
 constexpr const char GeneralArguments::default_prefix[];
 constexpr const char GeneralArguments::default_dir[];
+constexpr const unsigned short GeneralArguments::default_output_precision;
 
 
 constexpr const double BasicDiskBinaryArguments::default_kerr;
+constexpr const double BasicDiskBinaryArguments::default_roche_lobe_fill;
 constexpr const double BasicDiskBinaryArguments::default_Topt;
 
-
-double BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(const double mass_ratio) { // Eggleton, P. P. 1983, ApJ, 268, 368
-	const double q = std::cbrt(mass_ratio);
-	return 0.49 * m::pow<2>(q) / (0.6 * m::pow<2>(q) + std::log(1. + q));
-}
 
 constexpr const char DiskStructureArguments::default_opacity[];
 constexpr const double DiskStructureArguments::default_Mdotout;
@@ -57,6 +54,36 @@ DiskStructureArguments::DiskStructureArguments(
 		const double h_in = bdb_args.h(bdb_args.rin);
 		const double h_out = bdb_args.h(bdb_args.rout);
 
+		if (initialcond == "linearF" || initialcond == "linear") {
+			odeint::runge_kutta_cash_karp54<double> stepper;
+			const double a = 1. - oprel->m;
+			const double b = oprel->n;
+			const double x0 = h_in / (h_out - h_in);
+			double integral = 0.;
+			integrate_adaptive(
+					stepper,
+					[a, b, x0](const double &y, double &dydx, double x) {
+						dydx = pow(x, a) * pow(x + x0, b);
+					},
+					integral, 0., 1., 0.01
+			);
+			const double coeff = std::pow(h_out - h_in, oprel->n + 1.) * integral / ((1. - oprel->m) * oprel->D);
+
+			if (Mdot0) {
+				F0 = *Mdot0 * (h_out - h_in);
+				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+			} else if (Mdisk0) {
+				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel->m));
+				Mdot0 = *F0 / (h_out - h_in);
+			} else if (F0) {
+				Mdot0 = *F0 / (h_out - h_in);
+				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+			} else {
+				throw std::logic_error("We couldn't be here");
+			}
+
+			return std::make_shared<InitialFLinearF>(*F0, *Mdisk0, *Mdot0);
+		}
 		if (initialcond == "powerF" || initialcond == "power") {
 			if (!powerorder) {
 				throw std::runtime_error("powerorder must be specified for the case of initialcond=powerF");
@@ -290,8 +317,10 @@ constexpr const double FluxArguments::default_emin;
 constexpr const double FluxArguments::default_emax;
 constexpr const double FluxArguments::default_star_albedo;
 constexpr const double FluxArguments::default_inclination;
+constexpr const double FluxArguments::default_ephemeris_t0;
 
 
+constexpr const double CalculationArguments::default_init_time;
 constexpr const unsigned int CalculationArguments::default_Nx;
 constexpr const unsigned int CalculationArguments::default_Nt_for_tau;
 constexpr const char CalculationArguments::default_gridscale[];

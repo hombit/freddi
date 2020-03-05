@@ -1,3 +1,5 @@
+#include <algorithm> // max
+
 #include <ns/ns_arguments.hpp>
 
 constexpr const char NeutronStarArguments::default_nsprop[];
@@ -6,6 +8,11 @@ constexpr const double NeutronStarArguments::default_epsilonAlfven;
 constexpr const double NeutronStarArguments::default_inversebeta;
 constexpr const double NeutronStarArguments::default_Rdead;
 constexpr const char NeutronStarArguments::default_fptype[];
+constexpr const char NeutronStarArguments::default_kappat_type[];
+const std::map<std::string, pard> NeutronStarArguments::default_kappat_params{
+		{"const", {{"t", 1. / 3.}}},
+		{"corstep", {{"in", 1. / 3.}, {"out", 1. / 3.}}}
+};
 constexpr const double NeutronStarArguments::default_Rx_dummy;
 constexpr const double NeutronStarArguments::default_freqx_dummy;
 
@@ -49,6 +56,29 @@ double SibgatullinSunyaev2000Geometry::radiusISCO(double freqx) {
 	return 1e5 * isco_minus_ns_km + radiusNS(freqx);
 }
 
+
+NeutronStarBasicDiskBinaryArguments::NeutronStarBasicDiskBinaryArguments(
+		const NeutronStarArguments& ns_args,
+		double alpha_,
+		double Mx_, double kerr_,
+		double period_,
+		double Mopt_, double roche_lobe_fill_, double Topt_,
+		std::optional<double> rin_, std::optional<double> rout_, std::optional<double> risco_
+):
+		BasicDiskBinaryArguments(
+				alpha_,
+				Mx_, kerr_,
+				period_,
+				Mopt_,
+				roche_lobe_fill_,
+				Topt_,
+				rin_,
+				rout_,
+				initializeRisco(ns_args, risco_)) {
+	if (!rin_) {
+		rin = std::max(ns_args.Rx, risco);
+	}
+}
 
 std::optional<double> NeutronStarBasicDiskBinaryArguments::initializeRisco(const NeutronStarArguments& ns_args, std::optional<double> risco){
 	if (risco) {

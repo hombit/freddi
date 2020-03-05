@@ -40,10 +40,12 @@ void FreddiEvolution::truncateOuterRadius() {
 	if (args().disk->boundcond == "Teff") {
 		do {
 			ii--;
+			if (ii <= first()) throw std::runtime_error("Rout <= Rin");
 		} while( Tph().at(ii) < args().disk->Thot );
 	} else if (args().disk->boundcond == "Tirr") {
 		do {
 			ii--;
+			if (ii <= first()) throw std::runtime_error("Rout <= Rin");
 		} while( Tirr().at(ii) < args().disk->Thot );
 	} else{
 		throw std::invalid_argument("Wrong boundcond");

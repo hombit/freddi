@@ -1,4 +1,4 @@
-FROM python:3.7 as builder
+FROM python:3.8-buster as builder
 
 RUN apt-get update &&\
     apt-get install -y g++ cmake libboost-all-dev
@@ -11,11 +11,12 @@ WORKDIR ${SOURCE}
 RUN python setup.py bdist_wheel --dist-dir=/dist
 
 
-FROM python:3.7
+FROM python:3.8-buster
 
-RUN pip install numpy
+RUN  apt-get update &&\
+    apt-get install -y libboost-python1.67 libboost-numpy1.67 libboost-program-options1.67 libboost-filesystem1.67 &&\
+    rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /dist /dist
 
 RUN pip install /dist/*.whl
-

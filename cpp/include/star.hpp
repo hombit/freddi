@@ -9,6 +9,7 @@
 #include <arguments.hpp>
 #include <geometry.hpp>
 #include <passband.hpp>
+#include <rochelobe.hpp>
 #include <util.hpp>
 
 
@@ -23,13 +24,15 @@ protected:
 	const std::vector<Triangle> triangles_;
 	const vald Tth_;
 private:
-	static std::vector<Triangle> initializeTriangles(double radius, unsigned short grid_scale);
+	static std::vector<Triangle> initializeSphereTriangles(double radius, unsigned short grid_scale);
+	static std::vector<Triangle> initializeRocheTriangles(const RocheLobe& roche_lobe, unsigned short grid_scale);
 protected:
 	IrradiatedProperties irr_;
 protected:
 	void invalidate_irradiated_properties();
 public:
 	Star(double temp, double radius, unsigned short lod);
+	Star(double temp, const RocheLobe& roche_lobe, unsigned short lod);
 	const std::vector<Triangle>& triangles() const;
 	const vald& Tth() const;
 	virtual const vald& Qirr();
@@ -146,6 +149,7 @@ private:
 	sources_t cloneSources() const;
 public:
 	IrradiatedStar(sources_t&& sources, double temp, double radius, unsigned short lod);
+	IrradiatedStar(sources_t&& sources, double temp, const RocheLobe& roche_lobe, unsigned short lod);
 	IrradiatedStar(const IrradiatedStar& other);
 public:
 	const sources_t& sources() const;
