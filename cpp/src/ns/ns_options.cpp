@@ -11,24 +11,10 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 				vm["inversebeta"].as<double>(),
 				vm["Rdead"].as<double>(),
 				vm["fptype"].as<std::string>(),
-				fpparamsInitializer(vm)) {}
+				multitoken_string_option_to_map(vm, "fpparams", ":", {}),
+				vm["kappattype"].as<std::string>(),
+				multitoken_string_option_to_map(vm, "kappatparams", ":", default_kappat_params.at(vm["kappattype"].as<std::string>()))) {}
 
-pard NeutronStarOptions::fpparamsInitializer(const po::variables_map& vm) {
-	pard m;
-	if (vm.count("fpparams") == 0) {
-		return m;
-	}
-	const std::vector<std::string > tokens(vm["fpparams"].as<std::vector<std::string> >());
-	for (const auto& token : tokens) {
-		std::vector<std::string> parts;
-		boost::split(parts, token, boost::is_any_of(":"));
-		if (parts.size() != 2) {
-			throw po::validation_error(po::validation_error::invalid_option_value);
-		}
-		m[parts[0]] = std::stod(parts[1]);
-	}
-	return m;
-}
 
 po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star");
@@ -45,7 +31,12 @@ po::options_description NeutronStarOptions::description() {
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "???" )
 			( "Rdead", po::value<double>()->default_value(default_Rdead), "Maximum inner radius of the disk that can be obtained, it characterises minimum torque in the dead disk, cm" )
 			( "fptype", po::value<std::string>()->default_value(default_fptype), "Accretor Mdot fraction mode: no-outflow, propeller, corotation-block, eksi-kultu2010, romanova2018, geometrical" )
-			( "fpparams", po::value<std::vector<std::string> >()->multitoken(), "Accretor Mdot fraction parameters, specific for each fptype. Format is name:value. Examples: 1) for geometrical chi:15; 2) for romanova2018 par1:0.15 par2:0.92" )
+			( "fpparams", po::value<std::vector<std::string>>()->multitoken(), "Accretor Mdot fraction parameters, specific for each fptype. Format is name:value. Examples: 1) for geometrical chi:15; 2) for romanova2018 par1:0.15 par2:0.92" )
+			( "kappattype", po::value<std::string>()->default_value(default_kappat_type), "kappa_t describes how strong is interaction between neutron star magnitosphere and disk, magnetic torque is kappa_t(R) * mu^2 / R^3. This parameter describes type of radial destribution of this parameter\n\n"
+																						  "Values:\n"
+																						  "  const: doesn't depend on radius, default value is 1/3, --kappatype name: 'value'\n"
+																						  "  corstep: kappa_t takes one value inside corotation radius, and another outside, default values are 1/3, --kappatype names: 'in', 'out'")
+			( "kappatparams", po::value<std::vector<std::string>>()->multitoken(), "Parameters of kappa_t radial distribution, see --kappattype for details. Format is name:value" )
 			;
 	return od;
 }

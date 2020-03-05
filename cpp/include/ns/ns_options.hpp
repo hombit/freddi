@@ -1,8 +1,6 @@
 #ifndef FREDDI_NS_OPTIONS_HPP
 #define FREDDI_NS_OPTIONS_HPP
 
-#include <boost/algorithm/string.hpp> // split
-
 #include <options.hpp>
 #include <ns/ns_arguments.hpp>
 

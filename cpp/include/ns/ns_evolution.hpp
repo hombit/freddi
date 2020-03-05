@@ -6,10 +6,32 @@
 
 class FreddiNeutronStarEvolution: public FreddiEvolution {
 private:
+	class BasicKappaT {
+	public:
+		virtual double operator()(double R_to_Rcor) const = 0;
+	};
+
+	class ConstKappaT: public BasicKappaT {
+	public:
+		const double value;
+	public:
+		ConstKappaT(double value);
+		double operator()(double R_to_Rcor) const override;
+	};
+
+	class CorotationStepKappaT: public BasicKappaT {
+	public:
+		const double in;
+		const double out;
+	public:
+		CorotationStepKappaT(double in, double out);
+		double operator()(double R_to_Rcor) const override;
+	};
+
 	class NeutronStarStructure {
 	public:
 		NeutronStarArguments args_ns;
-		double k_t = 1. / 3.;
+		std::shared_ptr<BasicKappaT> kappa_t;
 //      Factor previously used changing initial radius of the disk
 //		double xi = 1.0;
 //		double xi_pow_minus_7_2;
@@ -17,9 +39,9 @@ private:
 		double redshift;
 		double R_m_min;
 		double mu_magn;
-		double R_dead;
-		double F_dead;
 		double R_cor;
+		double R_dead;
+//		double F_dead;
 		double inverse_beta;
 		double epsilon_Alfven;
 		double hot_spot_area;
@@ -28,6 +50,7 @@ private:
 		vecd d2Fmagn_dh2;
 		NeutronStarStructure(const NeutronStarArguments& args_ns, FreddiEvolution* evolution);
 	protected:
+		static std::shared_ptr<BasicKappaT> initialize_kappa_t(const NeutronStarArguments& args_ns);
 		vecd initialize_Fmagn(FreddiEvolution* evolution) const;
 		vecd initialize_dFmagn_dh(FreddiEvolution* evolution) const;
 		vecd initialize_d2Fmagn_dh2(FreddiEvolution* evolution) const;
@@ -147,7 +170,7 @@ private:
 	static std::shared_ptr<BasicNSAccretionEfficiency> initializeNsAccretionEfficiency(const NeutronStarArguments& args_ns, const FreddiNeutronStarEvolution* freddi);
 // ns_str_
 public:
-	inline double k_t() const { return ns_str_->k_t; }
+	inline double kappa_t(double R_to_Rcor) const { return (*ns_str_->kappa_t)(R_to_Rcor); }
 //	inline double xi() const { return ns_str_->xi; }
 //	inline double xi_pow_minus_7_2() const { return ns_str_->xi_pow_minus_7_2; }
 	inline double R_x() const { return ns_str_->R_x; }
@@ -155,7 +178,7 @@ public:
 	inline double R_m_min() const { return ns_str_->R_m_min; }
 	inline double mu_magn() const { return ns_str_->mu_magn; }
 	inline double R_dead() const { return ns_str_->R_dead; }
-	inline double F_dead() const { return ns_str_->F_dead; }
+//	inline double F_dead() const { return ns_str_->F_dead; }
 	inline double R_cor() const { return ns_str_->R_cor; }
 	inline double inverse_beta() const { return ns_str_->inverse_beta; }
 	inline double epsilon_Alfven() const { return ns_str_->epsilon_Alfven; }

@@ -2,6 +2,7 @@
 #define FREDDI_NS_ARGUMENTS_HPP
 
 #include <optional>
+#include <map>
 #include <string>
 
 #include <arguments.hpp>
@@ -20,6 +21,8 @@ public:
 	constexpr static const double default_inversebeta = 0.;
 	constexpr static const double default_Rdead = 0.;
 	constexpr static const char default_fptype[] = "no-outflow";
+	constexpr static const char default_kappat_type[] = "const";
+	static const std::map<std::string, pard> default_kappat_params;
 protected:
 	constexpr static const double default_Rx_dummy = 1e6;
 	constexpr static const double default_freqx_dummy = 0.;
@@ -34,6 +37,8 @@ public:
 	double Rdead;
 	std::string fptype;
 	pard fpparams;
+	std::string kappat_type;
+	pard kappat_params;
 protected:
 	static double initializeFreqx(const std::string& nsprop);
 	static double initializeRx(const std::string& nsprop, std::optional<double> freqx);
@@ -44,13 +49,15 @@ public:
 			std::optional<double> Rx,
 			double Bx, double hotspotarea,
 			double epsilonAlfven, double inversebeta, double Rdead,
-			const std::string& fptype, const pard& fpparams):
+			const std::string& fptype, const pard& fpparams,
+			const std::string& kappat_type, const pard& kappat_params):
 			nsprop(nsprop),
 			freqx(freqx ? *freqx : initializeFreqx(nsprop)),
 			Rx(Rx ? *Rx : initializeRx(nsprop, freqx)),
 			Bx(Bx), hotspotarea(hotspotarea),
 			epsilonAlfven(epsilonAlfven), inversebeta(inversebeta), Rdead(Rdead),
-			fptype(fptype), fpparams(fpparams) {}
+			fptype(fptype), fpparams(fpparams),
+			kappat_type(kappat_type), kappat_params(kappat_params) {}
 };
 
 
