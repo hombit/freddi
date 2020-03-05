@@ -87,14 +87,14 @@ void FreddiState::initializeWind() {
 		wind_.reset(static_cast<BasicWind*>(new __testC__Wind(*this)));
 	} else if (args().disk->wind == "__testC_q0_Shields1986__") {
 		wind_.reset(static_cast<BasicWind*>(new __testC_q0_Shields1986__(*this)));
-    } else if (args().disk->wind == "Shields_Wind_1986") {
-        wind_.reset(static_cast<BasicWind*>(new Shields_Wind_1986(*this)));
-    } else if (args().disk->wind == "Agnieszka_Wind_2016") {
-        wind_.reset(static_cast<BasicWind*>(new Agnieszka_Wind_2016(*this)));
-    } else if (args().disk->wind == "Woods_McKee_Klein_1996") {
-        wind_.reset(static_cast<BasicWind*>(new Woods_McKee_Klein_1996(*this)));
-    } else if (args().disk->wind == "Woods_ShieldsApprox_1996") {
-        wind_.reset(static_cast<BasicWind*>(new Woods_ShieldsApprox_1996(*this)));
+    } else if (args().disk->wind == "Shields1986Wind") {
+        wind_.reset(static_cast<BasicWind*>(new Shields1986Wind(*this)));
+    } else if (args().disk->wind == "Agnieszka2015Wind") {
+        wind_.reset(static_cast<BasicWind*>(new Agnieszka2015Wind(*this)));
+    } else if (args().disk->wind == "Woods1996Wind") {
+        wind_.reset(static_cast<BasicWind*>(new Woods1996Wind(*this)));
+    } else if (args().disk->wind == "Woods1996ShieldsApproxWind") {
+        wind_.reset(static_cast<BasicWind*>(new Woods1996ShieldsApproxWind(*this)));
 	} else {
 		throw std::invalid_argument("Wrong wind");
 	}
@@ -446,7 +446,7 @@ void FreddiState::__testC_q0_Shields1986__::update(const FreddiState& state) {
 	}
 }
 
-FreddiState::Shields_Wind_1986::Shields_Wind_1986(const FreddiState& state):
+FreddiState::Shields1986Wind::Shields1986Wind(const FreddiState& state):
         BasicWind(state),
 	f_X(state.args().disk->windparams.at("f_X")),
 	X_f(state.args().disk->windparams.at("X_f")),
@@ -454,7 +454,7 @@ FreddiState::Shields_Wind_1986::Shields_Wind_1986(const FreddiState& state):
     update(state);
 }
 
-void FreddiState::Shields_Wind_1986::update(const FreddiState& state) {
+void FreddiState::Shields1986Wind::update(const FreddiState& state) {
     BasicWind::update(state);
     const auto disk = state.args().disk;
     //  1983ApJ...271...70B page 4
@@ -483,14 +483,14 @@ void FreddiState::Shields_Wind_1986::update(const FreddiState& state) {
     }
 }
 
-FreddiState::Agnieszka_Wind_2016::Agnieszka_Wind_2016(const FreddiState& state):
+FreddiState::Agnieszka2015Wind::Agnieszka2015Wind(const FreddiState& state):
         BasicWind(state),
         A_0(state.args().disk->windparams.at("A_0")),
         B_1(state.args().disk->windparams.at("B_1")) {
     update(state);
 }
 
-void FreddiState::Agnieszka_Wind_2016::update(const FreddiState& state) {
+void FreddiState::Agnieszka2015Wind::update(const FreddiState& state) {
     BasicWind::update(state);
     const auto disk = state.args().disk;
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
@@ -511,14 +511,14 @@ void FreddiState::Agnieszka_Wind_2016::update(const FreddiState& state) {
     }
 }
 
-FreddiState::Woods_McKee_Klein_1996::Woods_McKee_Klein_1996(const FreddiState& state):
+FreddiState::Woods1996Wind::Woods1996Wind(const FreddiState& state):
         BasicWind(state),
         C_0(state.args().disk->windparams.at("C_0")),
         T_iC(state.args().disk->windparams.at("T_iC")) {
     update(state);
 }
 
-void FreddiState::Woods_McKee_Klein_1996::update(const FreddiState& state) {
+void FreddiState::Woods1996Wind::update(const FreddiState& state) {
     BasicWind::update(state);
     const auto disk = state.args().disk;
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
@@ -562,14 +562,14 @@ void FreddiState::Woods_McKee_Klein_1996::update(const FreddiState& state) {
 
 
 
-FreddiState::Woods_ShieldsApprox_1996::Woods_ShieldsApprox_1996(const FreddiState& state):
+FreddiState::Woods1996ShieldsApproxWind::Woods1996ShieldsApproxWind(const FreddiState& state):
 BasicWind(state),
         Xi_max(state.args().disk->windparams.at("Xi_max")),
         T_iC(state.args().disk->windparams.at("T_iC")) {
     update(state);
 }
 
-void FreddiState::Woods_ShieldsApprox_1996::update(const FreddiState& state) {
+void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
     BasicWind::update(state);
     const auto disk = state.args().disk;
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();

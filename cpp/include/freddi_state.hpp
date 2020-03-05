@@ -109,56 +109,64 @@ private:
 		virtual void update(const FreddiState&) override;
 	};
 
-	class Shields_Wind_1986: public BasicWind {
+	class Shields1986Wind: public BasicWind {
+	//G. A. Shields, C. F. McKee, D. N. C. Lin, and M. C. Begelman. Compton-heated winds andcoronae above accretion disks. II - Instability and oscillations. ApJ, 306:90–106, July 1986.
+	//doi:10.1086/164322
 	private:
 		// windparams
 		const double f_X;
 		const double X_f;
 		const double T_iC;
 	public:
-		explicit Shields_Wind_1986(const FreddiState& state);
-		~Shields_Wind_1986() override = default;
-		Shields_Wind_1986(const Shields_Wind_1986&) = default;
-		virtual Shields_Wind_1986* clone() const override { return new Shields_Wind_1986(*this); }
+		explicit Shields1986Wind(const FreddiState& state);
+		~Shields1986Wind() override = default;
+		Shields1986Wind(const Shields1986Wind&) = default;
+		virtual Shields1986Wind* clone() const override { return new Shields1986Wind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 
-	class  Agnieszka_Wind_2016: public BasicWind {
+	class  Agnieszka2015Wind: public BasicWind {
+	//Janiuk A., Grzedzielski M., Capitanio F., Bianchi S., 2015, Interplay between heartbeat oscillations and wind outflow in microquasar IGR J17091-3624 A&A, 574, A92
+	//doi:10.1051/0004-6361/201425003
 	private:
 		// windparams
 		const double A_0;
 		const double B_1;
 	public:
-		explicit  Agnieszka_Wind_2016(const FreddiState& state);
-		~Agnieszka_Wind_2016() override = default;
-		Agnieszka_Wind_2016(const  Agnieszka_Wind_2016&) = default;
-		virtual  Agnieszka_Wind_2016* clone() const override { return new  Agnieszka_Wind_2016(*this); }
+		explicit  Agnieszka2015Wind(const FreddiState& state);
+		~Agnieszka2015Wind() override = default;
+		Agnieszka2015Wind(const  Agnieszka2015Wind&) = default;
+		virtual  Agnieszka2015Wind* clone() const override { return new  Agnieszka2015Wind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 
-	class Woods_McKee_Klein_1996: public BasicWind {
+	class Woods1996Wind: public BasicWind {
+	//D. T. Woods, R. I. Klein, J. I. Castor, C. F. McKee, and J. B. Bell. X-Ray–heated Coronae andWinds from Accretion Disks: Time-dependent Two-dimensional Hydrodynamics with AdaptiveMesh Refinement. ApJ, 461:767, April 1996
+	//doi:10.1086/177101
 	private:
 		// windparams
 		const double C_0;
 		const double T_iC;
 	public:
-		explicit Woods_McKee_Klein_1996(const FreddiState& state);
-		~Woods_McKee_Klein_1996() override = default;
-		Woods_McKee_Klein_1996(const Woods_McKee_Klein_1996&) = default;
-		virtual Woods_McKee_Klein_1996* clone() const override { return new Woods_McKee_Klein_1996(*this); }
+		explicit Woods1996Wind(const FreddiState& state);
+		~Woods1996Wind() override = default;
+		Woods1996Wind(const Woods1996Wind&) = default;
+		virtual Woods1996Wind* clone() const override { return new Woods1996Wind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 
-	class Woods_ShieldsApprox_1996 : public BasicWind {
+	class Woods1996ShieldsApproxWind : public BasicWind {
+	//D. T. Woods, R. I. Klein, J. I. Castor, C. F. McKee, and J. B. Bell. X-Ray–heated Coronae andWinds from Accretion Disks: Time-dependent Two-dimensional Hydrodynamics with AdaptiveMesh Refinement. ApJ, 461:767, April 1996
+	//doi:10.1086/177101
 	private:
 		// windparams
 		const double Xi_max;
 		const double T_iC;
 	public:
-		explicit Woods_ShieldsApprox_1996(const FreddiState& state);
-		~Woods_ShieldsApprox_1996() override = default;
-		Woods_ShieldsApprox_1996(const Woods_ShieldsApprox_1996&) = default;
-		virtual Woods_ShieldsApprox_1996* clone() const override { return new Woods_ShieldsApprox_1996(*this); }
+		explicit Woods1996ShieldsApproxWind(const FreddiState& state);
+		~Woods1996ShieldsApproxWind() override = default;
+		Woods1996ShieldsApproxWind(const Woods1996ShieldsApproxWind&) = default;
+		virtual Woods1996ShieldsApproxWind* clone() const override { return new Woods1996ShieldsApproxWind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 
