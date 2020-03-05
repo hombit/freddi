@@ -32,9 +32,6 @@ private:
 	public:
 		NeutronStarArguments args_ns;
 		std::shared_ptr<BasicKappaT> kappa_t;
-//      Factor previously used changing initial radius of the disk
-//		double xi = 1.0;
-//		double xi_pow_minus_7_2;
 		double R_x;
 		double redshift;
 		double R_m_min;
@@ -171,8 +168,6 @@ private:
 // ns_str_
 public:
 	inline double kappa_t(double R_to_Rcor) const { return (*ns_str_->kappa_t)(R_to_Rcor); }
-//	inline double xi() const { return ns_str_->xi; }
-//	inline double xi_pow_minus_7_2() const { return ns_str_->xi_pow_minus_7_2; }
 	inline double R_x() const { return ns_str_->R_x; }
 	inline double redshift() const { return ns_str_->redshift; }
 	inline double R_m_min() const { return ns_str_->R_m_min; }
