@@ -95,13 +95,13 @@ void FreddiState::initializeWind() {
 	} else if (args().disk->wind == "Cambier2013") { // Cambier & Smith 1303.6218
 		wind_.reset(static_cast<BasicWind*>(new Cambier2013Wind(*this)));
 	} else if (args().disk->wind == "__testA__") {
-		wind_.reset(static_cast<BasicWind*>(new __testA__Wind(*this)));
+		wind_.reset(static_cast<BasicWind*>(new testAWind(*this)));
 	} else if (args().disk->wind == "__testB__") {
-		wind_.reset(static_cast<BasicWind*>(new __testB__Wind(*this)));
+		wind_.reset(static_cast<BasicWind*>(new testBWind(*this)));
 	} else if (args().disk->wind == "__testC__") {
-		wind_.reset(static_cast<BasicWind*>(new __testC__Wind(*this)));
+		wind_.reset(static_cast<BasicWind*>(new testCWind(*this)));
 	} else if (args().disk->wind == "__testC_q0_Shields1986__") {
-		wind_.reset(static_cast<BasicWind*>(new __testC_q0_Shields1986__(*this)));
+		wind_.reset(static_cast<BasicWind*>(new testCq0Shields1986Wind(*this)));
     } else if (args().disk->wind == "Shields1986Wind") {
         wind_.reset(static_cast<BasicWind*>(new Shields1986Wind(*this)));
     } else if (args().disk->wind == "Agnieszka2015Wind") {
@@ -406,7 +406,7 @@ FreddiState::Cambier2013Wind::Cambier2013Wind(const FreddiState& state):
 	}
 }
 
-FreddiState::__testA__Wind::__testA__Wind(const FreddiState& state):
+FreddiState::testAWind::testAWind(const FreddiState& state):
 		BasicWind(state),
 		kA(state.args().disk->windparams.at("kA")) {
 	const double A0 = -kA / m::pow<2>(state.h().back() - state.h().front());
@@ -415,7 +415,7 @@ FreddiState::__testA__Wind::__testA__Wind(const FreddiState& state):
 	}
 }
 
-FreddiState::__testB__Wind::__testB__Wind(const FreddiState& state):
+FreddiState::testBWind::testBWind(const FreddiState& state):
 		BasicWind(state),
 		kB(state.args().disk->windparams.at("kB")) {
 	const double B0 = -kB / m::pow<2>(state.h().back() - state.h().front());
@@ -424,7 +424,7 @@ FreddiState::__testB__Wind::__testB__Wind(const FreddiState& state):
 	}
 }
 
-FreddiState::__testC__Wind::__testC__Wind(const FreddiState& state):
+FreddiState::testCWind::testCWind(const FreddiState& state):
 		BasicWind(state),
 		kC(state.args().disk->windparams.at("kC")) {
 	const double C0 = kC * state.args().disk->Mdotout / (state.h().back() - state.h().front());
@@ -436,12 +436,12 @@ FreddiState::__testC__Wind::__testC__Wind(const FreddiState& state):
 	}
 }
 
-FreddiState::__testC_q0_Shields1986__::__testC_q0_Shields1986__(const FreddiState& state):
+FreddiState::testCq0Shields1986Wind::testCq0Shields1986Wind(const FreddiState& state):
 		BasicWind(state),
 		kC(state.args().disk->windparams.at("kC")),
 		R_windmin2out(state.args().disk->windparams.at("Rwind")) {}
 
-void FreddiState::__testC_q0_Shields1986__::update(const FreddiState& state) {
+void FreddiState::testCq0Shields1986Wind::update(const FreddiState& state) {
 	BasicWind::update(state);
 	const double h_wind_min = std::sqrt(R_windmin2out) * state.h().back();
 	for (size_t i = state.first(); i <= state.last(); ++i) {

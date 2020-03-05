@@ -64,49 +64,49 @@ private:
 		virtual Cambier2013Wind* clone() const override { return new Cambier2013Wind(*this); }
 	};
 
-	class __testA__Wind: public BasicWind {
+	class testAWind: public BasicWind {
 	private:
 		// windparams
 		const double kA;
 	public:
-		explicit __testA__Wind(const FreddiState& state);
-		~__testA__Wind() override = default;
-		__testA__Wind(const __testA__Wind&) = default;
-		virtual __testA__Wind* clone() const override { return new __testA__Wind(*this); }
+		explicit testAWind(const FreddiState& state);
+		~testAWind() override = default;
+		testAWind(const testAWind&) = default;
+		virtual testAWind* clone() const override { return new testAWind(*this); }
 	};
 
-	class __testB__Wind: public BasicWind {
+	class testBWind: public BasicWind {
 	private:
 		// windparams
 		const double kB;
 	public:
-		explicit __testB__Wind(const FreddiState& state);
-		~__testB__Wind() override = default;
-		__testB__Wind(const __testB__Wind&) = default;
-		virtual __testB__Wind* clone() const override { return new __testB__Wind(*this); }
+		explicit testBWind(const FreddiState& state);
+		~testBWind() override = default;
+		testBWind(const testBWind&) = default;
+		virtual testBWind* clone() const override { return new testBWind(*this); }
 	};
 
-	class __testC__Wind: public BasicWind {
+	class testCWind: public BasicWind {
 	private:
 		// windparams
 		const double kC;
 	public:
-		explicit __testC__Wind(const FreddiState& state);
-		~__testC__Wind() override = default;
-		__testC__Wind(const __testC__Wind&) = default;
-		virtual __testC__Wind* clone() const override { return new __testC__Wind(*this); }
+		explicit testCWind(const FreddiState& state);
+		~testCWind() override = default;
+		testCWind(const testCWind&) = default;
+		virtual testCWind* clone() const override { return new testCWind(*this); }
 	};
 
-	class __testC_q0_Shields1986__: public BasicWind {
+	class testCq0Shields1986Wind: public BasicWind {
 	private:
 		// windparams
 		const double kC;
 		const double R_windmin2out;
 	public:
-		explicit __testC_q0_Shields1986__(const FreddiState& state);
-		~__testC_q0_Shields1986__() override = default;
-		__testC_q0_Shields1986__(const __testC_q0_Shields1986__&) = default;
-		virtual __testC_q0_Shields1986__* clone() const override { return new __testC_q0_Shields1986__(*this); }
+		explicit testCq0Shields1986Wind(const FreddiState& state);
+		~testCq0Shields1986Wind() override = default;
+		testCq0Shields1986Wind(const testCq0Shields1986Wind&) = default;
+		virtual testCq0Shields1986Wind* clone() const override { return new testCq0Shields1986Wind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 
