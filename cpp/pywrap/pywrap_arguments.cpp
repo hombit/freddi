@@ -103,12 +103,14 @@ boost::shared_ptr<NeutronStarArguments> make_neutron_star_arguments(
 		const std::string& nsprop,
 		const object& freqx, const object& Rx, double Bx, double hotspotarea,
 		double epsilonAlfven, double inversebeta, double Rdead,
-		const std::string& fptype, const object& fpparams_) {
+		const std::string& fptype, const object& fpparams_,
+		const std::string& kappat_type, const object& kappat_params_) {
 	return boost::make_shared<NeutronStarArguments>(
 			nsprop,
 			objToOpt<double>(freqx), objToOpt<double>(Rx), Bx, hotspotarea,
 			epsilonAlfven, inversebeta, Rdead,
-			fptype, mapping_to_map(fpparams_));
+			fptype, mapping_to_map(fpparams_),
+			kappat_type, mapping_to_map(kappat_params_));
 }
 
 boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_disk_binary_arguments(

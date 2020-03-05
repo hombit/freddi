@@ -210,6 +210,8 @@ dict neutron_star_evolution_kwdefaults() {
 	kw["Rdead"] = NeutronStarArguments::default_Rdead;
 	kw["fptype"] = NeutronStarArguments::default_fptype;
 	kw["fpparams"] = tuple();
+	kw["kappattype"] = NeutronStarArguments::default_kappat_type;
+	kw["kappatparams"] = NeutronStarArguments::default_kappat_params.at(NeutronStarArguments::default_kappat_type);
 
 	return kw;
 }
@@ -221,7 +223,8 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			extract<std::string>(kw["nsprop"]),
 			kw["freqx"], kw["Rx"], extract<double>(kw["Bx"]), extract<double>(kw["hotspotarea"]),
 			extract<double>(kw["epsilonAlfven"]), extract<double>(kw["inversebeta"]), extract<double>(kw["Rdead"]),
-			extract<std::string>(kw["fptype"]), kw["fpparams"]);
+			extract<std::string>(kw["fptype"]), kw["fpparams"],
+			extract<std::string>(kw["kappattype"]), kw["kappatparams"]);
 
 	const auto general = make_general_arguments();
 	const auto basic = make_neutron_star_basic_disk_binary_arguments(
@@ -298,9 +301,8 @@ void wrap_evolution() {
 		.def("_required_args", neutron_star_evolution_required_args, "Mock values for non-scientific calls")
 		.staticmethod("_required_args")
 		.add_property("mu_magn", &FreddiNeutronStarEvolution::mu_magn)
-		.add_property("R_dead", &FreddiNeutronStarEvolution::R_dead)
-		.add_property("F_dead", &FreddiNeutronStarEvolution::F_dead)
 		.add_property("R_cor", &FreddiNeutronStarEvolution::R_cor)
+		.add_property("R_dead", &FreddiNeutronStarEvolution::R_dead)
 		.add_property("inverse_beta", &FreddiNeutronStarEvolution::inverse_beta)
 		.add_property("Fmagn", make_function(&FreddiNeutronStarEvolution::Fmagn, return_value_policy<copy_const_reference>()))
 		.add_property("dFmagn_dh", make_function(&FreddiNeutronStarEvolution::dFmagn_dh, return_value_policy<copy_const_reference>()))
