@@ -6,18 +6,18 @@
 FreddiNeutronStarEvolution::ConstKappaT::ConstKappaT(double value):
 		value(value) {}
 
-double FreddiNeutronStarEvolution::ConstKappaT::operator()(double R_to_Rcor) const {
+double FreddiNeutronStarEvolution::ConstKappaT::operator()(const FreddiNeutronStarEvolution& freddi, double R) const {
 	return value;
 }
 
 FreddiNeutronStarEvolution::CorotationStepKappaT::CorotationStepKappaT(double in, double out):
 		in(in), out(out) {}
 
-double FreddiNeutronStarEvolution::CorotationStepKappaT::operator()(double R_to_Rcor) const {
-	if (R_to_Rcor > 1.0) {
-		return out;
+double FreddiNeutronStarEvolution::CorotationStepKappaT::operator()(const FreddiNeutronStarEvolution& freddi, double R) const {
+	if (R < freddi.R_cor()) {
+		return in;
 	}
-	return in;
+	return out;
 }
 
 
@@ -253,7 +253,7 @@ FreddiNeutronStarEvolution::FreddiNeutronStarEvolution(const FreddiNeutronStarAr
 	// Change initial condition due presence of magnetic field torque. It can spoil user-defined initial disk
 	// parameters, such as mass or Fout
 	if (inverse_beta() <= 0.) {  // F_in is non-zero, Fmagn is zero everywhere
-		current_.F_in = kappa_t(str_->R[0] / R_cor()) * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
+		current_.F_in = kappa_t(str_->R[0]) * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
 		for (size_t i = 0; i < Nx(); i++) {
 			current_.F[i] += current_.F_in;
 		}
@@ -369,10 +369,10 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	double new_F_in = 0;
 	if (inverse_beta() <= 0.) {
 		if (R_m <= R_cor()) {
-			new_F_in = kappa_t(R_m / R_cor()) * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
+			new_F_in = kappa_t(R_m) * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
 		} else {
 //			new_F_in = F_dead() * m::pow<3>(R_dead() / R_m);
-			new_F_in = kappa_t(R_m / R_cor()) * m::pow<2>(mu_magn()) / m::pow<3>(R_m);
+			new_F_in = kappa_t(R_m) * m::pow<2>(mu_magn()) / m::pow<3>(R_m);
 		}
 	}
 	current_.F_in = new_F_in;

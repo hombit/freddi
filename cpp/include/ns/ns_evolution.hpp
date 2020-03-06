@@ -8,7 +8,7 @@ class FreddiNeutronStarEvolution: public FreddiEvolution {
 private:
 	class BasicKappaT {
 	public:
-		virtual double operator()(double R_to_Rcor) const = 0;
+		virtual double operator()(const FreddiNeutronStarEvolution& freddi, double R) const = 0;
 	};
 
 	class ConstKappaT: public BasicKappaT {
@@ -16,7 +16,7 @@ private:
 		const double value;
 	public:
 		ConstKappaT(double value);
-		double operator()(double R_to_Rcor) const override;
+		double operator()(const FreddiNeutronStarEvolution& freddi, double R) const override;
 	};
 
 	class CorotationStepKappaT: public BasicKappaT {
@@ -25,7 +25,7 @@ private:
 		const double out;
 	public:
 		CorotationStepKappaT(double in, double out);
-		double operator()(double R_to_Rcor) const override;
+		double operator()(const FreddiNeutronStarEvolution& freddi, double R) const override;
 	};
 
 	class NeutronStarStructure {
@@ -167,7 +167,7 @@ private:
 	static std::shared_ptr<BasicNSAccretionEfficiency> initializeNsAccretionEfficiency(const NeutronStarArguments& args_ns, const FreddiNeutronStarEvolution* freddi);
 // ns_str_
 public:
-	inline double kappa_t(double R_to_Rcor) const { return (*ns_str_->kappa_t)(R_to_Rcor); }
+	inline double kappa_t(double R) const { return (*ns_str_->kappa_t)(*this, R); }
 	inline double R_x() const { return ns_str_->R_x; }
 	inline double redshift() const { return ns_str_->redshift; }
 	inline double R_m_min() const { return ns_str_->R_m_min; }
