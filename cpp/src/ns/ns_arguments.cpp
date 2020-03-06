@@ -11,7 +11,8 @@ constexpr const char NeutronStarArguments::default_fptype[];
 constexpr const char NeutronStarArguments::default_kappat_type[];
 const std::map<std::string, pard> NeutronStarArguments::default_kappat_params{
 		{"const", {{"value", 1. / 3.}}},
-		{"corstep", {{"in", 1. / 3.}, {"out", 1. / 3.}}}
+		{"corstep", {{"in", 1. / 3.}, {"out", 1. / 3.}}},
+                {"romanova2018", {{"in", 1. / 3.}, {"out", 1. / 3.}}},
 };
 constexpr const double NeutronStarArguments::default_Rx_dummy;
 constexpr const double NeutronStarArguments::default_freqx_dummy;

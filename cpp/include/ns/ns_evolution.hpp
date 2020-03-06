@@ -27,6 +27,15 @@ private:
 		CorotationStepKappaT(double in, double out);
 		double operator()(double R_to_Rcor) const override;
 	};
+	
+	class Romanova2018KappaT: public BasicKappaT {
+	public:
+		const double in;
+		const double out;
+	public:
+		Romanova2018KappaT(double in, double out);
+		double operator()(double R_to_Rcor) const override;
+	};
 
 	class NeutronStarStructure {
 	public:
