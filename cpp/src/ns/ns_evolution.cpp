@@ -14,24 +14,28 @@ FreddiNeutronStarEvolution::CorotationStepKappaT::CorotationStepKappaT(double in
 		in(in), out(out) {}
 
 double FreddiNeutronStarEvolution::CorotationStepKappaT::operator()(const FreddiNeutronStarEvolution& freddi, double R) const {
-	if (R < freddi.R_cor()) {
-		return in;
+	if (R > freddi.R_cor()) {
+		return out;
 	}
-	return out;
+	return in;
 }
 
 FreddiNeutronStarEvolution::Romanova2018KappaT::Romanova2018KappaT(double in, double out):
 		in(in), out(out) {}
 
-double FreddiNeutronStarEvolution::Romanova2018KappaT::operator()(double R_to_Rcor) const {
+double FreddiNeutronStarEvolution::Romanova2018KappaT::operator()(const FreddiNeutronStarEvolution& freddi, double R) const {
+	const double R_to_Rcor = R / freddi.R_cor();
 	if (R_to_Rcor > 1.0) {
-                // see Table 2 of Romanova+18 NewA 62, 94, the last line
-                const double fastness = std::pow(R_to_Rcor, 1.5);
-                const double feff1 = 6e-4 * std::pow(fastness, 4.01); 
-		const double epsilonAlfven  = 0.5;
-                const double out_minus_wind = out - feff1 * std::pow(epsilonAlfven, 3.5);
-                if (out_minus_wind<0) return 0.0;
-		else return out_minus_wind;
+		// see Table 2 of Romanova+18 NewA 62, 94, the last line
+		const double fastness = std::pow(R_to_Rcor, 1.5);
+		const double feff1 = 6e-4 * std::pow(fastness, 4.01);
+		const double epsilonAlfven = freddi.epsilon_Alfven();
+		const double out_minus_wind = out - feff1 * std::pow(epsilonAlfven, 3.5);
+		if (out_minus_wind < 0){
+			return 0.0;
+		} else {
+			return out_minus_wind;
+		}
 	}
 	return in;
 }
@@ -46,8 +50,8 @@ std::shared_ptr<FreddiNeutronStarEvolution::BasicKappaT> FreddiNeutronStarEvolut
 	} else if (type == "corstep") {
 		return std::make_shared<CorotationStepKappaT>(params.at("in"), params.at("out"));
 	} else if (type == "romanova2018") {
-                return std::make_shared<Romanova2018KappaT>(params.at("in"), params.at("out"));
-        }
+		return std::make_shared<Romanova2018KappaT>(params.at("in"), params.at("out"));
+	}
 	throw std::invalid_argument("Wrong kappattype");
 }
 

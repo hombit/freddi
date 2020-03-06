@@ -34,7 +34,7 @@ private:
 		const double out;
 	public:
 		Romanova2018KappaT(double in, double out);
-		double operator()(double R_to_Rcor) const override;
+		double operator()(const FreddiNeutronStarEvolution& freddi, double R) const override;
 	};
 
 	class NeutronStarStructure {
