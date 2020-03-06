@@ -35,7 +35,7 @@ po::options_description NeutronStarOptions::description() {
 			( "kappattype", po::value<std::string>()->default_value(default_kappat_type), "kappa_t describes how strong is interaction between neutron star magnitosphere and disk, magnetic torque is kappa_t(R) * mu^2 / R^3. This parameter describes type of radial destribution of this parameter\n\n"
 																						  "Values:\n"
 																						  "  const: doesn't depend on radius, default value is 1/3, --kappatype name: 'value'\n"
-																						  "  corstep: kappa_t takes one value inside corotation radius, and another outside, default values are 1/3, --kappatype names: 'in', 'out'")
+																						  "  corstep: kappa_t takes one value inside corotation radius, and another outside, default values are 1/3, --kappatype names: 'in', 'out'"																											  "  romanova2018: similar to corstep option, but the outside value is reduced by the portion taken away by wind (see Table 2 of Romanova+2018,NewA,62,94), --kappatype names: 'in', 'out'")
 			( "kappatparams", po::value<std::vector<std::string>>()->multitoken(), "Parameters of kappa_t radial distribution, see --kappattype for details. Format is name:value" )
 			;
 	return od;
