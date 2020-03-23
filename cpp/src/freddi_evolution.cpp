@@ -14,8 +14,8 @@ FreddiEvolution::FreddiEvolution(const FreddiArguments &args):
 
 
 void FreddiEvolution::step(const double tau) {
-	FreddiState::step(tau);
 	truncateInnerRadius();
+	FreddiState::step(tau);
 	nonlinear_diffusion_nonuniform_wind_1_2(
 			args().calc->tau, args().calc->eps,
 			F_in(), Mdot_out(),
