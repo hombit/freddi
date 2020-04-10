@@ -14,6 +14,7 @@ const std::map<std::string, pard> NeutronStarArguments::default_kappat_params{
 		{"corstep", {{"in", 1. / 3.}, {"out", 1. / 3.}}},
                 {"romanova2018", {{"in", 1. / 3.}, {"out", 1. / 3.}}},
 };
+constexpr const char NeutronStarArguments::default_ns_grav_redshift[];
 constexpr const double NeutronStarArguments::default_Rx_dummy;
 constexpr const double NeutronStarArguments::default_freqx_dummy;
 

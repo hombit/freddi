@@ -13,7 +13,8 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 				vm["fptype"].as<std::string>(),
 				multitoken_string_option_to_map(vm, "fpparams", ":", {}),
 				vm["kappattype"].as<std::string>(),
-				multitoken_string_option_to_map(vm, "kappatparams", ":", default_kappat_params.at(vm["kappattype"].as<std::string>()))) {}
+				multitoken_string_option_to_map(vm, "kappatparams", ":", default_kappat_params.at(vm["kappattype"].as<std::string>())),
+				vm["nsgravredshift"].as<std::string>()) {}
 
 
 po::options_description NeutronStarOptions::description() {
@@ -38,6 +39,10 @@ po::options_description NeutronStarOptions::description() {
 																						  "  corstep: kappa_t takes one value inside corotation radius, and another outside, default values are 1/3, --kappatype names: 'in', 'out'\n"
 																						  "  romanova2018: similar to corstep option, but the outside value is reduced by the portion taken away by wind (see Table 2 of Romanova+2018,NewA,62,94), --kappatype names: 'in', 'out'")
 			( "kappatparams", po::value<std::vector<std::string>>()->multitoken(), "Parameters of kappa_t radial distribution, see --kappattype for details. Format is name:value" )
+			( "nsgravredshift", po::value<std::string>()->default_value(default_ns_grav_redshift), "Neutron star gravitational redshift type.\n"
+																						           "Values:\n"
+								                                                                   "  off: gravitational redshift doesn't taken into account\n"
+																		                           "  on: redshift is (1 - R_sch / Rx), where R_sch = 2GM/c^2" )
 			;
 	return od;
 }

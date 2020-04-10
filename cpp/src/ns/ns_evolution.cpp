@@ -41,27 +41,12 @@ double FreddiNeutronStarEvolution::Romanova2018KappaT::operator()(const FreddiNe
 }
 
 
-std::shared_ptr<FreddiNeutronStarEvolution::BasicKappaT> FreddiNeutronStarEvolution::NeutronStarStructure::initialize_kappa_t(const NeutronStarArguments& args_ns) {
-	const auto& type = args_ns.kappat_type;
-	const auto& params = args_ns.kappat_params;
-
-	if (type == "const") {
-		return std::make_shared<ConstKappaT>(params.at("value"));
-	} else if (type == "corstep") {
-		return std::make_shared<CorotationStepKappaT>(params.at("in"), params.at("out"));
-	} else if (type == "romanova2018") {
-		return std::make_shared<Romanova2018KappaT>(params.at("in"), params.at("out"));
-	}
-	throw std::invalid_argument("Wrong kappattype");
-}
-
-
 FreddiNeutronStarEvolution::NeutronStarStructure::NeutronStarStructure(
 		const NeutronStarArguments &args_ns, FreddiEvolution* evolution):
 		args_ns(args_ns),
 		kappa_t(initialize_kappa_t(args_ns)),
 		R_x(args_ns.Rx),
-		redshift(1.0 - 2.0 * evolution->R_g() / args_ns.Rx),
+		redshift(initialize_redshift(evolution, args_ns)),
 		R_m_min(std::max(R_x, evolution->R()[evolution->first()])),
 		mu_magn(0.5 * args_ns.Bx * m::pow<3>(R_x)),
 		R_cor(std::cbrt(evolution->GM() / m::pow<2>(2*M_PI * args_ns.freqx))),
@@ -76,6 +61,32 @@ FreddiNeutronStarEvolution::NeutronStarStructure::NeutronStarStructure(
 	if (args_ns.Rdead > 0. && args_ns.Rdead < R_cor) {
 		throw std::logic_error("R_dead is positive and less than R_cor, it is unacceptably");
 	}
+}
+
+
+double FreddiNeutronStarEvolution::NeutronStarStructure::initialize_redshift(const FreddiEvolution* evolution, const NeutronStarArguments& args_ns) {
+	if (args_ns.ns_grav_redshift == "off") {
+		return 1.0;
+	}
+	if (args_ns.ns_grav_redshift == "on") {
+		return 1.0 - 2.0 * evolution->R_g() / args_ns.Rx;
+	}
+	throw std::invalid_argument("Wrong nsgravredshift");
+}
+
+
+std::shared_ptr<FreddiNeutronStarEvolution::BasicKappaT> FreddiNeutronStarEvolution::NeutronStarStructure::initialize_kappa_t(const NeutronStarArguments& args_ns) {
+	const auto& type = args_ns.kappat_type;
+	const auto& params = args_ns.kappat_params;
+
+	if (type == "const") {
+		return std::make_shared<ConstKappaT>(params.at("value"));
+	} else if (type == "corstep") {
+		return std::make_shared<CorotationStepKappaT>(params.at("in"), params.at("out"));
+	} else if (type == "romanova2018") {
+		return std::make_shared<Romanova2018KappaT>(params.at("in"), params.at("out"));
+	}
+	throw std::invalid_argument("Wrong kappattype");
 }
 
 

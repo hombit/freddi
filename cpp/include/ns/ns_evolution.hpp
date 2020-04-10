@@ -56,6 +56,7 @@ private:
 		vecd d2Fmagn_dh2;
 		NeutronStarStructure(const NeutronStarArguments& args_ns, FreddiEvolution* evolution);
 	protected:
+		static double initialize_redshift(const FreddiEvolution* evolution, const NeutronStarArguments& args_ns);
 		static std::shared_ptr<BasicKappaT> initialize_kappa_t(const NeutronStarArguments& args_ns);
 		vecd initialize_Fmagn(FreddiEvolution* evolution) const;
 		vecd initialize_dFmagn_dh(FreddiEvolution* evolution) const;
