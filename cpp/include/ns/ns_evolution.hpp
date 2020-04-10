@@ -71,28 +71,29 @@ private:
 	public:
 		BasicNSMdotFraction() = default;
 		virtual ~BasicNSMdotFraction() = 0;
-		virtual double operator()(double R_to_Rcor) const = 0;
+		double operator()(const FreddiNeutronStarEvolution& freddi, double R) const;
+		virtual double fp(double R_to_Rcor) const = 0;
 	};
 
 	class NoOutflowNSMdotFraction: public BasicNSMdotFraction {
 	public:
 		NoOutflowNSMdotFraction() = default;
 		~NoOutflowNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	class PropellerNSMdotFraction: public BasicNSMdotFraction {
 	public:
 		PropellerNSMdotFraction() = default;
 		~PropellerNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	class CorotationBlockNSMdotFraction: public BasicNSMdotFraction {
 	public:
 		CorotationBlockNSMdotFraction() = default;
 		~CorotationBlockNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	// https://arxiv.org/pdf/1010.1528.pdf Eksi-Kutlu (2010)
@@ -100,7 +101,7 @@ private:
 	public:
 		EksiKultu2010NSMdotFraction() = default;
 		~EksiKultu2010NSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	class Romanova2018NSMdotFraction: public BasicNSMdotFraction {
@@ -110,7 +111,7 @@ private:
 	public:
 		Romanova2018NSMdotFraction(double par1, double par2);
 		~Romanova2018NSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	class GeometricalNSMdotFraction: public BasicNSMdotFraction {
@@ -119,7 +120,7 @@ private:
 	public:
 		GeometricalNSMdotFraction(double chi);
 		~GeometricalNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	class BasicNSAccretionEfficiency {
@@ -203,7 +204,7 @@ public:
 	inline double angular_dist_ns(const double mu) { return ns_irr_source_->angular_dist(mu); }
 // fp_
 public:
-	inline double fp(double radius) const { return (*fp_)(radius / R_cor()); }
+	inline double fp(double radius) const { return (*fp_)(*this, radius); }
 	inline double fp() const { return fp(R()[first()]); }
 // eta_ns_
 public:
