@@ -212,6 +212,7 @@ dict neutron_star_evolution_kwdefaults() {
 	kw["fpparams"] = tuple();
 	kw["kappattype"] = NeutronStarArguments::default_kappat_type;
 	kw["kappatparams"] = NeutronStarArguments::default_kappat_params.at(NeutronStarArguments::default_kappat_type);
+	kw["nsgravredshift"] = NeutronStarArguments::default_ns_grav_redshift;
 
 	return kw;
 }
@@ -224,7 +225,8 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			kw["freqx"], kw["Rx"], extract<double>(kw["Bx"]), extract<double>(kw["hotspotarea"]),
 			extract<double>(kw["epsilonAlfven"]), extract<double>(kw["inversebeta"]), extract<double>(kw["Rdead"]),
 			extract<std::string>(kw["fptype"]), kw["fpparams"],
-			extract<std::string>(kw["kappattype"]), kw["kappatparams"]);
+			extract<std::string>(kw["kappattype"]), kw["kappatparams"],
+			extract<std::string>(kw["nsgravredshift"]));
 
 	const auto general = make_general_arguments();
 	const auto basic = make_neutron_star_basic_disk_binary_arguments(
