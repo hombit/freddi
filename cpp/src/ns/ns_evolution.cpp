@@ -142,9 +142,12 @@ FreddiNeutronStarEvolution::BasicNSMdotFraction::~BasicNSMdotFraction() {}
 
 double FreddiNeutronStarEvolution::BasicNSMdotFraction::operator()(const FreddiNeutronStarEvolution& freddi, double R) const {
 	const double Rx = freddi.R_x();
-	if (R <= Rx) {
+	const double Risco = freddi.args().basic->risco;
+
+	if (R <= Rx || R <= Risco) {
 		return 1.0;
 	}
+
 	const double Rcor = freddi.R_cor();
 	return fp(R / Rcor);
 }
