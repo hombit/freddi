@@ -98,7 +98,8 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 	}
 
 	output << "### Derived values\n"
-		<< "# Tidal radius = " << freddi->args().basic->rout / solar_radius << " Rsun\n";
+		<< "# Tidal radius = " << freddi->args().basic->rout / solar_radius << " Rsun\n"
+		<< "# ISCO radius = " << freddi->args().basic->risco << " cm\n";
 
 	output << std::flush;
 }
