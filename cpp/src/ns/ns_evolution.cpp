@@ -194,6 +194,7 @@ double FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::fp(double R_to_Rc
 	if (fastness >= 1) {
 		_fp = par1 * std::pow(fastness, par2);
 	}
+
 	if (_fp > 1) {
 		_fp = 1.;
 	}
@@ -247,6 +248,32 @@ double FreddiNeutronStarEvolution::DummyNSAccretionEfficiency::newtonian(const F
 	const double Rx = freddi.R_x();
 	return Rg * (1. / Rx - 0.5 / R_in);
 }
+
+double FreddiNeutronStarEvolution::RotatingNewtonianNSAccretionEfficiency::rotating_magnetosphere_newt(const FreddiNeutronStarEvolution& freddi, const double Rm)
+const {
+    const double Rsch = 2.0 * freddi.R_g();
+    const double Rx = freddi.R_x();
+    const double Rcor = freddi.R_cor();
+    const double omega_ns = freddi.ns_str_->args_ns.freqx * 2 * M_PI;
+    
+    double Reff = Rm;
+    // if the inner disc radius > Rcor, return efficiency calculated at R=Rcor:
+    if (Rm > Rcor) {
+    	Reff = Rcor;
+    }
+    const double omega_Kepl_Rin = std::sqrt(freddi.GM() / m::pow<3>(Reff));
+    
+    return Rsch / 2.0 / Rx * (1.0 - Rx / Rm)
+    	+ m::pow<2>(omega_ns) / 2.0 / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * (Rx-Reff) * (Rx+Reff)
+    	+ Rsch / 4.0 / Reff * m::pow<2>(1.0 - omega_ns/omega_Kepl_Rin);
+}
+
+double FreddiNeutronStarEvolution::RotatingNewtonianNSAccretionEfficiency::small_magnetosphere_newt(const FreddiNeutronStarEvolution& freddi, const double Rm) const {
+	const double Rsch = 2.0 * freddi.R_g();
+	const double Rx = freddi.R_x();
+	return Rsch / 4.0 / Rx ;
+}  
+
 
 double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::schwarzschild(const FreddiNeutronStarEvolution& freddi, const double Rm) const {
 	const double Rsch = 2.0 * freddi.R_g();
@@ -345,6 +372,9 @@ std::shared_ptr<FreddiNeutronStarEvolution::BasicNSAccretionEfficiency> FreddiNe
 	}
 	if (nsprop == "sibgatullinsunyaev2000" || nsprop == "sibsun2000") {
 		return std::make_shared<SibgatullinSunyaev2000NSAccretionEfficiency>();
+	}
+	if (nsprop == "newt") {
+		return std::make_shared<RotatingNewtonianNSAccretionEfficiency>();
 	}
 	throw std::invalid_argument("Wrong nsprop");
 }

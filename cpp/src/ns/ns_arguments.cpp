@@ -25,6 +25,9 @@ double NeutronStarArguments::initializeFreqx(const std::string& nsprop) {
 	if (nsprop == "sibgatullinsunyaev2000" || nsprop == "sibsun2000") {
 		throw std::runtime_error("freqx must be specified for nsprop=sibgatullinsunyaev2000");
 	}
+	if (nsprop == "newt") {
+		throw std::runtime_error("freqx must be specified for nsprop=newt");
+	}
 	throw std::invalid_argument("Wrong nsprop value");
 }
 
@@ -38,6 +41,13 @@ double NeutronStarArguments::initializeRx(const std::string& nsprop, const std::
 		}
 		return SibgatullinSunyaev2000Geometry::radiusNS(*freqx);
 	}
+	if (nsprop == "newt") {
+		if (!freqx) {
+			throw std::runtime_error("freqx must be specified for nsprop=newt");
+		}
+		return SibgatullinSunyaev2000Geometry::radiusNS(*freqx);
+	}
+
 	throw std::invalid_argument("Wrong nsprop value");
 }
 
@@ -89,6 +99,9 @@ std::optional<double> NeutronStarBasicDiskBinaryArguments::initializeRisco(const
 	if (ns_args.nsprop == "dummy") {
 		return risco;
 	}
+	if (ns_args.nsprop == "newt") {
+		return SibgatullinSunyaev2000Geometry::radiusISCO(ns_args.freqx);
+        }
 	if (ns_args.nsprop == "sibgatullinsunyaev2000" || ns_args.nsprop == "sibsun2000") {
 		return SibgatullinSunyaev2000Geometry::radiusISCO(ns_args.freqx);
 	}

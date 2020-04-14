@@ -23,6 +23,7 @@ po::options_description NeutronStarOptions::description() {
 			( "nsprop", po::value<std::string>()->default_value(default_nsprop), "Neutron star geometry and radiation properties name and specifies default values of --Rx, --Risco and --freqx\n\n"
 																				 "Values:\n"
 																				 "  dummy: NS radiation efficiency is R_g * (1 / R_x - 1 / 2R_in), default --freqx is 0, default Rx is 1e6, default Risco is Kerr value\n"
+																				 "  newt: NS radiation efficiency is a functions of NS frequency, that's why --freqx must be specified explicitly\n"
 																				 "  sibgatullin-sunyaev2000: NS radiation efficiency, and default values of Rx and Risco are functions of NS frequency, that's why --freqx must be specified explicitly")
 			( "freqx", po::value<double>(), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
 			( "Rx", po::value<double>(), "Accretor radius, cm" )
