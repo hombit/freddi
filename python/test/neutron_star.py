@@ -42,13 +42,16 @@ class FmagnDerivativesTestCase(unittest.TestCase):
 
 class NSMdotFractionTestCase(unittest.TestCase):
     """fp(r/r_cor) function"""
+    Rx = 1e6  # cm
+    rin = 1.3e6  # cm larger Rx and Risco
     basic_kwargs = {
         **default_freddi_kwargs(),
         'Mdot0':1e16,
         'initialcond':'quasistat',
         'Mx':1.4 * 2e33,  # g
-        'Rx':1e6,  # cm
+        'Rx':Rx,  # cm
         'freqx':500,  # Hz
+        'rin': rin,  # cm
         'rout':1e11,  # cm
         'Bx':1e8,  # G
         'Rdead':5e6,  # cm
@@ -65,6 +68,15 @@ class NSMdotFractionTestCase(unittest.TestCase):
         fr = FreddiNeutronStar(fptype='propeller', **self.basic_kwargs)
         result = fr.evolve()
         assert_array_equal(0, result.fp)
+
+    def test_propeller_unity_fp(self):
+        """fp must be unity if R_in <= Rx or R_in <= Risco"""
+        kwargs = self.basic_kwargs.copy()
+        kwargs['rin'] = self.Rx
+        fr = FreddiNeutronStar(fptype='propeller', **kwargs)
+        result = fr.evolve()
+        idx = fr.first_R == self.Rx
+        assert_array_equal(1, result.fp[idx])
 
     def test_corotation_block(self):
         fr = FreddiNeutronStar(fptype='corotation-block', **self.basic_kwargs)
