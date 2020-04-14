@@ -67,8 +67,8 @@ class ShakuraSunyaevSupercriticalTestCase(unittest.TestCase):
 
 
 class StationaryWindATestCase(unittest.TestCase):
-    @unittest.skipIf(scipy is None, 'No scipy module is available')
     @parameterized.expand([[0.1], [1.], [10.]])
+    @unittest.skipIf(scipy is None, 'No scipy module is available')
     def test(self, k_A0):
         """Stationary disk with outflow rate proportional to accretion rate
 
