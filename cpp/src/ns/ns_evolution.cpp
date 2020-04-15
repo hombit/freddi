@@ -194,7 +194,6 @@ double FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::fp(double R_to_Rc
 	if (fastness >= 1) {
 		_fp = par1 * std::pow(fastness, par2);
 	}
-
 	if (_fp > 1) {
 		_fp = 1.;
 	}
@@ -263,7 +262,7 @@ const {
     }
     const double omega_Kepl_Rin = std::sqrt(freddi.GM() / m::pow<3>(Reff));
     
-    return Rsch / 2.0 / Rx * (1.0 - Rx / Rm)
+    return Rsch / 2.0 / Rx * (1.0 - Rx / Reff)
     	+ m::pow<2>(omega_ns) / 2.0 / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * (Rx-Reff) * (Rx+Reff)
     	+ Rsch / 4.0 / Reff * m::pow<2>(1.0 - omega_ns/omega_Kepl_Rin);
 }
@@ -271,7 +270,10 @@ const {
 double FreddiNeutronStarEvolution::RotatingNewtonianNSAccretionEfficiency::small_magnetosphere_newt(const FreddiNeutronStarEvolution& freddi, const double Rm) const {
 	const double Rsch = 2.0 * freddi.R_g();
 	const double Rx = freddi.R_x();
-	return Rsch / 4.0 / Rx ;
+	const double omega_ns = freddi.ns_str_->args_ns.freqx * 2 * M_PI;
+	const double omega_Kepl_Rx = std::sqrt(freddi.GM() / m::pow<3>(Rx)); // Kepler angular velocity at NS surface
+
+	return Rsch / 4.0 / Rx * m::pow<2>(1.0 - omega_ns/omega_Kepl_Rx);
 }  
 
 
