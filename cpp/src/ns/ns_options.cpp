@@ -32,13 +32,13 @@ po::options_description NeutronStarOptions::description() {
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "???" )
 			( "Rdead", po::value<double>()->default_value(default_Rdead), "Maximum inner radius of the disk that can be obtained, it characterises minimum torque in the dead disk, cm" )
 			( "fptype", po::value<std::string>()->default_value(default_fptype), "Accretor Mdot fraction mode: no-outflow, propeller, corotation-block, eksi-kultu2010, romanova2018, geometrical" )
-			( "fpparams", po::value<std::vector<std::string>>()->multitoken(), "Accretor Mdot fraction parameters, specific for each fptype. Format is name:value. Examples: 1) for geometrical chi:15; 2) for romanova2018 par1:0.15 par2:0.92" )
+			( "fpparams", po::value<std::vector<std::string>>()->multitoken()->composing(), "Accretor Mdot fraction parameters, specific for each fptype. Format is name:value. Examples: 1) for geometrical chi:15; 2) for romanova2018 par1:0.15 par2:0.92" )
 			( "kappattype", po::value<std::string>()->default_value(default_kappat_type), "kappa_t describes how strong is interaction between neutron star magnitosphere and disk, magnetic torque is kappa_t(R) * mu^2 / R^3. This parameter describes type of radial destribution of this parameter\n\n"
 																						  "Values:\n"
 																						  "  const: doesn't depend on radius, default value is 1/3, --kappatype name: 'value'\n"
 																						  "  corstep: kappa_t takes one value inside corotation radius, and another outside, default values are 1/3, --kappatype names: 'in', 'out'\n"
 																						  "  romanova2018: similar to corstep option, but the outside value is reduced by the portion taken away by wind (see Table 2 of Romanova+2018,NewA,62,94), --kappatype names: 'in', 'out'")
-			( "kappatparams", po::value<std::vector<std::string>>()->multitoken(), "Parameters of kappa_t radial distribution, see --kappattype for details. Format is name:value" )
+			( "kappatparams", po::value<std::vector<std::string>>()->multitoken()->composing(), "Parameters of kappa_t radial distribution, see --kappattype for details. Format is name:value" )
 			( "nsgravredshift", po::value<std::string>()->default_value(default_ns_grav_redshift), "Neutron star gravitational redshift type.\n"
 																						           "Values:\n"
 								                                                                   "  off: gravitational redshift doesn't taken into account\n"
