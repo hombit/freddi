@@ -20,11 +20,12 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star");
 	od.add_options()
-			( "nsprop", po::value<std::string>()->default_value(default_nsprop), "Neutron star geometry and radiation properties name and specifies default values of --Rx, --Risco and --freqx\n\n"
-																				 "Values:\n"
-																				 "  dummy: NS radiation efficiency is R_g * (1 / R_x - 1 / 2R_in), default --freqx is 0, default Rx is 1e6, default Risco is Kerr value\n"
-																				 "  newt: NS radiation efficiency is a functions of NS frequency, that's why --freqx must be specified explicitly\n"
-																				 "  sibgatullin-sunyaev2000: NS radiation efficiency, and default values of Rx and Risco are functions of NS frequency, that's why --freqx must be specified explicitly")
+			( "nsprop", po::value<std::string>()->default_value(default_nsprop),
+					"Neutron star geometry and radiation properties name and specifies default values of --Rx, --Risco and --freqx\n\n"
+	 				"Values:\n"
+	  				"  dummy: NS radiation efficiency is R_g * (1 / R_x - 1 / 2R_in), default --freqx is 0, default Rx is 1e6, default Risco is Kerr value\n"
+	   				"  newt: NS radiation efficiency is a functions of NS frequency, that's why --freqx must be specified explicitly\n"
+					"  sibgatullin-sunyaev2000: NS radiation efficiency, and default values of Rx and Risco are functions of NS frequency, that's why --freqx must be specified explicitly")
 			( "freqx", po::value<double>(), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, agree them yourself" )
 			( "Rx", po::value<double>(), "Accretor radius, cm" )
 			( "Bx", po::value<double>()->required(), "Accretor polar magnetic induction, G" )
@@ -32,18 +33,28 @@ po::options_description NeutronStarOptions::description() {
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Factor in Alfven radius formula" )
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "???" )
 			( "Rdead", po::value<double>()->default_value(default_Rdead), "Maximum inner radius of the disk that can be obtained, it characterises minimum torque in the dead disk, cm" )
-			( "fptype", po::value<std::string>()->default_value(default_fptype), "Accretor Mdot fraction mode: no-outflow, propeller, corotation-block, eksi-kutlu2010, romanova2018, geometrical" )
+			( "fptype", po::value<std::string>()->default_value(default_fptype),
+					"??? Accretor Mdot fraction mode fp.\n\n"
+					"Values:\n"
+	 				"  no-outflow: all the matter passing inner disk radius falling onto neutron star, fp = 1\n"
+	  				"  propeller: all the matter flows away from both disk and neutron star, fp = 0\n"
+	   				"  corotation-block: ???\n"
+					"  geometrical: ???\n"
+					"  eksi-kutlu2010: ???\n"
+	 				"  romanova2018: ???" )
 			( "fpparams", po::value<std::vector<std::string>>()->multitoken()->composing(), "Accretor Mdot fraction parameters, specific for each fptype. Format is name:value. Examples: 1) for geometrical chi:15; 2) for romanova2018 par1:0.15 par2:0.92" )
-			( "kappattype", po::value<std::string>()->default_value(default_kappat_type), "kappa_t describes how strong is interaction between neutron star magnitosphere and disk, magnetic torque is kappa_t(R) * mu^2 / R^3. This parameter describes type of radial destribution of this parameter\n\n"
-																						  "Values:\n"
-																						  "  const: doesn't depend on radius, default value is 1/3, --kappatype name: 'value'\n"
-																						  "  corstep: kappa_t takes one value inside corotation radius, and another outside, default values are 1/3, --kappatype names: 'in', 'out'\n"
-																						  "  romanova2018: similar to corstep option, but the outside value is reduced by the portion taken away by wind (see Table 2 of Romanova+2018,NewA,62,94), --kappatype names: 'in', 'out'")
+			( "kappattype", po::value<std::string>()->default_value(default_kappat_type),
+					"kappa_t describes how strong is interaction between neutron star magnitosphere and disk, magnetic torque is kappa_t(R) * mu^2 / R^3. This parameter describes type of radial destribution of this parameter\n\n"
+					"Values:\n"
+					"  const: doesn't depend on radius, default value is 1/3, --kappatype name: 'value'\n"
+					"  corstep: kappa_t takes one value inside corotation radius, and another outside, default values are 1/3, --kappatype names: 'in', 'out'\n"
+					"  romanova2018: similar to corstep option, but the outside value is reduced by the portion taken away by wind (see Table 2 of Romanova+2018,NewA,62,94), --kappatype names: 'in', 'out'" )
 			( "kappatparams", po::value<std::vector<std::string>>()->multitoken()->composing(), "Parameters of kappa_t radial distribution, see --kappattype for details. Format is name:value" )
-			( "nsgravredshift", po::value<std::string>()->default_value(default_ns_grav_redshift), "Neutron star gravitational redshift type.\n"
-																						           "Values:\n"
-								                                                                   "  off: gravitational redshift doesn't taken into account\n"
-																		                           "  on: redshift is (1 - R_sch / Rx), where R_sch = 2GM/c^2" )
+			( "nsgravredshift", po::value<std::string>()->default_value(default_ns_grav_redshift),
+					"Neutron star gravitational redshift type.\n\n"
+					"Values:\n"
+					"  off: gravitational redshift doesn't taken into account\n"
+					"  on: redshift is (1 - R_sch / Rx), where R_sch = 2GM/c^2" )
 			;
 	return od;
 }
@@ -115,4 +126,3 @@ po::options_description FreddiNeutronStarOptions::description() {
 	desc.add(CalculationOptions::description());
 	return desc;
 }
-
