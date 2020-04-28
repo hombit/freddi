@@ -11,11 +11,100 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 				vm["inversebeta"].as<double>(),
 				vm["Rdead"].as<double>(),
 				vm["fptype"].as<std::string>(),
-				multitoken_string_option_to_map(vm, "fpparams", ":", {}),
+				fpparamsInitializer(vm),
 				vm["kappattype"].as<std::string>(),
-				multitoken_string_option_to_map(vm, "kappatparams", ":", default_kappat_params.at(vm["kappattype"].as<std::string>())),
+				kappatparamsInitalizer(vm),
 				vm["nsgravredshift"].as<std::string>()) {}
 
+pard NeutronStarOptions::fpparamsInitializer(const po::variables_map& vm) {
+	const auto fptype = vm["fptype"].as<std::string>();
+
+	if (fptype == "no-outflow") {
+		return {};
+	}
+	if (fptype == "propeller") {
+		return {};
+	}
+	if (fptype == "corotation-block") {
+		return {};
+	}
+	if (fptype == "geometrical") {
+		if (vm.count("fp-geometrical-chi") == 0) {
+			throw po::error("--fp-geometrical-chi is required if --fptype=geometrical");
+		}
+		return {{"chi", vm["fp-geometrical-chi"].as<double>()}};
+	}
+	if (fptype == "eksi-kultu2010") {
+		return {};
+	}
+	if (fptype == "romanova2018") {
+		if (vm.count("romanova2018-part1") == 0) {
+			throw po::error("--romanova2018-part1 is required if --fptype=romanova2018");
+		}
+		const double par1 = vm["romanova2018-par1"].as<double>();
+		if (vm.count("romanova2018-part2") == 0) {
+			throw po::error("--romanova2018-part2 is required if --fptype=romanova2018");
+		}
+		const double par2 = vm["romanova2018-par2"].as<double>();
+		return {
+			{"par1", par1},
+			{"par2", par2},
+		};
+	}
+
+	throw po::invalid_option_value("Unknown --fptype=" + fptype);
+}
+
+pard NeutronStarOptions::kappatparamsInitalizer(const po::variables_map &vm) {
+	const auto kappattype = vm["kappattype"].as<std::string>();
+
+	if (kappattype == "const") {
+		if (vm.count("kappat-const-value") == 0) {
+			throw po::error("--kappat-const-value is required if --kappattype=const");
+		}
+		return {{"value", vm["kappat-const-value"].as<double>()}};
+	}
+	if (kappattype == "corstep") {
+		if (vm.count("kappat-corstep-in") == 0) {
+			throw po::error("--kappat-corstep-in is required if --kappattype=corstep");
+		}
+		const double in = vm["kappat-corstep-in"].as<double>();
+		if (vm.count("kappat-corstep-out") == 0) {
+			throw po::error("--kappat-corstep-out is required if --kappattype=corstep");
+		}
+		const double out = vm["kappat-corstep-out"].as<double>();
+		return {
+			{"in", in},
+			{"out", out},
+		};
+	}
+	if (kappattype == "romanova2018") {
+		if (vm.count("kappat-romanova2018-in") == 0) {
+			throw po::error("--kappat-romanova2018-in is required if --kappattype=romanova2018");
+		}
+		const double in = vm["kappat-romanova2018-in"].as<double>();
+		if (vm.count("kappat-romanova2018-out") == 0) {
+			throw po::error("--kappat-romanova2018-out is required if --kappattype=romanova2018");
+		}
+		const double out = vm["kappat-romanova2018-out"].as<double>();
+		if (vm.count("romanova2018-part1") == 0) {
+			throw po::error("--romanova2018-part1 is required if --kappattype=romanova2018");
+		}
+		const double par1 = vm["romanova2018-par1"].as<double>();
+		if (vm.count("romanova2018-part2") == 0) {
+			throw po::error("--romanova2018-part2 is required if --kappattype=romanova2018");
+		}
+		const double par2 = vm["romanova2018-par2"].as<double>();
+		return {
+			{"in", in},
+			{"out", out},
+			{"par1", par1},
+			{"par2", par2},
+		};
+	}
+
+	throw po::invalid_option_value("Unknown --kappattype=" + kappattype);
+}
 
 po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star");
@@ -38,18 +127,24 @@ po::options_description NeutronStarOptions::description() {
 					"Values:\n"
 	 				"  no-outflow: all the matter passing inner disk radius falling onto neutron star, fp = 1\n"
 	  				"  propeller: all the matter flows away from both disk and neutron star, fp = 0\n"
-	   				"  corotation-block: ???\n"
-					"  geometrical: ???\n"
+	   				"  corotation-block: like 'no-otflow' when Alfven radius is smaller than corotation radius, like 'propeller' otherwise\n"
+					"  geometrical: generalisation of 'corotation-block' for the case of not co-directional of disk rotation axis and neutron star magnetic field axis. Requires --fp-geometrical-chi to be specified\n"
 					"  eksi-kutlu2010: ???\n"
-	 				"  romanova2018: ???" )
-			( "fpparams", po::value<std::vector<std::string>>()->multitoken()->composing(), "Accretor Mdot fraction parameters, specific for each fptype. Format is name:value. Examples: 1) for geometrical chi:15; 2) for romanova2018 par1:0.15 par2:0.92" )
+	 				"  romanova2018: ???, requires --romanova2018-par1 and --romanova2018-par2 to be specified" )
+			( "fp-geometrical-chi", po::value<double>(), "angle between disk rotation axis and neutron star magnetic axis for --fptype=geometrical, degrees" )
+			( "romanova2018-par1", po::value<double>(), "??? par1 value for --fptype=romanova2018 and --kappattype=romanova2018" )
+			( "romanova2018-par2", po::value<double>(), "??? par2 value for --fptype=romanova2018 and --kappattype=romanova2018" )
 			( "kappattype", po::value<std::string>()->default_value(default_kappat_type),
 					"kappa_t describes how strong is interaction between neutron star magnitosphere and disk, magnetic torque is kappa_t(R) * mu^2 / R^3. This parameter describes type of radial destribution of this parameter\n\n"
 					"Values:\n"
-					"  const: doesn't depend on radius, default value is 1/3, --kappatype name: 'value'\n"
-					"  corstep: kappa_t takes one value inside corotation radius, and another outside, default values are 1/3, --kappatype names: 'in', 'out'\n"
-					"  romanova2018: similar to corstep option, but the outside value is reduced by the portion taken away by wind (see Table 2 of Romanova+2018,NewA,62,94), --kappatype names: 'in', 'out'" )
-			( "kappatparams", po::value<std::vector<std::string>>()->multitoken()->composing(), "Parameters of kappa_t radial distribution, see --kappattype for details. Format is name:value" )
+					"  const: doesn't depend on radius, kappa_t = value. Requires --kappat-const-value to be specified\n"
+					"  corstep: kappa_t is 'in' inside corotation radius, and 'out' outside. Requires --kappat-corstep-in and --kappat-corstep-out to be specified\n"
+					"  romanova2018: similar to corstep option, but the outside value is reduced by the portion taken away by wind (see Table 2 of Romanova+2018,NewA,62,94). Requires --kappat-romanova2018-in, --kappat-romanova2018-out --romanova2018-par1 and --romanova-par2 to be specified" )
+			( "kappat-const-value", po::value<double>()->default_value(default_kappat_value), "kappa_t value for --kappattype=const" )
+			( "kappat-corstep-in", po::value<double>()->default_value(default_kappat_value), "kappa_t value inside corotation radius for --kappattype=corstep" )
+			( "kappat-corstep-out", po::value<double>()->default_value(default_kappat_value), "kappa_t value outside corotation radius for --kappattype=corstep" )
+			( "kappat-romanova2018-in", po::value<double>()->default_value(default_kappat_value), "kappa_t value inside corotation radius for --kappattype=romanova2018" )
+			( "kappat-romanova2018-out", po::value<double>()->default_value(default_kappat_value), "kappa_t value outside corotation radius for --kappattype=romanova2018" )
 			( "nsgravredshift", po::value<std::string>()->default_value(default_ns_grav_redshift),
 					"Neutron star gravitational redshift type.\n\n"
 					"Values:\n"

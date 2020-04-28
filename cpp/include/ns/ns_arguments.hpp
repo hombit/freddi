@@ -22,7 +22,7 @@ public:
 	constexpr static const double default_Rdead = 0.;
 	constexpr static const char default_fptype[] = "no-outflow";
 	constexpr static const char default_kappat_type[] = "const";
-	static const std::map<std::string, pard> default_kappat_params;
+	constexpr static const double default_kappat_value = 1.0 / 3.0;
 	constexpr static const char default_ns_grav_redshift[] = "off";
 protected:
 	constexpr static const double default_Rx_dummy = 1e6;

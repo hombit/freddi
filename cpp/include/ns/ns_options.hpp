@@ -7,6 +7,7 @@
 class NeutronStarOptions: public NeutronStarArguments {
 protected:
 	static pard fpparamsInitializer(const po::variables_map& vm);
+	static pard kappatparamsInitalizer(const po::variables_map& vm);
 public:
 	NeutronStarOptions(const po::variables_map& vm);
 	static po::options_description description();

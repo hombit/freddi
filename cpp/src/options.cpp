@@ -283,22 +283,3 @@ po::options_description FreddiOptions::description() {
 	desc.add(CalculationOptions::description());
 	return desc;
 }
-
-
-pard multitoken_string_option_to_map(const po::variables_map& vm, const std::string& name,
-		const std::string& separators, const pard& default_value){
-	if (vm.count(name) == 0) {
-		return default_value;
-	}
-	pard m;
-	const auto tokens = vm[name].as<std::vector<std::string>>();
-	for (const auto& token : tokens) {
-		std::vector<std::string> parts;
-		boost::split(parts, token, boost::is_any_of(separators.c_str()));
-		if (parts.size() != 2) {
-			throw po::validation_error(po::validation_error::invalid_option_value);
-		}
-		m[parts[0]] = std::stod(parts[1]);
-	}
-	return m;
-}
