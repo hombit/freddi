@@ -32,8 +32,10 @@ private:
 	public:
 		const double in;
 		const double out;
+		const double par1;
+		const double par2;
 	public:
-		Romanova2018KappaT(double in, double out);
+		Romanova2018KappaT(double in, double out, double par1, double par2);
 		double operator()(const FreddiNeutronStarEvolution& freddi, double R) const override;
 	};
 
