@@ -32,7 +32,7 @@ po::options_description NeutronStarOptions::description() {
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Factor in Alfven radius formula" )
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "???" )
 			( "Rdead", po::value<double>()->default_value(default_Rdead), "Maximum inner radius of the disk that can be obtained, it characterises minimum torque in the dead disk, cm" )
-			( "fptype", po::value<std::string>()->default_value(default_fptype), "Accretor Mdot fraction mode: no-outflow, propeller, corotation-block, eksi-kultu2010, romanova2018, geometrical" )
+			( "fptype", po::value<std::string>()->default_value(default_fptype), "Accretor Mdot fraction mode: no-outflow, propeller, corotation-block, eksi-kutlu2010, romanova2018, geometrical" )
 			( "fpparams", po::value<std::vector<std::string>>()->multitoken()->composing(), "Accretor Mdot fraction parameters, specific for each fptype. Format is name:value. Examples: 1) for geometrical chi:15; 2) for romanova2018 par1:0.15 par2:0.92" )
 			( "kappattype", po::value<std::string>()->default_value(default_kappat_type), "kappa_t describes how strong is interaction between neutron star magnitosphere and disk, magnetic torque is kappa_t(R) * mu^2 / R^3. This parameter describes type of radial destribution of this parameter\n\n"
 																						  "Values:\n"

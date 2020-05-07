@@ -350,7 +350,7 @@ std::shared_ptr<FreddiNeutronStarEvolution::BasicNSMdotFraction> FreddiNeutronSt
 	if (fptype == "corotation-block") {
 		return std::make_shared<CorotationBlockNSMdotFraction>();
 	}
-	if (fptype == "eksi-kultu2010") {
+	if (fptype == "eksi-kutlu2010") {
 		return std::make_shared<EksiKultu2010NSMdotFraction>();
 	}
 	if (fptype == "romanova2018") {
