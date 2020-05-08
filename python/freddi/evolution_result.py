@@ -1,3 +1,5 @@
+from collections.abc import Iterable
+
 import numpy as np
 
 
@@ -29,19 +31,25 @@ class EvolutionResult:
         region: str, optional
             Object optically luminous component, could be one of: `hot`, `cold`,
             `disk`, `star`, `all`
-        phase: float or None, optional
-            Phase of the observation, must be specified if `region` is `star` or
-            `all`
+        phase: array-like or float or None, optional
+            Phase of the observation in radians, must be specified if `region`
+            is `star` or `all`
 
         Returns
         -------
         array
 
         """
+        if isinstance(phase, Iterable):
+            phase = np.asarray(phase)
+            if phase.shape != (self.__len_states, ):
+                raise ValueError('phase length should be {}'.format(self.__len_states))
+        else:
+            phase = [phase] * self.__len_states
         lmbd = np.asarray(lmbd)
         arr = np.empty((self.__len_states,) + lmbd.shape, dtype=np.float)
         for i in range(self.__len_states):
-            arr[i] = self.__states[i].flux(lmbd, region, phase)
+            arr[i] = self.__states[i].flux(lmbd, region, phase[i])
         return arr
 
     def __getattr__(self, attr) -> np.ndarray:
