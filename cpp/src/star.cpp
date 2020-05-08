@@ -226,7 +226,7 @@ IrradiatedStar::IrradiatedStar(sources_t&& sources, const double temp, const Roc
 
 IrradiatedStar::IrradiatedStar(const IrradiatedStar& other):
 		Star(other),
-		sources_(cloneSources()) {}
+		sources_(other.cloneSources()) {}
 
 IrradiatedStar::sources_t IrradiatedStar::cloneSources() const {
 	sources_t result;
