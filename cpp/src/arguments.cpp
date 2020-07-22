@@ -309,6 +309,7 @@ constexpr const double SelfIrradiationArguments::default_Cirr;
 constexpr const double SelfIrradiationArguments::default_irrindex;
 constexpr const double SelfIrradiationArguments::default_Cirr_cold;
 constexpr const double SelfIrradiationArguments::default_irrindex_cold;
+constexpr const double SelfIrradiationArguments::default_height_to_radius_cold;
 constexpr const char SelfIrradiationArguments::default_angular_dist_disk[];
 
 

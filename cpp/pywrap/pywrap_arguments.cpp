@@ -51,10 +51,14 @@ boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
 }
 
 boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(
-		double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+		double Cirr, double irrindex,
+		double Cirr_cold, double irrindex_cold, double height_to_radius_cold,
 		const std::string& angular_dist_disk
 		) {
-	return boost::make_shared<SelfIrradiationArguments>(Cirr, irrindex, Cirr_cold, irrindex_cold, angular_dist_disk);
+	return boost::make_shared<SelfIrradiationArguments>(
+			Cirr, irrindex,
+			Cirr_cold, irrindex_cold, height_to_radius_cold,
+			angular_dist_disk);
 }
 
 boost::shared_ptr<FluxArguments> make_flux_arguments(
@@ -132,10 +136,12 @@ boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_d
 }
 
 boost::shared_ptr<NeutronStarSelfIrradiationArguments> make_neutron_star_self_irradiation_arguments(
-		double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+		double Cirr, double irrindex,
+		double Cirr_cold, double irrindex_cold, double height_to_radius_cold,
 		const std::string& angular_dist_disk, const std::string& angular_dist_ns) {
 	return boost::make_shared<NeutronStarSelfIrradiationArguments>(
-			Cirr, irrindex, Cirr_cold, irrindex_cold,
+			Cirr, irrindex,
+			Cirr_cold, irrindex_cold, height_to_radius_cold,
 			angular_dist_disk, angular_dist_ns);
 }
 

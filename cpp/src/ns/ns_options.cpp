@@ -74,6 +74,7 @@ NeutronStarSelfIrradiationOptions::NeutronStarSelfIrradiationOptions(const po::v
 				vm["irrindex"].as<double>(),
 				vm["Cirrcold"].as<double>(),
 				vm["irrindexcold"].as<double>(),
+				vm["h2rcold"].as<double>(),
 				vm["angulardistdisk"].as<std::string>(),
 				vm["angulardistns"].as<std::string>()) {
 	if (Cirr <= 0. && dsa_args.boundcond == "Tirr") {

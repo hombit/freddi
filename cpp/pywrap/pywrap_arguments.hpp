@@ -34,7 +34,8 @@ boost::shared_ptr<DiskStructureArguments> make_disk_structure_arguments(
 		const std::string& wind, const object& windparams);
 
 boost::shared_ptr<SelfIrradiationArguments> make_self_irradiation_arguments(
-		double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+		double Cirr, double irrindex,
+		double Cirr_cold, double irrindex_cold, double height_to_radius_cold,
 		const std::string& angular_dist_disk);
 
 boost::shared_ptr<FluxArguments> make_flux_arguments(
@@ -74,7 +75,8 @@ boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_d
 		const object& rin, const object& rout, const object& risco);
 
 boost::shared_ptr<NeutronStarSelfIrradiationArguments> make_neutron_star_self_irradiation_arguments(
-		double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+		double Cirr, double irrindex,
+		double Cirr_cold, double irrindex_cold, double default_height_to_radius_cold,
 		const std::string& angular_dist_disk, const std::string& angular_dist_ns);
 
 boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments(

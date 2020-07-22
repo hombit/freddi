@@ -139,6 +139,7 @@ SelfIrradiationOptions::SelfIrradiationOptions(const po::variables_map &vm, cons
 				vm["irrindex"].as<double>(),
 				vm["Cirrcold"].as<double>(),
 				vm["irrindexcold"].as<double>(),
+				vm["h2rcold"].as<double>(),
 				vm["angulardistdisk"].as<std::string>()) {
 	if (Cirr <= 0. && dsa_args.boundcond == "Tirr") {
 		throw po::error("Set positive --Cirr when --boundcond=Tirr");
@@ -152,6 +153,7 @@ po::options_description SelfIrradiationOptions::description() {
 			( "irrindex", po::value<double>()->default_value(default_irrindex), "Irradiation index for the hot disk" )
 			( "Cirrcold", po::value<double>()->default_value(default_Cirr_cold), "Irradiation factor for the cold disk" )
 			( "irrindexcold", po::value<double>()->default_value(default_irrindex_cold), "Irradiation index for the cold disk" )
+			( "h2rcold", po::value<double>()->default_value(default_height_to_radius_cold), "Seme-height to radius ratio for the cold disk" )
 			( "angulardistdisk", po::value<std::string>()->default_value(default_angular_dist_disk), "Angular distribution of the disk X-ray radiation. Values: isotropic, plane" )
 			;
 	return od;

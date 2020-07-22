@@ -60,6 +60,7 @@ dict evolution_kwdefaults() {
 	kw["irrindex"] = SelfIrradiationArguments::default_irrindex;
 	kw["Cirrcold"] = SelfIrradiationArguments::default_Cirr_cold;
 	kw["irrindexcold"] = SelfIrradiationArguments::default_irrindex_cold;
+	kw["h2rcold"] = SelfIrradiationArguments::default_height_to_radius_cold;
 	kw["angulardistdisk"] = SelfIrradiationArguments::default_angular_dist_disk;
 
 	kw["colourfactor"] = FluxArguments::default_colourfactor;
@@ -151,6 +152,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<double>(kw["irrindex"]),
 			extract<double>(kw["Cirrcold"]),
 			extract<double>(kw["irrindexcold"]),
+			extract<double>(kw["h2rcold"]),
 			extract<std::string>(kw["angulardistdisk"]));
 	const auto flux = make_flux_arguments(
 			extract<double>(kw["colourfactor"]),
@@ -250,6 +252,7 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			extract<double>(kw["irrindex"]),
 			extract<double>(kw["Cirrcold"]),
 			extract<double>(kw["irrindexcold"]),
+			extract<double>(kw["h2rcold"]),
 			extract<std::string>(kw["angulardistdisk"]),
 			extract<std::string>(kw["angulardistns"]));
 	const auto flux = make_flux_arguments(

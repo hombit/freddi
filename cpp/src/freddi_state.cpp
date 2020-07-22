@@ -243,7 +243,6 @@ const vecd& FreddiState::Kirr() {
 			x[i] = args().irr->Cirr * std::pow(H[i] / (R()[i] * 0.05), args().irr->irrindex);
 		}
 		for (size_t i = last() + 1; i < Nx(); i++) {
-			// Height is given by formula for C zone, cold disk can be thinner
 			x[i] = args().irr->Cirr_cold * std::pow(H[i] / (R()[i] * 0.05), args().irr->irrindex_cold);
 		}
 		opt_str_.Kirr = std::move(x);
@@ -255,8 +254,11 @@ const vecd& FreddiState::Kirr() {
 const vecd& FreddiState::Height() {
 	if (!opt_str_.Height) {
 		vecd x(Nx());
-		for (size_t i = first(); i < Nx(); i++) {
+		for (size_t i = first(); i <= last(); i++) {
 			x[i] = oprel().Height(R()[i], F()[i]);
+		}
+		for (size_t i = last() + 1; i < Nx(); i++) {
+			x[i] = args().irr->height_to_radius_cold;
 		}
 		opt_str_.Height = std::move(x);
 	}

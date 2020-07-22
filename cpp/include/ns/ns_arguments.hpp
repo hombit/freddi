@@ -87,9 +87,12 @@ public:
 	std::string angular_dist_ns;
 public:
 	NeutronStarSelfIrradiationArguments(
-			double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+			double Cirr, double irrindex,
+			double Cirr_cold, double irrindex_cold, double height_to_radius_cold,
 			const std::string& angular_dist_disk, const std::string& angular_dist_ns):
-			SelfIrradiationArguments(Cirr, irrindex, Cirr_cold, irrindex_cold, angular_dist_disk),
+			SelfIrradiationArguments(Cirr, irrindex, Cirr_cold,
+					irrindex_cold, height_to_radius_cold,
+					angular_dist_disk),
 			angular_dist_ns(angular_dist_ns) {}
 };
 
