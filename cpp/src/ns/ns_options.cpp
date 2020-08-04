@@ -38,12 +38,12 @@ pard NeutronStarOptions::fpparamsInitializer(const po::variables_map& vm) {
 		return {};
 	}
 	if (fptype == "romanova2018") {
-		if (vm.count("romanova2018-part1") == 0) {
-			throw po::error("--romanova2018-part1 is required if --fptype=romanova2018");
+		if (vm.count("romanova2018-par1") == 0) {
+			throw po::error("--romanova2018-par1 is required if --fptype=romanova2018");
 		}
 		const double par1 = vm["romanova2018-par1"].as<double>();
-		if (vm.count("romanova2018-part2") == 0) {
-			throw po::error("--romanova2018-part2 is required if --fptype=romanova2018");
+		if (vm.count("romanova2018-par2") == 0) {
+			throw po::error("--romanova2018-par2 is required if --fptype=romanova2018");
 		}
 		const double par2 = vm["romanova2018-par2"].as<double>();
 		return {
@@ -87,12 +87,12 @@ pard NeutronStarOptions::kappatparamsInitalizer(const po::variables_map &vm) {
 			throw po::error("--kappat-romanova2018-out is required if --kappattype=romanova2018");
 		}
 		const double out = vm["kappat-romanova2018-out"].as<double>();
-		if (vm.count("romanova2018-part1") == 0) {
-			throw po::error("--romanova2018-part1 is required if --kappattype=romanova2018");
+		if (vm.count("romanova2018-par1") == 0) {
+			throw po::error("--romanova2018-par1 is required if --kappattype=romanova2018");
 		}
 		const double par1 = vm["romanova2018-par1"].as<double>();
-		if (vm.count("romanova2018-part2") == 0) {
-			throw po::error("--romanova2018-part2 is required if --kappattype=romanova2018");
+		if (vm.count("romanova2018-par2") == 0) {
+			throw po::error("--romanova2018-par2 is required if --kappattype=romanova2018");
 		}
 		const double par2 = vm["romanova2018-par2"].as<double>();
 		return {
