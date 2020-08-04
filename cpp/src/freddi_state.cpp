@@ -654,3 +654,9 @@ double FreddiState::PlaneFreddiIrradiationSource::angular_dist(const double mu) 
 std::unique_ptr<IrrSource> FreddiState::PlaneFreddiIrradiationSource::irr_source(FreddiState& state, const double luminosity) const {
 	return std::make_unique<CentralDiskSource>(position(state), normal, luminosity, state.args().flux->star_albedo, Height2R(state));
 }
+
+double FreddiState::Sigma_minus(double r) const {
+	// Lasota et al., A&A 486, 523–528 (2008), Eq A.1, DOI: 10.1051/0004-6361:200809658
+	return 74.6 * std::pow(args().basic->alpha / 0.1, -0.83) * std::pow(r / 1e10, 1.18)
+		* std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, -0.40);
+}
