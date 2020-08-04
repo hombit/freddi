@@ -35,6 +35,7 @@ dict evolution_kwdefaults() {
 
 	kw["__cgs"] = true;
 
+	kw["alphacold"] = object();
 	kw["kerr"] = BasicDiskBinaryArguments::default_kerr;
 	kw["rochelobefill"] = BasicDiskBinaryArguments::default_roche_lobe_fill;
 	kw["Topt"] = BasicDiskBinaryArguments::default_Topt;
@@ -134,7 +135,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 
 	const auto general = make_general_arguments();
 	const auto basic = make_basic_disk_binary_arguments(
-			extract<double>(kw["alpha"]),
+			extract<double>(kw["alpha"]), kw["alphacold"],
 			extract<double>(kw["Mx"]), extract<double>(kw["kerr"]),
 			extract<double>(kw["period"]),
 			extract<double>(kw["Mopt"]), extract<double>(kw["rochelobefill"]), extract<double>(kw["Topt"]),
@@ -235,7 +236,7 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 	const auto general = make_general_arguments();
 	const auto basic = make_neutron_star_basic_disk_binary_arguments(
 			*ns_args,
-			extract<double>(kw["alpha"]),
+			extract<double>(kw["alpha"]), kw["alphacold"],
 			extract<double>(kw["Mx"]), extract<double>(kw["kerr"]),
 			extract<double>(kw["period"]),
 			extract<double>(kw["Mopt"]), extract<double>(kw["rochelobefill"]), extract<double>(kw["Topt"]),

@@ -32,6 +32,7 @@ po::options_description GeneralOptions::description() {
 BasicDiskBinaryOptions::BasicDiskBinaryOptions(const po::variables_map &vm):
 		BasicDiskBinaryArguments(
 				vm["alpha"].as<double>(),
+				varToOpt<double>(vm, "alphacold"),
 				sunToGram(vm["Mx"].as<double>()),
 				vm["kerr"].as<double>(),
 				dayToS(vm["period"].as<double>()),
@@ -73,6 +74,7 @@ po::options_description BasicDiskBinaryOptions::description() {
 	po::options_description od("Basic binary and disk parameter");
 	od.add_options()
 			( "alpha,a", po::value<double>()->required(), "Alpha parameter of Shakura-Sunyaev model" )
+			( "alphacold", po::value<double>(), "Alpha parameter of cold disk, currently it is used only for Sigma_minus, see --Qirr2Qvishot. Default is --alpha values divided by ten" )  // default_alpha_to_alphacold
 			( "Mx,M", po::value<double>()->required(), "Mass of the central object, in the units of solar masses" )
 			( "kerr", po::value<double>()->default_value(default_kerr), "Dimensionless Kerr parameter of the black hole" )
 			( "Mopt",	po::value<double>()->required(), "Mass of the optical star, in units of solar masses" )
@@ -114,7 +116,7 @@ po::options_description DiskStructureOptions::description() {
 																					   "  Teff: outer radius of the disk moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"
 																					   "  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
 			( "Thot", po::value<double>()->default_value(default_Thot), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description" )
-			( "Qirr2Qvishot", po::value<double>()->default_value(m::pow<4>(default_Tirr2Tvishot)), "Minimum Qirr / Qvis ratio at the outer edge of the hot disk to switch evolution from temperature-based regime to Sigma_minus-based regime (see Eq. A.1 in Lasota et al. 2008)" )
+			( "Qirr2Qvishot", po::value<double>()->default_value(m::pow<4>(default_Tirr2Tvishot)), "Minimum Qirr / Qvis ratio at the outer edge of the hot disk to switch evolution from temperature-based regime to Sigma_minus-based regime (see Eq. A.1 in Lasota et al. 2008, --alphacold value is used as alpha parameter)" )
 			( "initialcond", po::value<std::string>()->default_value(default_initialcond), "Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 																						   "Values:\n"
 																						   "  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power does the same

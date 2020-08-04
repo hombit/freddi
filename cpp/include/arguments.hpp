@@ -36,11 +36,13 @@ public:
 
 class BasicDiskBinaryArguments: public BlackHoleFunctions, public BinaryFunctions {
 public:
+	constexpr static const double default_alpha_to_alphacold = 10.0;
 	constexpr static const double default_kerr = 0.0;
 	constexpr static const double default_roche_lobe_fill = 1.0;
 	constexpr static const double default_Topt = 0.0;
 public:
 	double alpha;
+	double alphacold;
 	double Mx;
 	double kerr;
 	double period;
@@ -61,13 +63,13 @@ protected:
 	static inline double riscoFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
 public:
 	BasicDiskBinaryArguments(
-			double alpha,
+			double alpha, std::optional<double> alphacold,
 			double Mx, double kerr,
 			double period,
 			double Mopt, double roche_lobe_fill, double Topt,
 			std::optional<double> rin, std::optional<double> rout, std::optional<double> risco
 	):
-			alpha(alpha),
+			alpha(alpha), alphacold(alphacold ? *alphacold : alpha / default_alpha_to_alphacold),
 			Mx(Mx), kerr(kerr),
 			period(period),
 			Mopt(Mopt),

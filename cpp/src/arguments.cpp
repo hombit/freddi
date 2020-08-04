@@ -12,6 +12,7 @@ constexpr const char GeneralArguments::default_dir[];
 constexpr const unsigned short GeneralArguments::default_output_precision;
 
 
+constexpr const double BasicDiskBinaryArguments::default_alpha_to_alphacold;
 constexpr const double BasicDiskBinaryArguments::default_kerr;
 constexpr const double BasicDiskBinaryArguments::default_roche_lobe_fill;
 constexpr const double BasicDiskBinaryArguments::default_Topt;

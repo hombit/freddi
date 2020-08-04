@@ -71,7 +71,7 @@ protected:
 public:
 	NeutronStarBasicDiskBinaryArguments(
 			const NeutronStarArguments& ns_args,
-			double alpha_,
+			double alpha_, std::optional<double> alphacold_,
 			double Mx_, double kerr_,
 			double period_,
 			double Mopt_, double roche_lobe_fill_, double Topt_,

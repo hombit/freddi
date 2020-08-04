@@ -53,6 +53,7 @@ NeutronStarBasicDiskBinaryOptions::NeutronStarBasicDiskBinaryOptions(const po::v
 		NeutronStarBasicDiskBinaryArguments(
 				args_ns,
 				vm["alpha"].as<double>(),
+				varToOpt<double>(vm, "alphacold"),
 				sunToGram(vm["Mx"].as<double>()),
 				vm["kerr"].as<double>(),
 				dayToS(vm["period"].as<double>()),

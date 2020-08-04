@@ -71,14 +71,14 @@ double SibgatullinSunyaev2000Geometry::radiusISCO(double freqx) {
 
 NeutronStarBasicDiskBinaryArguments::NeutronStarBasicDiskBinaryArguments(
 		const NeutronStarArguments& ns_args,
-		double alpha_,
+		double alpha_, std::optional<double> alphacold_,
 		double Mx_, double kerr_,
 		double period_,
 		double Mopt_, double roche_lobe_fill_, double Topt_,
 		std::optional<double> rin_, std::optional<double> rout_, std::optional<double> risco_
 ):
 		BasicDiskBinaryArguments(
-				alpha_,
+				alpha_, alphacold_,
 				Mx_, kerr_,
 				period_,
 				Mopt_,

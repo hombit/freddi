@@ -17,7 +17,7 @@ void wrap_arguments();
 boost::shared_ptr<GeneralArguments> make_general_arguments();
 
 boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(
-		double alpha,
+		double alpha, const object& alphacold,
 		double Mx, double kerr,
 		double period,
 		double Mopt, double roche_lobe_fill, double Topt,
@@ -68,7 +68,7 @@ boost::shared_ptr<NeutronStarArguments> make_neutron_star_arguments(
 
 boost::shared_ptr<NeutronStarBasicDiskBinaryArguments> make_neutron_star_basic_disk_binary_arguments(
 		const NeutronStarArguments& ns_args,
-		double alpha,
+		double alpha, const object& alphacold,
 		double Mx, double kerr,
 		double period,
 		double Mopt, double roche_lobe_fill, double Topt,
