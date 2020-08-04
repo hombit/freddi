@@ -1,4 +1,4 @@
-#t	Mdot	Mdisk	Rhot	Kirrout	H2R	Teffout	Tirrout	Qiir2Qvisout	TphXmax	Lx	Lbol	Fx	Fbol	mU	mB	mV	mR	mI	mJ
+#t	Mdot	Mdisk	Rhot	Kirrout	H2R	Teffout	Tirrout	Qirr2Qvisout	TphXmax	Lx	Lbol	Fx	Fbol	mU	mB	mV	mR	mI	mJ
 #days	g/s	g	Rsun	float	float	K	K	float	keV	erg/s	erg/s	erg/s/cm^2	erg/s/cm^2	mag	mag	mag	mag	mag	mag
 ### Columns description
 # 1=t [days] : Time moment
@@ -9,7 +9,7 @@
 # 6=H2R [float] : Relative semiheight at the outer radius of the hot disk
 # 7=Teffout [K] : Effective tempreture at the outer radius of the hot disk
 # 8=Tirrout [K] : Irradiation temperature (Qirr / sigma_SB)^1/4 at the outer radius of the hot disk
-# 9=Qiir2Qvisout [float] : Irradiation flux to viscous flux ratio at the outer radius of the hot disk
+# 9=Qirr2Qvisout [float] : Irradiation flux to viscous flux ratio at the outer radius of the hot disk
 # 10=TphXmax [keV] : Maximum effective temperature of the disk
 # 11=Lx [erg/s] : X-ray luminosity of the disk in the given energy range [emin, emax]
 # 12=Lbol [erg/s] : Bolometric luminosity of the disk
@@ -30,7 +30,7 @@
 # Mopt=0.5
 # Mx=5
 # Nx=1000
-# Qiir2Qvishot=0
+# Qirr2Qvishot=0
 # Thot=0
 # Topt=0
 # alpha=0.25

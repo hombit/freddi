@@ -184,7 +184,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"H2R", "float", "Relative semiheight at the outer radius of the hot disk", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
 			{"Teffout", "K", "Effective tempreture at the outer radius of the hot disk", [freddi]() {return freddi->Tph()[freddi->last()];}},
 			{"Tirrout", "K", "Irradiation temperature (Qirr / sigma_SB)^1/4 at the outer radius of the hot disk", [freddi]() {return freddi->Tirr()[freddi->last()];}},
-			{"Qiir2Qvisout", "float", "Irradiation flux to viscous flux ratio at the outer radius of the hot disk", [freddi]() {return std::pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
+			{"Qirr2Qvisout", "float", "Irradiation flux to viscous flux ratio at the outer radius of the hot disk", [freddi]() {return std::pow(freddi->Tirr()[freddi->last()] / freddi->Tph_vis()[freddi->last()], 4.);}},
 			{"TphXmax", "keV", "Maximum effective temperature of the disk", [freddi]() {return kToKev(*std::max_element(freddi->Tph_X().begin() + freddi->first(), freddi->Tph_X().begin() + freddi->last() + 1));}},
 			{"Lx", "erg/s", "X-ray luminosity of the disk in the given energy range [emin, emax]", [freddi]() {return freddi->Lx();}},
 			{"Lbol", "erg/s", "Bolometric luminosity of the disk", [freddi]() {return freddi->Lbol_disk();}},
