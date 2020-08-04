@@ -162,6 +162,7 @@ public:
 	constexpr static const double default_Mdotout = 0.;
 	constexpr static const char default_boundcond[] = "Teff";
 	constexpr static const double default_Thot = 0.;
+	constexpr static const double default_Tirr2Tvishot = 0.;
 	constexpr static const char default_initialcond[] = "powerF";
 	constexpr static const char default_wind[] = "no";
 public:
@@ -172,6 +173,7 @@ public:
 	double Mdotout;
 	std::string boundcond;
 	double Thot;
+	double Tirr2Tvishot;
 	double F0;
 	double Mdisk0;
 	double Mdot0;
@@ -185,7 +187,7 @@ public:
 			const BasicDiskBinaryArguments &bdb_args,
 			const std::string& opacity,
 			double Mdotout,
-			const std::string& boundcond, double Thot,
+			const std::string& boundcond, double Thot, double Tirr2Tvishot,
 			const std::string& initialcond,
 			std::optional<double> F0,
 			std::optional<double> Mdisk0, std::optional<double> Mdot0,

@@ -47,6 +47,7 @@ dict evolution_kwdefaults() {
 	kw["boundcond"] = DiskStructureArguments::default_boundcond;
 	kw["initialcond"] = DiskStructureArguments::default_initialcond;
 	kw["Thot"] = DiskStructureArguments::default_Thot;
+	kw["Qiir2Qvishot"] = m::pow<4>(DiskStructureArguments::default_Tirr2Tvishot);
 	kw["F0"] = object();
 	kw["Mdisk0"] = object();
 	kw["Mdot0"] = object();
@@ -143,6 +144,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<std::string>(kw["opacity"]),
 			extract<double>(kw["Mdotout"]),
 			extract<std::string>(kw["boundcond"]), extract<double>(kw["Thot"]),
+			std::pow(extract<double>(kw["Qiir2Qvishot"]), 0.25),
 			extract<std::string>(kw["initialcond"]),
 			kw["F0"], kw["Mdisk0"], kw["Mdot0"],
 			kw["powerorder"], kw["gaussmu"], kw["gausssigma"],
@@ -243,6 +245,7 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			extract<std::string>(kw["opacity"]),
 			extract<double>(kw["Mdotout"]),
 			extract<std::string>(kw["boundcond"]), extract<double>(kw["Thot"]),
+			std::pow(extract<double>(kw["Qiir2Qvishot"]), 0.25),
 			extract<std::string>(kw["initialcond"]),
 			kw["F0"], kw["Mdisk0"], kw["Mdot0"],
 			kw["powerorder"], kw["gaussmu"], kw["gausssigma"],

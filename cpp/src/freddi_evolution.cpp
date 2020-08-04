@@ -37,7 +37,7 @@ void FreddiEvolution::truncateOuterRadius() {
 	}
 
 	auto ii = last() + 1;
-	if (Tirr().at(last()) / Tph_vis().at(last()) < 1.0) {
+	if (Tirr().at(last()) / Tph_vis().at(last()) < args().disk->Tirr2Tvishot) {
 		do {
 			ii--;
 			if (ii <= first()) throw std::runtime_error("Rout <= Rin");

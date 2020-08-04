@@ -29,6 +29,7 @@
 # Mopt=0.5
 # Mx=5
 # Nx=1000
+# Qiir2Qvishot=0
 # Thot=10000
 # Topt=0
 # alpha=0.25

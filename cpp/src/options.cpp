@@ -94,6 +94,7 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 				vm["Mdotout"].as<double>(),
 				vm["boundcond"].as<std::string>(),
 				vm["Thot"].as<double>(),
+				std::pow(vm["Qiir2Qvishot"].as<double>(), 0.25),
 				vm["initialcond"].as<std::string>(),
 				varToOpt<double>(vm, "F0"),
 				varToOpt<double>(vm, "Mdisk0"),
@@ -113,6 +114,7 @@ po::options_description DiskStructureOptions::description() {
 																					   "  Teff: outer radius of the disk moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"
 																					   "  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
 			( "Thot", po::value<double>()->default_value(default_Thot), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description" )
+			( "Qiir2Qvishot", po::value<double>()->default_value(m::pow<4>(default_Tirr2Tvishot)), "Minimum Qirr / Qvis ratio at the outer edge of the hot disk to switch evolution from temperature-based regime to Sigma_minus-based regime (see Eq. A.1 in Lasota et al. 2008)" )
 			( "initialcond", po::value<std::string>()->default_value(default_initialcond), "Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 																						   "Values:\n"
 																						   "  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power does the same
