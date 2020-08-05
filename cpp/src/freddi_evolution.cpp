@@ -32,6 +32,11 @@ void FreddiEvolution::truncateOuterRadius() {
 	if (args().disk->Thot <= 0. ){
 		return;
 	}
+	// check proper value of accretion rate:
+	if ((!std::isfinite(Mdot_in_prev())) || ( Mdot_in() < 0.0 ) || ( Mdot_in_prev() < 0.0 )) {
+		return;
+	}
+	// check that Mdot decaying:
 	if (Mdot_in() > Mdot_in_prev()) {
 		return;
 	}
