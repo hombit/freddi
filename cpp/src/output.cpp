@@ -98,6 +98,7 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 	}
 
 	output << "### Derived values\n"
+		<< "# alpha_cold = " << freddi->args().basic->alphacold << "\n"
 		<< "# Tidal radius = " << freddi->args().basic->rout / solar_radius << " Rsun\n"
 		<< "# ISCO radius = " << freddi->args().basic->risco << " cm\n";
 
