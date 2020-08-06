@@ -181,6 +181,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Mdot", "g/s", "Accretion rate onto central object",  [freddi]() {return freddi->Mdot_in();}},
 			{"Mdisk", "g", "Mass of the hot disk", [freddi]() {return freddi->Mdisk();}},
 			{"Rhot", "Rsun", "Radius of the hot disk", [freddi]() {return cmToSun(freddi->R()[freddi->last()]);}},
+			{"Sigmaout", "g/cm^2", "Surface density at the outer radius of the hot disk", [freddi]() {return freddi->Sigma()[freddi->last()];}},
 			{"Kirrout", "float", "Irradiation coefficient Kirr at the outer radius of the hot disk", [freddi]() {return freddi->Kirr()[freddi->last()];}},
 			{"H2R", "float", "Relative semiheight at the outer radius of the hot disk", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
 			{"Teffout", "K", "Effective tempreture at the outer radius of the hot disk", [freddi]() {return freddi->Tph()[freddi->last()];}},
