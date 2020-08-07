@@ -627,7 +627,13 @@ Vec3 FreddiState::BasicFreddiIrradiationSource::position(const FreddiState& stat
 }
 
 double FreddiState::BasicFreddiIrradiationSource::Height2R(FreddiState& state) const {
-	return state.Height()[state.last()] / state.R()[state.last()];
+	const auto& H = state.Height();
+	const auto& R = state.R();
+	double max_H2R = 0.0;
+	for (size_t i = state.first(); i < state.Nx(); i++) {
+		max_H2R = std::max(H[i] / R[i], max_H2R);
+	}
+	return max_H2R;
 }
 
 double FreddiState::IsotropicFreddiIrradiationSource::angular_dist(const double mu) const {
