@@ -258,7 +258,7 @@ const vecd& FreddiState::Height() {
 			x[i] = oprel().Height(R()[i], F()[i]);
 		}
 		for (size_t i = last() + 1; i < Nx(); i++) {
-			x[i] = args().irr->height_to_radius_cold;
+			x[i] = args().irr->height_to_radius_cold * R()[i];
 		}
 		opt_str_.Height = std::move(x);
 	}
