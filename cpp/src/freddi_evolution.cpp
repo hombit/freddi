@@ -58,6 +58,7 @@ void FreddiEvolution::truncateOuterRadius() {
 
 	if ( ii <= last() - 1 ){
 		current_.last = ii;
+		invalidate_optional_structure();
 	}
 }
 
