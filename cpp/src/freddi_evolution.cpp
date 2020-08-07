@@ -43,16 +43,20 @@ void FreddiEvolution::truncateOuterRadius() {
 
 	auto ii = last() + 1;
 	if (Tirr().at(last()) / Tph_vis().at(last()) < args().disk->Tirr2Tvishot) {
+	// when irradiation is not important
+	// hot disc extends as far as Sigma>Sigma_max_cold(alpha_cold) and not farther than R_cooling_front
 		do {
 			ii--;
 			if (ii <= first()) throw std::runtime_error("Rout <= Rin");
-		} while( Sigma().at(ii) < Sigma_minus(R().at(ii)) );
+		} while( ( R().at(ii) > R_cooling_front ( R().at(ii)) ) && ( Sigma().at(ii) < Sigma_minus(R().at(ii)) ) );
 	} else if (args().disk->boundcond == "Teff") {
+	// irradiation is important, the boundary is at fixed Teff
 		do {
 			ii--;
 			if (ii <= first()) throw std::runtime_error("Rout <= Rin");
 		} while( Tph().at(ii) < args().disk->Thot );
 	} else if (args().disk->boundcond == "Tirr") {
+	// irradiation is important, the boundary is at fixed Tir
 		do {
 			ii--;
 			if (ii <= first()) throw std::runtime_error("Rout <= Rin");
