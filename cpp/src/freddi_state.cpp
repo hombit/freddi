@@ -669,10 +669,11 @@ double FreddiState::Sigma_plus(double r) const {
 
 double FreddiState::v_cooling_front(double r) {
         // The cooling-front velocity depends on the ratio between the current Sigma and critical Sigmas
-        // Ludwig et al., A7A 290, 473-486 (1994), section 3
+        // Ludwig et al., A&A 290, 473-486 (1994), section 3
         // units: cm/s
-        double sigma = ( std::log(Sigma()[last()]) - std::log(Sigma_plus(r)) ) / ( std::log(Sigma_minus(r)) - std::log(Sigma_plus(r)) );
-        return 1e5 * (1.439-5.305*sigma+10.440*std::pow(sigma,2) -10.55*std::pow(sigma,3)+4.142*std::pow(sigma,4))
+        const double Sigma_plus_ = Sigma_plus(r);
+        const double sigma =  std::log( Sigma()[last()] / Sigma_plus_ ) /  std::log( Sigma_minus(r)/Sigma_plus_ ) ;
+        return 1e5 * (1.439-5.305*sigma+10.440*m::pow<2>(sigma)-10.55*m::pow<3>(sigma)+4.142*m::pow<4>(sigma))
                * std::pow(args().basic->alpha / 0.2, 0.85-0.69*sigma) 
                * std::pow(args().basic->alphacold / 0.05, 0.05+0.69*sigma)
                * std::pow(r / 1e10, 0.035)
@@ -681,8 +682,7 @@ double FreddiState::v_cooling_front(double r) {
 
 double FreddiState::R_cooling_front(double r)  {
         // previous location of Rhot moves with the cooling-front velocity:
-        return  R()[last()] - v_cooling_front(r) * args().calc->tau  ;        
-       
+        return  R()[last()] - v_cooling_front(r) * args().calc->tau;       
         //return  R()[last()] - v_cooling_front(R()[last()]) * args().calc->tau  ; 
         // this variant leads to more abrupt evolution, since the front velocity is larger
 }
