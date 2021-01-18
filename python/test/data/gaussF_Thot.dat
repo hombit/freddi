@@ -45,7 +45,7 @@
 # gaussmu=1
 # gausssigma=0.25
 # gridscale=log
-# h2rcold=0.05
+# h2rcold=0
 # inclination=0
 # initialcond=gaussF
 # inittime=0

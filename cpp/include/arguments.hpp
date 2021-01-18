@@ -206,7 +206,7 @@ public:
 	constexpr static const double default_irrindex = 0.0;
 	constexpr static const double default_Cirr_cold = 0.0;
 	constexpr static const double default_irrindex_cold = 0.0;
-	constexpr static const double default_height_to_radius_cold = 0.05;
+	constexpr static const double default_height_to_radius_cold = 0.0;
 	constexpr static const char default_angular_dist_disk[] = "plane";
 public:
 	double Cirr;
