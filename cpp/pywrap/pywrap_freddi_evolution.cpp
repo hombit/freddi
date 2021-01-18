@@ -35,6 +35,7 @@ dict evolution_kwdefaults() {
 
 	kw["__cgs"] = true;
 
+	kw["alphacold"] = object();
 	kw["kerr"] = BasicDiskBinaryArguments::default_kerr;
 	kw["rochelobefill"] = BasicDiskBinaryArguments::default_roche_lobe_fill;
 	kw["Topt"] = BasicDiskBinaryArguments::default_Topt;
@@ -47,6 +48,7 @@ dict evolution_kwdefaults() {
 	kw["boundcond"] = DiskStructureArguments::default_boundcond;
 	kw["initialcond"] = DiskStructureArguments::default_initialcond;
 	kw["Thot"] = DiskStructureArguments::default_Thot;
+	kw["Qirr2Qvishot"] = m::pow<4>(DiskStructureArguments::default_Tirr2Tvishot);
 	kw["F0"] = object();
 	kw["Mdisk0"] = object();
 	kw["Mdot0"] = object();
@@ -60,6 +62,7 @@ dict evolution_kwdefaults() {
 	kw["irrindex"] = SelfIrradiationArguments::default_irrindex;
 	kw["Cirrcold"] = SelfIrradiationArguments::default_Cirr_cold;
 	kw["irrindexcold"] = SelfIrradiationArguments::default_irrindex_cold;
+	kw["h2rcold"] = SelfIrradiationArguments::default_height_to_radius_cold;
 	kw["angulardistdisk"] = SelfIrradiationArguments::default_angular_dist_disk;
 
 	kw["colourfactor"] = FluxArguments::default_colourfactor;
@@ -132,7 +135,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 
 	const auto general = make_general_arguments();
 	const auto basic = make_basic_disk_binary_arguments(
-			extract<double>(kw["alpha"]),
+			extract<double>(kw["alpha"]), kw["alphacold"],
 			extract<double>(kw["Mx"]), extract<double>(kw["kerr"]),
 			extract<double>(kw["period"]),
 			extract<double>(kw["Mopt"]), extract<double>(kw["rochelobefill"]), extract<double>(kw["Topt"]),
@@ -142,6 +145,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<std::string>(kw["opacity"]),
 			extract<double>(kw["Mdotout"]),
 			extract<std::string>(kw["boundcond"]), extract<double>(kw["Thot"]),
+			std::pow(extract<double>(kw["Qirr2Qvishot"]), 0.25),
 			extract<std::string>(kw["initialcond"]),
 			kw["F0"], kw["Mdisk0"], kw["Mdot0"],
 			kw["powerorder"], kw["gaussmu"], kw["gausssigma"],
@@ -151,6 +155,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<double>(kw["irrindex"]),
 			extract<double>(kw["Cirrcold"]),
 			extract<double>(kw["irrindexcold"]),
+			extract<double>(kw["h2rcold"]),
 			extract<std::string>(kw["angulardistdisk"]));
 	const auto flux = make_flux_arguments(
 			extract<double>(kw["colourfactor"]),
@@ -212,6 +217,7 @@ dict neutron_star_evolution_kwdefaults() {
 	kw["fpparams"] = tuple();
 	kw["kappattype"] = NeutronStarArguments::default_kappat_type;
 	kw["kappatparams"] = NeutronStarArguments::default_kappat_params.at(NeutronStarArguments::default_kappat_type);
+	kw["nsgravredshift"] = NeutronStarArguments::default_ns_grav_redshift;
 
 	return kw;
 }
@@ -224,12 +230,13 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			kw["freqx"], kw["Rx"], extract<double>(kw["Bx"]), extract<double>(kw["hotspotarea"]),
 			extract<double>(kw["epsilonAlfven"]), extract<double>(kw["inversebeta"]), extract<double>(kw["Rdead"]),
 			extract<std::string>(kw["fptype"]), kw["fpparams"],
-			extract<std::string>(kw["kappattype"]), kw["kappatparams"]);
+			extract<std::string>(kw["kappattype"]), kw["kappatparams"],
+			extract<std::string>(kw["nsgravredshift"]));
 
 	const auto general = make_general_arguments();
 	const auto basic = make_neutron_star_basic_disk_binary_arguments(
 			*ns_args,
-			extract<double>(kw["alpha"]),
+			extract<double>(kw["alpha"]), kw["alphacold"],
 			extract<double>(kw["Mx"]), extract<double>(kw["kerr"]),
 			extract<double>(kw["period"]),
 			extract<double>(kw["Mopt"]), extract<double>(kw["rochelobefill"]), extract<double>(kw["Topt"]),
@@ -239,6 +246,7 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			extract<std::string>(kw["opacity"]),
 			extract<double>(kw["Mdotout"]),
 			extract<std::string>(kw["boundcond"]), extract<double>(kw["Thot"]),
+			std::pow(extract<double>(kw["Qirr2Qvishot"]), 0.25),
 			extract<std::string>(kw["initialcond"]),
 			kw["F0"], kw["Mdisk0"], kw["Mdot0"],
 			kw["powerorder"], kw["gaussmu"], kw["gausssigma"],
@@ -248,6 +256,7 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			extract<double>(kw["irrindex"]),
 			extract<double>(kw["Cirrcold"]),
 			extract<double>(kw["irrindexcold"]),
+			extract<double>(kw["h2rcold"]),
 			extract<std::string>(kw["angulardistdisk"]),
 			extract<std::string>(kw["angulardistns"]));
 	const auto flux = make_flux_arguments(

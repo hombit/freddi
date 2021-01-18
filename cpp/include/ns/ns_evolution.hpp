@@ -56,6 +56,7 @@ private:
 		vecd d2Fmagn_dh2;
 		NeutronStarStructure(const NeutronStarArguments& args_ns, FreddiEvolution* evolution);
 	protected:
+		static double initialize_redshift(const FreddiEvolution* evolution, const NeutronStarArguments& args_ns);
 		static std::shared_ptr<BasicKappaT> initialize_kappa_t(const NeutronStarArguments& args_ns);
 		vecd initialize_Fmagn(FreddiEvolution* evolution) const;
 		vecd initialize_dFmagn_dh(FreddiEvolution* evolution) const;
@@ -70,28 +71,29 @@ private:
 	public:
 		BasicNSMdotFraction() = default;
 		virtual ~BasicNSMdotFraction() = 0;
-		virtual double operator()(double R_to_Rcor) const = 0;
+		double operator()(const FreddiNeutronStarEvolution& freddi, double R) const;
+		virtual double fp(double R_to_Rcor) const = 0;
 	};
 
 	class NoOutflowNSMdotFraction: public BasicNSMdotFraction {
 	public:
 		NoOutflowNSMdotFraction() = default;
 		~NoOutflowNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	class PropellerNSMdotFraction: public BasicNSMdotFraction {
 	public:
 		PropellerNSMdotFraction() = default;
 		~PropellerNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	class CorotationBlockNSMdotFraction: public BasicNSMdotFraction {
 	public:
 		CorotationBlockNSMdotFraction() = default;
 		~CorotationBlockNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	// https://arxiv.org/pdf/1010.1528.pdf Eksi-Kutlu (2010)
@@ -99,7 +101,7 @@ private:
 	public:
 		EksiKultu2010NSMdotFraction() = default;
 		~EksiKultu2010NSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	class Romanova2018NSMdotFraction: public BasicNSMdotFraction {
@@ -109,7 +111,7 @@ private:
 	public:
 		Romanova2018NSMdotFraction(double par1, double par2);
 		~Romanova2018NSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	class GeometricalNSMdotFraction: public BasicNSMdotFraction {
@@ -118,7 +120,7 @@ private:
 	public:
 		GeometricalNSMdotFraction(double chi);
 		~GeometricalNSMdotFraction() override = default;
-		virtual double operator()(double R_to_Rcor) const override;
+		virtual double fp(double R_to_Rcor) const override;
 	};
 
 	class BasicNSAccretionEfficiency {
@@ -140,22 +142,23 @@ private:
 		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return newtonian(freddi, Rm); }
 	};
 
-// 	class SibgatullinSunyaev2000NSAccretionEfficiency: public BasicNSAccretionEfficiency {
-// 	protected:
-// 		double schwarzschild(const FreddiNeutronStarEvolution& freddi, double Rm) const;
-// 		double small_magnetosphere(const FreddiNeutronStarEvolution& freddi, double Rm) const;
-// 	public:
-// 		using BasicNSAccretionEfficiency::BasicNSAccretionEfficiency;
-// 		~SibgatullinSunyaev2000NSAccretionEfficiency() override = default;
-// 		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return schwarzschild(freddi, Rm); }
-// 		double RxIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
-// 		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
-// 	};
-        class SibgatullinSunyaev2000NSAccretionEfficiency: public BasicNSAccretionEfficiency {
+ 	class RotatingNewtonianNSAccretionEfficiency: public BasicNSAccretionEfficiency {
+ 	protected:
+ 		double rotating_magnetosphere_newt(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+ 		double small_magnetosphere_newt(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+ 	public:
+ 		using BasicNSAccretionEfficiency::BasicNSAccretionEfficiency;
+ 		~RotatingNewtonianNSAccretionEfficiency() override = default;
+ 		double RmIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return rotating_magnetosphere_newt(freddi, Rm); }
+ 		double RxIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere_newt(freddi, Rm); }
+ 		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere_newt(freddi, Rm); }
+ 	};
+
+ 	class SibgatullinSunyaev2000NSAccretionEfficiency: public BasicNSAccretionEfficiency {
 	protected:
-                double schwarzschild(const FreddiNeutronStarEvolution& freddi, double Rm) const;
-		double rotating_magnetosphere_sibsun(const FreddiNeutronStarEvolution& freddi, double Rm) const;
-		double small_magnetosphere(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+ 		double schwarzschild(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+ 		double rotating_magnetosphere_sibsun(const FreddiNeutronStarEvolution& freddi, double Rm) const;
+ 		double small_magnetosphere(const FreddiNeutronStarEvolution& freddi, double Rm) const;
 	public:
 		using BasicNSAccretionEfficiency::BasicNSAccretionEfficiency;
 		~SibgatullinSunyaev2000NSAccretionEfficiency() override = default;
@@ -202,7 +205,7 @@ public:
 	inline double angular_dist_ns(const double mu) { return ns_irr_source_->angular_dist(mu); }
 // fp_
 public:
-	inline double fp(double radius) const { return (*fp_)(radius / R_cor()); }
+	inline double fp(double radius) const { return (*fp_)(*this, radius); }
 	inline double fp() const { return fp(R()[first()]); }
 // eta_ns_
 public:

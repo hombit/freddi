@@ -14,6 +14,7 @@ const std::map<std::string, pard> NeutronStarArguments::default_kappat_params{
 		{"corstep", {{"in", 1. / 3.}, {"out", 1. / 3.}}},
                 {"romanova2018", {{"in", 1. / 3.}, {"out", 1. / 3.}}},
 };
+constexpr const char NeutronStarArguments::default_ns_grav_redshift[];
 constexpr const double NeutronStarArguments::default_Rx_dummy;
 constexpr const double NeutronStarArguments::default_freqx_dummy;
 
@@ -23,6 +24,9 @@ double NeutronStarArguments::initializeFreqx(const std::string& nsprop) {
 	}
 	if (nsprop == "sibgatullinsunyaev2000" || nsprop == "sibsun2000") {
 		throw std::runtime_error("freqx must be specified for nsprop=sibgatullinsunyaev2000");
+	}
+	if (nsprop == "newt") {
+		throw std::runtime_error("freqx must be specified for nsprop=newt");
 	}
 	throw std::invalid_argument("Wrong nsprop value");
 }
@@ -37,6 +41,13 @@ double NeutronStarArguments::initializeRx(const std::string& nsprop, const std::
 		}
 		return SibgatullinSunyaev2000Geometry::radiusNS(*freqx);
 	}
+	if (nsprop == "newt") {
+		if (!freqx) {
+			throw std::runtime_error("freqx must be specified for nsprop=newt");
+		}
+		return SibgatullinSunyaev2000Geometry::radiusNS(*freqx);
+	}
+
 	throw std::invalid_argument("Wrong nsprop value");
 }
 
@@ -60,14 +71,14 @@ double SibgatullinSunyaev2000Geometry::radiusISCO(double freqx) {
 
 NeutronStarBasicDiskBinaryArguments::NeutronStarBasicDiskBinaryArguments(
 		const NeutronStarArguments& ns_args,
-		double alpha_,
+		double alpha_, std::optional<double> alphacold_,
 		double Mx_, double kerr_,
 		double period_,
 		double Mopt_, double roche_lobe_fill_, double Topt_,
 		std::optional<double> rin_, std::optional<double> rout_, std::optional<double> risco_
 ):
 		BasicDiskBinaryArguments(
-				alpha_,
+				alpha_, alphacold_,
 				Mx_, kerr_,
 				period_,
 				Mopt_,
@@ -88,6 +99,9 @@ std::optional<double> NeutronStarBasicDiskBinaryArguments::initializeRisco(const
 	if (ns_args.nsprop == "dummy") {
 		return risco;
 	}
+	if (ns_args.nsprop == "newt") {
+		return SibgatullinSunyaev2000Geometry::radiusISCO(ns_args.freqx);
+        }
 	if (ns_args.nsprop == "sibgatullinsunyaev2000" || ns_args.nsprop == "sibsun2000") {
 		return SibgatullinSunyaev2000Geometry::radiusISCO(ns_args.freqx);
 	}

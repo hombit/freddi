@@ -41,27 +41,12 @@ double FreddiNeutronStarEvolution::Romanova2018KappaT::operator()(const FreddiNe
 }
 
 
-std::shared_ptr<FreddiNeutronStarEvolution::BasicKappaT> FreddiNeutronStarEvolution::NeutronStarStructure::initialize_kappa_t(const NeutronStarArguments& args_ns) {
-	const auto& type = args_ns.kappat_type;
-	const auto& params = args_ns.kappat_params;
-
-	if (type == "const") {
-		return std::make_shared<ConstKappaT>(params.at("value"));
-	} else if (type == "corstep") {
-		return std::make_shared<CorotationStepKappaT>(params.at("in"), params.at("out"));
-	} else if (type == "romanova2018") {
-		return std::make_shared<Romanova2018KappaT>(params.at("in"), params.at("out"));
-	}
-	throw std::invalid_argument("Wrong kappattype");
-}
-
-
 FreddiNeutronStarEvolution::NeutronStarStructure::NeutronStarStructure(
 		const NeutronStarArguments &args_ns, FreddiEvolution* evolution):
 		args_ns(args_ns),
 		kappa_t(initialize_kappa_t(args_ns)),
 		R_x(args_ns.Rx),
-		redshift(1.0 - 2.0 * evolution->R_g() / args_ns.Rx),
+		redshift(initialize_redshift(evolution, args_ns)),
 		R_m_min(std::max(R_x, evolution->R()[evolution->first()])),
 		mu_magn(0.5 * args_ns.Bx * m::pow<3>(R_x)),
 		R_cor(std::cbrt(evolution->GM() / m::pow<2>(2*M_PI * args_ns.freqx))),
@@ -76,6 +61,32 @@ FreddiNeutronStarEvolution::NeutronStarStructure::NeutronStarStructure(
 	if (args_ns.Rdead > 0. && args_ns.Rdead < R_cor) {
 		throw std::logic_error("R_dead is positive and less than R_cor, it is unacceptably");
 	}
+}
+
+
+double FreddiNeutronStarEvolution::NeutronStarStructure::initialize_redshift(const FreddiEvolution* evolution, const NeutronStarArguments& args_ns) {
+	if (args_ns.ns_grav_redshift == "off") {
+		return 1.0;
+	}
+	if (args_ns.ns_grav_redshift == "on") {
+		return 1.0 - 2.0 * evolution->R_g() / args_ns.Rx;
+	}
+	throw std::invalid_argument("Wrong nsgravredshift");
+}
+
+
+std::shared_ptr<FreddiNeutronStarEvolution::BasicKappaT> FreddiNeutronStarEvolution::NeutronStarStructure::initialize_kappa_t(const NeutronStarArguments& args_ns) {
+	const auto& type = args_ns.kappat_type;
+	const auto& params = args_ns.kappat_params;
+
+	if (type == "const") {
+		return std::make_shared<ConstKappaT>(params.at("value"));
+	} else if (type == "corstep") {
+		return std::make_shared<CorotationStepKappaT>(params.at("in"), params.at("out"));
+	} else if (type == "romanova2018") {
+		return std::make_shared<Romanova2018KappaT>(params.at("in"), params.at("out"));
+	}
+	throw std::invalid_argument("Wrong kappattype");
 }
 
 
@@ -129,18 +140,30 @@ vecd FreddiNeutronStarEvolution::NeutronStarStructure::initialize_d2Fmagn_dh2(Fr
 
 FreddiNeutronStarEvolution::BasicNSMdotFraction::~BasicNSMdotFraction() {}
 
+double FreddiNeutronStarEvolution::BasicNSMdotFraction::operator()(const FreddiNeutronStarEvolution& freddi, double R) const {
+	const double Rx = freddi.R_x();
+	const double Risco = freddi.args().basic->risco;
 
-double FreddiNeutronStarEvolution::NoOutflowNSMdotFraction::operator()(double R_to_Rcor) const {
+	if (R <= Rx || R <= Risco) {
+		return 1.0;
+	}
+
+	const double Rcor = freddi.R_cor();
+	return fp(R / Rcor);
+}
+
+
+double FreddiNeutronStarEvolution::NoOutflowNSMdotFraction::fp(double R_to_Rcor) const {
 	return 1.;
 }
 
 
-double FreddiNeutronStarEvolution::PropellerNSMdotFraction::operator()(double R_to_Rcor) const {
+double FreddiNeutronStarEvolution::PropellerNSMdotFraction::fp(double R_to_Rcor) const {
 	return 0.;
 }
 
 
-double FreddiNeutronStarEvolution::CorotationBlockNSMdotFraction::operator()(double R_to_Rcor) const {
+double FreddiNeutronStarEvolution::CorotationBlockNSMdotFraction::fp(double R_to_Rcor) const {
 	if (R_to_Rcor > 1.) {
 		return 0.;
 	}
@@ -150,7 +173,7 @@ double FreddiNeutronStarEvolution::CorotationBlockNSMdotFraction::operator()(dou
 
 // https://arxiv.org/pdf/1010.1528.pdf Eksi-Kutlu (2010)
 // fastness = (R_in/R_cor)^(3/2)  */
-double FreddiNeutronStarEvolution::EksiKultu2010NSMdotFraction::operator()(double R_to_Rcor) const {
+double FreddiNeutronStarEvolution::EksiKultu2010NSMdotFraction::fp(double R_to_Rcor) const {
 	const double fastness2 = m::pow<3>(R_to_Rcor);
 	double p = (1. - 1./fastness2);
 	if (p < 0){
@@ -165,7 +188,7 @@ FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::Romanova2018NSMdotFracti
 
 // Return fraction of the accretion rate penetrating to the NS surface
 // according to numerical results of MHD simulations (Romanova+2018, Table 2)
-double FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::operator()(double R_to_Rcor) const {
+double FreddiNeutronStarEvolution::Romanova2018NSMdotFraction::fp(double R_to_Rcor) const {
 	const double fastness = std::pow(R_to_Rcor, 1.5);
 	double _fp = 0;
 	if (fastness >= 1) {
@@ -188,7 +211,7 @@ FreddiNeutronStarEvolution::GeometricalNSMdotFraction::GeometricalNSMdotFraction
 // Return fraction of the accretion rate penetrating to the NS surface
 // for an inclined dipole with angle chi [grad] and R_to_R_cor = Rin/Rcor > 1
 // see magnetospheric_form_1.mw
-double FreddiNeutronStarEvolution::GeometricalNSMdotFraction::operator()(double R_to_Rcor) const {
+double FreddiNeutronStarEvolution::GeometricalNSMdotFraction::fp(double R_to_Rcor) const {
 	const double mdot_factor = std::pow(R_to_Rcor, -3.5);
 	if ( mdot_factor > 1. ) {
 		return 1;
@@ -224,6 +247,35 @@ double FreddiNeutronStarEvolution::DummyNSAccretionEfficiency::newtonian(const F
 	const double Rx = freddi.R_x();
 	return Rg * (1. / Rx - 0.5 / R_in);
 }
+
+double FreddiNeutronStarEvolution::RotatingNewtonianNSAccretionEfficiency::rotating_magnetosphere_newt(const FreddiNeutronStarEvolution& freddi, const double Rm)
+const {
+    const double Rsch = 2.0 * freddi.R_g();
+    const double Rx = freddi.R_x();
+    const double Rcor = freddi.R_cor();
+    const double omega_ns = freddi.ns_str_->args_ns.freqx * 2 * M_PI;
+    
+    double Reff = Rm;
+    // if the inner disc radius > Rcor, return efficiency calculated at R=Rcor:
+    if (Rm > Rcor) {
+    	Reff = Rcor;
+    }
+    const double omega_Kepl_Rin = std::sqrt(freddi.GM() / m::pow<3>(Reff));
+    
+    return Rsch / 2.0 / Rx * (1.0 - Rx / Reff)
+    	+ m::pow<2>(omega_ns) / 2.0 / m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * (Rx-Reff) * (Rx+Reff)
+    	+ Rsch / 4.0 / Reff * m::pow<2>(1.0 - omega_ns/omega_Kepl_Rin);
+}
+
+double FreddiNeutronStarEvolution::RotatingNewtonianNSAccretionEfficiency::small_magnetosphere_newt(const FreddiNeutronStarEvolution& freddi, const double Rm) const {
+	const double Rsch = 2.0 * freddi.R_g();
+	const double Rx = freddi.R_x();
+	const double omega_ns = freddi.ns_str_->args_ns.freqx * 2 * M_PI;
+	const double omega_Kepl_Rx = std::sqrt(freddi.GM() / m::pow<3>(Rx)); // Kepler angular velocity at NS surface
+
+	return Rsch / 4.0 / Rx * m::pow<2>(1.0 - omega_ns/omega_Kepl_Rx);
+}  
+
 
 double FreddiNeutronStarEvolution::SibgatullinSunyaev2000NSAccretionEfficiency::schwarzschild(const FreddiNeutronStarEvolution& freddi, const double Rm) const {
 	const double Rsch = 2.0 * freddi.R_g();
@@ -298,7 +350,7 @@ std::shared_ptr<FreddiNeutronStarEvolution::BasicNSMdotFraction> FreddiNeutronSt
 	if (fptype == "corotation-block") {
 		return std::make_shared<CorotationBlockNSMdotFraction>();
 	}
-	if (fptype == "eksi-kultu2010") {
+	if (fptype == "eksi-kutlu2010") {
 		return std::make_shared<EksiKultu2010NSMdotFraction>();
 	}
 	if (fptype == "romanova2018") {
@@ -322,6 +374,9 @@ std::shared_ptr<FreddiNeutronStarEvolution::BasicNSAccretionEfficiency> FreddiNe
 	}
 	if (nsprop == "sibgatullinsunyaev2000" || nsprop == "sibsun2000") {
 		return std::make_shared<SibgatullinSunyaev2000NSAccretionEfficiency>();
+	}
+	if (nsprop == "newt") {
+		return std::make_shared<RotatingNewtonianNSAccretionEfficiency>();
 	}
 	throw std::invalid_argument("Wrong nsprop");
 }
@@ -370,6 +425,11 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	if (R_dead() <= 0.) {
 		return;
 	}
+	// check proper value of accretion rate:
+	if ((!std::isfinite(Mdot_in_prev())) || ( Mdot_in() < 0.0 ) || ( Mdot_in_prev() < 0.0 )) {
+		return;
+	}
+	// check that Mdot decaying:
 	if ( Mdot_in() > Mdot_in_prev() ) {
 		return;
 	}

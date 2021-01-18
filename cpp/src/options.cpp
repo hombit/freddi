@@ -32,6 +32,7 @@ po::options_description GeneralOptions::description() {
 BasicDiskBinaryOptions::BasicDiskBinaryOptions(const po::variables_map &vm):
 		BasicDiskBinaryArguments(
 				vm["alpha"].as<double>(),
+				varToOpt<double>(vm, "alphacold"),
 				sunToGram(vm["Mx"].as<double>()),
 				vm["kerr"].as<double>(),
 				dayToS(vm["period"].as<double>()),
@@ -73,6 +74,7 @@ po::options_description BasicDiskBinaryOptions::description() {
 	po::options_description od("Basic binary and disk parameter");
 	od.add_options()
 			( "alpha,a", po::value<double>()->required(), "Alpha parameter of Shakura-Sunyaev model" )
+			( "alphacold", po::value<double>(), "Alpha parameter of cold disk, currently it is used only for Sigma_minus, see --Qirr2Qvishot. Default is --alpha values divided by ten" )  // default_alpha_to_alphacold
 			( "Mx,M", po::value<double>()->required(), "Mass of the central object, in the units of solar masses" )
 			( "kerr", po::value<double>()->default_value(default_kerr), "Dimensionless Kerr parameter of the black hole" )
 			( "Mopt",	po::value<double>()->required(), "Mass of the optical star, in units of solar masses" )
@@ -94,6 +96,7 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 				vm["Mdotout"].as<double>(),
 				vm["boundcond"].as<std::string>(),
 				vm["Thot"].as<double>(),
+				std::pow(vm["Qirr2Qvishot"].as<double>(), 0.25),
 				vm["initialcond"].as<std::string>(),
 				varToOpt<double>(vm, "F0"),
 				varToOpt<double>(vm, "Mdisk0"),
@@ -113,6 +116,7 @@ po::options_description DiskStructureOptions::description() {
 																					   "  Teff: outer radius of the disk moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"
 																					   "  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
 			( "Thot", po::value<double>()->default_value(default_Thot), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description" )
+			( "Qirr2Qvishot", po::value<double>()->default_value(m::pow<4>(default_Tirr2Tvishot)), "Minimum Qirr / Qvis ratio at the outer edge of the hot disk to switch evolution from temperature-based regime to Sigma_minus-based regime (see Eq. A.1 in Lasota et al. 2008, --alphacold value is used as alpha parameter)" )
 			( "initialcond", po::value<std::string>()->default_value(default_initialcond), "Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 																						   "Values:\n"
 																						   "  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power does the same
@@ -139,6 +143,7 @@ SelfIrradiationOptions::SelfIrradiationOptions(const po::variables_map &vm, cons
 				vm["irrindex"].as<double>(),
 				vm["Cirrcold"].as<double>(),
 				vm["irrindexcold"].as<double>(),
+				vm["h2rcold"].as<double>(),
 				vm["angulardistdisk"].as<std::string>()) {
 	if (Cirr <= 0. && dsa_args.boundcond == "Tirr") {
 		throw po::error("Set positive --Cirr when --boundcond=Tirr");
@@ -152,6 +157,7 @@ po::options_description SelfIrradiationOptions::description() {
 			( "irrindex", po::value<double>()->default_value(default_irrindex), "Irradiation index for the hot disk" )
 			( "Cirrcold", po::value<double>()->default_value(default_Cirr_cold), "Irradiation factor for the cold disk" )
 			( "irrindexcold", po::value<double>()->default_value(default_irrindex_cold), "Irradiation index for the cold disk" )
+			( "h2rcold", po::value<double>()->default_value(default_height_to_radius_cold), "Seme-height to radius ratio for the cold disk, it affects disk shadow in star" )
 			( "angulardistdisk", po::value<std::string>()->default_value(default_angular_dist_disk), "Angular distribution of the disk X-ray radiation. Values: isotropic, plane" )
 			;
 	return od;
@@ -208,9 +214,9 @@ po::options_description FluxOptions::description() {
 			( "ephemerist0", po::value<double>()->default_value(default_ephemeris_t0), "Ephemeris for the time of the minimum of the orbital light curve T0, phase zero corresponds to inferior conjunction of the optical star, days" )
 			( "distance", po::value<double>()->required(), "Distance to the system, kpc" )
 			( "colddiskflux", "Add Fnu for cold disk into output file. Default output is for hot disk only" )
-			( "starflux", "Add Fnu for optical star into output file. Mx, Mopt and period must be specified, see also Topt and starlod options. Default output is for hot disk only" )
-			( "lambda", po::value<vecd>()->multitoken(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced" )
-			( "passband", po::value<std::vector<std::string>>()->multitoken(), "Path of a file containing tabulated passband, the first column for wavelength in Angstrom, the second column for transmission factor, columns should be separated by spaces" )
+			( "starflux", "Add Fnu for irradiated optical star into output file. See --Topt, --starlod and --h2rcold options. Default is output for the hot disk only" )
+			( "lambda", po::value<vecd>()->multitoken()->composing(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced" )
+			( "passband", po::value<std::vector<std::string>>()->multitoken()->composing(), "Path of a file containing tabulated passband, the first column for wavelength in Angstrom, the second column for transmission factor, columns should be separated by spaces" )
 			;
 	return od;
 }

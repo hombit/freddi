@@ -243,7 +243,6 @@ const vecd& FreddiState::Kirr() {
 			x[i] = args().irr->Cirr * std::pow(H[i] / (R()[i] * 0.05), args().irr->irrindex);
 		}
 		for (size_t i = last() + 1; i < Nx(); i++) {
-			// Height is given by formula for C zone, cold disk can be thinner
 			x[i] = args().irr->Cirr_cold * std::pow(H[i] / (R()[i] * 0.05), args().irr->irrindex_cold);
 		}
 		opt_str_.Kirr = std::move(x);
@@ -255,8 +254,11 @@ const vecd& FreddiState::Kirr() {
 const vecd& FreddiState::Height() {
 	if (!opt_str_.Height) {
 		vecd x(Nx());
-		for (size_t i = first(); i < Nx(); i++) {
+		for (size_t i = first(); i <= last(); i++) {
 			x[i] = oprel().Height(R()[i], F()[i]);
+		}
+		for (size_t i = last() + 1; i < Nx(); i++) {
+			x[i] = args().irr->height_to_radius_cold * R()[i];
 		}
 		opt_str_.Height = std::move(x);
 	}
@@ -625,7 +627,13 @@ Vec3 FreddiState::BasicFreddiIrradiationSource::position(const FreddiState& stat
 }
 
 double FreddiState::BasicFreddiIrradiationSource::Height2R(FreddiState& state) const {
-	return state.Height()[state.last()] / state.R()[state.last()];
+	const auto& H = state.Height();
+	const auto& R = state.R();
+	double max_H2R = 0.0;
+	for (size_t i = state.first(); i < state.Nx(); i++) {
+		max_H2R = std::max(H[i] / R[i], max_H2R);
+	}
+	return max_H2R;
 }
 
 double FreddiState::IsotropicFreddiIrradiationSource::angular_dist(const double mu) const {
@@ -646,3 +654,37 @@ double FreddiState::PlaneFreddiIrradiationSource::angular_dist(const double mu) 
 std::unique_ptr<IrrSource> FreddiState::PlaneFreddiIrradiationSource::irr_source(FreddiState& state, const double luminosity) const {
 	return std::make_unique<CentralDiskSource>(position(state), normal, luminosity, state.args().flux->star_albedo, Height2R(state));
 }
+
+double FreddiState::Sigma_minus(double r) const {
+	// Lasota et al., A&A 486, 523–528 (2008), Eq A.1, DOI: 10.1051/0004-6361:200809658
+	return 74.6 * std::pow(args().basic->alphacold / 0.1, -0.83) * std::pow(r / 1e10, 1.18)
+		* std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, -0.40);
+}
+
+double FreddiState::Sigma_plus(double r) const {
+	// Lasota et al., A&A 486, 523–528 (2008), Eq A.1, DOI: 10.1051/0004-6361:200809658
+	return 39.9 * std::pow(args().basic->alpha / 0.1, -0.80) * std::pow(r / 1e10, 1.11)
+		* std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, -0.37);
+}
+
+double FreddiState::v_cooling_front(double r) {
+        // The cooling-front velocity depends on the ratio between the current Sigma and critical Sigmas
+        // Ludwig et al., A&A 290, 473-486 (1994), section 3
+        // units: cm/s
+        const double Sigma_plus_ = Sigma_plus(r);
+        const double sigma =  std::log( Sigma()[last()] / Sigma_plus_ ) /  std::log( Sigma_minus(r)/Sigma_plus_ ) ;
+        return 1e5 * (1.439-5.305*sigma+10.440*m::pow<2>(sigma)-10.55*m::pow<3>(sigma)+4.142*m::pow<4>(sigma))
+               * std::pow(args().basic->alpha / 0.2, 0.85-0.69*sigma) 
+               * std::pow(args().basic->alphacold / 0.05, 0.05+0.69*sigma)
+               * std::pow(r / 1e10, 0.035)
+               * std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, -0.012);
+}
+
+double FreddiState::R_cooling_front(double r)  {
+        // previous location of Rhot moves with the cooling-front velocity:
+        return  R()[last()] - v_cooling_front(r) * args().calc->tau;       
+        //return  R()[last()] - v_cooling_front(R()[last()]) * args().calc->tau  ; 
+        // this variant leads to more abrupt evolution, since the front velocity is larger
+}
+
+

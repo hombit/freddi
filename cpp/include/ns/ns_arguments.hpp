@@ -23,6 +23,7 @@ public:
 	constexpr static const char default_fptype[] = "no-outflow";
 	constexpr static const char default_kappat_type[] = "const";
 	static const std::map<std::string, pard> default_kappat_params;
+	constexpr static const char default_ns_grav_redshift[] = "off";
 protected:
 	constexpr static const double default_Rx_dummy = 1e6;
 	constexpr static const double default_freqx_dummy = 0.;
@@ -39,6 +40,7 @@ public:
 	pard fpparams;
 	std::string kappat_type;
 	pard kappat_params;
+	std::string ns_grav_redshift;
 protected:
 	static double initializeFreqx(const std::string& nsprop);
 	static double initializeRx(const std::string& nsprop, std::optional<double> freqx);
@@ -50,14 +52,16 @@ public:
 			double Bx, double hotspotarea,
 			double epsilonAlfven, double inversebeta, double Rdead,
 			const std::string& fptype, const pard& fpparams,
-			const std::string& kappat_type, const pard& kappat_params):
+			const std::string& kappat_type, const pard& kappat_params,
+			const std::string& ns_grav_redshift):
 			nsprop(nsprop),
 			freqx(freqx ? *freqx : initializeFreqx(nsprop)),
 			Rx(Rx ? *Rx : initializeRx(nsprop, freqx)),
 			Bx(Bx), hotspotarea(hotspotarea),
 			epsilonAlfven(epsilonAlfven), inversebeta(inversebeta), Rdead(Rdead),
 			fptype(fptype), fpparams(fpparams),
-			kappat_type(kappat_type), kappat_params(kappat_params) {}
+			kappat_type(kappat_type), kappat_params(kappat_params),
+			ns_grav_redshift(ns_grav_redshift) {}
 };
 
 
@@ -67,7 +71,7 @@ protected:
 public:
 	NeutronStarBasicDiskBinaryArguments(
 			const NeutronStarArguments& ns_args,
-			double alpha_,
+			double alpha_, std::optional<double> alphacold_,
 			double Mx_, double kerr_,
 			double period_,
 			double Mopt_, double roche_lobe_fill_, double Topt_,
@@ -83,9 +87,12 @@ public:
 	std::string angular_dist_ns;
 public:
 	NeutronStarSelfIrradiationArguments(
-			double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+			double Cirr, double irrindex,
+			double Cirr_cold, double irrindex_cold, double height_to_radius_cold,
 			const std::string& angular_dist_disk, const std::string& angular_dist_ns):
-			SelfIrradiationArguments(Cirr, irrindex, Cirr_cold, irrindex_cold, angular_dist_disk),
+			SelfIrradiationArguments(Cirr, irrindex, Cirr_cold,
+					irrindex_cold, height_to_radius_cold,
+					angular_dist_disk),
 			angular_dist_ns(angular_dist_ns) {}
 };
 

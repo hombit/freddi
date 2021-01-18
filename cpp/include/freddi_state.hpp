@@ -413,6 +413,10 @@ public:
 	inline double mJ() { return lazy_magnitude(opt_str_.mJ, lambdaJ, irr0J); }
 	inline double Mdisk() { return lazy_integrate<HotRegion>(opt_str_.Mdisk, Sigma()); }
 	double Mdot_wind();
+	double Sigma_minus(double r) const;
+	double Sigma_plus(double r) const;
+	double R_cooling_front(double r);
+	double v_cooling_front(double r);
 };
 
 #endif //FREDDI_FREDDI_STATE_HPP

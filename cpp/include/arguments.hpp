@@ -36,11 +36,13 @@ public:
 
 class BasicDiskBinaryArguments: public BlackHoleFunctions, public BinaryFunctions {
 public:
+	constexpr static const double default_alpha_to_alphacold = 10.0;
 	constexpr static const double default_kerr = 0.0;
 	constexpr static const double default_roche_lobe_fill = 1.0;
 	constexpr static const double default_Topt = 0.0;
 public:
 	double alpha;
+	double alphacold;
 	double Mx;
 	double kerr;
 	double period;
@@ -61,13 +63,13 @@ protected:
 	static inline double riscoFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
 public:
 	BasicDiskBinaryArguments(
-			double alpha,
+			double alpha, std::optional<double> alphacold,
 			double Mx, double kerr,
 			double period,
 			double Mopt, double roche_lobe_fill, double Topt,
 			std::optional<double> rin, std::optional<double> rout, std::optional<double> risco
 	):
-			alpha(alpha),
+			alpha(alpha), alphacold(alphacold ? *alphacold : alpha / default_alpha_to_alphacold),
 			Mx(Mx), kerr(kerr),
 			period(period),
 			Mopt(Mopt),
@@ -162,6 +164,7 @@ public:
 	constexpr static const double default_Mdotout = 0.;
 	constexpr static const char default_boundcond[] = "Teff";
 	constexpr static const double default_Thot = 0.;
+	constexpr static const double default_Tirr2Tvishot = 0.;
 	constexpr static const char default_initialcond[] = "powerF";
 	constexpr static const char default_wind[] = "no";
 public:
@@ -172,6 +175,7 @@ public:
 	double Mdotout;
 	std::string boundcond;
 	double Thot;
+	double Tirr2Tvishot;
 	double F0;
 	double Mdisk0;
 	double Mdot0;
@@ -185,7 +189,7 @@ public:
 			const BasicDiskBinaryArguments &bdb_args,
 			const std::string& opacity,
 			double Mdotout,
-			const std::string& boundcond, double Thot,
+			const std::string& boundcond, double Thot, double Tirr2Tvishot,
 			const std::string& initialcond,
 			std::optional<double> F0,
 			std::optional<double> Mdisk0, std::optional<double> Mdot0,
@@ -202,18 +206,22 @@ public:
 	constexpr static const double default_irrindex = 0.0;
 	constexpr static const double default_Cirr_cold = 0.0;
 	constexpr static const double default_irrindex_cold = 0.0;
+	constexpr static const double default_height_to_radius_cold = 0.0;
 	constexpr static const char default_angular_dist_disk[] = "plane";
 public:
 	double Cirr;
 	double irrindex;
 	double Cirr_cold;
 	double irrindex_cold;
+	double height_to_radius_cold;
 	std::string angular_dist_disk;
 public:
 	SelfIrradiationArguments(
-			double Cirr, double irrindex, double Cirr_cold, double irrindex_cold,
+			double Cirr, double irrindex,
+			double Cirr_cold, double irrindex_cold, double height_to_radius_cold,
 			const std::string& angular_dist_disk):
-			Cirr(Cirr), irrindex(irrindex), Cirr_cold(Cirr_cold), irrindex_cold(irrindex_cold),
+			Cirr(Cirr), irrindex(irrindex),
+			Cirr_cold(Cirr_cold), irrindex_cold(irrindex_cold), height_to_radius_cold(height_to_radius_cold),
 			angular_dist_disk(angular_dist_disk) {}
 };
 
