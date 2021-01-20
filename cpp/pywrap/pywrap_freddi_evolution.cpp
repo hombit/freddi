@@ -216,7 +216,8 @@ dict neutron_star_evolution_kwdefaults() {
 	kw["fptype"] = NeutronStarArguments::default_fptype;
 	kw["fpparams"] = tuple();
 	kw["kappattype"] = NeutronStarArguments::default_kappat_type;
-	kw["kappatparams"] = NeutronStarArguments::default_kappat_params.at(NeutronStarArguments::default_kappat_type);
+	kw["kappatparams"] = dict();
+	kw["kappatparams"]["value"] = kw["kappatparams"]["in"] = kw["kappatparams"]["out"] = NeutronStarArguments::default_kappat_value;
 	kw["nsgravredshift"] = NeutronStarArguments::default_ns_grav_redshift;
 
 	return kw;

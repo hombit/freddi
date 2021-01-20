@@ -86,10 +86,6 @@ std::optional<T> varToOpt(const po::variables_map& vm, const std::string& name) 
 }
 
 
-pard multitoken_string_option_to_map(const po::variables_map& vm, const std::string& name,
-		const std::string& separators, const pard& default_value);
-
-
 template <typename Options>
 bool parseOptions(po::variables_map& vm, int ac, char* av[]) {
 	const std::string default_config_filename = "freddi.ini";

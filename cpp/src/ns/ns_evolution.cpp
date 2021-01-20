@@ -20,17 +20,17 @@ double FreddiNeutronStarEvolution::CorotationStepKappaT::operator()(const Freddi
 	return in;
 }
 
-FreddiNeutronStarEvolution::Romanova2018KappaT::Romanova2018KappaT(double in, double out):
-		in(in), out(out) {}
+FreddiNeutronStarEvolution::Romanova2018KappaT::Romanova2018KappaT(double in, double out, double par1, double par2):
+		in(in), out(out), par1(par1), par2(par2) {}
 
 double FreddiNeutronStarEvolution::Romanova2018KappaT::operator()(const FreddiNeutronStarEvolution& freddi, double R) const {
 	const double R_to_Rcor = R / freddi.R_cor();
 	if (R_to_Rcor > 1.0) {
 		// see Table 2 of Romanova+18 NewA 62, 94, the last line
 		const double fastness = std::pow(R_to_Rcor, 1.5);
-		const double feff1 = 6e-4 * std::pow(fastness, 4.01);
+		const double feff = par1 * std::pow(fastness, par2);
 		const double epsilonAlfven = freddi.epsilon_Alfven();
-		const double out_minus_wind = out - feff1 * std::pow(epsilonAlfven, 3.5);
+		const double out_minus_wind = out - feff * std::pow(epsilonAlfven, 3.5);
 		if (out_minus_wind < 0){
 			return 0.0;
 		} else {
@@ -84,7 +84,7 @@ std::shared_ptr<FreddiNeutronStarEvolution::BasicKappaT> FreddiNeutronStarEvolut
 	} else if (type == "corstep") {
 		return std::make_shared<CorotationStepKappaT>(params.at("in"), params.at("out"));
 	} else if (type == "romanova2018") {
-		return std::make_shared<Romanova2018KappaT>(params.at("in"), params.at("out"));
+		return std::make_shared<Romanova2018KappaT>(params.at("in"), params.at("out"), params.at("par1"), params.at("par2"));
 	}
 	throw std::invalid_argument("Wrong kappattype");
 }
