@@ -1,7 +1,7 @@
 `Freddi` — compute FRED-like light curves of LMXB
 =================================================
 
-## The beta version of version 2.0 is [in the branch dev](https://github.com/hombit/freddi/tree/dev)
+## The beta version of version 2.0 with neutron star accretion disks and winds is [in the branch dev](https://github.com/hombit/freddi/tree/dev)
 
 [![arXiv](https://img.shields.io/badge/arXiv-1610.01399%20-green.svg)](https://arxiv.org/abs/1610.01399)
 [![Build Status](https://travis-ci.org/hombit/freddi.svg?branch=master)](https://travis-ci.org/hombit/freddi)
