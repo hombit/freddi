@@ -13,6 +13,7 @@ GeneralOptions::GeneralOptions(const po::variables_map& vm):
 				vm["prefix"].as<std::string>(),
 				vm["dir"].as<std::string>(),
 				vm["precision"].as<unsigned int>(),
+				vm["tempsparsity"].as<unsigned int>(),
 				(vm.count("fulldata") > 0),
 				(vm.count("stdout") > 0)) {}
 
@@ -25,6 +26,7 @@ po::options_description GeneralOptions::description() {
 			( "stdout", "Output temporal distribution to stdout instead of PREFIX.dat file" )
 			( "dir,d", po::value<std::string>()->default_value(default_dir), "Choose the directory to write output files. It should exist" )
 			( "precision", po::value<unsigned int>()->default_value(default_output_precision), "Number of digits to print into output files" )
+			( "tempsparsity", po::value<unsigned int>()->default_value(default_temp_sparsity_output), "Output every k-th time moment" )
 			( "fulldata", "Output files PREFIX_%d.dat with radial structure for every time step. Default is to output only PREFIX.dat with global disk parameters for every time step" )
 			;
 	return od;

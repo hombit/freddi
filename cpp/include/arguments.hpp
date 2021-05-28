@@ -20,18 +20,24 @@ public:
 	constexpr static const char default_prefix[] = "freddi";
 	constexpr static const char default_dir[] = ".";
 	constexpr static const unsigned short default_output_precision = 12;
+	constexpr static const unsigned int default_temp_sparsity_output = 1;
 public:
 	std::string prefix;
 	std::string dir;
 	unsigned short output_precision;
+	unsigned int temp_sparsity_output;
 	bool fulldata;
 	bool stdout;
 public:
-	GeneralArguments(const std::string& prefix, const std::string& dir, unsigned short output_precision, bool fulldata,
-				     bool stdout):
+	GeneralArguments(const std::string& prefix, const std::string& dir,
+				  unsigned short output_precision,
+				  unsigned int temp_sparsity_output,
+				  bool fulldata,
+				  bool stdout):
 			prefix(prefix),
 			dir(dir),
 			output_precision(output_precision),
+			temp_sparsity_output(temp_sparsity_output),
 			fulldata(fulldata),
 			stdout(stdout) {}
 };

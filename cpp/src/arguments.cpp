@@ -10,6 +10,7 @@ namespace odeint = boost::numeric::odeint;
 constexpr const char GeneralArguments::default_prefix[];
 constexpr const char GeneralArguments::default_dir[];
 constexpr const unsigned short GeneralArguments::default_output_precision;
+constexpr const unsigned int GeneralArguments::default_temp_sparsity_output;
 
 
 constexpr const double BasicDiskBinaryArguments::default_alpha_to_alphacold;

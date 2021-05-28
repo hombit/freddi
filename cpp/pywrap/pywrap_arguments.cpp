@@ -13,7 +13,7 @@ using namespace boost::python;
 
 
 boost::shared_ptr<GeneralArguments> make_general_arguments() {
-	return boost::make_shared<GeneralArguments>("", "", 0, false, false);
+	return boost::make_shared<GeneralArguments>("", "", 0, 1, false, false);
 }
 
 boost::shared_ptr<BasicDiskBinaryArguments> make_basic_disk_binary_arguments(

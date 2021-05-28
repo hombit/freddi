@@ -61,6 +61,7 @@
 # staralbedo=0
 # starlod=3
 # tau=0.25
+# tempsparsity=1
 # time=100
 ### Derived values
 # alpha_cold = 0.025
