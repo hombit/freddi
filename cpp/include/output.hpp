@@ -11,6 +11,18 @@
 #include "freddi_evolution.hpp"
 
 
+// https://stackoverflow.com/a/366969
+class FileOrStdoutStream {
+private:
+	std::unique_ptr<std::ofstream> ofs;
+public:
+	std::ostream os;
+public:
+	FileOrStdoutStream();
+	FileOrStdoutStream(const std::string& filename);
+};
+
+
 struct FileOutputShortField {
 	std::string name;
 	std::string unit;
@@ -42,7 +54,7 @@ protected:
 	void starDump();
 private:
 	const unsigned short precision;
-	std::ofstream output;
+	FileOrStdoutStream output;
 	std::string disk_structure_header;
 	std::string star_header;
 	static std::string initializeFulldataHeader(const std::vector<FileOutputLongField>& fields);

@@ -25,12 +25,15 @@ public:
 	std::string dir;
 	unsigned short output_precision;
 	bool fulldata;
+	bool stdout;
 public:
-	GeneralArguments(const std::string& prefix, const std::string& dir, unsigned short output_precision, bool fulldata):
+	GeneralArguments(const std::string& prefix, const std::string& dir, unsigned short output_precision, bool fulldata,
+				     bool stdout):
 			prefix(prefix),
 			dir(dir),
 			output_precision(output_precision),
-			fulldata(fulldata) {}
+			fulldata(fulldata),
+			stdout(stdout) {}
 };
 
 

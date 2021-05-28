@@ -6,6 +6,15 @@
 #include "unit_transformation.hpp"
 
 
+FileOrStdoutStream::FileOrStdoutStream():
+		os(std::ostream(std::cout.rdbuf())) {}
+
+
+FileOrStdoutStream::FileOrStdoutStream(const std::string& filename):
+		ofs(new std::ofstream(filename)),
+		os(ofs->rdbuf()) {}
+
+
 template <class T>
 void outputHeader(std::basic_ostream<char>& os, const T& fields) {
 	os << "#" << fields.at(0).name;
@@ -28,6 +37,14 @@ void outputHeader(std::basic_ostream<char>& os, const T& fields) {
 }
 
 
+FileOrStdoutStream output_from_args(const FreddiArguments& args) {
+	if (args.general->stdout) {
+		return FileOrStdoutStream();
+	}
+	return FileOrStdoutStream(args.general->dir + "/" + args.general->prefix + ".dat");
+}
+
+
 BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvolution>& freddi,
 											 const boost::program_options::variables_map& vm,
 											 std::vector<FileOutputShortField>&& short_fields,
@@ -35,46 +52,47 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 											 std::vector<FileOutputLongField>&& star_fields):
 		freddi(freddi),
 		precision(freddi->args().general->output_precision),
-		output(freddi->args().general->dir + "/" + freddi->args().general->prefix + ".dat"),
+		output(output_from_args(freddi->args())),
 		short_fields(short_fields),
 		disk_structure_fields(disk_structure_fields),
 		disk_structure_header(initializeFulldataHeader(disk_structure_fields)),
 		star_fields(star_fields),
 		star_header(initializeFulldataHeader(star_fields)) {
-	output.precision(precision);
+	auto& out = output.os;
+	out.precision(precision);
 
-	outputHeader(output, short_fields);
+	outputHeader(output.os, short_fields);
 
-	output << "### Parameters\n";
+	out << "### Parameters\n";
 	for (const auto &it : vm) {
 		auto &value = it.second.value();
 		if (auto v = boost::any_cast<uint32_t>(&value)) {
-			output << "# "
+			out << "# "
 				   << it.first.c_str()
 				   << "="
 				   << *v
 				   << "\n";
 		} else if (auto v = boost::any_cast<std::string>(&value)) {
-			output << "# "
+			out << "# "
 				   << it.first.c_str()
 				   << "="
 				   << *v
 				   << "\n";
 		} else if (auto v = boost::any_cast<double>(&value)) {
-			output << "# "
+			out << "# "
 				   << it.first.c_str()
 				   << "="
 				   << *v
 				   << "\n";
 		} else if (auto v = boost::any_cast<unsigned int>(&value)) {
-			output << "# "
+			out << "# "
 				   << it.first.c_str()
 				   << "="
 				   << *v
 				   << "\n";
 		} else if (auto v = boost::any_cast<std::vector<double> >(&value)) {
 			for (int i = 0; i < v->size(); ++i) {
-				output << "# "
+				out << "# "
 					   << it.first.c_str()
 					   << "="
 					   << v->at(i)
@@ -84,7 +102,7 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 			}
 		} else if (auto v = boost::any_cast<std::vector<std::string> >(&value)) {
 			for (int i = 0; i < v->size(); ++i) {
-				output << "# "
+				out << "# "
 					   << it.first.c_str()
 					   << "="
 					   << v->at(i)
@@ -97,12 +115,12 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 		}
 	}
 
-	output << "### Derived values\n"
+	out << "### Derived values\n"
 		<< "# alpha_cold = " << freddi->args().basic->alphacold << "\n"
 		<< "# Tidal radius = " << freddi->args().basic->rout / solar_radius << " Rsun\n"
 		<< "# ISCO radius = " << freddi->args().basic->risco << " cm\n";
 
-	output << std::flush;
+	out << std::flush;
 }
 
 
@@ -113,11 +131,11 @@ std::string BasicFreddiFileOutput::initializeFulldataHeader(const std::vector<Fi
 }
 
 void BasicFreddiFileOutput::shortDump() {
-	output << short_fields[0].func();
+	output.os << short_fields[0].func();
 	for (size_t i = 1; i < short_fields.size(); ++i) {
-		output << "\t" << short_fields[i].func();
+		output.os << "\t" << short_fields[i].func();
 	}
-	output << std::endl;
+	output.os << std::endl;
 }
 
 void BasicFreddiFileOutput::diskStructureDump() {
