@@ -304,6 +304,13 @@ vecd DiskStructureArguments::InitialFGaussF::operator()(const vecd& h) const {
 		const double xi = (h[i] - h.front()) / (h.back() - h.front());
 		F[i] = F0 * std::exp(-m::pow<2>(xi - gaussmu) / (2. * m::pow<2>(gausssigma)));
 	}
+	// Add some tiny accretion rate to avoid numerical problems
+	if (F[1] == 0.0) {
+		for (size_t i = 0; i < h.size(); ++i) {
+			const double xi = (h[i] - h.front()) / (h.back() - h.front());
+			F[i] += 1e-100 * F0 * xi;
+		}
+	}
 	return F;
 }
 
