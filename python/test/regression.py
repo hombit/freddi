@@ -42,7 +42,7 @@ class RegressionTestCase(unittest.TestCase):
             except ValueError:
                 return value.encode()
 
-    def load_config(self, data_file, arguments_to_remove=()):
+    def load_config(self, data_file, arguments_to_remove=frozenset()):
         section = 'section'
         section_str = '[{}]\n'.format(section)
         with open(data_file) as f:
@@ -65,7 +65,11 @@ class RegressionTestCase(unittest.TestCase):
 
     @parameterized.expand(glob.glob(os.path.join(DATA_DIR, '*.dat')))
     def test(self, data_file):
-        config = self.load_config(data_file, ('dir', 'prefix', 'fulldata', 'precision', 'config'))
+        config = self.load_config(
+            data_file,
+            arguments_to_remove=frozenset(['dir', 'prefix', 'fulldata', 'precision', 'config', 'tempsparsity',
+                                           'stdout']),
+        )
         lmbd_ = np.array(config.pop('lambda', [])) * 1e-8
         f = Freddi(**config)
         result = f.evolve()
