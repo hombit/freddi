@@ -11,15 +11,6 @@
 #include "freddi_evolution.hpp"
 
 
-class FstreamWithPath: public std::ofstream {
-public:
-	const std::string path;
-public:
-	FstreamWithPath(const std::string& path):
-			std::ofstream(path),
-			path(path) {}
-};
-
 struct FileOutputShortField {
 	std::string name;
 	std::string unit;
@@ -51,7 +42,7 @@ protected:
 	void starDump();
 private:
 	const unsigned short precision;
-	FstreamWithPath output;
+	std::ofstream output;
 	std::string disk_structure_header;
 	std::string star_header;
 	static std::string initializeFulldataHeader(const std::vector<FileOutputLongField>& fields);
@@ -61,7 +52,6 @@ public:
 						  std::vector<FileOutputLongField>&& disk_structure_fields,
 						  std::vector<FileOutputLongField>&& star_fields);
 	void dump();
-	inline std::string path() const { return output.path; }
 };
 
 class FreddiFileOutput: public BasicFreddiFileOutput {

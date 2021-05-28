@@ -123,7 +123,7 @@ void BasicFreddiFileOutput::shortDump() {
 void BasicFreddiFileOutput::diskStructureDump() {
 	auto filename = (freddi->args().general->dir + "/" + freddi->args().general->prefix
 			+ "_" + std::to_string(freddi->i_t()) + ".dat");
-	FstreamWithPath full_output(filename);
+	std::ofstream full_output(filename);
 	full_output.precision(precision);
 
 	full_output << disk_structure_header
@@ -145,7 +145,7 @@ void BasicFreddiFileOutput::diskStructureDump() {
 void BasicFreddiFileOutput::starDump() {
 	auto filename = (freddi->args().general->dir + "/" + freddi->args().general->prefix
 					 + "_" + std::to_string(freddi->i_t()) + "_star.dat");
-	FstreamWithPath full_output(filename);
+	std::ofstream full_output(filename);
 	full_output.precision(precision);
 
 	full_output << star_header
