@@ -90,8 +90,16 @@ template <typename Options>
 bool parseOptions(po::variables_map& vm, int ac, char* av[]) {
 	const std::string default_config_filename = "freddi.ini";
 
-	const char* home = getenv("HOME");
-	const std::array<std::string, 4> config_file_dirs = {".", home, INSTALLPATHPREFIX"/etc", "/etc"};
+	const char* xdg_config_home = getenv("XDG_CONFIG_HOME");
+	std::string config_home;
+	if (xdg_config_home) {
+		config_home = xdg_config_home;
+	} else {
+		config_home = std::string(getenv("HOME")) + "/.config";
+	}
+
+
+	const std::array<std::string, 4> config_file_dirs = {".", config_home, INSTALLPATHPREFIX"/etc", "/etc"};
 	std::vector<std::string> config_file_paths;
 	for (const auto& dir : config_file_dirs) {
 		config_file_paths.push_back(dir + "/" + default_config_filename);
