@@ -13,6 +13,9 @@ Table of contents
   * [Options](#options)
   * [Output values](#output-values)
   * [Example](#example)
+* [Physical Background](#physical-background) 
+* [Accretion disk wind](#accretion-disk-wind) 
+  * [Compton-heated wind](#compton-heated-wind)
 * [Questions and comments](#questions-and-comments)
 * [License](#license)
 * [BibTex](#bibtex)
@@ -99,134 +102,193 @@ values are given in brackets.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ ./freddi --help
-Freddi - numerical calculation of accretion disk evolution:
+Freddi: numerical calculation of accretion disk evolution:
 
 General options:
-  -h [ --help ]                    Produce help message
-  --prefix arg (=freddi)           Set prefix for output filenames. Output file
-                                   with distribution of parameters over time is
-                                   PREFIX.dat
-  -d [ --dir ] arg (=.)            Choose the directory to write output files. 
-                                   It should exist
-  --fulldata                       Output files PREFIX_%d.dat with radial 
-                                   structure for every time step. Default is to
-                                   output only PREFIX.dat with global disk 
-                                   parameters for every time step
+  -h [ --help ]                         Produce help message
+  --config arg                          Set additional configuration filepath
+  --prefix arg (=freddi)                Set prefix for output filenames. Output
+                                        file with distribution of parameters 
+                                        over time is PREFIX.dat
+  -d [ --dir ] arg (=.)                 Choose the directory to write output 
+                                        files. It should exist
+  --precision arg (=12)                 Number of digits to print into output 
+                                        files
+  --fulldata                            Output files PREFIX_%d.dat with radial 
+                                        structure for every time step. Default 
+                                        is to output only PREFIX.dat with 
+                                        global disk parameters for every time 
+                                        step
 
-Basic binary and disk parameters:
-  -M [ --Mx ] arg (=5)             Mass of the central object, in the units of 
-                                   solar masses
-  --kerr arg (=0)                  Dimensionless Kerr parameter of the black 
-                                   hole
-  -a [ --alpha ] arg (=0.25)       Alpha parameter of Shakura-Sunyaev model
-  --rin arg                        Inner radius of the disk, in the units of 
-                                   the Schwarzschild radius of the central 
-                                   object 2GM/c^2. If it isn't set then the 
-                                   radius of ISCO orbit is used defined by --Mx
-                                   and --kerr values
-  --Mopt arg (=0.5)                Mass of the optical star, in units of solar 
-                                   masses
-  -P [ --period ] arg (=0.25)      Orbital period of the binary system, in 
-                                   units of days
-  -R [ --rout ] arg                Outer radius of the disk, in units of solar 
-                                   radius. If it isn't set then the tidal 
-                                   radius is used defined by --Mx, --Mopt and 
-                                   --period values
+Basic binary and disk parameter:
+  -a [ --alpha ] arg                    Alpha parameter of Shakura-Sunyaev 
+                                        model
+  --alphacold arg                       Alpha parameter of cold disk, currently
+                                        it is used only for Sigma_minus, see 
+                                        --Qirr2Qvishot. Default is --alpha 
+                                        values divided by ten
+  -M [ --Mx ] arg                       Mass of the central object, in the 
+                                        units of solar masses
+  --kerr arg (=0)                       Dimensionless Kerr parameter of the 
+                                        black hole
+  --Mopt arg                            Mass of the optical star, in units of 
+                                        solar masses
+  --rochelobefill arg (=1)              Dimensionless factor describing a size 
+                                        of the optical star. Polar radius of 
+                                        the star is rochelobefill * (polar 
+                                        radius of critical Roche lobe)
+  --Topt arg (=0)                       Thermal temperature of the optical 
+                                        star, in units of kelvins
+  -P [ --period ] arg                   Orbital period of the binary system, in
+                                        units of days
+  --rin arg                             Inner radius of the disk, in the units 
+                                        of the gravitational radius of the 
+                                        central object GM/c^2. If it isn't set 
+                                        then the radius of ISCO orbit is used 
+                                        defined by --Mx and --kerr values
+  -R [ --rout ] arg                     Outer radius of the disk, in units of 
+                                        solar radius. If it isn't set then the 
+                                        tidal radius is used defined by --Mx, 
+                                        --Mopt and --period values
+  --risco arg                           Innermost stable circular orbit, in 
+                                        units of gravitational radius of the 
+                                        central object GM/c^2. If it isn't set 
+                                        then the radius of ISCO orbit is used 
+                                        defined by --Mx and --kerr values
 
-Parameters of the disk model:
-  -O [ --opacity ] arg (=Kramers)  Opacity law: Kramers (varkappa ~ rho / 
-                                   T^7/2) or OPAL (varkappa ~ rho / T^5/2)
-  --boundcond arg (=Teff)          Outer boundary movement condition
-                                   
-                                   Values:
-                                     Teff: outer radius of the disk moves 
-                                   inwards to keep photosphere temperature of 
-                                   the disk larger than some value. This value 
-                                   is specified by --Thot option
-                                     Tirr: outer radius of the disk moves 
-                                   inwards to keep irradiation flux of the disk
-                                   larger than some value. The value of this 
-                                   minimal irradiation flux is 
-                                   [Stefan-Boltzmann constant] * Tirr^4, where 
-                                   Tirr is specified by --Thot option
-  --Thot arg (=0)                  Minimum photosphere or irradiation 
-                                   temperature at the outer edge of the hot 
-                                   disk, Kelvin. For details see --boundcond 
-                                   description
-  --F0 arg (=2e+38)                Initial maximum viscous torque in the disk, 
-                                   dyn*cm. Can be overwritten via --Mdisk0 and 
-                                   --Mdot0
-  --Mdisk0 arg                     Initial disk mass, g. If both --F0 and 
-                                   --Mdisk0 are specified then --Mdisk0 is 
-                                   used. If both --Mdot0 and --Mdisk0 are 
-                                   specified then --Mdot0 is used
-  --Mdot0 arg                      Initial mass accretion rate through the 
-                                   inner radius, g/s. If --F0, --Mdisk0 and 
-                                   --Mdot0 are specified then --Mdot0 is used. 
-                                   Works only when --initialcond is set to 
-                                   sinusF or quasistat
-  --initialcond arg (=powerF)      Type of the initial condition for viscous 
-                                   torque F or surface density Sigma
-                                   
-                                   Values:
-                                     powerF: F ~ xi^powerorder, powerorder is 
-                                   specified by --powerorder option
-                                     powerSigma: Sigma ~ xi^powerorder, 
-                                   powerorder is specified by --powerorder 
-                                   option
-                                     sinusF: F ~ sin( xi * pi/2 )
-                                     gaussF: F ~ exp(-(xi-mu)**2 / 2 sigma**2),
-                                   mu and sigma are specified by --gaussmu and 
-                                   --gausssigma options
-                                     quasistat: F ~ f(h/h_out) * xi * h_out/h, 
-                                   where f is quasi-stationary solution found 
-                                   in Lipunova & Shakura 2000. f(xi=0) = 0, 
-                                   df/dxi(xi=1) = 0
-                                   
-                                   Here xi is (h - h_in) / (h_out - h_in)
-                                   
-  --powerorder arg (=6)            Parameter for the powerlaw initial condition
-                                   distribution. This option works only with 
-                                   --initialcond=powerF or powerSigma
-  --gaussmu arg (=1)               Position of the maximum for Gauss 
-                                   distribution, positive number not greater 
-                                   than unity. This option works only with 
-                                   --initialcond=gaussF
-  --gausssigma arg (=0.25)         Width of for Gauss distribution. This option
-                                   works only with --initialcond=gaussF
+Parameters of the disk mode:
+  -O [ --opacity ] arg (=Kramers)       Opacity law: Kramers (varkappa ~ rho / 
+                                        T^7/2) or OPAL (varkappa ~ rho / T^5/2)
+  --Mdotout arg (=0)                    Accretion rate onto the disk through 
+                                        its outer radius
+  --boundcond arg (=Teff)               Outer boundary movement condition
+                                        
+                                        Values:
+                                          Teff: outer radius of the disk moves 
+                                        inwards to keep photosphere temperature
+                                        of the disk larger than some value. 
+                                        This value is specified by --Thot 
+                                        option
+                                          Tirr: outer radius of the disk moves 
+                                        inwards to keep irradiation flux of the
+                                        disk larger than some value. The value 
+                                        of this minimal irradiation flux is 
+                                        [Stefan-Boltzmann constant] * Tirr^4, 
+                                        where Tirr is specified by --Thot 
+                                        option
+  --Thot arg (=0)                       Minimum photosphere or irradiation 
+                                        temperature at the outer edge of the 
+                                        hot disk, Kelvin. For details see 
+                                        --boundcond description
+  --Qirr2Qvishot arg (=0)               Minimum Qirr / Qvis ratio at the outer 
+                                        edge of the hot disk to switch 
+                                        evolution from temperature-based regime
+                                        to Sigma_minus-based regime (see Eq. 
+                                        A.1 in Lasota et al. 2008, --alphacold 
+                                        value is used as alpha parameter)
+  --initialcond arg (=powerF)           Type of the initial condition for 
+                                        viscous torque F or surface density 
+                                        Sigma
+                                        
+                                        Values:
+                                          powerF: F ~ xi^powerorder, powerorder
+                                        is specified by --powerorder option
+                                          linearF: F ~ xi, specific case of 
+                                        powerF but can be normalised by 
+                                        --Mdot0, see its description for 
+                                        details  powerSigma: Sigma ~ 
+                                        xi^powerorder, powerorder is specified 
+                                        by --powerorder option
+                                          sineF: F ~ sin( xi * pi/2 )
+                                          gaussF: F ~ exp(-(xi-mu)**2 / 2 
+                                        sigma**2), mu and sigma are specified 
+                                        by --gaussmu and --gausssigma options
+                                          quasistat: F ~ f(h/h_out) * xi * 
+                                        h_out/h, where f is quasi-stationary 
+                                        solution found in Lipunova & Shakura 
+                                        2000. f(xi=0) = 0, df/dxi(xi=1) = 0
+                                        
+                                        Here xi is (h - h_in) / (h_out - h_in)
+                                        
+  --F0 arg                              Initial maximum viscous torque in the 
+                                        disk, dyn*cm. Can be overwritten via 
+                                        --Mdisk0 and --Mdot0
+  --Mdisk0 arg                          Initial disk mass, g. If both --F0 and 
+                                        --Mdisk0 are specified then --Mdisk0 is
+                                        used. If both --Mdot0 and --Mdisk0 are 
+                                        specified then --Mdot0 is used
+  --Mdot0 arg                           Initial mass accretion rate through the
+                                        inner radius, g/s. If --F0, --Mdisk0 
+                                        and --Mdot0 are specified then --Mdot0 
+                                        is used. Works only when --initialcond 
+                                        is set to linearF, sinusF or quasistat
+  --powerorder arg                      Parameter for the powerlaw initial 
+                                        condition distribution. This option 
+                                        works only with --initialcond=powerF or
+                                        powerSigma
+  --gaussmu arg                         Position of the maximum for Gauss 
+                                        distribution, positive number not 
+                                        greater than unity. This option works 
+                                        only with --initialcond=gaussF
+  --gausssigma arg                      Width of for Gauss distribution. This 
+                                        option works only with 
+                                        --initialcond=gaussF
 
-Parameters of self-irradiation:
-  --Cirr arg (=0)                  Irradiation factor
-  --irrfactortype arg (=const)     Type of irradiation factor Cirr
-                                   
-                                   Values:
-                                     const: doesn't depend on disk shape:
-                                   [rad. flux] = Cirr  L / (4 pi r^2)
-                                     square: Cirr depends on the disk relative 
-                                   half-thickness:
-                                   [rad. flux] = Cirr (z/r)^2 L / (4 pi r^2)
-                                   
-                                   Here L is bolometric Luminosity:
-                                   L = eta Mdot c^2
+Parameters of self-irradiation.
+Qirr = Cirr * (H/r / 0.05)^irrindex * L * psi / (4 pi R^2), where psi is angular distrbution of X-ray radiation:
+  --Cirr arg (=0)                       Irradiation factor for the hot disk
+  --irrindex arg (=0)                   Irradiation index for the hot disk
+  --Cirrcold arg (=0)                   Irradiation factor for the cold disk
+  --irrindexcold arg (=0)               Irradiation index for the cold disk
+  --h2rcold arg (=0.050000000000000003) Seme-height to radius ratio for the 
+                                        cold disk
+  --angulardistdisk arg (=plane)        Angular distribution of the disk X-ray 
+                                        radiation. Values: isotropic, plane
 
-Parameters of optical magnitudes calculation:
-  --colourfactor arg (=1.7)        Colour factor to calculate X-ray flux
-  --emin arg (=1)                  Minimum energy of X-ray band, keV
-  --emax arg (=12)                 Maximum energy of X-ray band, keV
-  -i [ --inclination ] arg (=0)    Inclination of the system, degrees
-  --distance arg (=10)             Distance to the system, kpc
-  --lambda arg                     Wavelength to calculate Fnu, Angstrom. You 
-                                   can use this option multiple times. For each
-                                   lambda one additional column with values of 
-                                   spectral flux density Fnu [erg/s/cm^2/Hz] is
-                                   produced
+Parameters of flux calculation:
+  --colourfactor arg (=1.7)             Colour factor to calculate X-ray flux
+  --emin arg (=1)                       Minimum energy of X-ray band, keV
+  --emax arg (=12)                      Maximum energy of X-ray band, keV
+  --staralbedo arg (=0)                 Part of X-ray radiation reflected by 
+                                        optical star, (1 - albedo) heats star's
+                                        photosphere. Used only when --starflux 
+                                        is specified
+  -i [ --inclination ] arg (=0)         Inclination of the system, degrees
+  --ephemerist0 arg (=0)                Ephemeris for the time of the minimum 
+                                        of the orbital light curve T0, phase 
+                                        zero corresponds to inferior 
+                                        conjunction of the optical star, days
+  --distance arg                        Distance to the system, kpc
+  --colddiskflux                        Add Fnu for cold disk into output file.
+                                        Default output is for hot disk only
+  --starflux                            Add Fnu for optical star into output 
+                                        file. Mx, Mopt and period must be 
+                                        specified, see also Topt and starlod 
+                                        options. Default output is for hot disk
+                                        only
+  --lambda arg                          Wavelength to calculate Fnu, Angstrom. 
+                                        You can use this option multiple times.
+                                        For each lambda one additional column 
+                                        with values of spectral flux density 
+                                        Fnu [erg/s/cm^2/Hz] is produced
+  --passband arg                        Path of a file containing tabulated 
+                                        passband, the first column for 
+                                        wavelength in Angstrom, the second 
+                                        column for transmission factor, columns
+                                        should be separated by spaces
 
 Parameters of disk evolution calculation:
-  -T [ --time ] arg (=50)          Time interval to calculate evolution, days
-  --tau arg (=0.25)                Time step, days
-  --Nx arg (=1000)                 Size of calculation grid
-  --gridscale arg (=log)           Type of grid for angular momentum h: log or 
-                                   linear
+  --inittime arg (=0)                   Initial time moment, days
+  -T [ --time ] arg                     Time interval to calculate evolution, 
+                                        days
+  --tau arg                             Time step, days
+  --Nx arg (=1000)                      Size of calculation grid
+  --gridscale arg (=log)                Type of grid for angular momentum h: 
+                                        log or linear
+  --starlod arg (=3)                    Level of detail of the optical star 3-D
+                                        model. The optical star is represented 
+                                        by a triangular tile, the number of 
+                                        tiles is 20 * 4^starlod
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -266,7 +328,8 @@ Kerr's parameter is 0.4. The outer disk is irradiated with Cirr=1e-3.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ./freddi --alpha=0.5 --Mx=9 --rout=1 --time=50 --tau=0.25 --dir=data/ \
   --F0=2e+37 --colourfactor=1.7 --Nx=1000 --distance=5 --gridscale=log \
-  --kerr=0.4 --Cirr=0.001 --opacity=OPAL --initialcond=quasistat
+  --kerr=0.4 --Cirr=0.001 --opacity=OPAL --initialcond=quasistat \
+  --wind=Woods1996 --Xi_max=10 --Tic=1e8 --M_pow=1 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Physical Background
@@ -297,12 +360,10 @@ In a binary system, the accretion disk is radially confined. In `Freddi`, the
 outer radius of the disk can be set explicitely or calculated as the position of
 the tidal truncation radius following [Paczynski
 (1997)](http://adsabs.harvard.edu/abs/1977ApJ...216..822P) for small mass ratios
-of the black using the approximation by [Suleimanov et al
-(2008)](http://adsabs.harvard.edu/abs/2008A%26A...491..267S).
+of the black using the approximation by [Suleimanov et al. (2008)](http://adsabs.harvard.edu/abs/2008A%26A...491..267S).
 
 The parameters at the disk central plane are defined by the analytic
-approximations ([Suleimanov et al.
-2007](http://adsabs.harvard.edu/abs/2007ARep...51..549S)), valid for the
+approximations ([Suleimanov et al. 2007](http://adsabs.harvard.edu/abs/2007ARep...51..549S)), valid for the
 effective surface temperatures from 10 000 to 100 000 K, approximately. It is
 assumed that the gas pressure dominates, the gas is completely ionized, and the
 photon opacity is defined by the free-free and free-bound transitions. Opacity
@@ -351,6 +412,70 @@ taking into account general relativity effects near the black hole, following
 [Page & Thorne
 (1974)](http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=1974ApJ...191..499P)
 and [Riffert & Herold (1995)](http://adsabs.harvard.edu/cgi-bin/nph-bib\_query?bibcode=1995ApJ...450..508R).
+
+
+Accretion disk wind
+-------------------
+
+Presumably, during an outburst there is an outflow in the form of a wind from the 
+accretion disk around the compact object. The presence of such a wind in the LMXBs is supported
+by modern observations indicating the expansion of ionized matter. Such an outflow of matter,
+being an additional  source of angular momentum transfer in the disk, can strongly influence 
+its viscous evolution. 
+
+However, the nature of such winds and their  physical characteristics are an open question.
+Namely, there are three mechanisms which are considered:
+heating of matter by central radiation in optically thin regions of the disk 
+([Begelman et al. 1983](https://ui.adsabs.harvard.edu/abs/1983ApJ...271...70B), 
+[Shields et al. 1986](https://ui.adsabs.harvard.edu/abs/1986ApJ...306...90S), 
+[Woods et al. 1996](https://ui.adsabs.harvard.edu/abs/1996ApJ...461..767W)), 
+the pressure of the magnetic field of the disk
+([Blandford & Payne 1982](https://ui.adsabs.harvard.edu/abs/1982MNRAS.199..883B), 
+[Habibi & Abbassi 2019](https://ui.adsabs.harvard.edu/abs/2019ApJ...887..256H), 
+[Nixon & Pringle 2019](https://ui.adsabs.harvard.edu/abs/2019A%26A...628A.121N))
+and the pressure of local radiation at super-Eddington accretion rates
+([Shakura & Sunyaev 1973](http://adsabs.harvard.edu/abs/1973A%26A....24..337S), 
+[Proga & Kallman 2002](https://ui.adsabs.harvard.edu/abs/2002ApJ...565..455P)). 
+
+`Freddi` is modernized in such a way that it is able to solve the viscous evolution 
+equation with an inhomogeneous term that is responsible for the presence of the disk wind.
+This term is the dependence of the surface density of the wind mass loss rate of 
+distance along the disk's surface. Different forms of such dependence correspond 
+to different wind models, and to different corresponding classes within `Freddi`. 
+
+
+When starting the program, you can choose one of several wind models by setting 
+`--wind` option. Thermal wind model ([Woods et al. 1996](https://ui.adsabs.harvard.edu/abs/1996ApJ...461..767W)),
+within which the outflow of matter occurs due to the heating of the outer parts of the disk
+by a central radiation source, you can choose in the option `--wind=Woods1996`. The option `--wind=Janiuk15`
+corresponds to the model from work [Janiuk et al. (2015)](https://ui.adsabs.harvard.edu/abs/2015A%26A...574A..92J)
+where the wind is started in super Eddington mode. You can also select the `--wind=ToyWind` option, 
+which corresponds to a toy wind model where the launch radius is equal to the outer radius of the disk. 
+In this option, you can set the wind strength relative to the accretion rate.
+
+### Compton-heated wind
+
+At the moment, `Freddi` is more focused on simulating outbbursts taking into account the thermal wind (`--wind=Woods1996` option). 
+For a better understanding, let's discuss a little the physics of the process of launching such a wind 
+and its parameters in the code.
+
+In the standard accretion model by [Shakura & Sunyaev (1973)](http://adsabs.harvard.edu/abs/1973A%26A....24..337S) 
+the disk is concave, and, as a result, the disk surface is exposed to the central radiation, 
+which heats the disk material. As a result, the heated matter, starting from a certain radius, 
+begins to leave the accretion disk. This process of heating the matter of the accretion disk by means of Compoton
+processes was described in detail in [Begelman et al. (1983)](https://ui.adsabs.harvard.edu/abs/1983ApJ...271...70B) and 
+[Shields et al. (1986)](https://ui.adsabs.harvard.edu/abs/1986ApJ...306...90S). 
+In a later work [Woods et al. (1996)](https://ui.adsabs.harvard.edu/abs/1996ApJ...461..767W), 
+two-dimensional magnetohydrodynamic calculations were performed and the 
+results of [Shields et al. (1986)](https://ui.adsabs.harvard.edu/abs/1986ApJ...306...90S) were generalized. 
+[Woods et al. (1996)](https://ui.adsabs.harvard.edu/abs/1996ApJ...461..767W) give an expression for the surface density of the mass 
+loss rate as a function of distance along the disk's surface. This function was used and added in `Freddi` 
+to taking thermal wind into account.
+
+Choosing option `--wind=Woods1996`, it is necessary to set the values of the ionization parameter Xi
+(which is proportional to the ratio of the radiation and gas pressure) by the option `--Xi_max` and the Compoton temperature T_IC 
+(it determines the hardness of the irradiating spectrum and the size of the region in which the wind acts) by the option `--Tic`. 
+
 
 Questions and comments
 ----------------------
