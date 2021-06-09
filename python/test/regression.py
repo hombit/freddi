@@ -68,7 +68,7 @@ class RegressionTestCase(unittest.TestCase):
         config = self.load_config(
             data_file,
             arguments_to_remove=frozenset(['dir', 'prefix', 'fulldata', 'precision', 'config', 'tempsparsity',
-                                           'stdout']),
+                                           'stdout', 'windtype']),
         )
         lmbd_ = np.array(config.pop('lambda', [])) * 1e-8
         f = Freddi(**config)
