@@ -63,6 +63,7 @@
 # tau=0.25
 # tempsparsity=1
 # time=100
+# windtype=no
 ### Derived values
 # alpha_cold = 0.025
 # Tidal radius = 1.53444 Rsun
