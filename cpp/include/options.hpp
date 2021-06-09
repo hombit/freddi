@@ -41,6 +41,7 @@ class DiskStructureOptions: public DiskStructureArguments {
 public:
 	DiskStructureOptions(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args);
 	static po::options_description description();
+	static pard windparamsInitializer(const po::variables_map& vm);
 };
 
 

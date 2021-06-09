@@ -126,7 +126,7 @@ private:
 		virtual void update(const FreddiState&) override;
 	};
 
-	class Agnieszka2015Wind: public BasicWind {
+	class Janiuk2015Wind: public BasicWind {
 	//Janiuk A., Grzedzielski M., Capitanio F., Bianchi S., 2015, Interplay between heartbeat oscillations and wind outflow in microquasar IGR J17091-3624 A&A, 574, A92
 	//doi:10.1051/0004-6361/201425003
 	private:
@@ -134,10 +134,10 @@ private:
 		const double A_0;
 		const double B_1;
 	public:
-		explicit Agnieszka2015Wind(const FreddiState& state);
-		~Agnieszka2015Wind() override = default;
-		Agnieszka2015Wind(const  Agnieszka2015Wind&) = default;
-		virtual Agnieszka2015Wind* clone() const override { return new Agnieszka2015Wind(*this); }
+		explicit Janiuk2015Wind(const FreddiState& state);
+		~Janiuk2015Wind() override = default;
+		Janiuk2015Wind(const  Janiuk2015Wind&) = default;
+		virtual Janiuk2015Wind* clone() const override { return new Janiuk2015Wind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 

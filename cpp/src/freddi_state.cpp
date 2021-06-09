@@ -102,13 +102,13 @@ void FreddiState::initializeWind() {
 		wind_.reset(static_cast<BasicWind*>(new testCWind(*this)));
 	} else if (args().disk->wind == "__testC_q0_Shields1986__") {
 		wind_.reset(static_cast<BasicWind*>(new testCq0Shields1986Wind(*this)));
-    } else if (args().disk->wind == "Shields1986Wind") {
+    } else if (args().disk->wind == "Shields1986") {
         wind_.reset(static_cast<BasicWind*>(new Shields1986Wind(*this)));
-    } else if (args().disk->wind == "Agnieszka2015Wind") {
-        wind_.reset(static_cast<BasicWind*>(new Agnieszka2015Wind(*this)));
-    } else if (args().disk->wind == "Woods1996Wind") {
+    } else if (args().disk->wind == "Janiuk2015") {
+        wind_.reset(static_cast<BasicWind*>(new Janiuk2015Wind(*this)));
+    } else if (args().disk->wind == "Woods1996AGN") {
         wind_.reset(static_cast<BasicWind*>(new Woods1996Wind(*this)));
-    } else if (args().disk->wind == "Woods1996ShieldsApproxWind") {
+    } else if (args().disk->wind == "Woods1996") {
         wind_.reset(static_cast<BasicWind*>(new Woods1996ShieldsApproxWind(*this)));
 	} else {
 		throw std::invalid_argument("Wrong wind");
@@ -492,14 +492,14 @@ void FreddiState::Shields1986Wind::update(const FreddiState& state) {
     }
 }
 
-FreddiState::Agnieszka2015Wind::Agnieszka2015Wind(const FreddiState& state):
+FreddiState::Janiuk2015Wind::Janiuk2015Wind(const FreddiState& state):
         BasicWind(state),
         A_0(state.args().disk->windparams.at("A_0")),
         B_1(state.args().disk->windparams.at("B_1")) {
     update(state);
 }
 
-void FreddiState::Agnieszka2015Wind::update(const FreddiState& state) {
+void FreddiState::Janiuk2015Wind::update(const FreddiState& state) {
     BasicWind::update(state);
     const auto disk = state.args().disk;
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();

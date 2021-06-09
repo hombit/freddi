@@ -108,7 +108,35 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 				varToOpt<double>(vm, "powerorder"),
 				varToOpt<double>(vm, "gaussmu"),
 				varToOpt<double>(vm, "gausssigma"),
-				"no", {}) {}  // wind
+				vm["windtype"].as<std::string>(),
+				windparamsInitializer(vm)) {}
+
+
+pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
+	const auto windtype = vm["windtype"].as<std::string>();
+
+	if (windtype == "no") {
+		return {};
+	}
+	if (windtype == "SS73C") {
+		return {};
+	}
+	if (windtype == "Woods1996"){
+		if (vm.count("windXi") == 0) {
+			throw po::error("--windXi is required if --windtype=Woods1996");
+		}
+		if (vm.count("windTic") == 0) {
+			throw po::error("--windTic is required if --windtype=Woods1996");
+		}
+		return {
+				{"Xi_max", vm["windXi"].as<double>()},
+				{"T_iC", vm["windTic"].as<double>()}
+		};
+	}
+
+	throw po::invalid_option_value("Unknown --windtype=" + windtype);
+}
+
 
 po::options_description DiskStructureOptions::description() {
 	po::options_description od("Parameters of the disk mode");
@@ -138,6 +166,15 @@ po::options_description DiskStructureOptions::description() {
 			( "powerorder", po::value<double>(), "Parameter for the powerlaw initial condition distribution. This option works only with --initialcond=powerF or powerSigma" )
 			( "gaussmu", po::value<double>(), "Position of the maximum for Gauss distribution, positive number not greater than unity. This option works only with --initialcond=gaussF" )
 			( "gausssigma", po::value<double>(), "Width of for Gauss distribution. This option works only with --initialcond=gaussF" )
+			( "windtype", po::value<std::string>()->default_value(default_wind),
+			        "Type of the wind\n\n"
+					"Values:\n"
+					"  no: no wind\n"
+					"  SS73C: super-Eddington spherical wind from Shakura-Sunyaev 1973\n"
+					"  Janiuk2015: super-Eddington Janiuk et al. 2015\n"
+					"  Woods1996: thermal wind Woods et al. 1996. Requires --windXi and --windTic to be specified")
+			( "windXi", po::value<double>(), "Ionization parameter, the ratio of the radiation and gas pressures" )
+			( "windTic", po::value<double>(), "Inverse Compton temperature, K. Characterizes the hardness of the irradiating spectrum")
 			;
 	return od;
 }
