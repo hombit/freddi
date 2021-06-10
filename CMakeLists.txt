@@ -7,6 +7,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
 include_directories("${PROJECT_SOURCE_DIR}/cpp/include")
 
+set(STATIC_LINKING FALSE CACHE BOOL "Build a static binary?")
+if(STATIC_LINKING)
+    set(Boost_USE_STATIC_LIBS "ON")
+endif(STATIC_LINKING)
 
 function(CREATE_SHARED)
     set(TARGET freddi-dll)
@@ -29,11 +33,6 @@ CREATE_SHARED()
 function(CREATE_EXE targ)
     set(TARGET freddi${targ}-exe)
     set(EXE freddi${targ})
-
-    set(STATIC_LINKING FALSE CACHE BOOL "Build a static binary?")
-    if(STATIC_LINKING)
-        set(Boost_USE_STATIC_LIBS "ON")
-    endif(STATIC_LINKING)
 
     find_package(Boost 1.57.0 COMPONENTS program_options filesystem REQUIRED)
 
