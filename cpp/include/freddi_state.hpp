@@ -163,6 +163,7 @@ private:
 		// windparams
 		const double Xi_max;
 		const double T_iC;
+		const double W_pow;
 	public:
 		explicit Woods1996ShieldsApproxWind(const FreddiState& state);
 		~Woods1996ShieldsApproxWind() override = default;
@@ -170,7 +171,20 @@ private:
 		virtual Woods1996ShieldsApproxWind* clone() const override { return new Woods1996ShieldsApproxWind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
-
+	
+	class WindForPer : public BasicWind {
+	//self
+	private:
+		// windparams
+		const double W_pow;
+	public:
+		explicit WindForPer(const FreddiState& state);
+		~WindForPer() override = default;
+		WindForPer(const WindForPer&) = default;
+		virtual WindForPer* clone() const override { return new WindForPer(*this); }
+		virtual void update(const FreddiState&) override;
+	};
+	
 protected:
 	class BasicFreddiIrradiationSource {
 	public:

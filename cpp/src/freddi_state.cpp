@@ -110,6 +110,8 @@ void FreddiState::initializeWind() {
         wind_.reset(static_cast<BasicWind*>(new Woods1996Wind(*this)));
     } else if (args().disk->wind == "Woods1996") {
         wind_.reset(static_cast<BasicWind*>(new Woods1996ShieldsApproxWind(*this)));
+    } else if (args().disk->wind == "ToyWind") {
+        wind_.reset(static_cast<BasicWind*>(new WindForPer(*this)));      
 	} else {
 		throw std::invalid_argument("Wrong wind");
 	}
@@ -574,7 +576,8 @@ void FreddiState::Woods1996Wind::update(const FreddiState& state) {
 FreddiState::Woods1996ShieldsApproxWind::Woods1996ShieldsApproxWind(const FreddiState& state):
 BasicWind(state),
         Xi_max(state.args().disk->windparams.at("Xi_max")),
-        T_iC(state.args().disk->windparams.at("T_iC")) {
+        T_iC(state.args().disk->windparams.at("T_iC")),
+        W_pow(state.args().disk->windparams.at("W_pow")) {
     update(state);
 }
 
@@ -613,9 +616,26 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
                 //                        (1.0 / 6.0)));
             const double Expo = std::exp(-(((1.0 - (1 / std::sqrt(1.0 + 0.25 * m::pow<2>(xi1)))) *
                                             (1.0 - (1 / std::sqrt(1.0 + 0.25 * m::pow<2>(xi1))))) / (2.0 * xi)));
-            C_[i] = -2.0 * C0 * Fr * Fc * Expo;
+            C_[i] = - 2.0 * W_pow * C0 * Fr * Fc * Expo;
         }
 
+    }
+}
+
+FreddiState::WindForPer::WindForPer(const FreddiState& state):
+	BasicWind(state),
+	W_pow(state.args().disk->windparams.at("W_pow")) {
+    update(state);
+}
+
+void FreddiState::WindForPer::update(const FreddiState& state) {
+    BasicWind::update(state);
+    const auto disk = state.args().disk;
+
+    for (size_t i = state.first(); i <= state.last(); ++i) {
+	//const double C0 = (4.0 * M_PI * m::pow<3>(state.h()[i])) / (m::pow<2>(state.GM()));
+	const double Mdot = state.Mdot_in() * (state.h()[i] - state.h()[state.first()]) /(m::pow<2>(state.h()[state.last()] - state.h()[state.first()])) ;
+	C_[i] = - 2.0 * W_pow * Mdot;
     }
 }
 
