@@ -24,7 +24,7 @@ Overview
 --------
 
 The code solves 1-D evolution equation of Shakura-Sunyaev accretion disk. The
-code is developed to simulate fast rise exponential decay (FRED) light curves of
+code is developed to simulate fast-rise exponential-decay (FRED) light curves of
 low mass X-ray binaries (LMXBs) for the paper “Determination of the turbulent
 parameter in the accretion disks: effects of self-irradiation in 4U 1543-47
 during the 2002 outburst” by Lipunova & Malanchev (2017)
@@ -439,42 +439,41 @@ and the pressure of local radiation at super-Eddington accretion rates
 
 `Freddi` is modernized in such a way that it is able to solve the viscous evolution 
 equation with an inhomogeneous term that is responsible for the presence of the disk wind.
-This term is the dependence of the surface density of the wind mass loss rate of 
-distance along the disk's surface. Different forms of such dependence correspond 
-to different wind models, and to different corresponding classes within `Freddi`. 
+This term is the dependence of the surface density of the wind mass-loss rate on 
+the distance along the disk's surface. Different forms of such dependence correspond 
+to different wind models, and to different classes within `Freddi`. 
 
 
-When starting the program, you can choose one of several wind models by setting 
-`--wind` option. Thermal wind model ([Woods et al. 1996](https://ui.adsabs.harvard.edu/abs/1996ApJ...461..767W)),
-within which the outflow of matter occurs due to the heating of the outer parts of the disk
-by a central radiation source, you can choose in the option `--wind=Woods1996`. The option `--wind=Janiuk15`
+One can choose a wind model by setting the
+`--wind` option. The thermal wind model ([Woods et al. 1996](https://ui.adsabs.harvard.edu/abs/1996ApJ...461..767W)),
+which implies that the outflow of matter occurs due to the heating of the outer parts of the disk
+by a central radiation source, can be chosen by setting `--wind=Woods1996`. The option `--wind=Janiuk15`
 corresponds to the model from work [Janiuk et al. (2015)](https://ui.adsabs.harvard.edu/abs/2015A%26A...574A..92J)
-where the wind is started in super Eddington mode. You can also select the `--wind=ToyWind` option, 
-which corresponds to a toy wind model where the launch radius is equal to the outer radius of the disk. 
-In this option, you can set the wind strength relative to the accretion rate.
+where the wind is started in the super-Eddington regime. You can also select the `--wind=ToyWind` option, 
+which corresponds to a toy wind model when the user sets the wind strength relatively to the accretion rate using the option `--windpow`.
 
 ### Compton-heated wind
 
-At the moment, `Freddi` is more focused on simulating outbbursts taking into account the thermal wind (`--wind=Woods1996` option). 
+At the moment, `Freddi` is more focused on simulating outbursts taking into account the thermal wind (`--wind=Woods1996` option). 
 For a better understanding, let's discuss a little the physics of the process of launching such a wind 
 and its parameters in the code.
 
-In the standard accretion model by [Shakura & Sunyaev (1973)](http://adsabs.harvard.edu/abs/1973A%26A....24..337S) 
+In the standard accretion disk model by [Shakura & Sunyaev (1973)](http://adsabs.harvard.edu/abs/1973A%26A....24..337S) 
 the disk is concave, and, as a result, the disk surface is exposed to the central radiation, 
 which heats the disk material. As a result, the heated matter, starting from a certain radius, 
 begins to leave the accretion disk. This process of heating the matter of the accretion disk by means of Compoton
-processes was described in detail in [Begelman et al. (1983)](https://ui.adsabs.harvard.edu/abs/1983ApJ...271...70B) and 
+processes was developed in [Begelman et al. (1983)](https://ui.adsabs.harvard.edu/abs/1983ApJ...271...70B) and 
 [Shields et al. (1986)](https://ui.adsabs.harvard.edu/abs/1986ApJ...306...90S). 
 In a later work [Woods et al. (1996)](https://ui.adsabs.harvard.edu/abs/1996ApJ...461..767W), 
 two-dimensional magnetohydrodynamic calculations were performed and the 
 results of [Shields et al. (1986)](https://ui.adsabs.harvard.edu/abs/1986ApJ...306...90S) were generalized. 
 [Woods et al. (1996)](https://ui.adsabs.harvard.edu/abs/1996ApJ...461..767W) give an expression for the surface density of the mass 
-loss rate as a function of distance along the disk's surface. This function was used and added in `Freddi` 
+loss rate as a function of distance along the disk's surface. This function is used in `Freddi` 
 to taking thermal wind into account.
 
-Choosing option `--wind=Woods1996`, it is necessary to set the values of the ionization parameter Xi
-(which is proportional to the ratio of the radiation and gas pressure) by the option `--Xi_max` and the Compoton temperature T_IC 
-(it determines the hardness of the irradiating spectrum and the size of the region in which the wind acts) by the option `--Tic`. 
+Choosing option `--wind=Woods1996`, it is necessary to set the value of the ionization parameter Xi
+(which is proportional to the ratio of the radiation and gas pressures) by the option `--Xi_max` and the Compoton temperature T_IC 
+(which determines the hardness of the irradiating spectrum and the size of the region where the wind operates) by the option `--Tic`. 
 
 
 Questions and comments
@@ -486,7 +485,7 @@ If you have any problems, questions, or comments, please address them to
 License
 -------
 
-Copyright (c) 2016–2017, Konstantin L. Malanchev & Galina V. Lipunova.
+Copyright (c) 2016–2021, Konstantin L. Malanchev, Galina V. Lipunova & Artur L. Avakyan.
 
 `Freddi` is distributed under the terms of the
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
