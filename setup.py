@@ -8,7 +8,7 @@ from setuptools.command.build_ext import build_ext
 
 setup(
     name='freddi',
-    version='2.0a0.dev0',
+    version='2.0b0',
     url='http://xray.sai.msu.ru/~malanchev/freddi/',
     license='MIT',
     author='Konstantin Malanchev',
