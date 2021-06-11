@@ -1,24 +1,24 @@
-FROM ubuntu:18.04 as builder
+FROM ubuntu:20.04 as builder
 
+ARG DEBIAN_FRONTEND=noninteractive
 ENV PACKAGES "g++ make cmake libboost-all-dev"
 ENV SOURCE "/tmp/source"
 ENV BUILD "/tmp/build"
 
-RUN apt-get update &&\
-    apt-get install -y ${PACKAGES}
+RUN apt-get update \
+    && apt-get install -y ${PACKAGES}
 
 COPY CMakeLists.txt freddi.ini ${SOURCE}/
 COPY cpp ${SOURCE}/cpp
 
-RUN mkdir -p ${BUILD} &&\
-    cd ${BUILD} &&\
-    cmake ${SOURCE} -DSTATIC_LINKING=TRUE -DNO_PYTHON_MODULE=TRUE &&\
-    make -j4 install VERBOSE=1 &&\
-    ctest -V
+RUN mkdir -p ${BUILD} \
+    && cd ${BUILD} \
+    && cmake ${SOURCE} -DSTATIC_LINKING=TRUE \
+    && make -j4 install VERBOSE=1
 
 
 
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 LABEL maintainer="Konstantin Malanchev <malanchev@sai.msu.ru>"
 

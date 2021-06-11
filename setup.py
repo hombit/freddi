@@ -17,7 +17,7 @@ setup(
     package_dir={'': 'python'},
     packages=['freddi'],
     install_requires=['numpy'],
-    setup_requires=['cmake', 'numpy'],
+    setup_requires=['numpy'],
     tests_require=['parameterized'],
     python_requires='>=3.5',
     test_suite='test',

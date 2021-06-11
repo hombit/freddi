@@ -81,26 +81,6 @@ set(PYWRAP_SRC
     cpp/pywrap/util.hpp
     )
 
-set(SHARED_SRC ${MIN_SRC} ${IO_SRC} ${NS_MIN_SRC} ${NS_IO_SRC})
-
-
-function(CREATE_SHARED)
-    set(TARGET freddi-dll)
-    find_package(Boost 1.57.0 COMPONENTS program_options filesystem REQUIRED)
-
-    add_library(${TARGET} SHARED ${SHARED_SRC})
-    set_property(TARGET ${TARGET} PROPERTY OUTPUT_NAME freddi)
-
-    target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIR})
-    target_compile_definitions(${TARGET} PUBLIC INSTALLPATHPREFIX="${CMAKE_INSTALL_PREFIX}")
-    target_link_libraries(${TARGET} ${Boost_LIBRARIES})
-    install(TARGETS ${TARGET} DESTINATION lib)
-endfunction()
-
-if(NOT SKBUILD)
-    CREATE_SHARED()
-endif()
-
 
 function(CREATE_EXE targ)
     set(TARGET freddi${targ}-exe)
@@ -135,7 +115,7 @@ function(CREATE_UNIT_TEST targ)
 
     find_package(Boost 1.57.0 COMPONENTS unit_test_framework program_options filesystem REQUIRED)
 
-    add_executable(${TARGET} cpp/test/${targ}.cpp ${SHARED_SRC})
+    add_executable(${TARGET} cpp/test/${targ}.cpp ${MIN_SRC} ${IO_SRC} ${NS_MIN_SRC} ${NS_IO_SRC})
 
     target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIR})
     target_link_libraries(${TARGET} ${Boost_LIBRARIES})
@@ -152,7 +132,7 @@ function(CREATE_TESTS)
     endforeach()
 endfunction()
 
-if(NOT SKBUILD)
+if(NOT SKBUILD AND NOT STATIC_LINKING)
     CREATE_TESTS()
     enable_testing()
 endif()
