@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install dependencies
-        run: zypper install -y --no-recommends gcc-c++ cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel libboost_python3-devel libboost_numpy3-devel python3-devel python3-numpy-devel git
+        run: zypper install -y --no-recommends gcc-c++ cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel git
       - name: Create ./cmake-build directory
         run: mkdir ./cmake-build
       - name: Build and install
@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install dependencies
-        run: zypper install -y --no-recommends clang gcc cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel libboost_python3-devel libboost_numpy3-devel python3-devel python3-numpy-devel git
+        run: zypper install -y --no-recommends clang gcc cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel git
       - name: Create ./cmake-build directory
         run: mkdir ./cmake-build
       - name: Build and install
@@ -77,7 +77,7 @@ jobs:
         run: |
           zypper install -y python3-pip
           pip3 install -U pip
-          pip3 install -U setuptools
+          pip3 install -U setuptools numpy scikit-build cmake ninja
       - name: Install package
         run: python3 setup.py install
       - name: Test package
@@ -100,7 +100,9 @@ jobs:
     
     steps:
       - uses: actions/checkout@v1
-      - name: Build container
+      - name: Build container with wheels
         run: docker build -f Dockerfile.python -t freddi:python .
+      - name: Build containers
+        run: for V in 3.7 3.8 3.9; do docker build -f .ci/Dockerfile-test-wheels --build-arg PY_VERSION=$V -t freddi:python$V .; done
       - name: Run sample Python script
-        run: docker run --rm -t freddi:python python -c "import freddi; freddi.Freddi(**freddi._freddi._Freddi._required_args())"
+        run: for V in 3.7 3.8 3.9; do docker run --rm -t freddi:python$V python -c "import freddi; freddi.Freddi(**freddi._freddi._Freddi._required_args())"; done

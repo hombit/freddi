@@ -1,11 +1,13 @@
 ### Python ###
 __pycache__/
 *.py[cod]
+.eggs/
 *.egg-info/
 build/
 dist/
 .ipynb_checkpoints/
 .pytest_cache/
+MANIFEST
 
 ### C++ ###
 *.a
@@ -14,6 +16,9 @@ dist/
 
 ### cmake ###
 cmake-build*/
+
+### skbuild ###
+_skbuild/
 
 # Data and results
 *data*/
