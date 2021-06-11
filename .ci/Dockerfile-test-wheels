@@ -1,0 +1,7 @@
+ARG PY_VERSION
+FROM python:${PY_VERSION}
+
+COPY --from=freddi:python /dist /dist
+
+RUN V=$(python -c 'from sys import version_info as v; print(f"{v.major}{v.minor}", end="")') \
+    && bash -c "pip install /dist/*$V*.whl"

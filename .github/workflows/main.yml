@@ -100,7 +100,9 @@ jobs:
     
     steps:
       - uses: actions/checkout@v1
-      - name: Build container
+      - name: Build container with wheels
         run: docker build -f Dockerfile.python -t freddi:python .
+      - name: Build containers
+        run: echo "3.7\n3.8\n" | xargs -iZZZ docker build -f .ci/Dockerfile-test-wheels --build-arg PY_VERSION=ZZZ -t freddi:pythonZZZ .
       - name: Run sample Python script
-        run: docker run --rm -t freddi:python python -c "import freddi; freddi.Freddi(**freddi._freddi._Freddi._required_args())"
+        run: echo "3.7\n3.8\n3.9" | xargs -iZZZ docker run --rm -t freddi:pythonZZZ python -c "import freddi; freddi.Freddi(**freddi._freddi._Freddi._required_args())"
