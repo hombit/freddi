@@ -172,16 +172,17 @@ private:
 		virtual void update(const FreddiState&) override;
 	};
 	
-	class WindForPer : public BasicWind {
-	//self
+	class PeriodPaperWind : public BasicWind {
+	// Avakyan, 2021
+	// https://ui.adsabs.harvard.edu/abs/2021arXiv210511974A/
 	private:
 		// windparams
 		const double W_pow;
 	public:
-		explicit WindForPer(const FreddiState& state);
-		~WindForPer() override = default;
-		WindForPer(const WindForPer&) = default;
-		virtual WindForPer* clone() const override { return new WindForPer(*this); }
+		explicit PeriodPaperWind(const FreddiState& state);
+		~PeriodPaperWind() override = default;
+		PeriodPaperWind(const PeriodPaperWind&) = default;
+		virtual PeriodPaperWind* clone() const override { return new PeriodPaperWind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 	
