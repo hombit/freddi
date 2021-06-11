@@ -103,6 +103,6 @@ jobs:
       - name: Build container with wheels
         run: docker build -f Dockerfile.python -t freddi:python .
       - name: Build containers
-        run: echo "3.7\n3.8\n" | xargs -iZZZ docker build -f .ci/Dockerfile-test-wheels --build-arg PY_VERSION=ZZZ -t freddi:pythonZZZ .
+        run: for V in 3.7 3.8 3.9; do docker build -f .ci/Dockerfile-test-wheels --build-arg PY_VERSION=$V -t freddi:python$V .; done
       - name: Run sample Python script
-        run: echo "3.7\n3.8\n3.9" | xargs -iZZZ docker run --rm -t freddi:pythonZZZ python -c "import freddi; freddi.Freddi(**freddi._freddi._Freddi._required_args())"
+        run: for V in 3.7 3.8 3.9; do docker run --rm -t freddi:python$V python -c "import freddi; freddi.Freddi(**freddi._freddi._Freddi._required_args())"; done

@@ -144,7 +144,7 @@ function(CREATE_PY_EXT)
     find_package(PythonExtensions REQUIRED)
     find_package(NumPy REQUIRED)
 
-    find_package(Boost COMPONENTS python numpy REQUIRED)
+    find_package(Boost COMPONENTS python numpy filesystem REQUIRED)
 
     add_library(${TARGET} MODULE ${MIN_SRC} ${NS_MIN_SRC} ${PYWRAP_SRC})
     target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIRS} ${NumPy_INCLUDE_DIRS})
