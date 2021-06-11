@@ -97,7 +97,9 @@ function(CREATE_SHARED)
     install(TARGETS ${TARGET} DESTINATION lib)
 endfunction()
 
-CREATE_SHARED()
+if(NOT SKBUILD)
+    CREATE_SHARED()
+endif()
 
 
 function(CREATE_EXE targ)
@@ -122,8 +124,10 @@ function(CREATE_EXE targ)
     install(FILES ${PROJECT_SOURCE_DIR}/freddi.ini DESTINATION etc)
 endfunction()
 
-CREATE_EXE("")
-CREATE_EXE("-ns")
+if(NOT SKBUILD)
+    CREATE_EXE("")
+    CREATE_EXE("-ns")
+endif()
 
 
 function(CREATE_UNIT_TEST targ)
@@ -148,52 +152,28 @@ function(CREATE_TESTS)
     endforeach()
 endfunction()
 
-CREATE_TESTS()
-enable_testing()
+if(NOT SKBUILD)
+    CREATE_TESTS()
+    enable_testing()
+endif()
 
 
-function(CREATE_PY_MODULE)
-    find_package(Python3 COMPONENTS Development Interpreter)
-    message("Python3_LIBRARIES: ${Python3_LIBRARIES}")
+function(CREATE_PY_EXT)
+    set(TARGET _freddi)
+
+    find_package(PythonExtensions REQUIRED)
+    find_package(NumPy REQUIRED)
+
+    find_package(Boost COMPONENTS python numpy REQUIRED)
+
+    add_library(${TARGET} MODULE ${MIN_SRC} ${NS_MIN_SRC} ${PYWRAP_SRC})
+    target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIRS} ${NumPy_INCLUDE_DIRS})
+    target_link_libraries(${TARGET} ${Boost_LIBRARIES})
+    python_extension_module(${TARGET})
+    install(TARGETS ${TARGET} LIBRARY DESTINATION python/freddi)
     
-    function(LOCATE_BOOST_PYTHON Boost_Python3_VERSION_TAG)
-        foreach(TAG
-                "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
-                "${Python3_VERSION_MAJOR}"
-                "-py${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
-                "-${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}"
-                "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
-                "-${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
-            find_package(Boost QUIET COMPONENTS "python${TAG}")
-            if(${Boost_FOUND})
-                message("Boost_Python3_VERSION_TAG: ${TAG}")
-                set(Boost_Python3_VERSION_TAG ${TAG} PARENT_SCOPE)
-                break()
-            endif()
-        endforeach()
-    endfunction(LOCATE_BOOST_PYTHON)
+endfunction(CREATE_PY_EXT)
 
-    find_package(Python3 COMPONENTS Development Interpreter)
-
-    LOCATE_BOOST_PYTHON(Boost_Python3_VERSION_TAG)
-    find_package(Boost COMPONENTS "python${Boost_Python3_VERSION_TAG}" "numpy${Boost_Python3_VERSION_TAG}")
-    message("Boost_LIBRARIES: ${Boost_LIBRARIES}")
-
-    if (${Python3_FOUND} AND ${Boost_FOUND})
-        set(TARGET _freddi)
-        Python3_add_library(${TARGET} MODULE ${MIN_SRC} ${NS_MIN_SRC} ${PYWRAP_SRC})
-        if (MODULE_OUTPUT_NAME)
-            set_property(TARGET ${TARGET} PROPERTY LIBRARY_OUTPUT_NAME ${MODULE_OUTPUT_NAME})
-        endif()
-        if (MODULE_OUTPUT_SUFFIX)
-            set_property(TARGET ${TARGET} PROPERTY SUFFIX ${MODULE_OUTPUT_SUFFIX})
-        endif()
-        execute_process(COMMAND ${Python3_EXECUTABLE} -c "import numpy; print(numpy.get_include(), end='')" OUTPUT_VARIABLE NumPy_INCLUDE_DIR)
-        target_include_directories(${TARGET} PUBLIC ${Python3_INCLUDE_DIRS} ${NumPy_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
-        target_link_libraries(${TARGET} LINK_PUBLIC ${Boost_LIBRARIES} ${Python3_LIBRARIES})
-    endif()
-endfunction(CREATE_PY_MODULE)
-
-if (NOT NO_PYTHON_MODULE)
-    CREATE_PY_MODULE()
+if(SKBUILD)
+    CREATE_PY_EXT()
 endif()

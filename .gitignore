@@ -15,6 +15,9 @@ dist/
 ### cmake ###
 cmake-build*/
 
+### skbuild ###
+_skbuild/
+
 # Data and results
 *data*/
 *.dat
