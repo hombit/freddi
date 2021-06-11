@@ -128,11 +128,25 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 		if (vm.count("windTic") == 0) {
 			throw po::error("--windTic is required if --windtype=Woods1996");
 		}
+		if (vm.count("windPow") == 0) {
+			throw po::error("--windPow is required if --windtype=Woods1996");
+		}
 		return {
 				{"Xi_max", vm["windXi"].as<double>()},
-				{"T_iC", vm["windTic"].as<double>()}
+				{"T_iC", vm["windTic"].as<double>()},
+				{"W_pow", vm["windPow"].as<double>()}
 		};
 	}
+	if (windtype == "toy"){
+		if (vm.count("windPow") == 0) {
+			throw po::error("--windPow is required if --windtype=toy");
+		}
+		return {
+
+				{"W_pow", vm["windPow"].as<double>()}
+		};
+	}
+	
 
 	throw po::invalid_option_value("Unknown --windtype=" + windtype);
 }
@@ -172,9 +186,11 @@ po::options_description DiskStructureOptions::description() {
 					"  no: no wind\n"
 					"  SS73C: super-Eddington spherical wind from Shakura-Sunyaev 1973\n"
 					"  Janiuk2015: super-Eddington Janiuk et al. 2015\n"
-					"  Woods1996: thermal wind Woods et al. 1996. Requires --windXi and --windTic to be specified")
+					"  Woods1996: thermal wind Woods et al. 1996. Requires --windXi, --windTic and --windPow to be specified"
+					"  toy: a toy wind model used in arXiv:2105.11974, the mass loss rate is proportional to the central accretion rate. Requires --windPow to be specified")
 			( "windXi", po::value<double>(), "Ionization parameter, the ratio of the radiation and gas pressures" )
 			( "windTic", po::value<double>(), "Inverse Compton temperature, K. Characterizes the hardness of the irradiating spectrum")
+			( "windPow", po::value<double>(), "Multiplicative coefficient to control wind power")
 			;
 	return od;
 }

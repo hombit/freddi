@@ -163,6 +163,7 @@ private:
 		// windparams
 		const double Xi_max;
 		const double T_iC;
+		const double W_pow;
 	public:
 		explicit Woods1996ShieldsApproxWind(const FreddiState& state);
 		~Woods1996ShieldsApproxWind() override = default;
@@ -170,7 +171,21 @@ private:
 		virtual Woods1996ShieldsApproxWind* clone() const override { return new Woods1996ShieldsApproxWind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
-
+	
+	class PeriodPaperWind : public BasicWind {
+	// Avakyan, 2021
+	// https://ui.adsabs.harvard.edu/abs/2021arXiv210511974A/
+	private:
+		// windparams
+		const double W_pow;
+	public:
+		explicit PeriodPaperWind(const FreddiState& state);
+		~PeriodPaperWind() override = default;
+		PeriodPaperWind(const PeriodPaperWind&) = default;
+		virtual PeriodPaperWind* clone() const override { return new PeriodPaperWind(*this); }
+		virtual void update(const FreddiState&) override;
+	};
+	
 protected:
 	class BasicFreddiIrradiationSource {
 	public:
