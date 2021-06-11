@@ -77,7 +77,7 @@ jobs:
         run: |
           zypper install -y python3-pip
           pip3 install -U pip
-          pip3 install -U setuptools
+          pip3 install -U setuptools numpy scikit-build cmake ninja
       - name: Install package
         run: python3 setup.py install
       - name: Test package
