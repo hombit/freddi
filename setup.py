@@ -6,6 +6,10 @@ from skbuild import setup
 from setuptools.command.build_ext import build_ext
 
 
+with open('Readme.md') as fh:
+    readme = fh.read()
+
+
 setup(
     name='freddi',
     version='2.0b0',
@@ -14,6 +18,8 @@ setup(
     author='Konstantin Malanchev',
     author_email='malanchev@sai.msu.ru',
     description='Compute FRED light curves of LMXBs outbursts',
+    long_description=readme,
+    long_description_content_type='text/markdown',
     package_dir={'': 'python'},
     packages=['freddi'],
     install_requires=['numpy'],

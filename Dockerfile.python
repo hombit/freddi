@@ -1,9 +1,9 @@
 FROM quay.io/pypa/manylinux2010_x86_64@sha256:d3b569e6a9d99aac5a928944abefa808b6f171bf23339a8e1341c9361514cfd5 AS builder
 
-RUN python3.7 -mpip install -U pip && python3.7 -mpip install -U numpy wheel auditwheel setuptools cmake ninja scikit-build \
-    && python3.8 -mpip install -U pip && python3.8 -mpip install -U numpy wheel auditwheel setuptools cmake ninja scikit-build \
-    && python3.9 -mpip install -U pip && python3.9 -mpip install -U numpy wheel auditwheel setuptools cmake ninja scikit-build
-#    && python3.10 -mpip install -U pip && python3.10 -mpip install -U numpy wheel auditwheel setuptools
+RUN python3.7 -mpip install -U pip && python3.7 -mpip install -U numpy wheel setuptools cmake ninja scikit-build \
+    && python3.8 -mpip install -U pip && python3.8 -mpip install -U numpy wheel setuptools cmake ninja scikit-build \
+    && python3.9 -mpip install -U pip && python3.9 -mpip install -U numpy wheel setuptools cmake ninja scikit-build
+#    && python3.10 -mpip install -U pip && python3.10 -mpip install -U numpy wheel setuptools cmake ninja scikit-build
 
 ENV BOOST_VERSION "1.76.0"
 ENV BOOST_VERSION_ "1_76_0"
@@ -21,11 +21,13 @@ RUN curl -LO https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}
     && cd / \
     && rm -rf /boost_${BOOST_VERSION_}
 
+RUN python3.7 install -U auditwheel twine
+
 ENV SOURCE "/tmp/source"
 ENV BUILD "/tmp/build"
 ENV DIST "/dist"
 
-COPY CMakeLists.txt freddi.ini pyproject.toml setup.py MANIFEST.in ${SOURCE}/
+COPY CMakeLists.txt freddi.ini pyproject.toml setup.py MANIFEST.in Readme.md ${SOURCE}/
 COPY cpp ${SOURCE}/cpp
 COPY python ${SOURCE}/python
 
