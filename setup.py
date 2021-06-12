@@ -12,7 +12,7 @@ with open('Readme.md') as fh:
 
 setup(
     name='freddi',
-    version='2.0b0',
+    version='2.0.0b1',
     url='http://xray.sai.msu.ru/~malanchev/freddi/',
     license='MIT',
     author='Konstantin Malanchev',
