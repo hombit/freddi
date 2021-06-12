@@ -93,7 +93,7 @@ jobs:
       - name: Run freddi
         run: docker run --rm -t freddi freddi --fulldata --starflux
       - name: Run freddi-ns
-        run: docker run --rm -t freddi freddi-ns --fulldata --starflux
+        run: docker run --rm -t freddi freddi-ns --Bx=1e16 --fulldata --starflux
 
   docker-python:
     runs-on: ubuntu-latest
