@@ -3,3 +3,4 @@ recursive-include cpp *.hpp
 recursive-include cpp *.h
 include CMakeLists.txt
 include Readme.md
+include pyproject.toml
