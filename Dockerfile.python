@@ -9,7 +9,7 @@ ENV BOOST_VERSION "1.76.0"
 ENV BOOST_VERSION_ "1_76_0"
 
 RUN curl -LO https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.gz \
-    && tar -xzvf boost_${BOOST_VERSION_}.tar.gz \
+    && tar -xzf boost_${BOOST_VERSION_}.tar.gz \
     && rm /boost_${BOOST_VERSION_}.tar.gz \
     && cd /boost_${BOOST_VERSION_} \
     && sh ./bootstrap.sh \
