@@ -27,5 +27,4 @@ COPY --from=builder /usr/local/bin/freddi-ns /bin/freddi-ns
 COPY --from=builder /usr/local/etc/freddi.ini /etc/freddi.ini
 
 VOLUME /data
-WORKDIR /
-ENTRYPOINT ["/bin/freddi", "--dir=/data"]
+WORKDIR /data
