@@ -716,15 +716,22 @@ in the disk with the constant outer radius equal to 1 solar radius. The Kerr
 black hole at the distance of 5 kpc has the mass of 9 solar masses, and the
 Kerr's parameter is 0.4. The outer disk is irradiated with Cirr=1e-3.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```sh
 ./freddi --alpha=0.5 --Mx=9 --rout=1 --time=50 --tau=0.25 --dir=data/ \
   --F0=2e+37 --colourfactor=1.7 --Nx=1000 --distance=5 --gridscale=log \
   --kerr=0.4 --Cirr=0.001 --opacity=OPAL --initialcond=quasistat \
   --windtype=Woods1996 --windXi=10 --windTic=1e8 --windPow=1 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
-Physical Background
--------------------
+### Python
+
+#### Constructor
+
+#### Attributes and methods
+
+#### Example
+
+## Physical Background
 
 `Freddi` — Fast Rise Exponential Decay: accretion Disk model Implementation — is
 designed to solve the differential equation of the viscous evolution of the
@@ -805,8 +812,7 @@ taking into account general relativity effects near the black hole, following
 and [Riffert & Herold (1995)](http://adsabs.harvard.edu/cgi-bin/nph-bib\_query?bibcode=1995ApJ...450..508R).
 
 
-Accretion disk wind
--------------------
+### Accretion disk wind
 
 Presumably, during an outburst there is an outflow in the form of a wind from the 
 accretion disk around the compact object. The presence of such a wind in the LMXBs is supported
@@ -846,7 +852,7 @@ the super-Eddington wind parameters with `--windA0` and `--windB1` options.
 You can also select the `--windtype=Toy` option, which corresponds to a toy wind model when the user sets 
 the wind strength relatively to the accretion rate using the option `--windPow`.
 
-### Compton-heated wind
+#### Compton-heated wind
 
 At the moment, `Freddi` is more focused on simulating outbursts taking into account the thermal wind (`--windtype=Woods1996` option). 
 For a better understanding, let's discuss a little the physics of the process of launching such a wind 
@@ -870,14 +876,12 @@ Choosing option `--windtype=Woods1996`, it is necessary to set the value of the 
 (which determines the hardness of the irradiating spectrum and the size of the region where the wind operates) by the option `--windTic`. 
 
 
-Questions and comments
-----------------------
+## Questions and comments
 
 If you have any problems, questions, or comments, please address them to
 [Issues](https://github.com/hombit/freddi/issues) or to hombit\@gmail.com
 
-License
--------
+## License
 
 Copyright (c) 2016–2021, Konstantin L. Malanchev, Galina V. Lipunova & Artur L. Avakyan.
 
@@ -885,10 +889,9 @@ Copyright (c) 2016–2021, Konstantin L. Malanchev, Galina V. Lipunova & Artur L
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
 
 Please, accompany any results obtained using this code with reference to
-Lipunova & Malanchev (2017) [2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L)
+Lipunova & Malanchev (2017) [2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L), and for the case of windy calculations please also refer Avakyan et al. (2021) [2021arXiv210511974A](https://ui.adsabs.harvard.edu/abs/2021arXiv210511974A/).
 
-BibTex
-------
+## BibTex
 ```bibtex
 @ARTICLE{2017MNRAS.468.4735L,
    author = {{Lipunova}, G.~V. and {Malanchev}, K.~L.},
