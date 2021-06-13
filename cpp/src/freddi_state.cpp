@@ -110,7 +110,7 @@ void FreddiState::initializeWind() {
         wind_.reset(static_cast<BasicWind*>(new Woods1996Wind(*this)));
     } else if (args().disk->wind == "Woods1996") {
         wind_.reset(static_cast<BasicWind*>(new Woods1996ShieldsApproxWind(*this)));
-    } else if (args().disk->wind == "Toy") {
+    } else if (args().disk->wind == "toy") {
         wind_.reset(static_cast<BasicWind*>(new PeriodPaperWind(*this)));
 	} else {
 		throw std::invalid_argument("Wrong wind");

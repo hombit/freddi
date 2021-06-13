@@ -149,9 +149,9 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 				{"W_pow", vm["windPow"].as<double>()}
 		};
 	}
-	if (windtype == "Toy"){
+	if (windtype == "toy"){
 		if (vm.count("windPow") == 0) {
-			throw po::error("--windPow is required if --windtype=Toy");
+			throw po::error("--windPow is required if --windtype=toy");
 		}
 		return {
 
@@ -199,7 +199,7 @@ po::options_description DiskStructureOptions::description() {
 					"  SS73C: super-Eddington spherical wind from Shakura-Sunyaev 1973\n"
 					"  Janiuk2015: super-Eddington wind from Janiuk et al 2015. Requires --windA0 and --windB1 to be specified\n"
 					"  Woods1996: thermal wind Woods et al. 1996. Requires --windXi, --windTic and --windPow to be specified\n"
-					"  Toy: a toy wind model used in arXiv:2105.11974, the mass loss rate is proportional to the central accretion rate. Requires --windPow to be specified\n")
+					"  toy: a toy wind model used in arXiv:2105.11974, the mass loss rate is proportional to the central accretion rate. Requires --windPow to be specified\n")
 			( "windA0", po::value<double>(), "Dimensionless parameter characterizing the strength of the super-Eddington wind in the framework of the model Janiuk et al. 2015. Effective value range from 10 to 25")
 			( "windB1", po::value<double>(), "The quantity is of the order of unity. Characterizes the relationship between the change in energy per particle and virial energy.\nE = B_1 * k * T")
 			( "windXi", po::value<double>(), "Ionization parameter, the ratio of the radiation and gas pressures" )
