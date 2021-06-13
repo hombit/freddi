@@ -58,6 +58,11 @@ On Red-Hat based systems (e.g. Fedora):
 dnf install gcc-c++ cmake boost-devel
 ```
 
+On macOS via [Homebrew](https://brew.sh):
+```sh
+brew install cmake boost
+```
+
 Get `Freddi` source code and compile it:
 ```sh
 git clone https://github.com/hombit/freddi
