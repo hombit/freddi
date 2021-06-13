@@ -46,7 +46,7 @@ docker run -v "`pwd`":/data --rm -ti ghcr.io/hombit/freddi freddi-ns --Bx=1e8 -d
 
 - [Boost](http://www.boost.org/) 1.57+
 - [CMake](https://cmake.org)) with any back-end like Make or Ninja
-- C++ compiler with C++11 support, e.g. `gcc` version 8+ or `clang` 5+
+- C++ compiler with C++17 support, e.g. `gcc` version 8+ or `clang` 5+
 
 Get requirements on Debian based systems (e.g. Ubuntu):
 ```sh
