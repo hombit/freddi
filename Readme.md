@@ -329,7 +329,7 @@ Kerr's parameter is 0.4. The outer disk is irradiated with Cirr=1e-3.
 ./freddi --alpha=0.5 --Mx=9 --rout=1 --time=50 --tau=0.25 --dir=data/ \
   --F0=2e+37 --colourfactor=1.7 --Nx=1000 --distance=5 --gridscale=log \
   --kerr=0.4 --Cirr=0.001 --opacity=OPAL --initialcond=quasistat \
-  --wind=Woods1996 --Xi_max=10 --Tic=1e8 --M_pow=1 
+  --windtype=Woods1996 --windXi=10 --windTic=1e8 --windPow=1 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Physical Background
@@ -445,16 +445,19 @@ to different wind models, and to different classes within `Freddi`.
 
 
 One can choose a wind model by setting the
-`--wind` option. The thermal wind model ([Woods et al. 1996](https://ui.adsabs.harvard.edu/abs/1996ApJ...461..767W)),
+`--windtype` option. The thermal wind model ([Woods et al. 1996](https://ui.adsabs.harvard.edu/abs/1996ApJ...461..767W)),
 which implies that the outflow of matter occurs due to the heating of the outer parts of the disk
-by a central radiation source, can be chosen by setting `--wind=Woods1996`. The option `--wind=Janiuk15`
-corresponds to the model from work [Janiuk et al. (2015)](https://ui.adsabs.harvard.edu/abs/2015A%26A...574A..92J)
-where the wind is started in the super-Eddington regime. You can also select the `--wind=ToyWind` option, 
-which corresponds to a toy wind model when the user sets the wind strength relatively to the accretion rate using the option `--windpow`.
+by a central radiation source, can be chosen by setting `--windtype=Woods1996`. 
+The option `--windtype=Janiuk15` corresponds to the model from work [Janiuk et al. (2015)](https://ui.adsabs.harvard.edu/abs/2015A%26A...574A..92J)
+where the wind is started in the super-Eddington regime.
+When choosing option `--windtype=Janiuk15`, the you must also specify the values of
+the super-Eddington wind parameters with `--windA0` and `--windB1` options.
+You can also select the `--windtype=Toy` option, which corresponds to a toy wind model when the user sets 
+the wind strength relatively to the accretion rate using the option `--windPow`.
 
 ### Compton-heated wind
 
-At the moment, `Freddi` is more focused on simulating outbursts taking into account the thermal wind (`--wind=Woods1996` option). 
+At the moment, `Freddi` is more focused on simulating outbursts taking into account the thermal wind (`--windtype=Woods1996` option). 
 For a better understanding, let's discuss a little the physics of the process of launching such a wind 
 and its parameters in the code.
 
@@ -471,9 +474,9 @@ results of [Shields et al. (1986)](https://ui.adsabs.harvard.edu/abs/1986ApJ...3
 loss rate as a function of distance along the disk's surface. This function is used in `Freddi` 
 to taking thermal wind into account.
 
-Choosing option `--wind=Woods1996`, it is necessary to set the value of the ionization parameter Xi
-(which is proportional to the ratio of the radiation and gas pressures) by the option `--Xi_max` and the Compoton temperature T_IC 
-(which determines the hardness of the irradiating spectrum and the size of the region where the wind operates) by the option `--Tic`. 
+Choosing option `--windtype=Woods1996`, it is necessary to set the value of the ionization parameter Xi
+(which is proportional to the ratio of the radiation and gas pressures) by the option `--windXi` and the Compoton temperature T_IC 
+(which determines the hardness of the irradiating spectrum and the size of the region where the wind operates) by the option `--windTic`. 
 
 
 Questions and comments
@@ -511,5 +514,21 @@ archivePrefix = "arXiv",
       doi = {10.1093/mnras/stx768},
    adsurl = {http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L},
   adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+@ARTICLE{2021arXiv210511974A,
+       author = {{Avakyan}, A.~L. and {Lipunova}, G.~V. and {Malanchev}, K.~L. and {Shakura}, N.~I.},
+        title = "{Change in the orbital period of a binary system due to an outburst in a windy accretion disc}",
+      journal = {arXiv e-prints},
+     keywords = {Astrophysics - High Energy Astrophysical Phenomena},
+         year = 2021,
+        month = may,
+          eid = {arXiv:2105.11974},
+        pages = {arXiv:2105.11974},
+archivePrefix = {arXiv},
+       eprint = {2105.11974},
+ primaryClass = {astro-ph.HE},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2021arXiv210511974A},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 ```
