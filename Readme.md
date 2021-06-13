@@ -2,14 +2,15 @@
 
 ## Table of contents
 
-* [Overview](#overview)
-* [Installation](#installation)
-* [Usage](#usage)
-* [Physical Background](#physical-background) 
-* [Accretion disk wind](#accretion-disk-wind) 
-* [Questions and comments](#questions-and-comments)
-* [License](#license)
-* [BibTex](#bibtex)
+- [Overview](#overview)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Physical Background](#physical-background) 
+- [Accretion disk wind](#accretion-disk-wind) 
+- [Development guide](#development-guide)
+- [Questions and comments](#questions-and-comments)
+- [License](#license)
+- [BibTex](#bibtex)
 
 ## Overview
 
@@ -874,6 +875,76 @@ to taking thermal wind into account.
 Choosing option `--windtype=Woods1996`, it is necessary to set the value of the ionization parameter Xi
 (which is proportional to the ratio of the radiation and gas pressures) by the option `--windXi` and the Compoton temperature T_IC 
 (which determines the hardness of the irradiating spectrum and the size of the region where the wind operates) by the option `--windTic`. 
+
+## Development guide
+
+### Source code and tests
+
+`Freddi` uses [Cmake](https://cmake.org) as a build system.
+
+The C++ source code is located in `cpp` folder which has following structure:
+- `main.cpp` and `main-ns.cpp` implements `main()` function for `freddi` and `freddi-ns` correspondingly;
+- `include` for library header files, it has `ns` sub-folder for neutron star related stuff;
+- `src` for library C++ files, it also has `ns` sub-folder;
+- `test` provides library unit tests;
+- `pywrap` has both header and source files for `Boost::Python`/`Boost::NumPy` bindings.
+
+Note, that we require C++17 standard (while not having idiomatic C++17 code),
+and require code to be compiled on modern GCC and CLang on Linux. Please write
+unit tests where you can and use `ctest` to check they pass.
+
+The Python project is specified by `pyproject.toml` (which just lists build
+requirements), `setup.py` and `MANIFEST.in` files, we use
+[`scikit-build`](https://scikit-build.readthedocs.io/) as a build system.
+`scikit-build` uses Python-related section of `CMakeLists.txt` to build C++
+source code into Python extension, and accomplish it with Python files located
+in `python/freddi` directory. Use `python setup.py build_ext` to build the
+extension, optionally with `-DSTATIC_LINKING=TRUE` to link `Boost::Filesystem`,
+`Boost::Python` and `Boost::NumPy` statically. Please, pay attention to two
+last libraries, because they should be built against the same Python version
+you use.
+
+`python/test` contains some tests, which you can run by `python3 setup.py test`:
+- `freddi.py` and `neutron_star.py` has unit tests for Python source;
+- `analytical.py` contains integration tests to compare analytical solutions of the equation of viscous evolution with numerical solutions of `Freddi`;
+- `regression.py` contains regression tests to be sure that 1) the `Freddi` output is stable, and 2) the Python code gives the same results as binary executables do.
+
+The regression test data are located in `python/test/data`. Sometimes you need
+to update these regression data, for example when you introduce new
+command-line option with a default value, add new output column or fix some bug
+in physical model. For these purposes you can use `generate_test_data.sh`
+script located in this folder.
+
+`Dockerfile` is used to build a Docker image with statically-linked binaries, and `Dockerfile.python` is used to build a Docker image with `manylinux`-compatible Python wheels.
+
+
+### Continuous integration
+
+We use [Github Actions](https://github.com/hombit/freddi/actions) as a
+continuous integration (CI) system. The workflow file is located in
+`.github/workflows/main.yml` and a couple of auxiliary files are located in
+`.ci` folder. CI allows us to test new commits against different bugs:
+- `gcc` and `clang` actions test binaries building, execute sample `Freddi` programs, run C++ unit tests, perform C++ regression tests, and check the consistency of the `Readme.md` with programs' `--help` output
+- `cpython` action builds Python extension module and runs all Python tests
+- `docker-exe` builds a Docker image using `Dockerfile` and execute sample `Freddi` programs inside a Docker container
+- `docker-python` builds a Docker image using `Dockefile.python`, uses wheels it has built to build Python Docker images for several Python versions using `.ci/Dockerfile-test-wheels`, and runs sample Python scripts with `freddi.Freddi` class
+
+### This Readme
+
+Please, keep Readme updated. The help messages in the [Usage](#usage) section
+can be updated automatically using `.ci/update-help-readme.py` script.
+
+### Release new version
+
+Check-list:
+
+- Create `git` tag
+- Build new `freddi` image using `Dockerfile`
+- Build new `freddi-python` image using `Dockerfile.python`
+- Run `docker run --rm -ti docker-python:VERSION sh -c "python3.7 -m twine upload /dist/*"` to upload source code distribution and x86-64 Python wheels onto PyPi.org
+- [Optional] Build executables for GitHub release
+- [Optional] Build and upload macOS wheels
+- Crate new GitHub release
 
 
 ## Questions and comments
