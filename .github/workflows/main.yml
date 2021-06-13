@@ -32,6 +32,8 @@ jobs:
       - name: Regression test
         run: FREDDI=../../../cmake-build/freddi ./generate_test_data.sh && git diff --word-diff --exit-code
         working-directory: ./python/test/data
+      - name: Check --help messages in Readme.md
+        run: FREDDI_PREFIX=./cmake-build/ ./.ci/update-help-readme.py && git diff --word-diff --exit-code
   
   clang:
     runs-on: ubuntu-latest
@@ -62,6 +64,8 @@ jobs:
       - name: Regression test
         run: FREDDI=../../../cmake-build/freddi ./generate_test_data.sh && git diff --word-diff --exit-code
         working-directory: ./python/test/data
+      - name: Check --help messages in Readme.md
+        run: FREDDI_PREFIX=./cmake-build/ ./.ci/update-help-readme.py && git diff --word-diff --exit-code
 
   cpython:
     runs-on: ubuntu-latest
