@@ -4,16 +4,9 @@
 
 * [Overview](#overview)
 * [Installation](#installation)
-  * [Docker](#docker)
-  * [Requirements](#requirements)
-  * [Get and compile source files](#get-and-compile-source-files)
 * [Usage](#usage)
-  * [Options](#options)
-  * [Output values](#output-values)
-  * [Example](#example)
 * [Physical Background](#physical-background) 
 * [Accretion disk wind](#accretion-disk-wind) 
-  * [Compton-heated wind](#compton-heated-wind)
 * [Questions and comments](#questions-and-comments)
 * [License](#license)
 * [BibTex](#bibtex)
@@ -92,17 +85,18 @@ cmake --install . --prefix=PREFIX  # replace with preferable location
 `Freddi` pre-compiled x86-64 Linux packages for several Python versions
 are available on <https://pypi.org/project/freddi/> and can be used as is,
 while for other systems you should have C++ compiler and Boost
-libraries in your system (see [executable requirements section](#build-from-source)
-for details) before running this command:
+libraries in your system before running this command:
 
 ```sh
 # Please, upgrade your pip
 python3 -m pip install -U pip
-# Depending on your Python setup, you need or need not --user flag:
+# Depending on your Python setup, you need or need not --user flag
 python3 -m pip install --user freddi
 ```
 
 ## Usage
+
+### Executables
 
 `Freddi` runs from the command line with inline options and/or with a configuration file. `Freddi`
 outputs file `freddi.dat` with distribution of various physical values over
@@ -115,7 +109,7 @@ Docker way and would like to specify the directory, then avoid using `--dir`
 option and just replace `` "`pwd`" `` with some local path (for more details see
 [Docker documentation](https://docs.docker.com/engine/tutorials/dockervolumes)).
 
-### Options
+#### Options
 
 The full list of command line options is viewed with `--help` option. Default
 values are given in brackets.
@@ -700,7 +694,7 @@ Paths where this file is searched are `./freddi.ini` (execution path),
 `/etc/freddi.ini`. You can provide configuration file to Docker container as a
 volume: `` -v "`pwd`/freddi.ini":/etc/freddi.ini ``.
 
-### Output values
+#### Output values
 
 `Freddi` outputs time; the accretion rate; the mass of the hot part of the disk;
 the outer radius of the hot zone; the irradiation factor; the relative
@@ -715,7 +709,7 @@ data: radial coordinate in terms of the specific angular momentum, radius,
 viscous torque, surface density, effective temperature Teff, viscous temperature
 Tvis, irradiation temperature Tirr, and the absolute half-height of the disk.
 
-### Example
+#### Example
 
 The following arguments instruct `Freddi` to calculate the decay of the outburst
 in the disk with the constant outer radius equal to 1 solar radius. The Kerr
