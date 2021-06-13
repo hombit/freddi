@@ -110,7 +110,7 @@ void FreddiState::initializeWind() {
         wind_.reset(static_cast<BasicWind*>(new Woods1996Wind(*this)));
     } else if (args().disk->wind == "Woods1996") {
         wind_.reset(static_cast<BasicWind*>(new Woods1996ShieldsApproxWind(*this)));
-    } else if (args().disk->wind == "toy") {
+    } else if (args().disk->wind == "Toy") {
         wind_.reset(static_cast<BasicWind*>(new PeriodPaperWind(*this)));
 	} else {
 		throw std::invalid_argument("Wrong wind");
@@ -513,10 +513,10 @@ void FreddiState::Janiuk2015Wind::update(const FreddiState& state) {
     for (size_t i = state.first(); i <= state.last(); ++i) {
         //  https://arxiv.org/pdf/1411.4434.pdf
         if (state.R()[i] > 70.0*R_g) {
-			const double fout = 1 - 1/(1+A_0*m::pow<2>(lol));
+       //C_[i] =  B_1 * 3000.0 * v_r * R_g * fout * ( std::pow((state.R()[state.last()]/R_g), 0.2) - std::pow((state.R()[i]/R_g), 0.2) );
+       //*( std::pow((state.R()[state.last()]/R_g), 0.2) - std::pow((state.R()[i]/R_g), 0.2)
+            const double fout = 1 - 1/(1+A_0*m::pow<2>(lol));
             const double C_0 = (4.0 * M_PI * m::pow<3>(state.h()[i])) / (m::pow<2>(state.GM()));
-			//C_[i] =  B_1 * 3000.0 * v_r * R_g * fout * ( std::pow((state.R()[state.last()]/R_g), 0.2) - std::pow((state.R()[i]/R_g), 0.2) );
-            //*( std::pow((state.R()[state.last()]/R_g), 0.2) - std::pow((state.R()[i]/R_g), 0.2)
             const double Q = 2 * (3/(8 * M_PI)) * ((m::pow<4>(state.GM()))/(m::pow<7>(state.h()[i])))  ;
             B_[i] =  - 0.75 * C_0 * (1/B_1) * ((4 * Q * state.R()[i])/(3* state.GM()))*fout ; }
     }
