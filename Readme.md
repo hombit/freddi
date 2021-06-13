@@ -22,7 +22,7 @@ during the 2002 outburst” by Lipunova & Malanchev (2017)
 [2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L).
 
 `Freddi` is written on C++ and available as a couple of binary executables and
-Python 3 module.
+Python module.
 
 ## Installation
 
@@ -84,9 +84,11 @@ cmake --install . --prefix=PREFIX  # replace with preferable location
 
 `Freddi` is known to be built on Linux and macOS.
 
-### Python 3
+### Python
 
 [![PyPI version](https://badge.fury.io/py/freddi.svg)](https://badge.fury.io/py/freddi)
+
+Python 2 isn't supported, use Python 3 instead.
 
 `Freddi` pre-compiled x86-64 Linux packages for several Python versions
 are available on <https://pypi.org/project/freddi/> and can be used as is,
@@ -906,7 +908,7 @@ source code into Python extension, and accomplish it with Python files located
 in `python/freddi` directory. Use `python setup.py build_ext` to build the
 extension, optionally with `-DSTATIC_LINKING=TRUE` to link `Boost::Filesystem`,
 `Boost::Python` and `Boost::NumPy` statically. Please, pay attention to two
-last libraries, because they should be built against the same Python version
+last libraries, because they should be built against the same Python version as
 you use.
 
 `python/test` contains some tests, which you can run by `python3 setup.py test`:
