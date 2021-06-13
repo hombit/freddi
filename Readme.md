@@ -258,14 +258,26 @@ Parameters of the disk mode:
                                      no: no wind
                                      SS73C: super-Eddington spherical wind from
                                    Shakura-Sunyaev 1973
-                                     Janiuk2015: super-Eddington Janiuk et al. 
-                                   2015
+                                     Janiuk2015: super-Eddington wind from 
+                                   Janiuk et al 2015. Requires --windA0 and 
+                                   --windB1 to be specified
                                      Woods1996: thermal wind Woods et al. 1996.
                                    Requires --windXi, --windTic and --windPow 
-                                   to be specified  toy: a toy wind model used 
-                                   in arXiv:2105.11974, the mass loss rate is 
+                                   to be specified
+                                     toy: a toy wind model used in 
+                                   arXiv:2105.11974, the mass loss rate is 
                                    proportional to the central accretion rate. 
                                    Requires --windPow to be specified
+                                   
+  --windA0 arg                     Dimensionless parameter characterizing the 
+                                   strength of the super-Eddington wind in the 
+                                   framework of the model Janiuk et al. 2015. 
+                                   Effective value range from 10 to 25
+  --windB1 arg                     The quantity is of the order of unity. 
+                                   Characterizes the relationship between the 
+                                   change in energy per particle and virial 
+                                   energy.
+                                   E = B_1 * k * T
   --windXi arg                     Ionization parameter, the ratio of the 
                                    radiation and gas pressures
   --windTic arg                    Inverse Compton temperature, K. 
@@ -478,15 +490,28 @@ Parameters of the disk mode:
                                           no: no wind
                                           SS73C: super-Eddington spherical wind
                                         from Shakura-Sunyaev 1973
-                                          Janiuk2015: super-Eddington Janiuk et
-                                        al. 2015
+                                          Janiuk2015: super-Eddington wind from
+                                        Janiuk et al 2015. Requires --windA0 
+                                        and --windB1 to be specified
                                           Woods1996: thermal wind Woods et al. 
                                         1996. Requires --windXi, --windTic and 
-                                        --windPow to be specified  toy: a toy 
-                                        wind model used in arXiv:2105.11974, 
-                                        the mass loss rate is proportional to 
-                                        the central accretion rate. Requires 
                                         --windPow to be specified
+                                          toy: a toy wind model used in 
+                                        arXiv:2105.11974, the mass loss rate is
+                                        proportional to the central accretion 
+                                        rate. Requires --windPow to be 
+                                        specified
+                                        
+  --windA0 arg                          Dimensionless parameter characterizing 
+                                        the strength of the super-Eddington 
+                                        wind in the framework of the model 
+                                        Janiuk et al. 2015. Effective value 
+                                        range from 10 to 25
+  --windB1 arg                          The quantity is of the order of unity. 
+                                        Characterizes the relationship between 
+                                        the change in energy per particle and 
+                                        virial energy.
+                                        E = B_1 * k * T
   --windXi arg                          Ionization parameter, the ratio of the 
                                         radiation and gas pressures
   --windTic arg                         Inverse Compton temperature, K. 
