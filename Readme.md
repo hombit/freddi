@@ -22,7 +22,7 @@ during the 2002 outburst” by Lipunova & Malanchev (2017)
 [2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L).
 
 `Freddi` is written on C++ and available as a couple of binary executables and
-Python module.
+a Python module.
 
 ## Installation
 
@@ -45,7 +45,7 @@ docker run -v "`pwd`":/data --rm -ti ghcr.io/hombit/freddi freddi-ns --Bx=1e8 -d
 `Freddi` has following build dependencies:
 
 - [Boost](http://www.boost.org/) 1.57+
-- [CMake](https://cmake.org)) with any back-end like Make or Ninja
+- [CMake](https://cmake.org) with a back-end build system like Make or Ninja
 - C++ compiler with C++17 support, e.g. `gcc` version 8+ or `clang` 5+
 
 Get requirements on Debian based systems (e.g. Ubuntu):
@@ -96,7 +96,7 @@ while for other systems you should have C++ compiler and Boost
 libraries in your system before running this command:
 
 ```sh
-# Please, upgrade your pip
+# Please upgrade your pip
 python3 -m pip install -U pip
 # Depending on your Python setup, you need or need not --user flag
 python3 -m pip install --user freddi

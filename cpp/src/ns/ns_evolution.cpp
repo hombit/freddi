@@ -1,5 +1,6 @@
 #include <exception>
 
+#include "exceptions.hpp"
 #include "ns/ns_evolution.hpp"
 
 
@@ -443,7 +444,7 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 		}
 	}
 	if (ii >= last() - 2) {
-		throw std::runtime_error("R_in > R_out");
+		throw RadiusCollapseException();
 	}
 	R_m = R()[ii];
 	current_.first = ii;
