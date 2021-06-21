@@ -109,23 +109,7 @@ private:
 		virtual testCq0Shields1986Wind* clone() const override { return new testCq0Shields1986Wind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
-
-	class Shields1986Wind: public BasicWind {
-	//G. A. Shields, C. F. McKee, D. N. C. Lin, and M. C. Begelman. Compton-heated winds andcoronae above accretion disks. II - Instability and oscillations. ApJ, 306:90–106, July 1986.
-	//doi:10.1086/164322
-	private:
-		// windparams
-		const double f_X;
-		const double X_f;
-		const double T_iC;
-	public:
-		explicit Shields1986Wind(const FreddiState& state);
-		~Shields1986Wind() override = default;
-		Shields1986Wind(const Shields1986Wind&) = default;
-		virtual Shields1986Wind* clone() const override { return new Shields1986Wind(*this); }
-		virtual void update(const FreddiState&) override;
-	};
-
+	
 	class Janiuk2015Wind: public BasicWind {
 	//Janiuk A., Grzedzielski M., Capitanio F., Bianchi S., 2015, Interplay between heartbeat oscillations and wind outflow in microquasar IGR J17091-3624 A&A, 574, A92
 	//doi:10.1051/0004-6361/201425003
@@ -140,8 +124,24 @@ private:
 		virtual Janiuk2015Wind* clone() const override { return new Janiuk2015Wind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
+	
+	class Shields1986Wind: public BasicWind {
+	//G. A. Shields, C. F. McKee, D. N. C. Lin, and M. C. Begelman. Compton-heated winds andcoronae above accretion disks. II - Instability and oscillations. ApJ, 306:90–106, July 1986.
+	//doi:10.1086/164322
+	private:
+		// windparams
+		const double Xi_max;
+		const double T_iC;
+		const double W_pow;
+	public:
+		explicit Shields1986Wind(const FreddiState& state);
+		~Shields1986Wind() override = default;
+		Shields1986Wind(const Shields1986Wind&) = default;
+		virtual Shields1986Wind* clone() const override { return new Shields1986Wind(*this); }
+		virtual void update(const FreddiState&) override;
+	};
 
-	class Woods1996Wind: public BasicWind {
+	class Woods1996AGNWind: public BasicWind {
 	//D. T. Woods, R. I. Klein, J. I. Castor, C. F. McKee, and J. B. Bell. X-Ray–heated Coronae andWinds from Accretion Disks: Time-dependent Two-dimensional Hydrodynamics with AdaptiveMesh Refinement. ApJ, 461:767, April 1996
 	//doi:10.1086/177101
 	private:
@@ -149,10 +149,10 @@ private:
 		const double C_0;
 		const double T_iC;
 	public:
-		explicit Woods1996Wind(const FreddiState& state);
-		~Woods1996Wind() override = default;
-		Woods1996Wind(const Woods1996Wind&) = default;
-		virtual Woods1996Wind* clone() const override { return new Woods1996Wind(*this); }
+		explicit Woods1996AGNWind(const FreddiState& state);
+		~Woods1996AGNWind() override = default;
+		Woods1996AGNWind(const Woods1996AGNWind&) = default;
+		virtual Woods1996AGNWind* clone() const override { return new Woods1996AGNWind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
 

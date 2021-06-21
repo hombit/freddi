@@ -102,12 +102,12 @@ void FreddiState::initializeWind() {
 		wind_.reset(static_cast<BasicWind*>(new testCWind(*this)));
 	} else if (args().disk->wind == "__testC_q0_Shields1986__") {
 		wind_.reset(static_cast<BasicWind*>(new testCq0Shields1986Wind(*this)));
-    } else if (args().disk->wind == "Shields1986") {
-        wind_.reset(static_cast<BasicWind*>(new Shields1986Wind(*this)));
     } else if (args().disk->wind == "Janiuk2015") {
         wind_.reset(static_cast<BasicWind*>(new Janiuk2015Wind(*this)));
+    } else if (args().disk->wind == "Shields1986") {
+        wind_.reset(static_cast<BasicWind*>(new Shields1986Wind(*this)));
     } else if (args().disk->wind == "Woods1996AGN") {
-        wind_.reset(static_cast<BasicWind*>(new Woods1996Wind(*this)));
+        wind_.reset(static_cast<BasicWind*>(new Woods1996AGNWind(*this)));
     } else if (args().disk->wind == "Woods1996") {
         wind_.reset(static_cast<BasicWind*>(new Woods1996ShieldsApproxWind(*this)));
     } else if (args().disk->wind == "toy") {
@@ -457,43 +457,6 @@ void FreddiState::testCq0Shields1986Wind::update(const FreddiState& state) {
 	}
 }
 
-FreddiState::Shields1986Wind::Shields1986Wind(const FreddiState& state):
-        BasicWind(state),
-	f_X(state.args().disk->windparams.at("f_X")),
-	X_f(state.args().disk->windparams.at("X_f")),
-        T_iC(state.args().disk->windparams.at("T_iC")) {
-    update(state);
-}
-
-void FreddiState::Shields1986Wind::update(const FreddiState& state) {
-    BasicWind::update(state);
-    const auto disk = state.args().disk;
-    //  1983ApJ...271...70B page 4
-    const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
-    //  1983ApJ...271...70B page 3
-    const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_iC);
-    const double P_0 = (f_X/X_f)*L/(4 * M_PI * GSL_CONST_CGSM_SPEED_OF_LIGHT * m::pow<2>(R_iC));
-    const double C_ch = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_iC)/(disk->mu * GSL_CONST_CGSM_MASS_PROTON));
-    const double m_ch0 = P_0/C_ch;
-    const double L_edd = (4.0 * M_PI * state.GM()* 2.0 * disk->mu * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION);
-    const double L_crit = 0.03 * std::sqrt(1e8/T_iC) * L_edd;
-    const double el = L/L_crit;
-
-	//std::cerr << "\t" << L << "\t" << R_iC  << "\t" << L_edd << "\t" << C_ch << "\t" << P_0 << "\t" << m_ch0 << std::endl;
-
-    for (size_t i = state.first(); i <= state.last(); ++i) {
-        //  1986ApJ...306...90S page 2
-        if (state.R()[i] > 0.1*R_iC) {
-            const double xi = state.R()[i] / R_iC;
-            const double C0 = (4.0 * M_PI * m::pow<3>(state.h()[i])) / (m::pow<2>(state.GM()));
-            //  1986ApJ...306...90S appendix B page 16
-            const double y = std::sqrt(1 + 1/(4*m::pow<2>(xi)) + ((m::pow<2>(xi))/(1 + m::pow<2>(xi)))*((1.2*xi/(xi + el) + 2.2/(1 + m::pow<2>(el)*xi))*(1.2*xi/(xi + el) + 2.2/(1 + m::pow<2>(el)*xi))));
-            const double Mach_cc = std::cbrt(((1 + (el + 1)/xi)/(1 + 1/((1 + m::pow<2>(xi))*m::pow<4>(el)))));
-	    const double p_po = 0.5 * std::exp(-(((1 - 1/y)*(1 - 1/y))/(2*xi)));
-	    C_[i] = -2.0 * C0 * m_ch0 * Mach_cc * p_po * m::pow<2>(y) * std::pow(xi, -5/3);		}
-    }
-}
-
 FreddiState::Janiuk2015Wind::Janiuk2015Wind(const FreddiState& state):
         BasicWind(state),
         A_0(state.args().disk->windparams.at("A_0")),
@@ -522,14 +485,56 @@ void FreddiState::Janiuk2015Wind::update(const FreddiState& state) {
     }
 }
 
-FreddiState::Woods1996Wind::Woods1996Wind(const FreddiState& state):
+
+FreddiState::Shields1986Wind::Shields1986Wind(const FreddiState& state):
+        BasicWind(state),
+        Xi_max(state.args().disk->windparams.at("Xi_max")),
+        T_iC(state.args().disk->windparams.at("T_iC")),
+        W_pow(state.args().disk->windparams.at("W_pow")) {
+    update(state);
+}
+
+void FreddiState::Shields1986Wind::update(const FreddiState& state) {
+    BasicWind::update(state);
+    const auto disk = state.args().disk;
+    //  1983ApJ...271...70B page 4
+    const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
+    //  1983ApJ...271...70B page 3
+    const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_iC);
+    const double L_edd = (4.0 * M_PI * state.GM()* 2.0 * disk->mu * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION);
+    const double L_crit = (1.0 / 8.0) * std::sqrt(GSL_CONST_CGSM_MASS_ELECTRON / (disk->mu * GSL_CONST_CGSM_MASS_PROTON)) * std::sqrt((GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT ) / (GSL_CONST_CGSM_BOLTZMANN * T_iC)) * L_edd;
+    const double P_iC = L / (4.0 * M_PI * m::pow<2>(R_iC) * Xi_max * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+    const double el = L/L_crit;
+    
+    	std::cerr << R_iC << "\t" << disk->mu << "\t" << P_iC << "\t" << state.eta() << "\t" << state.Mdot_in() << "\t" <<  L << "\t" << L_edd << "\t" << L_crit << "\t" <<  GSL_CONST_CGSM_MASS_ELECTRON << std::endl; 
+	//std::cerr << "\t" << L << "\t" << R_iC  << "\t" << L_edd << "\t" << C_ch << "\t" << P_0 << "\t" << m_ch0 << std::endl;
+
+    for (size_t i = state.first(); i <= state.last(); ++i) {
+        //  1986ApJ...306...90S page 2
+        if (state.R()[i] > 0.1*R_iC) {
+            const double xi = state.R()[i] / R_iC;
+            const double T_ch = T_iC * std::pow(el, 2.0 / 3.0) * std::pow(xi, -2.0 / 3.0);
+            const double P_0 = L / (4.0 * M_PI * m::pow<2>(state.R()[i]) * Xi_max * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+            const double C_ch = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_ch) / (disk->mu * GSL_CONST_CGSM_MASS_PROTON));
+            const double m_ch0 = P_0/C_ch;
+            const double C0 = (4.0 * M_PI * m::pow<3>(state.h()[i])) / (m::pow<2>(state.GM()));
+            //  1986ApJ...306...90S appendix B page 16
+            const double y = std::sqrt(1. + 1./(4.*m::pow<2>(xi)) + ((m::pow<2>(xi))/(1. + m::pow<2>(xi)))*((1.2*xi/(xi + el) + 2.2/(1. + m::pow<2>(el)*xi))*(1.2*xi/(xi + el) + 2.2/(1. + m::pow<2>(el)*xi))));
+            const double Mach_cc = std::cbrt(((1. + (el + 1.)/xi)/(1. + 1./((1. + m::pow<2>(xi))*m::pow<4>(el)))));
+	    const double p_po = 0.5 * std::exp(-(((1. - 1./y)*(1. - 1./y))/(2.*xi)));
+	    C_[i] = - 2.0 * W_pow * C0 * m_ch0 * Mach_cc * p_po * m::pow<2>(y);		}
+    }
+}
+
+
+FreddiState::Woods1996AGNWind::Woods1996AGNWind(const FreddiState& state):
         BasicWind(state),
         C_0(state.args().disk->windparams.at("C_0")),
         T_iC(state.args().disk->windparams.at("T_iC")) {
     update(state);
 }
 
-void FreddiState::Woods1996Wind::update(const FreddiState& state) {
+void FreddiState::Woods1996AGNWind::update(const FreddiState& state) {
     BasicWind::update(state);
     const auto disk = state.args().disk;
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
@@ -586,14 +591,14 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
     const auto disk = state.args().disk;
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
     const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_iC);
-    const double VeL = std::sqrt(state.GM()/R_iC) ;
-    const double C_iC = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_iC)/( GSL_CONST_CGSM_MASS_PROTON));
+    //const double VeL = std::sqrt(state.GM()/R_iC) ;
+    //const double C_iC = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_iC)/( GSL_CONST_CGSM_MASS_PROTON));
     //const double m_ch0 = disk->Mdot0 / (M_PI * state.R().back()*state.R().back());
     const double L_edd = (4.0 * M_PI * state.GM()* 2.0 * disk->mu * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION);
-    const double L_crit = 0.03 * std::sqrt(1e8/T_iC) * L_edd;
-    const double el = L / L_crit;
-
-
+    const double L_crit = (1.0 / 8.0) * std::sqrt(GSL_CONST_CGSM_MASS_ELECTRON / (disk->mu * GSL_CONST_CGSM_MASS_PROTON)) * std::sqrt((GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT* GSL_CONST_CGSM_SPEED_OF_LIGHT ) / (GSL_CONST_CGSM_BOLTZMANN * T_iC)) * L_edd;
+    const double el = L/L_crit;
+    
+   //std::cerr << "\t" << Lcrit << "\t" << L_crit   << "\t" << std::endl;
 
     //std::cerr << "\t" << L << " \t" << L_edd << "\t" << L/L_edd  << "\t" << L_crit << "\t" << R_iC << "\t" << state.eta() << "\t" << std::endl;
 
