@@ -133,6 +133,34 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 				{"B_1", vm["windB1"].as<double>()}
 		};
 	}
+	if (windtype == "Shields1986"){
+		if (vm.count("windXi") == 0) {
+			throw po::error("--windXi is required if --windtype=Shields1986");
+		}
+		if (vm.count("windTic") == 0) {
+			throw po::error("--windTic is required if --windtype=Shields1986");
+		}
+		if (vm.count("windPow") == 0) {
+			throw po::error("--windPow is required if --windtype=Shields1986");
+		}
+		return {
+				{"Xi_max", vm["windXi"].as<double>()},
+				{"T_iC", vm["windTic"].as<double>()},
+				{"W_pow", vm["windPow"].as<double>()}
+		};
+	}
+	if (windtype == "Woods1996AGN"){
+		if (vm.count("windC_0") == 0) {
+			throw po::error("--windC_0 is required if --windtype=Woods1996AGN");
+		}
+		if (vm.count("windTic") == 0) {
+			throw po::error("--windTic is required if --windtype=Woods1996AGN");
+		}
+		return {
+				{"C_0", vm["windC_0"].as<double>()},
+				{"T_iC", vm["windTic"].as<double>()}
+		};
+	}
 	if (windtype == "Woods1996"){
 		if (vm.count("windXi") == 0) {
 			throw po::error("--windXi is required if --windtype=Woods1996");
@@ -194,17 +222,19 @@ po::options_description DiskStructureOptions::description() {
 			( "gausssigma", po::value<double>(), "Width of for Gauss distribution. This option works only with --initialcond=gaussF" )
 			( "windtype", po::value<std::string>()->default_value(default_wind),
 			        "Type of the wind\n\n"
-					"Values:\n"
 					"  no: no wind\n"
 					"  SS73C: super-Eddington spherical wind from Shakura-Sunyaev 1973\n"
 					"  Janiuk2015: super-Eddington wind from Janiuk et al 2015. Requires --windA0 and --windB1 to be specified\n"
-					"  Woods1996: thermal wind Woods et al. 1996. Requires --windXi, --windTic and --windPow to be specified\n"
+					"  Shields1986: thermal wind from Begelman et al. 1983 and Shields et al. 1986. Requires --windXi, --windTic and --windPow to be specified\n"
+					"  Woods1996AGN: thermal AGN wind from Woods et al. 1996. Requires --windC_0 and --windTic to be specified\n"
+					"  Woods1996: thermal wind from Woods et al. 1996. Requires --windXi, --windTic and --windPow to be specified\n"
 					"  toy: a toy wind model used in arXiv:2105.11974, the mass loss rate is proportional to the central accretion rate. Requires --windPow to be specified\n")
 			( "windA0", po::value<double>(), "Dimensionless parameter characterizing the strength of the super-Eddington wind in the framework of the model Janiuk et al. 2015. Effective value range from 10 to 25")
 			( "windB1", po::value<double>(), "The quantity is of the order of unity. Characterizes the relationship between the change in energy per particle and virial energy.\nE = B_1 * k * T")
 			( "windXi", po::value<double>(), "Ionization parameter, the ratio of the radiation and gas pressures" )
 			( "windTic", po::value<double>(), "Inverse Compton temperature, K. Characterizes the hardness of the irradiating spectrum")
 			( "windPow", po::value<double>(), "Multiplicative coefficient to control wind power")
+			( "windC_0", po::value<double>(), "Characteristic column density of the wind mass loss rate from Woods et al. 1996 model, g/(s*cm^2). For AGN approx value is 3e-13 g/(s*cm^2)")
 			;
 	return od;
 }

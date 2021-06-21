@@ -256,16 +256,22 @@ Parameters of the disk mode:
                                    works only with --initialcond=gaussF
   --windtype arg (=no)             Type of the wind
                                    
-                                   Values:
                                      no: no wind
                                      SS73C: super-Eddington spherical wind from
                                    Shakura-Sunyaev 1973
                                      Janiuk2015: super-Eddington wind from 
                                    Janiuk et al 2015. Requires --windA0 and 
                                    --windB1 to be specified
-                                     Woods1996: thermal wind Woods et al. 1996.
-                                   Requires --windXi, --windTic and --windPow 
-                                   to be specified
+                                     Shields1986: thermal wind from Begelman et
+                                   al. 1983 and Shields et al. 1986. Requires 
+                                   --windXi, --windTic and --windPow to be 
+                                   specified
+                                     Woods1996AGN: thermal AGN wind from Woods 
+                                   et al. 1996. Requires --windC_0 and 
+                                   --windTic to be specified
+                                     Woods1996: thermal wind from Woods et al. 
+                                   1996. Requires --windXi, --windTic and 
+                                   --windPow to be specified
                                      toy: a toy wind model used in 
                                    arXiv:2105.11974, the mass loss rate is 
                                    proportional to the central accretion rate. 
@@ -287,6 +293,10 @@ Parameters of the disk mode:
                                    irradiating spectrum
   --windPow arg                    Multiplicative coefficient to control wind 
                                    power
+  --windC_0 arg                    Characteristic column density of the wind 
+                                   mass loss rate from Woods et al. 1996 model,
+                                   g/(s*cm^2). For AGN approx value is 3e-13 
+                                   g/(s*cm^2)
 
 Parameters of self-irradiation.
 Qirr = Cirr * (H/r / 0.05)^irrindex * L * psi / (4 pi R^2), where psi is angular distrbution of X-ray radiation:
@@ -488,16 +498,22 @@ Parameters of the disk mode:
                                         --initialcond=gaussF
   --windtype arg (=no)                  Type of the wind
                                         
-                                        Values:
                                           no: no wind
                                           SS73C: super-Eddington spherical wind
                                         from Shakura-Sunyaev 1973
                                           Janiuk2015: super-Eddington wind from
                                         Janiuk et al 2015. Requires --windA0 
                                         and --windB1 to be specified
-                                          Woods1996: thermal wind Woods et al. 
-                                        1996. Requires --windXi, --windTic and 
+                                          Shields1986: thermal wind from 
+                                        Begelman et al. 1983 and Shields et al.
+                                        1986. Requires --windXi, --windTic and 
                                         --windPow to be specified
+                                          Woods1996AGN: thermal AGN wind from 
+                                        Woods et al. 1996. Requires --windC_0 
+                                        and --windTic to be specified
+                                          Woods1996: thermal wind from Woods et
+                                        al. 1996. Requires --windXi, --windTic 
+                                        and --windPow to be specified
                                           toy: a toy wind model used in 
                                         arXiv:2105.11974, the mass loss rate is
                                         proportional to the central accretion 
@@ -521,6 +537,10 @@ Parameters of the disk mode:
                                         irradiating spectrum
   --windPow arg                         Multiplicative coefficient to control 
                                         wind power
+  --windC_0 arg                         Characteristic column density of the 
+                                        wind mass loss rate from Woods et al. 
+                                        1996 model, g/(s*cm^2). For AGN approx 
+                                        value is 3e-13 g/(s*cm^2)
 
 Parameters of accreting neutron star:
   --nsprop arg (=dummy)                 Neutron star geometry and radiation 
@@ -857,7 +877,7 @@ The option `--windtype=Janiuk15` corresponds to the model from work [Janiuk et a
 where the wind is started in the super-Eddington regime.
 When choosing option `--windtype=Janiuk15`, the you must also specify the values of
 the super-Eddington wind parameters with `--windA0` and `--windB1` options.
-You can also select the `--windtype=Toy` option, which corresponds to a toy wind model when the user sets 
+You can also select the `--windtype=toy` option, which corresponds to a toy wind model when the user sets 
 the wind strength relatively to the accretion rate using the option `--windPow`.
 
 #### Compton-heated wind
