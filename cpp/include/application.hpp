@@ -5,8 +5,10 @@
 
 #include <boost/program_options.hpp>
 
+#include "exceptions.hpp"
 #include "options.hpp"
 #include "output.hpp"
+#include "unit_transformation.hpp"
 
 namespace po = boost::program_options;
 
@@ -24,7 +26,20 @@ bool run_application(int ac, char *av[]) {
 		if (i_t % freddi->args().general->temp_sparsity_output == 0) {
 			output.dump();
 		}
-		freddi->step();
+		try {
+			freddi->step();
+		} catch (const RadiusCollapseException &e) {
+			std::cerr
+				<< "Freddi terminated prematurely"
+				<< ", "
+				<< "i_t = " << i_t
+				<< ", "
+				<< "t = " << sToDay(freddi->t()) << " (days)"
+				<< ", "
+				<< "reason: " << e.what()
+				<< std::endl;
+			return true;
+		}
 	}
 	return true;
 }
