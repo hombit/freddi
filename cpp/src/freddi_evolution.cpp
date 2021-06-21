@@ -4,6 +4,7 @@
 #include <string>
 
 #include "arguments.hpp"
+#include "exceptions.hpp"
 #include "nonlinear_diffusion.hpp"
 
 using namespace std::placeholders;
@@ -47,20 +48,20 @@ void FreddiEvolution::truncateOuterRadius() {
 	// hot disc extends as far as Sigma>Sigma_max_cold(alpha_cold) and not farther than R_cooling_front and Tirr <= Thot 
 		do {
 			ii--;
-			if (ii <= first()) throw std::runtime_error("Rout <= Rin");
+			if (ii <= first()) throw RadiusCollapseException();
 		  } while( ( R().at(ii) > R_cooling_front ( R().at(ii)) ) && ( Sigma().at(ii) < Sigma_minus(R().at(ii)) ) && ( Tirr().at(ii) < args().disk->Thot ) );
 		//} while( ( R().at(ii) > R_cooling_front ( R().at(ii)) ) && ( Sigma().at(ii) < Sigma_minus(R().at(ii)) ) );
 	} else if (args().disk->boundcond == "Teff") {
 	// irradiation is important, the boundary is at fixed Teff
 		do {
 			ii--;
-			if (ii <= first()) throw std::runtime_error("Rout <= Rin");
+			if (ii <= first()) throw RadiusCollapseException();
 		} while( Tph().at(ii) < args().disk->Thot );
 	} else if (args().disk->boundcond == "Tirr") {
 	// irradiation is important, the boundary is at fixed Tir
 		do {
 			ii--;
-			if (ii <= first()) throw std::runtime_error("Rout <= Rin");
+			if (ii <= first()) throw RadiusCollapseException();
 		} while( Tirr().at(ii) < args().disk->Thot );
 	} else{
 		throw std::invalid_argument("Wrong boundcond");

@@ -28,6 +28,7 @@ set(MIN_SRC
 
     cpp/include/arguments.hpp
     cpp/include/constants.hpp
+    cpp/include/exceptions.hpp
     cpp/include/freddi_evolution.hpp
     cpp/include/freddi_state.hpp
     cpp/include/geometry.hpp
