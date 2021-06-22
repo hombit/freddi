@@ -792,7 +792,7 @@ meanings as [command line options](#usage-executables-options), but with three
 major exceptions:
  1. Python package doesn't provide any file output functionality, that's why output arguments like `config`, `dir`, `fulldata`, `starflux`, `lambda` or `passband` are missed;
  2. all values are assumed to be in CGS units, but one can use `Freddi.from_asrtopy` for dimensional values (see details bellow);
- 3. wind, NS `fp` and NS `kappa` specific options are passed as dictionaries **write a specification somewhere**.
+ 3. parameters of wind, NS `fp` and NS `kappa` models are passed as dictionaries (see specification bellow).
 
 The following code snippet would set-up roughly the same simulation as
 [the command-line example](#usage-executables-example)
@@ -826,6 +826,24 @@ freddi = Freddi.from_astropy(
     windparams=dict(Xi_max=10, T_iC=1e8*u.K, W_pow=1),
 )
 ```
+
+Wind model parameters are specified by `windparams` argument which should be
+a `dict` instance with string keys and numeric values. Command option to 
+`windparams` keys relation is: `--windC_w -> C_w`, `--windR_w -> R_w`,
+`--windA_0 -> A_0`, `--windB_1 -> B_1`, `--windXi_max -> Xi_max`,
+`windT_ic -> T_ic`, `--windPow -> Pow`, `windC_0 -> C_0`.
+
+Neutron star f_p model parameters are specified by `fpparams` mapping with the
+same structure as `windparams`. Command options to `fpparams` keys relation is:
+`--fp-geometrical-chi -> chi`, `romanova2018-par1 -> par1`,
+`romanova2018-par2 -> par2`.
+
+Neutron star kappa_t model parameters are specified by `kappatparams` mapping
+with the same structure as `windparams`. Command options to the mapping keys
+relation is: `--kappat-const-value -> value`, `--kappat-corstep-in -> in`,
+`kappat-corstep-out -> out`, `--kappat-romanova2018-in -> in`,
+`--kappat-romanova2018-out -> out`, `romanova2018-par1 -> par1`,
+`--romanova2018-par2 -> par2`
 
 #### Running
 
