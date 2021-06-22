@@ -92,7 +92,7 @@ Python 2 isn't supported, use Python 3 instead.
 
 `Freddi` pre-compiled x86-64 Linux packages for several Python versions
 are available on <https://pypi.org/project/freddi/> and can be used as is,
-while for other systems you should have C++ compiler and Boost
+while for other configurations you should have C++ compiler and Boost
 libraries in your system before running this command:
 
 ```sh
