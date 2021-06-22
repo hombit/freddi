@@ -121,69 +121,81 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 	if (windtype == "SS73C") {
 		return {};
 	}
-	if (windtype == "Janiuk2015"){
-		if (vm.count("windA0") == 0) {
-			throw po::error("--windA0 is required if --windtype=Janiuk2015");
+	if (windtype == "ShieldsOscil1986"){
+		if (vm.count("windC_w") == 0) {
+			throw po::error("--windC_w is required if --windtype=ShieldsOscil1986");
 		}
-		if (vm.count("windB1") == 0) {
-			throw po::error("--windB1 is required if --windtype=Janiuk2015");
+		if (vm.count("windR_w") == 0) {
+			throw po::error("--windR_w is required if --windtype=ShieldsOscil1986");
 		}
 		return {
-				{"A_0", vm["windA0"].as<double>()},
-				{"B_1", vm["windB1"].as<double>()}
+				{"C_w", vm["windC_w"].as<double>()},
+				{"R_w", vm["windR_w"].as<double>()}
+		};
+	}
+	if (windtype == "Janiuk2015"){
+		if (vm.count("windA_0") == 0) {
+			throw po::error("--windA_0 is required if --windtype=Janiuk2015");
+		}
+		if (vm.count("windB_1") == 0) {
+			throw po::error("--windB_1 is required if --windtype=Janiuk2015");
+		}
+		return {
+				{"A_0", vm["windA_0"].as<double>()},
+				{"B_1", vm["windB_1"].as<double>()}
 		};
 	}
 	if (windtype == "Shields1986"){
-		if (vm.count("windXi") == 0) {
-			throw po::error("--windXi is required if --windtype=Shields1986");
+		if (vm.count("windXi_max") == 0) {
+			throw po::error("--windXi_max is required if --windtype=Shields1986");
 		}
-		if (vm.count("windTic") == 0) {
-			throw po::error("--windTic is required if --windtype=Shields1986");
+		if (vm.count("windT_ic") == 0) {
+			throw po::error("--windT_ic is required if --windtype=Shields1986");
 		}
 		if (vm.count("windPow") == 0) {
 			throw po::error("--windPow is required if --windtype=Shields1986");
 		}
 		return {
-				{"Xi_max", vm["windXi"].as<double>()},
-				{"T_iC", vm["windTic"].as<double>()},
-				{"W_pow", vm["windPow"].as<double>()}
+				{"Xi_max", vm["windXi_max"].as<double>()},
+				{"T_ic", vm["windT_ic"].as<double>()},
+				{"Pow", vm["windPow"].as<double>()}
 		};
 	}
 	if (windtype == "Woods1996AGN"){
 		if (vm.count("windC_0") == 0) {
 			throw po::error("--windC_0 is required if --windtype=Woods1996AGN");
 		}
-		if (vm.count("windTic") == 0) {
-			throw po::error("--windTic is required if --windtype=Woods1996AGN");
+		if (vm.count("windT_ic") == 0) {
+			throw po::error("--windT_ic is required if --windtype=Woods1996AGN");
 		}
 		return {
 				{"C_0", vm["windC_0"].as<double>()},
-				{"T_iC", vm["windTic"].as<double>()}
+				{"T_ic", vm["windT_ic"].as<double>()}
 		};
 	}
 	if (windtype == "Woods1996"){
-		if (vm.count("windXi") == 0) {
-			throw po::error("--windXi is required if --windtype=Woods1996");
+		if (vm.count("windXi_max") == 0) {
+			throw po::error("--windXi_max is required if --windtype=Woods1996");
 		}
-		if (vm.count("windTic") == 0) {
-			throw po::error("--windTic is required if --windtype=Woods1996");
+		if (vm.count("windT_ic") == 0) {
+			throw po::error("--windT_ic is required if --windtype=Woods1996");
 		}
 		if (vm.count("windPow") == 0) {
 			throw po::error("--windPow is required if --windtype=Woods1996");
 		}
 		return {
-				{"Xi_max", vm["windXi"].as<double>()},
-				{"T_iC", vm["windTic"].as<double>()},
-				{"W_pow", vm["windPow"].as<double>()}
+				{"Xi_max", vm["windXi_max"].as<double>()},
+				{"T_ic", vm["windT_ic"].as<double>()},
+				{"Pow", vm["windPow"].as<double>()}
 		};
 	}
 	if (windtype == "toy"){
-		if (vm.count("windPow") == 0) {
-			throw po::error("--windPow is required if --windtype=toy");
+		if (vm.count("windC_w") == 0) {
+			throw po::error("--windC_w is required if --windtype=toy");
 		}
 		return {
 
-				{"W_pow", vm["windPow"].as<double>()}
+				{"C_w", vm["windC_w"].as<double>()}
 		};
 	}
 	
@@ -224,15 +236,18 @@ po::options_description DiskStructureOptions::description() {
 			        "Type of the wind\n\n"
 					"  no: no wind\n"
 					"  SS73C: super-Eddington spherical wind from Shakura-Sunyaev 1973\n"
-					"  Janiuk2015: super-Eddington wind from Janiuk et al 2015. Requires --windA0 and --windB1 to be specified\n"
-					"  Shields1986: thermal wind from Begelman et al. 1983 and Shields et al. 1986. Requires --windXi, --windTic and --windPow to be specified\n"
-					"  Woods1996AGN: thermal AGN wind from Woods et al. 1996. Requires --windC_0 and --windTic to be specified\n"
-					"  Woods1996: thermal wind from Woods et al. 1996. Requires --windXi, --windTic and --windPow to be specified\n"
-					"  toy: a toy wind model used in arXiv:2105.11974, the mass loss rate is proportional to the central accretion rate. Requires --windPow to be specified\n")
-			( "windA0", po::value<double>(), "Dimensionless parameter characterizing the strength of the super-Eddington wind in the framework of the model Janiuk et al. 2015. Effective value range from 10 to 25")
-			( "windB1", po::value<double>(), "The quantity is of the order of unity. Characterizes the relationship between the change in energy per particle and virial energy.\nE = B_1 * k * T")
-			( "windXi", po::value<double>(), "Ionization parameter, the ratio of the radiation and gas pressures" )
-			( "windTic", po::value<double>(), "Inverse Compton temperature, K. Characterizes the hardness of the irradiating spectrum")
+					"  ShieldsOscil1986: toy wind model from Shields et al. 1986 which was used to obtain oscillations in the disk luminosity. Requires --windC_w and --windR_w to be specified\n"
+					"  Janiuk2015: super-Eddington wind from Janiuk et al 2015. Requires --windA_0 and --windB_1 to be specified\n"
+					"  Shields1986: thermal wind from Begelman et al. 1983 and Shields et al. 1986. Requires --windXi_max, --windT_ic and --windPow to be specified\n"
+					"  Woods1996AGN: thermal AGN wind from Woods et al. 1996. Requires --windC_0 and --windT_ic to be specified\n"
+					"  Woods1996: thermal wind from Woods et al. 1996. Requires --windXi_max, --windT_ic and --windPow to be specified\n"
+					"  toy: a toy wind model used in arXiv:2105.11974, the mass loss rate is proportional to the central accretion rate. Requires --windC_w to be specified\n")
+			( "windC_w", po::value<double>(), "The ratio of the mass loss rate due to wind to the central accretion rate, |Mwind|/Macc")
+			( "windR_w", po::value<double>(), "The ratio of the wind launch radius to the outer disk radius, Rwind/Rout")		
+			( "windA_0", po::value<double>(), "Dimensionless parameter characterizing the strength of the super-Eddington wind in the framework of the model Janiuk et al. 2015. Effective value range from 10 to 25")
+			( "windB_1", po::value<double>(), "The quantity is of the order of unity. Characterizes the relationship between the change in energy per particle and virial energy.\nE = B_1 * k * T")
+			( "windXi_max", po::value<double>(), "Ionization parameter, the ratio of the radiation and gas pressures" )
+			( "windT_ic", po::value<double>(), "Inverse Compton temperature, K. Characterizes the hardness of the irradiating spectrum")
 			( "windPow", po::value<double>(), "Multiplicative coefficient to control wind power")
 			( "windC_0", po::value<double>(), "Characteristic column density of the wind mass loss rate from Woods et al. 1996 model, g/(s*cm^2). For AGN approx value is 3e-13 g/(s*cm^2)")
 			;

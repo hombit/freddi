@@ -213,7 +213,7 @@ class ShieldPowerLawWindTestCase(unittest.TestCase):
         Mdotout = 1e18
         rout = 1e11
         Mdotin = Mdotout / (1 + self._k_C)
-        fr = freddi_w_default(wind=b'__testC_q0_Shields1986__', windparams={'kC': self._k_C, 'Rwind': self._r_wind},
+        fr = freddi_w_default(wind=b'ShieldsOscil1986', windparams={'C_w': self._k_C, 'R_w': self._r_wind},
                     F0=Mdotin*np.sqrt(GM*rout), Mdotout=Mdotout, rout=rout, Mx=Mx,
                     initialcond=b'powerF', powerorder=1,
                     time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
@@ -228,3 +228,4 @@ class ShieldPowerLawWindTestCase(unittest.TestCase):
             assert_allclose(state.F, F, rtol=1e-3)
         with self.subTest('Wind rate'):
             assert_allclose(state.Mdot_wind, Mdotout * self._k_C / (1 + self._k_C), rtol=1e-3)
+            
