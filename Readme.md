@@ -102,6 +102,9 @@ python3 -m pip install -U pip
 python3 -m pip install --user freddi
 ```
 
+[`astropy`](https://astropy.org) is an optional requirement which must be
+installed to use dimensional input via `Freddi.from_astropy`
+
 ## Usage
 
 ### Executables
@@ -117,7 +120,7 @@ Docker way and would like to specify the directory, then avoid using `--dir`
 option and just replace `` "`pwd`" `` with some local path (for more details see
 [Docker documentation](https://docs.docker.com/engine/tutorials/dockervolumes)).
 
-#### Options
+#### <a name="usage-executables-options"> Options
 
 The full list of command line options is viewed with `--help` option. Default
 values are given in brackets.
@@ -711,6 +714,8 @@ Parameters of disk evolution calculation:
 ```
 </details>
 
+**Write which options are mandatory**
+
 Also you can use `freddi.ini` configuration file to store options. This [INI
 file](https://en.wikipedia.org/wiki/INI_file) contains lines `option=value`,
 option names are the as provided by the help message above. Command line option
@@ -737,27 +742,168 @@ data: radial coordinate in terms of the specific angular momentum, radius,
 viscous torque, surface density, effective temperature Teff, viscous temperature
 Tvis, irradiation temperature Tirr, and the absolute half-height of the disk.
 
-#### Example
+#### <a name="usage-executables-example"></a> Example
 
 The following arguments instruct `Freddi` to calculate the decay of the outburst
 in the disk with the constant outer radius equal to 1 solar radius. The Kerr
 black hole at the distance of 5 kpc has the mass of 9 solar masses, and the
 Kerr's parameter is 0.4. The outer disk is irradiated with Cirr=1e-3.
+**Discuss all options used in the example***
 
 ```sh
-./freddi --alpha=0.5 --Mx=9 --rout=1 --time=50 --tau=0.25 --dir=data/ \
-  --F0=2e+37 --colourfactor=1.7 --Nx=1000 --distance=5 --gridscale=log \
-  --kerr=0.4 --Cirr=0.001 --opacity=OPAL --initialcond=quasistat \
-  --windtype=Woods1996 --windXi=10 --windTic=1e8 --windPow=1 
+./freddi --alpha=0.5 --Mx=9 --rout=1 --period=0.5 --Mopt=0.5 --time=50 \
+  --tau=0.25 --dir=data/ --F0=2e+37 --colourfactor=1.7 --Nx=1000 \
+  --distance=5 --gridscale=log --kerr=0.4 --Cirr=0.001 --opacity=OPAL \
+  --initialcond=quasistat --windtype=Woods1996 --windXi=10 --windTic=1e8 \
+  --windPow=1 
 ```
 
 ### Python
 
-#### Constructor
+Python bindings can be used as a convenient way to run and analyse Freddi
+simulations.
 
-#### Attributes and methods
+#### Initializing
 
-#### Example
+You can prepare simulation set-up initializing `Freddi`
+(for black hole accretion disk) or `FreddiNeutronStar` (for NS) class.
+These classes accept keyword-only arguments which have the same names and
+meanings as [command line options](#usage-executables-options), but with three
+minor exceptions:
+ 1. Python package doesn't provide any file output functionality, that's why output arguments like `config`, `dir`, `fulldata`, `starflux`, `lambda` or `passband` are missed;
+ 2. all values are assumed to be in CGS units, but one can use `Freddi.from_asrtopy` for dimensional values (see details bellow);
+ 3. wind, NS `fp` and NS `kappa` specific options are passed as dictionaries **write a specification somewhere**.
+
+The following code snippet would set-up roughly the same simulation as
+[the command-line example](#usage-executables-example)
+
+```python
+from freddi import Freddi
+
+freddi = Freddi(
+    alpha=0.5, Mx=9*2e33, rout=1*7e10, period=0.5*86400, Mopt=0.5*2e33,
+    time=50*86400, tau=0.25*86400, F0=2e+37, colourfactor=1.7, Nx=1000,
+    distance=5*3e21, gridscale='log', kerr=0.4, Cirr=0.001, opacity='OPAL',
+    initialcond='quasistat', wind='Woods1996',
+    windparams=dict(Xi_max=10, T_iC=1e8, W_pow=1),
+)
+```
+
+Alternatively we can do the same using `from_astropy` class-method which casts
+all [`astropy.units.Quantity`](https://docs.astropy.org/en/stable/units/quantity.html)
+objects to CGS values. Note that dimensionality isn't checked, and technically
+it just does `arg.cgs.value` for every `Quantity` argument.
+
+```python
+import astropy.units as u
+from freddi import Freddi
+
+freddi = Freddi.from_astropy(
+    alpha=0.5, Mx=9*u.Msun, rout=1*u.Rsun, period=0.5*u.day, Mopt=0.5*u.Msun,
+    time=50*u.day, tau=0.25*u.day, F0=2e+37, colourfactor=1.7, Nx=1000,
+    distance=5*u.kpc, gridscale='log', kerr=0.4, Cirr=0.001, opacity='OPAL',
+    initialcond='quasistat', wind='Woods1996',
+    windparams=dict(Xi_max=10, T_iC=1e8*u.K, W_pow=1),
+)
+```
+
+#### Running
+
+There are two ways to run a simulation: iterating over time steps, and run the
+whole simulation in one shot. Note that in both cases your `Freddi` object is
+mutating and represents the current state of the accretion disk.
+
+Here we use iterator interface which yields another `Freddi` object for each
+time moment.
+
+```python
+import astropy.units as u
+from freddi import Freddi
+
+freddi = Freddi.from_astropy(
+    alpha=0.5, Mx=9*u.Msun, rout=1*u.Rsun, period=0.5*u.day, Mopt=0.5*u.Msun,
+    time=20*u.day, tau=1.0*u.day, Mdot0=5e18, distance=10*u.kpc,
+    initialcond='quasistat',
+)
+
+for state in freddi:
+    print(f't = {state.t} s, Mdot = {state.Mdot:g} g/s')
+assert state.t == freddi.t
+```
+
+In this example we run a simulation via `.evolve()` method which returns
+`EvolutionResult` object keeping all evolution states internally and providing
+temporal distribution of disk's properties.
+
+```python
+import astropy.units as u
+import matplotlib.pyplot as plt
+from freddi import Freddi
+
+freddi = Freddi.from_astropy(
+    alpha=0.5, Mx=9*u.Msun, rout=1*u.Rsun, period=0.5*u.day, Mopt=0.5*u.Msun,
+    time=20*u.day, tau=1.0*u.day, Mdot0=5e18, distance=10*u.kpc,
+    initialcond='quasistat',
+)
+
+result = freddi.evolve()
+assert result.t[-1] == freddi.t
+
+# Plot Mdot(t)
+plt.figure()
+plt.title('Freddi disk evolution: accretion rate')
+plt.xlabel('t, day')
+plt.ylabel(r'$\dot{M}$, g/cm')
+plt.plot(result.t / 86400, result.Mdot)
+plt.show()
+
+# Plot all F(h) profiles
+plt.figure()
+plt.title('Freddi disk evolution: viscous torque')
+plt.xlabel('r, cm')
+plt.ylabel('F, dyn cm')
+plt.xscale('log')
+plt.yscale('log')
+plt.plot(result.R.T, result.F.T)
+plt.show()
+
+# Plot evolution of effective temperature of the outer hot disk ring
+plt.figure()
+plt.title('Freddi disk evolution: outer effective temperature')
+plt.xlabel('t, day')
+plt.ylabel('T, K')
+plt.plot(result.t / 86400, result.last_Tph)
+plt.show()
+```
+
+#### Properties and methods
+
+`Freddi`, `FreddiNeutronStar` and `EvolutionResult` objects contain dozens of
+properties returning various physical values like `t` for time moment,
+`Mdot` for accretion rate onto central object, `R` for radius, `F` for torque,
+`Tph` for effective temperature and so on. `first_*` and `last_*` properties
+are used to access innermost and outermost values of radial-distributed
+quantities. The complete list of properties can be got by `dir(Freddi)` or
+`dir(FreddiNeutronStar)`. Note that the most properties are lazy-evaluated and
+ require some time to access first time. `EvolutionRadius` provides all the
+same properties as underlying `Freddi` or `FreddiNeutronStar` objects but with
+additional array dimension for temporal distribution, so if `Freddi.Lx` is a
+scalar then `EvolutionResult.Lx` is 1-D `numpy` array of `(Nt,)` shape,
+if `Freddi.Sigma` is 1-D array of `(Nx,)` shape, then
+`EvolutionResult.Sigma` is 2-D array of `(Nt, Nx)` shape. Also, note that if
+disk shrinks during a simulation, the missing values of `EvolutionResult`
+properties will be filled by NaN.
+
+All three classes have `flux(lmbd, region='hot', phase=None)` method which can
+be used to find spectral flux density per unit frequency for optical
+emission. `lmbd` argument can be a scalar or a multidimensional `numpy` array
+of required wavelengths in cm; `region` could be one of "hot" (hot disk),
+"cold" (cold disk), "disk" ("hot" + "cold"), "star" (companion star), and
+"all" ("hot" + "cold" + "star"); `phase` is a binary system orbital phase in
+radians, it is required for `region="star"` and `region="all"` only, it can be
+calculated as `2π t / period + constant`.
+
+All properties and methods return values in CGS units.
 
 ## Physical Background
 
