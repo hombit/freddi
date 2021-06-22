@@ -55,7 +55,7 @@ dict evolution_kwdefaults() {
 	kw["powerorder"] = object();
 	kw["gaussmu"] = object();
 	kw["gausssigma"] = object();
-	kw["wind"] = DiskStructureArguments::default_wind;
+	kw["windtype"] = DiskStructureArguments::default_wind;
 	kw["windparams"] = tuple();
 
 	kw["Cirr"] = SelfIrradiationArguments::default_Cirr;
@@ -149,7 +149,7 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(dict& kw) {
 			extract<std::string>(kw["initialcond"]),
 			kw["F0"], kw["Mdisk0"], kw["Mdot0"],
 			kw["powerorder"], kw["gaussmu"], kw["gausssigma"],
-			extract<std::string>(kw["wind"]), kw["windparams"]);
+			extract<std::string>(kw["windtype"]), kw["windparams"]);
 	const auto irr = make_self_irradiation_arguments(
 			extract<double>(kw["Cirr"]),
 			extract<double>(kw["irrindex"]),
@@ -251,7 +251,7 @@ boost::shared_ptr<FreddiNeutronStarArguments> make_freddi_neutron_star_arguments
 			extract<std::string>(kw["initialcond"]),
 			kw["F0"], kw["Mdisk0"], kw["Mdot0"],
 			kw["powerorder"], kw["gaussmu"], kw["gausssigma"],
-			extract<std::string>(kw["wind"]), kw["windparams"]);
+			extract<std::string>(kw["windtype"]), kw["windparams"]);
 	const auto irr = make_neutron_star_self_irradiation_arguments(
 			extract<double>(kw["Cirr"]),
 			extract<double>(kw["irrindex"]),

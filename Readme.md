@@ -262,36 +262,45 @@ Parameters of the disk mode:
                                      no: no wind
                                      SS73C: super-Eddington spherical wind from
                                    Shakura-Sunyaev 1973
+                                     ShieldsOscil1986: toy wind model from 
+                                   Shields et al. 1986 which was used to obtain
+                                   oscillations in the disk luminosity. 
+                                   Requires --windC_w and --windR_w to be 
+                                   specified
                                      Janiuk2015: super-Eddington wind from 
-                                   Janiuk et al 2015. Requires --windA0 and 
-                                   --windB1 to be specified
+                                   Janiuk et al 2015. Requires --windA_0 and 
+                                   --windB_1 to be specified
                                      Shields1986: thermal wind from Begelman et
                                    al. 1983 and Shields et al. 1986. Requires 
-                                   --windXi, --windTic and --windPow to be 
+                                   --windXi_max, --windT_ic and --windPow to be
                                    specified
                                      Woods1996AGN: thermal AGN wind from Woods 
                                    et al. 1996. Requires --windC_0 and 
-                                   --windTic to be specified
+                                   --windT_ic to be specified
                                      Woods1996: thermal wind from Woods et al. 
-                                   1996. Requires --windXi, --windTic and 
+                                   1996. Requires --windXi_max, --windT_ic and 
                                    --windPow to be specified
                                      toy: a toy wind model used in 
                                    arXiv:2105.11974, the mass loss rate is 
                                    proportional to the central accretion rate. 
-                                   Requires --windPow to be specified
+                                   Requires --windC_w to be specified
                                    
-  --windA0 arg                     Dimensionless parameter characterizing the 
+  --windC_w arg                    The ratio of the mass loss rate due to wind 
+                                   to the central accretion rate, |Mwind|/Macc
+  --windR_w arg                    The ratio of the wind launch radius to the 
+                                   outer disk radius, Rwind/Rout
+  --windA_0 arg                    Dimensionless parameter characterizing the 
                                    strength of the super-Eddington wind in the 
                                    framework of the model Janiuk et al. 2015. 
                                    Effective value range from 10 to 25
-  --windB1 arg                     The quantity is of the order of unity. 
+  --windB_1 arg                    The quantity is of the order of unity. 
                                    Characterizes the relationship between the 
                                    change in energy per particle and virial 
                                    energy.
                                    E = B_1 * k * T
-  --windXi arg                     Ionization parameter, the ratio of the 
+  --windXi_max arg                 Ionization parameter, the ratio of the 
                                    radiation and gas pressures
-  --windTic arg                    Inverse Compton temperature, K. 
+  --windT_ic arg                   Inverse Compton temperature, K. 
                                    Characterizes the hardness of the 
                                    irradiating spectrum
   --windPow arg                    Multiplicative coefficient to control wind 
@@ -504,38 +513,49 @@ Parameters of the disk mode:
                                           no: no wind
                                           SS73C: super-Eddington spherical wind
                                         from Shakura-Sunyaev 1973
+                                          ShieldsOscil1986: toy wind model from
+                                        Shields et al. 1986 which was used to 
+                                        obtain oscillations in the disk 
+                                        luminosity. Requires --windC_w and 
+                                        --windR_w to be specified
                                           Janiuk2015: super-Eddington wind from
-                                        Janiuk et al 2015. Requires --windA0 
-                                        and --windB1 to be specified
+                                        Janiuk et al 2015. Requires --windA_0 
+                                        and --windB_1 to be specified
                                           Shields1986: thermal wind from 
                                         Begelman et al. 1983 and Shields et al.
-                                        1986. Requires --windXi, --windTic and 
-                                        --windPow to be specified
+                                        1986. Requires --windXi_max, --windT_ic
+                                        and --windPow to be specified
                                           Woods1996AGN: thermal AGN wind from 
                                         Woods et al. 1996. Requires --windC_0 
-                                        and --windTic to be specified
+                                        and --windT_ic to be specified
                                           Woods1996: thermal wind from Woods et
-                                        al. 1996. Requires --windXi, --windTic 
-                                        and --windPow to be specified
+                                        al. 1996. Requires --windXi_max, 
+                                        --windT_ic and --windPow to be 
+                                        specified
                                           toy: a toy wind model used in 
                                         arXiv:2105.11974, the mass loss rate is
                                         proportional to the central accretion 
-                                        rate. Requires --windPow to be 
+                                        rate. Requires --windC_w to be 
                                         specified
                                         
-  --windA0 arg                          Dimensionless parameter characterizing 
+  --windC_w arg                         The ratio of the mass loss rate due to 
+                                        wind to the central accretion rate, 
+                                        |Mwind|/Macc
+  --windR_w arg                         The ratio of the wind launch radius to 
+                                        the outer disk radius, Rwind/Rout
+  --windA_0 arg                         Dimensionless parameter characterizing 
                                         the strength of the super-Eddington 
                                         wind in the framework of the model 
                                         Janiuk et al. 2015. Effective value 
                                         range from 10 to 25
-  --windB1 arg                          The quantity is of the order of unity. 
+  --windB_1 arg                         The quantity is of the order of unity. 
                                         Characterizes the relationship between 
                                         the change in energy per particle and 
                                         virial energy.
                                         E = B_1 * k * T
-  --windXi arg                          Ionization parameter, the ratio of the 
+  --windXi_max arg                      Ionization parameter, the ratio of the 
                                         radiation and gas pressures
-  --windTic arg                         Inverse Compton temperature, K. 
+  --windT_ic arg                        Inverse Compton temperature, K. 
                                         Characterizes the hardness of the 
                                         irradiating spectrum
   --windPow arg                         Multiplicative coefficient to control 
@@ -754,7 +774,7 @@ Kerr's parameter is 0.4. The outer disk is irradiated with Cirr=1e-3.
 ./freddi --alpha=0.5 --Mx=9 --rout=1 --period=0.5 --Mopt=0.5 --time=50 \
   --tau=0.25 --dir=data/ --F0=2e+37 --colourfactor=1.7 --Nx=1000 \
   --distance=5 --gridscale=log --kerr=0.4 --Cirr=0.001 --opacity=OPAL \
-  --initialcond=quasistat --windtype=Woods1996 --windXi=10 --windTic=1e8 \
+  --initialcond=quasistat --windtype=Woods1996 --windXi_max=10 --windT_ic=1e8 \
   --windPow=1 
 ```
 
@@ -1046,8 +1066,8 @@ loss rate as a function of distance along the disk's surface. This function is u
 to taking thermal wind into account.
 
 Choosing option `--windtype=Woods1996`, it is necessary to set the value of the ionization parameter Xi
-(which is proportional to the ratio of the radiation and gas pressures) by the option `--windXi` and the Compoton temperature T_IC 
-(which determines the hardness of the irradiating spectrum and the size of the region where the wind operates) by the option `--windTic`. 
+(which is proportional to the ratio of the radiation and gas pressures) by the option `--windXi_max` and the Compoton temperature T_ic 
+(which determines the hardness of the irradiating spectrum and the size of the region where the wind operates) by the option `--windT_ic`. 
 
 ### Companion star irradiation
 

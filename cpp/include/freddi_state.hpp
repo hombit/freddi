@@ -100,8 +100,8 @@ private:
 	class testCq0Shields1986Wind: public BasicWind {
 	private:
 		// windparams
-		const double kC;
-		const double R_windmin2out;
+		const double C_w;
+		const double R_w;
 	public:
 		explicit testCq0Shields1986Wind(const FreddiState& state);
 		~testCq0Shields1986Wind() override = default;
@@ -131,8 +131,8 @@ private:
 	private:
 		// windparams
 		const double Xi_max;
-		const double T_iC;
-		const double W_pow;
+		const double T_ic;
+		const double Pow;
 	public:
 		explicit Shields1986Wind(const FreddiState& state);
 		~Shields1986Wind() override = default;
@@ -147,7 +147,7 @@ private:
 	private:
 		// windparams
 		const double C_0;
-		const double T_iC;
+		const double T_ic;
 	public:
 		explicit Woods1996AGNWind(const FreddiState& state);
 		~Woods1996AGNWind() override = default;
@@ -162,8 +162,8 @@ private:
 	private:
 		// windparams
 		const double Xi_max;
-		const double T_iC;
-		const double W_pow;
+		const double T_ic;
+		const double Pow;
 	public:
 		explicit Woods1996ShieldsApproxWind(const FreddiState& state);
 		~Woods1996ShieldsApproxWind() override = default;
@@ -177,7 +177,7 @@ private:
 	// https://ui.adsabs.harvard.edu/abs/2021arXiv210511974A/
 	private:
 		// windparams
-		const double W_pow;
+		const double C_w;
 	public:
 		explicit PeriodPaperWind(const FreddiState& state);
 		~PeriodPaperWind() override = default;
