@@ -54,7 +54,7 @@ class ShakuraSunyaevSupercriticalTestCase(unittest.TestCase):
         Ledd = 4. * np.pi * 1.67262158e-24 * c / 6.65245893699e-25 * GM
         eta = 1 - np.sqrt(8 / 9)
         Mcrit = Ledd / (c**2 * eta)
-        fr = freddi_w_default(wind=b'SS73C', windparams={}, Mx=Mx, Mdot0=Mcrit, Mdotout=Mcrit*Rout/Rin,
+        fr = freddi_w_default(windtype=b'SS73C', windparams={}, Mx=Mx, Mdot0=Mcrit, Mdotout=Mcrit*Rout/Rin,
                               initialcond=b'sineF', time=100*DAY, tau=1*DAY, rout=Rout)
         for state in fr:
             pass
@@ -85,7 +85,7 @@ class StationaryWindATestCase(unittest.TestCase):
 
         """
         Mdot = 1e18
-        fr = freddi_w_default(wind=b'__testA__', windparams={'kA': k_A0}, Mdotout=Mdot, initialcond=b'sineF',
+        fr = freddi_w_default(windtype=b'__testA__', windparams={'kA': k_A0}, Mdotout=Mdot, initialcond=b'sineF',
                               Mdot0=Mdot, time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
         for state in fr:
             pass
@@ -116,7 +116,7 @@ class StationaryWindBTestCase(unittest.TestCase):
 
         """
         Mdot = 1e18
-        fr = freddi_w_default(wind=b'__testB__', windparams={'kB': k_B0}, Mdotout=Mdot, initialcond=b'sineF',
+        fr = freddi_w_default(windtype=b'__testB__', windparams={'kB': k_B0}, Mdotout=Mdot, initialcond=b'sineF',
                               Mdot0=Mdot, time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
         for state in fr:
             pass
@@ -145,7 +145,7 @@ class StationaryWindCTestCase(unittest.TestCase):
 
         """
         Mdot = 1e18
-        fr = freddi_w_default(wind=b'__testC__', windparams={'kC': k_C0}, Mdotout=Mdot, initialcond=b'sineF',
+        fr = freddi_w_default(windtype=b'__testC__', windparams={'kC': k_C0}, Mdotout=Mdot, initialcond=b'sineF',
                               Mdot0=Mdot, time=10000*DAY, tau=10*DAY, gridscale=b'linear')
         for state in fr:
             pass
@@ -202,7 +202,7 @@ class LipunovaShakuraTestCase(unittest.TestCase):
 
 
 class ShieldPowerLawWindTestCase(unittest.TestCase):
-    """Shield et al. 1986, IVb), eq. 4.2"""
+    """Shields et al. 1986, IVb), eq. 4.2"""
 
     _k_C = 1
     _r_wind = 0.9
@@ -213,7 +213,7 @@ class ShieldPowerLawWindTestCase(unittest.TestCase):
         Mdotout = 1e18
         rout = 1e11
         Mdotin = Mdotout / (1 + self._k_C)
-        fr = freddi_w_default(wind=b'ShieldsOscil1986', windparams={'C_w': self._k_C, 'R_w': self._r_wind},
+        fr = freddi_w_default(windtype=b'ShieldsOscil1986', windparams={'C_w': self._k_C, 'R_w': self._r_wind},
                     F0=Mdotin*np.sqrt(GM*rout), Mdotout=Mdotout, rout=rout, Mx=Mx,
                     initialcond=b'powerF', powerorder=1,
                     time=1000*DAY, tau=1*DAY, Nx=10000, gridscale=b'linear')
