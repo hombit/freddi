@@ -1049,6 +1049,22 @@ Choosing option `--windtype=Woods1996`, it is necessary to set the value of the 
 (which is proportional to the ratio of the radiation and gas pressures) by the option `--windXi` and the Compoton temperature T_IC 
 (which determines the hardness of the irradiating spectrum and the size of the region where the wind operates) by the option `--windTic`. 
 
+### Companion star irradiation
+
+We use a simple model of irradiated star to simulate periodic variability and
+X-ray thermalization by a companion's photosphere. Our model assumes that the
+companion star's shape corresponds to equipotential surface which size is set
+by `--rochelobefill` option, unity means that star fills its Roche lobe, any
+smaller value decreases star's polar radius correspondingly. Technically,
+star's surface is built from `20 * 4^starlod` triangles, use `--starlod` to
+set level of detail, `--starlod=3` should give few percent precision. Every
+triangle has black-body spectrum with bolometric luminosity given by a sum of
+star's own luminosity (set by `--Topt`) and irradiation flux multiplied by 
+unity minus albedo (set by `--staralbedo`).
+
+Please note that the model is limited and doesn't implement limb darking or
+eclipsing.
+
 ## Development guide
 
 ### Source code and tests
