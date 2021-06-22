@@ -1,4 +1,4 @@
-from functools import partial
+from functools import partial, singledispatch
 
 import numpy as np
 
@@ -48,11 +48,11 @@ class _BasePyFreddi:
         return obj
 
     @classmethod
-    def alt(cls, **kwargs):
-        """Alternative Freddi constructor accepting astropy Quantity and str
+    def from_astropy(cls, **kwargs):
+        """Alternative Freddi constructor accepting astropy Quantity
 
         All physical values can be passed as `astropy.units.Quantity`, and all
-        string values can be passed as `str`. Needs `astropy` module to run
+        string values can be passed as `str`. Requires `astropy` package
 
         Parameters
         ----------
@@ -64,15 +64,31 @@ class _BasePyFreddi:
         Freddi
 
         """
+        from collections.abc import Mapping
+        from functools import singledispatch
+        
         from astropy.units import Quantity
 
-        for item, value in kwargs.items():
-            if isinstance(value, Quantity):
-                kwargs[item] = value.cgs.value
-                continue
-            if isinstance(value, str):
-                kwargs[item] = value.encode()
+        @singledispatch
+        def convert(value):
+            return value
+
+        @convert.register(Quantity)
+        def _(value):
+            return value.cgs.value
+
+        @convert.register(Mapping)
+        def _(value):
+            return {k: convert(v) for k, v in value.items()}
+
+        kwargs = {key: convert(value) for key, value in kwargs.items()}
+        
         return cls(**kwargs)
+
+    @classmethod
+    def alt(cls, **kwargs):
+        """Alias to .from_astropy()"""
+        return cls.from_astropy(**kwargs)
 
     def evolve(self):
         """Calculate disk evolution
@@ -93,6 +109,8 @@ class _BasePyFreddi:
         return self._freddi._flux_cold(lmbd)
 
     def _flux_star(self, lmbd, phase):
+        if phase is None:
+            raise ValueError('Phase must be specified if star flux is required')
         return self._freddi._flux_star(lmbd, phase)
 
     def flux(self, lmbd, region='hot', phase=None):
@@ -105,8 +123,6 @@ class _BasePyFreddi:
             def flux(lmbd, phase):
                 return self._flux_hot(lmbd, phase) + self._flux_cold(lmbd, phase)
         elif 'star'.startswith(region):
-            if phase is None:
-                raise ValueError('Phase must be specified if star flux is required')
             flux = self._flux_star
         elif 'all'.startswith(region):
             def flux(lmbd, phase):
@@ -132,3 +148,6 @@ class Freddi(_BasePyFreddi, metaclass=_MetaFreddi, boost_cls=_Freddi):
 
 class FreddiNeutronStar(_BasePyFreddi, metaclass=_MetaFreddi, boost_cls=_FreddiNeutronStar):
     pass
+
+
+__all__ = ('Freddi', 'FreddiNeutronStar')
