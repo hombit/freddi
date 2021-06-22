@@ -917,7 +917,7 @@ The C++ source code is located in `cpp` folder which has following structure:
 - `pywrap` has both header and source files for `Boost::Python`/`Boost::NumPy` bindings.
 
 Note, that we require C++17 standard (while not having idiomatic C++17 code),
-and require code to be compiled on modern GCC and CLang on Linux. Please write
+and require code to be compiled by modern GCC and CLang on Linux. Please write
 unit tests where you can and use `ctest` to check they pass.
 
 The Python project is specified by `pyproject.toml` (which just lists build
@@ -942,7 +942,9 @@ command-line option with a default value, add new output column or fix some bug
 in physical model. For these purposes you can use `generate_test_data.sh`
 script located in this folder.
 
-`Dockerfile` is used to build a Docker image with statically-linked binaries, and `Dockerfile.python` is used to build a Docker image with `manylinux`-compatible Python wheels.
+`Dockerfile` is used to build a Docker image with statically-linked binaries,
+and `Dockerfile.python` is used to build a Docker image with
+[`manylinux`](https://github.com/pypa/manylinux)-compatible Python wheels.
 
 
 ### Continuous integration
@@ -950,7 +952,7 @@ script located in this folder.
 We use [Github Actions](https://github.com/hombit/freddi/actions) as a
 continuous integration (CI) system. The workflow file is located in
 `.github/workflows/main.yml` and a couple of auxiliary files are located in
-`.ci` folder. CI allows us to test new commits against different bugs:
+`.ci` folder. CI allows us to test new commits to prevent different bugs:
 - `gcc` and `clang` actions test binaries building, execute sample `Freddi` programs, run C++ unit tests, perform C++ regression tests, and check the consistency of the `Readme.md` with programs' `--help` output
 - `cpython` action builds Python extension module and runs all Python tests
 - `docker-exe` builds a Docker image using `Dockerfile` and execute sample `Freddi` programs inside a Docker container
@@ -958,8 +960,8 @@ continuous integration (CI) system. The workflow file is located in
 
 ### This Readme
 
-Please, keep Readme updated. The help messages in the [Usage](#usage) section
-can be updated automatically using `.ci/update-help-readme.py` script.
+Please keep Readme updated. You can update the help messages in the
+[Usage](#usage) section using `.ci/update-help-readme.py` script.
 
 ### Release new version
 
@@ -971,6 +973,7 @@ Check-list:
 - Run `docker run --rm -ti docker-python:VERSION sh -c "python3.7 -m twine upload /dist/*"` to upload source code distribution and x86-64 Python wheels onto PyPi.org
 - [Optional] Build executables for GitHub release
 - [Optional] Build and upload macOS wheels
+- [Optional] Build and upload Linux AArch64 wheels
 - Crate new GitHub release
 
 
