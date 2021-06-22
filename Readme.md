@@ -883,7 +883,7 @@ properties returning various physical values like `t` for time moment,
 `Mdot` for accretion rate onto central object, `R` for radius, `F` for torque,
 `Tph` for effective temperature and so on. `first_*` and `last_*` properties
 are used to access innermost and outermost values of radial-distributed
-quantities. The complete list of properties can be got by `dir(Freddi)` or
+quantities. The complete list of properties can be obtained by `dir(Freddi)` or
 `dir(FreddiNeutronStar)`. Note that the most properties are lazy-evaluated and
  require some time to access first time. `EvolutionRadius` provides all the
 same properties as underlying `Freddi` or `FreddiNeutronStar` objects but with
