@@ -769,7 +769,7 @@ You can prepare simulation set-up initializing `Freddi`
 (for black hole accretion disk) or `FreddiNeutronStar` (for NS) class.
 These classes accept keyword-only arguments which have the same names and
 meanings as [command line options](#usage-executables-options), but with three
-minor exceptions:
+major exceptions:
  1. Python package doesn't provide any file output functionality, that's why output arguments like `config`, `dir`, `fulldata`, `starflux`, `lambda` or `passband` are missed;
  2. all values are assumed to be in CGS units, but one can use `Freddi.from_asrtopy` for dimensional values (see details bellow);
  3. wind, NS `fp` and NS `kappa` specific options are passed as dictionaries **write a specification somewhere**.
