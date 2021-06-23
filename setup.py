@@ -14,7 +14,7 @@ setup(
     name='freddi',
     version='2.0.0b1',
     url='http://xray.sai.msu.ru/~malanchev/freddi/',
-    license='MIT',
+    license='GPLv3',
     author='Konstantin Malanchev',
     author_email='malanchev@sai.msu.ru',
     description='Compute FRED light curves of LMXBs outbursts',
