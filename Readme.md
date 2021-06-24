@@ -1195,7 +1195,7 @@ Lipunova & Malanchev (2017) [2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/
 ## BibTex
 ```bibtex
 @ARTICLE{2017MNRAS.468.4735L,
-   author = {{Lipunova}, G.~V. and {Malanchev}, K.~L.},
+   author = { {Lipunova}, G.~V. and {Malanchev}, K.~L.},
     title = "{Determination of the turbulent parameter in accretion discs: effects of self-irradiation in 4U 1543{\minus}47 during the 2002 outburst}",
   journal = {\mnras},
 archivePrefix = "arXiv",
@@ -1212,7 +1212,7 @@ archivePrefix = "arXiv",
 }
 
 @ARTICLE{2021arXiv210511974A,
-       author = {{Avakyan}, A.~L. and {Lipunova}, G.~V. and {Malanchev}, K.~L. and {Shakura}, N.~I.},
+       author = { {Avakyan}, A.~L. and {Lipunova}, G.~V. and {Malanchev}, K.~L. and {Shakura}, N.~I.},
         title = "{Change in the orbital period of a binary system due to an outburst in a windy accretion disc}",
       journal = {arXiv e-prints},
      keywords = {Astrophysics - High Energy Astrophysical Phenomena},
