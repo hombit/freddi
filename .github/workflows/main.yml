@@ -75,17 +75,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Install dependencies
-        run: zypper install -y --no-recommends gcc-c++ cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel libboost_python3-devel libboost_numpy3-devel python3-devel python3-numpy-devel python3-scipy python3-setuptools
-      - name: Fix setuptools
+      - name: Install system dependencies
+        run: zypper install -y --no-recommends gcc-c++ cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel libboost_python3-devel libboost_numpy3-devel python3-devel python3-numpy-devel python3-pip
+      - name: Install Python dependencies
         run: |
-          zypper install -y python3-pip
-          pip3 install -U pip
-          pip3 install -U setuptools numpy scikit-build cmake ninja
-      - name: Install package
-        run: python3 setup.py install
-      - name: Test package
-        run: python3 setup.py test
+          python3 -m pip install -U pip setuptools
+          python3 -m pip install parameterized pytest numpy scipy
+      - name: Install
+        run: python3 -m pip install .
+      - name: Test
+        run: python3 -m pytest
 
   docker-exe:
     runs-on: ubuntu-latest

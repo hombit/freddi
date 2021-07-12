@@ -6,7 +6,7 @@ from numpy.testing import assert_allclose, assert_array_equal
 
 from freddi import FreddiNeutronStar
 
-from .util import default_freddi_kwargs
+from test_util import default_freddi_kwargs
 
 
 class FmagnDerivativesTestCase(unittest.TestCase):

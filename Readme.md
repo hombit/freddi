@@ -1132,8 +1132,8 @@ last libraries, because they should be built against the same Python version as
 you use.
 
 `python/test` contains some tests, you can run them by `python3 setup.py test`.
-- `freddi.py` and `neutron_star.py` contains unit tests for Python source;
-- `analytical.py` contains integration tests to compare analytical solutions of the equation of disk viscous evolution with the numerical solutions of `Freddi`;
+- `test_freddi.py` and `test_ns.py` contain unit tests for Python source;
+- `test_analytical.py` contains integration tests to compare analytical solutions of the equation of disk viscous evolution with the numerical solutions of `Freddi`;
 - `regression.py` contains regression tests to be sure that 1) the `Freddi` output is stable, and 2) the Python code gives the same results as binary executables do.
 
 The regression test data are located in `python/test/data`. Sometimes you need

@@ -5,7 +5,7 @@ import scipy.special
 from numpy.testing import assert_allclose
 from parameterized import parameterized
 
-from .util import DAY, freddi_w_default
+from test_util import DAY, freddi_w_default
 
 
 class ShakuraSunyaevSubctriticalTestCase(unittest.TestCase):

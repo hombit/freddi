@@ -11,7 +11,7 @@ from parameterized import parameterized
 
 from freddi import Freddi
 
-from .util import DATA_DIR
+from test_util import DATA_DIR
 
 
 class RegressionTestCase(unittest.TestCase):
