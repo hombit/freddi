@@ -49,7 +49,7 @@ FreddiNeutronStarEvolution::NeutronStarStructure::NeutronStarStructure(
 		R_x(args_ns.Rx),
 		redshift(initialize_redshift(evolution, args_ns)),
 		R_m_min(std::max(R_x, evolution->R()[evolution->first()])),
-		mu_magn(0.5 * args_ns.Bx * m::pow<3>(R_x)),
+		mu_magn(args_ns.mu_magn),
 		R_cor(std::cbrt(evolution->GM() / m::pow<2>(2*M_PI * args_ns.freqx))),
 		R_dead(args_ns.Rdead > 0. ? args_ns.Rdead : INFINITY),
 //		F_dead((*kappa_t)(R_dead / R_cor) * m::pow<2>(mu_magn) / m::pow<3>(R_dead)),
@@ -435,7 +435,7 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 		return;
 	}
 
-	double R_m = std::max(R_m_min(), R_alfven());
+	double R_m = std::max(R_m_min(), R_Alfven());
 	R_m = std::min(R_m, R_dead());
 	size_t ii;
 	for (ii = first(); ii <= last() - 2; ii++) {
@@ -467,8 +467,8 @@ double FreddiNeutronStarEvolution::Mdot_in() const {
 	return dF_dh + dFmagn_dh()[first()];
 }
 
-double FreddiNeutronStarEvolution::R_alfven() const {
-	return epsilon_Alfven() * std::pow(m::pow<4>(mu_magn()) / (m::pow<2>(Mdot_in()) * GM()), 1./7.);
+double FreddiNeutronStarEvolution::R_Alfven() const {
+	return ns_str_->args_ns.R_Alfven(GM(), Mdot_in());
 }
 
 IrradiatedStar::sources_t FreddiNeutronStarEvolution::star_irr_sources() {

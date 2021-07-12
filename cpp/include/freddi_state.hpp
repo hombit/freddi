@@ -253,6 +253,7 @@ private:
 		CurrentState(const CurrentState&) = default;
 		CurrentState& operator=(const CurrentState&) = default;
 	private:
+		static size_t initializeFirst(const DiskStructure& str);
 		static vecd initializeF(const DiskStructure& str);
 	};
 

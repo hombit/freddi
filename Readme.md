@@ -218,6 +218,7 @@ Parameters of the disk mode:
                                    torque F or surface density Sigma
                                    
                                    Values:
+                                     [xi = (h - h_in) / (h_out - h_in)]
                                      powerF: F ~ xi^powerorder, powerorder is 
                                    specified by --powerorder option
                                      linearF: F ~ xi, specific case of powerF 
@@ -233,8 +234,6 @@ Parameters of the disk mode:
                                    where f is quasi-stationary solution found 
                                    in Lipunova & Shakura 2000. f(xi=0) = 0, 
                                    df/dxi(xi=1) = 0
-                                   
-                                   Here xi is (h - h_in) / (h_out - h_in)
                                    
   --F0 arg                         Initial maximum viscous torque in the disk, 
                                    dyn*cm. Can be overwritten via --Mdisk0 and 
@@ -466,6 +465,7 @@ Parameters of the disk mode:
                                         Sigma
                                         
                                         Values:
+                                          [xi = (h - h_in) / (h_out - h_in)]
                                           powerF: F ~ xi^powerorder, powerorder
                                         is specified by --powerorder option
                                           linearF: F ~ xi, specific case of 
@@ -482,8 +482,7 @@ Parameters of the disk mode:
                                         h_out/h, where f is quasi-stationary 
                                         solution found in Lipunova & Shakura 
                                         2000. f(xi=0) = 0, df/dxi(xi=1) = 0
-                                        
-                                        Here xi is (h - h_in) / (h_out - h_in)
+                                          quasistat-ns: ???
                                         
   --F0 arg                              Initial maximum viscous torque in the 
                                         disk, dyn*cm. Can be overwritten via 

@@ -19,6 +19,13 @@ public:
 	static po::options_description description();
 };
 
+class NeutronStarDiskStructureOptions: public NeutronStarDiskStructureArguments {
+public:
+	NeutronStarDiskStructureOptions(const po::variables_map& vm, const NeutronStarArguments& ns_args,
+									const BasicDiskBinaryArguments& bdb_args);
+	static po::options_description description();
+};
+
 class NeutronStarSelfIrradiationOptions: public NeutronStarSelfIrradiationArguments {
 public:
 	NeutronStarSelfIrradiationOptions(const po::variables_map& vm, const DiskStructureArguments& dsa_args);

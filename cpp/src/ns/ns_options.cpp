@@ -175,6 +175,43 @@ po::options_description NeutronStarBasicDiskBinaryOptions::description() {
 }
 
 
+NeutronStarDiskStructureOptions::NeutronStarDiskStructureOptions(const po::variables_map& vm,
+																 const NeutronStarArguments& ns_args,
+																 const BasicDiskBinaryArguments& bdb_args):
+		NeutronStarDiskStructureArguments(
+				ns_args,
+				bdb_args,
+				vm["opacity"].as<std::string>(),
+				vm["Mdotout"].as<double>(),
+				vm["boundcond"].as<std::string>(),
+				vm["Thot"].as<double>(),
+				std::pow(vm["Qirr2Qvishot"].as<double>(), 0.25),
+				vm["initialcond"].as<std::string>(),
+				varToOpt<double>(vm, "F0"),
+				varToOpt<double>(vm, "Mdisk0"),
+				varToOpt<double>(vm, "Mdot0"),
+				varToOpt<double>(vm, "powerorder"),
+				varToOpt<double>(vm, "gaussmu"),
+				varToOpt<double>(vm, "gausssigma"),
+				vm["windtype"].as<std::string>(),
+				DiskStructureOptions::windparamsInitializer(vm)) {}
+
+po::options_description NeutronStarDiskStructureOptions::description() {
+	auto non_ns_od = DiskStructureOptions::description();
+	po::options_description od(DiskStructureOptions::caption);
+	for (const auto &non_ns_option : non_ns_od.options()) {
+		if (non_ns_option->long_name() == "initialcond") {
+			od.add_options()
+					( "initialcond", po::value<std::string>()->default_value(default_initialcond), (non_ns_option->description() + "  quasistat-ns: ???\n").c_str() )
+					;
+		} else {
+			od.add(non_ns_option);
+		}
+	}
+	return od;
+}
+
+
 NeutronStarSelfIrradiationOptions::NeutronStarSelfIrradiationOptions(const po::variables_map& vm, const DiskStructureArguments& dsa_args):
 		NeutronStarSelfIrradiationArguments(
 				vm["Cirr"].as<double>(),
@@ -203,7 +240,7 @@ FreddiNeutronStarOptions::FreddiNeutronStarOptions(const po::variables_map &vm) 
 
 	general.reset(new GeneralOptions(vm));
 	basic.reset(new NeutronStarBasicDiskBinaryOptions(vm, *ns));
-	disk.reset(new DiskStructureOptions(vm, *basic));
+	disk.reset(new NeutronStarDiskStructureOptions(vm, *ns, *basic));
 	irr_ns.reset(new NeutronStarSelfIrradiationOptions(vm, *disk));
 	irr = irr_ns;
 	flux.reset(new FluxOptions(vm));
@@ -214,7 +251,7 @@ po::options_description FreddiNeutronStarOptions::description() {
 	po::options_description desc("Freddi NS: numerical calculation of accretion disk evolution");
 	desc.add(GeneralOptions::description());
 	desc.add(NeutronStarBasicDiskBinaryOptions::description());
-	desc.add(DiskStructureOptions::description());
+	desc.add(NeutronStarDiskStructureOptions::description());
 	desc.add(NeutronStarOptions::description());
 	desc.add(NeutronStarSelfIrradiationOptions::description());
 	desc.add(FluxOptions::description());

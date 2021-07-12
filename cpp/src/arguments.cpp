@@ -237,19 +237,7 @@ std::shared_ptr<DiskStructureArguments::InitialFFunction> DiskStructureArguments
 		}
 
 		if (initialcond == "quasistat") {
-			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double x0 = h_in / (h_out - h_in);
-			const double x1 = h_in / h_out;
-			double integral = 0.;
-			integrate_adaptive(
-					stepper,
-					[x0, x1, &oprel](const double &y, double &dydx, double x) {
-						dydx = pow(oprel.f_F(x * (1. - x1) + x1) * x / (x * (1. - x1) + x1),
-								   1. - oprel.m) * pow(x + x0, oprel.n);
-					},
-					integral, 0., 1., 0.01
-			);
-			const double coeff = std::pow(h_out - h_in, oprel.n + 1.) * integral / ((1. - oprel.m) * oprel.D);
+			const double coeff = InitialFQuasistat::Coeff(h_in, h_out, oprel);
 
 			if (Mdot0) {
 				F0 = *Mdot0 * (h_out - h_in) / h_out * h_in / oprel.f_F(h_in / h_out);
@@ -305,6 +293,22 @@ vecd DiskStructureArguments::InitialFQuasistat::operator()(const vecd& h) const 
 		F[i] = F0 * oprel.f_F(xi_LS2000) * (1. - h.front() / h[i]) / (1. - h.front() / h.back());
 	}
 	return F;
+}
+
+double DiskStructureArguments::InitialFQuasistat::Coeff(double h_in, double h_out, const OpacityRelated &oprel) {
+	odeint::runge_kutta_cash_karp54<double> stepper;
+	const double x0 = h_in / (h_out - h_in);
+	const double x1 = h_in / h_out;
+	double integral = 0.;
+	integrate_adaptive(
+			stepper,
+			[x0, x1, &oprel](const double &y, double &dydx, double x) {
+				dydx = pow(oprel.f_F(x * (1. - x1) + x1) * x / (x * (1. - x1) + x1),
+						   1. - oprel.m) * pow(x + x0, oprel.n);
+			},
+			integral, 0., 1., 0.01
+	);
+	return std::pow(h_out - h_in, oprel.n + 1.) * integral / ((1. - oprel.m) * oprel.D);
 }
 
 vecd DiskStructureArguments::InitialFGaussF::operator()(const vecd& h) const {

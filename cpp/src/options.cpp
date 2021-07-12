@@ -205,7 +205,7 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 
 
 po::options_description DiskStructureOptions::description() {
-	po::options_description od("Parameters of the disk mode");
+	po::options_description od(DiskStructureOptions::caption);
 	od.add_options()
 			( "opacity,O", po::value<std::string>()->default_value(default_opacity), "Opacity law: Kramers (varkappa ~ rho / T^7/2) or OPAL (varkappa ~ rho / T^5/2)" )
 			( "Mdotout", po::value<double>()->default_value(default_Mdotout), "Accretion rate onto the disk through its outer radius" )
@@ -219,13 +219,13 @@ po::options_description DiskStructureOptions::description() {
 			( "initialcond", po::value<std::string>()->default_value(default_initialcond),
 					"Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 					"Values:\n"
+					"  [xi = (h - h_in) / (h_out - h_in)]\n"
 					"  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power does the same
 					"  linearF: F ~ xi, specific case of powerF but can be normalised by --Mdot0, see its description for details" // linear does the same
 					"  powerSigma: Sigma ~ xi^powerorder, powerorder is specified by --powerorder option\n"
 					"  sineF: F ~ sin( xi * pi/2 )\n" // sinus option does the same
 					"  gaussF: F ~ exp(-(xi-mu)**2 / 2 sigma**2), mu and sigma are specified by --gaussmu and --gausssigma options\n"
-					"  quasistat: F ~ f(h/h_out) * xi * h_out/h, where f is quasi-stationary solution found in Lipunova & Shakura 2000. f(xi=0) = 0, df/dxi(xi=1) = 0\n\n"
-					"Here xi is (h - h_in) / (h_out - h_in)\n")
+					"  quasistat: F ~ f(h/h_out) * xi * h_out/h, where f is quasi-stationary solution found in Lipunova & Shakura 2000. f(xi=0) = 0, df/dxi(xi=1) = 0\n")
 			( "F0", po::value<double>(), "Initial maximum viscous torque in the disk, dyn*cm. Can be overwritten via --Mdisk0 and --Mdot0" )
 			( "Mdisk0", po::value<double>(), "Initial disk mass, g. If both --F0 and --Mdisk0 are specified then --Mdisk0 is used. If both --Mdot0 and --Mdisk0 are specified then --Mdot0 is used" )
 			( "Mdot0", po::value<double>(), "Initial mass accretion rate through the inner radius, g/s. If --F0, --Mdisk0 and --Mdot0 are specified then --Mdot0 is used. Works only when --initialcond is set to linearF, sinusF or quasistat" )

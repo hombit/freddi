@@ -57,10 +57,14 @@ FreddiState::CurrentState::CurrentState(const DiskStructure& str):
 		Mdot_out(str.args.disk->Mdotout),
 		t(str.args.calc->init_time),
 		i_t(0),
-		first(0),
+		first(initializeFirst(str)),
 		last(str.Nx - 1),
 		F(initializeF(str)),
 		F_in(0) {}
+
+size_t FreddiState::CurrentState::initializeFirst(const DiskStructure& str) {
+	return str.args.disk->initial_first(str.h);
+}
 
 vecd FreddiState::CurrentState::initializeF(const DiskStructure& str) {
 	return str.args.disk->initial_F(str.h);
