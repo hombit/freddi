@@ -47,7 +47,7 @@ class EvolutionResult:
         else:
             phase = [phase] * self.__len_states
         lmbd = np.asarray(lmbd)
-        arr = np.empty((self.__len_states,) + lmbd.shape, dtype=np.float)
+        arr = np.empty((self.__len_states,) + lmbd.shape, dtype=float)
         for i in range(self.__len_states):
             arr[i] = self.__states[i].flux(lmbd, region, phase[i])
         return arr
