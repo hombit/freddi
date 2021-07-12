@@ -22,7 +22,7 @@ FreddiState::DiskStructure::DiskStructure(const FreddiArguments &args, const wun
 		cosi(std::cos(args.flux->inclination / 180.0 * M_PI)),
 		distance(args.flux->distance),
 		cosiOverD2(cosi / m::pow<2>(distance)),
-		oprel(*(args.disk->oprel.get())),
+		oprel(args.disk->oprel),
 		h(initialize_h(args, Nx)),
 		R(initialize_R(h, GM)),
 		wunc(wunc) {}

@@ -128,10 +128,10 @@ protected:
 	class InitialFPowerSigma: public InitialFFunction {
 	protected:
 		double powerorder;
-		std::shared_ptr<const OpacityRelated> oprel;
+		OpacityRelated oprel;
 	public:
 		InitialFPowerSigma(double F0, double Mdot0, double Mdisk0, double powerorder,
-				std::shared_ptr<const OpacityRelated> oprel):
+				const OpacityRelated &oprel):
 				InitialFFunction(F0, Mdot0, Mdisk0),
 				powerorder(powerorder),
 				oprel(oprel) {}
@@ -148,9 +148,9 @@ protected:
 
 	class InitialFQuasistat: public InitialFFunction {
 	protected:
-		std::shared_ptr<const OpacityRelated> oprel;
+		const OpacityRelated oprel;
 	public:
-		InitialFQuasistat(double F0, double Mdot0, double Mdisk0, const std::shared_ptr<const OpacityRelated>& oprel):
+		InitialFQuasistat(double F0, double Mdot0, double Mdisk0, const OpacityRelated& oprel):
 				InitialFFunction(F0, Mdot0, Mdisk0),
 				oprel(oprel) {}
 		~InitialFQuasistat() override = default;
@@ -180,7 +180,7 @@ public:
 	constexpr static const double mu = 0.62;
 public:
 	std::string opacity;
-	std::shared_ptr<const OpacityRelated> oprel;
+	const OpacityRelated oprel;
 	double Mdotout;
 	std::string boundcond;
 	double Thot;
@@ -193,6 +193,8 @@ public:
 	pard windparams;
 protected:
 	std::shared_ptr<InitialFFunction> initial_F_function;
+protected:
+	static std::shared_ptr<InitialFFunction> initializeInitialFFunction(const BasicDiskBinaryArguments &bdb_args);
 public:
 	DiskStructureArguments(
 			const BasicDiskBinaryArguments &bdb_args,
