@@ -46,15 +46,20 @@ DiskStructureArguments::DiskStructureArguments(
 		Thot(Thot),
 		Tirr2Tvishot(Tirr2Tvishot),
 		initialcond(initialcond),
-		initial_F_function(),
+		initial_F_function(initializeInitialFFunction(oprel,
+													  bdb_args, initialcond,
+													  F0, Mdisk0, Mdot0,
+													  powerorder,
+													  gaussmu, gausssigma)),
 		wind(wind),
-		windparams(windparams) {
-	initial_F_function = [](const OpacityRelated& oprel,
-							const BasicDiskBinaryArguments &bdb_args, const std::string& initialcond,
-							std::optional<double> F0,
-							std::optional<double> Mdisk0, std::optional<double> Mdot0,
-							std::optional<double> powerorder,
-							std::optional<double> gaussmu, std::optional<double> gausssigma) -> std::shared_ptr<InitialFFunction> {
+		windparams(windparams) {}
+
+std::shared_ptr<DiskStructureArguments::InitialFFunction> DiskStructureArguments::initializeInitialFFunction(
+				const OpacityRelated& oprel,
+				const BasicDiskBinaryArguments &bdb_args, const std::string& initialcond,
+				std::optional<double> F0, std::optional<double> Mdisk0, std::optional<double> Mdot0,
+				std::optional<double> powerorder,
+				std::optional<double> gaussmu, std::optional<double> gausssigma) {
 		if (!F0 && !Mdisk0 && !Mdot0) {
 			throw std::runtime_error("One of F0, Mdisk0 or Mdot0 must be specified");
 		}
@@ -263,13 +268,6 @@ DiskStructureArguments::DiskStructureArguments(
 		}
 
 		throw std::runtime_error("Invalid value of initialcond");
-	}(
-			oprel,
-			bdb_args,
-			initialcond,
-	  		F0, Mdisk0, Mdot0,
-			powerorder,
-			gaussmu, gausssigma);
 }
 
 DiskStructureArguments::InitialFFunction::~InitialFFunction() {}

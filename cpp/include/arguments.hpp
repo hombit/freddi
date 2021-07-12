@@ -194,7 +194,12 @@ public:
 protected:
 	std::shared_ptr<InitialFFunction> initial_F_function;
 protected:
-	static std::shared_ptr<InitialFFunction> initializeInitialFFunction(const BasicDiskBinaryArguments &bdb_args);
+	static std::shared_ptr<InitialFFunction> initializeInitialFFunction(
+			const OpacityRelated& oprel,
+			const BasicDiskBinaryArguments &bdb_args, const std::string& initialcond,
+			std::optional<double> F0, std::optional<double> Mdisk0, std::optional<double> Mdot0,
+			std::optional<double> powerorder,
+			std::optional<double> gaussmu, std::optional<double> gausssigma);
 public:
 	DiskStructureArguments(
 			const BasicDiskBinaryArguments &bdb_args,
