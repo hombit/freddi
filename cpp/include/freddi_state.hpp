@@ -260,7 +260,6 @@ private:
 		boost::optional<double> Mdisk;
 		boost::optional<double> Lx;
 		boost::optional<double> Mdot_wind;
-		boost::optional<double> mU, mB, mV, mR, mI, mJ;
 		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height;
 	};
 
@@ -420,12 +419,6 @@ public:
 	double flux_star(const Passband& passband, double phase);
 	inline double flux_star(double lambda) { return flux_star(lambda, phase_opt()); }
 	inline double flux_star(const Passband& passband) { return flux_star(passband, phase_opt()); }
-	inline double mU() { return lazy_magnitude(opt_str_.mU, lambdaU, irr0U); }
-	inline double mB() { return lazy_magnitude(opt_str_.mB, lambdaB, irr0B); }
-	inline double mV() { return lazy_magnitude(opt_str_.mV, lambdaV, irr0V); }
-	inline double mR() { return lazy_magnitude(opt_str_.mR, lambdaR, irr0R); }
-	inline double mI() { return lazy_magnitude(opt_str_.mI, lambdaI, irr0I); }
-	inline double mJ() { return lazy_magnitude(opt_str_.mJ, lambdaJ, irr0J); }
 	inline double Mdisk() { return lazy_integrate<HotRegion>(opt_str_.Mdisk, Sigma()); }
 	double Mdot_wind();
 	double Sigma_minus(double r) const;

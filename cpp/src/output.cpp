@@ -210,12 +210,6 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Lbol", "erg/s", "Bolometric luminosity of the disk", [freddi]() {return freddi->Lbol_disk();}},
 			{"Fx", "erg/s/cm^2", "X-ray flux of the disk in the given energy range [emin, emax]", [freddi]() {return freddi->Lx() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
 			{"Fbol", "erg/s/cm^2", "Bolometric flux of the disk", [freddi]() {return freddi->Lbol_disk() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
-			{"mU", "mag", "TO BE REMOVED", [freddi]() {return freddi->mU();}},
-			{"mB", "mag", "TO BE REMOVED", [freddi]() {return freddi->mB();}},
-			{"mV", "mag", "TO BE REMOVED", [freddi]() {return freddi->mV();}},
-			{"mR", "mag", "TO BE REMOVED", [freddi]() {return freddi->mR();}},
-			{"mI", "mag", "TO BE REMOVED", [freddi]() {return freddi->mI();}},
-			{"mJ", "mag", "TO BE REMOVED", [freddi]() {return freddi->mJ();}},
 	};
 	const bool cold_disk = freddi->args().flux->cold_disk;
 	const bool star = freddi->args().flux->star;
