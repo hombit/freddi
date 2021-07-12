@@ -61,14 +61,14 @@ class RegressionTestCase(unittest.TestCase):
         config['__cgs'] = False
         return config
 
-    columns_to_compare = ('Mdot', 'Mdisk', 'Lx', 'mU', 'mB', 'mV', 'mR', 'mI', 'mJ')
+    columns_to_compare = ('Mdot', 'Mdisk', 'Lx')
 
     @parameterized.expand(glob.glob(os.path.join(DATA_DIR, '*.dat')))
     def test(self, data_file):
         config = self.load_config(
             data_file,
             arguments_to_remove=frozenset(['dir', 'prefix', 'fulldata', 'precision', 'config', 'tempsparsity',
-                                           'stdout', 'windtype']),
+                                           'stdout', 'windtype', 'passband']),
         )
         lmbd_ = np.array(config.pop('lambda', [])) * 1e-8
         f = Freddi(**config)

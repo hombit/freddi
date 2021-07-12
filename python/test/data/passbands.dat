@@ -1,0 +1,79 @@
+#t	Mdot	Mdisk	Rhot	Sigmaout	Kirrout	H2R	Teffout	Tirrout	Qirr2Qvisout	TphXmax	Lx	Lbol	Fx	Fbol	FnuSwift_B	FnuSwift_V
+#days	g/s	g	Rsun	g/cm^2	float	float	K	K	float	keV	erg/s	erg/s	erg/s/cm^2	erg/s/cm^2	erg/s/cm^2/Hz	erg/s/cm^2/Hz
+### Columns description
+# 1=t [days] : Time moment
+# 2=Mdot [g/s] : Accretion rate onto central object
+# 3=Mdisk [g] : Mass of the hot disk
+# 4=Rhot [Rsun] : Radius of the hot disk
+# 5=Sigmaout [g/cm^2] : Surface density at the outer radius of the hot disk
+# 6=Kirrout [float] : Irradiation coefficient Kirr at the outer radius of the hot disk
+# 7=H2R [float] : Relative semiheight at the outer radius of the hot disk
+# 8=Teffout [K] : Effective tempreture at the outer radius of the hot disk
+# 9=Tirrout [K] : Irradiation temperature (Qirr / sigma_SB)^1/4 at the outer radius of the hot disk
+# 10=Qirr2Qvisout [float] : Irradiation flux to viscous flux ratio at the outer radius of the hot disk
+# 11=TphXmax [keV] : Maximum effective temperature of the disk
+# 12=Lx [erg/s] : X-ray luminosity of the disk in the given energy range [emin, emax]
+# 13=Lbol [erg/s] : Bolometric luminosity of the disk
+# 14=Fx [erg/s/cm^2] : X-ray flux of the disk in the given energy range [emin, emax]
+# 15=Fbol [erg/s/cm^2] : Bolometric flux of the disk
+# 16=FnuSwift_B [erg/s/cm^2/Hz] : Spectral flux density of the hot disk in passband Swift_B
+# 17=FnuSwift_V [erg/s/cm^2/Hz] : Spectral flux density of the hot disk in passband Swift_V
+### Parameters
+# Cirr=0
+# Cirrcold=0
+# F0=2e+38
+# Mdotout=0
+# Mopt=0.5
+# Mx=5
+# Nx=1000
+# Qirr2Qvishot=0
+# Thot=0
+# Topt=0
+# alpha=0.25
+# angulardistdisk=plane
+# boundcond=Teff
+# colourfactor=1.7
+# dir=.
+# distance=10
+# emax=12
+# emin=1
+# ephemerist0=0
+# gaussmu=1
+# gausssigma=0.25
+# gridscale=log
+# h2rcold=0
+# inclination=0
+# initialcond=powerF
+# inittime=0
+# irrindex=0
+# irrindexcold=0
+# kerr=0
+# opacity=Kramers
+# passband=passbands/Swift_B.dat  # 0
+# passband=passbands/Swift_V.dat  # 1
+# period=0.25
+# powerorder=6
+# precision=6
+# prefix=passbands
+# rochelobefill=1
+# staralbedo=0
+# starlod=3
+# tau=1
+# tempsparsity=1
+# time=10
+# windtype=no
+### Derived values
+# alpha_cold = 0.025
+# Tidal radius = 1.53444 Rsun
+# ISCO radius = 4.43015e+06 cm
+0	0.000912194	2.91708e+25	1.53444	1229.56	0	0.0996553	12855.7	0	0	3.59521e-06	0	4.68874e+16	0	7.83746e-30	1.77457e-26	1.5739e-26
+1	9.05771e+16	2.92109e+25	1.53444	814.979	0	0.0912491	11099.7	0	0	0.358886	1.4189e+36	4.65572e+36	2.37177e-10	7.78227e-10	2.11093e-26	1.80251e-26
+2	5.53791e+17	2.91811e+25	1.53444	682.497	0	0.0878454	10418.2	0	0	0.564337	1.48261e+37	2.84652e+37	2.47826e-09	4.7581e-09	2.31322e-26	1.92947e-26
+3	1.45204e+18	2.90664e+25	1.53444	607.94	0	0.0856945	9996.58	0	0	0.71812	4.65038e+37	7.46359e+37	7.77334e-09	1.24758e-08	2.43002e-26	1.99792e-26
+4	2.5579e+18	2.88527e+25	1.53444	557.896	0	0.0841315	9694.54	0	0	0.827319	8.89043e+37	1.31478e+38	1.48608e-08	2.19772e-08	2.49227e-26	2.03082e-26
+5	3.61669e+18	2.85456e+25	1.53444	521.17	0	0.0829128	9461.61	0	0	0.902152	1.31235e+38	1.859e+38	2.19365e-08	3.10741e-08	2.51982e-26	2.04175e-26
+6	4.48754e+18	2.81622e+25	1.53444	492.687	0	0.0819202	9273.59	0	0	0.952148	1.66859e+38	2.30663e+38	2.78913e-08	3.85564e-08	2.5251e-26	2.03891e-26
+7	5.13413e+18	2.7722e+25	1.53444	469.715	0	0.0810863	9116.78	0	0	0.984734	1.9366e+38	2.63897e+38	3.23712e-08	4.41118e-08	2.5159e-26	2.02728e-26
+8	5.57578e+18	2.72432e+25	1.53444	450.616	0	0.0803682	8982.63	0	0	1.00526	2.12109e+38	2.86599e+38	3.5455e-08	4.79064e-08	2.4972e-26	2.01e-26
+9	5.8512e+18	2.67401e+25	1.53444	434.334	0	0.0797369	8865.33	0	0	1.01745	2.23666e+38	3.00756e+38	3.73868e-08	5.02728e-08	2.47222e-26	1.98905e-26
+10	6.00007e+18	2.62238e+25	1.53444	420.147	0	0.0791715	8760.81	0	0	1.02386	2.29928e+38	3.08407e+38	3.84335e-08	5.15518e-08	2.44313e-26	1.96575e-26
