@@ -786,12 +786,12 @@ simulations.
 #### Initializing
 
 You can prepare simulation set-up initializing `Freddi`
-(for black hole accretion disk) or `FreddiNeutronStar` (for NS) class.
+(for black hole accretion disk) or `FreddiNeutronStar` (for NS) class instance.
 These classes accept keyword-only arguments which have the same names and
 meanings as [command line options](#usage-executables-options), but with three
 major exceptions:
  1. Python package doesn't provide any file output functionality, that's why output arguments like `config`, `dir`, `fulldata`, `starflux`, `lambda` or `passband` are missed;
- 2. all values are assumed to be in CGS units, but one can use `Freddi.from_asrtopy` for dimensional values (see details bellow);
+ 2. all values are assumed to be in CGS units, but you can use `Freddi.from_asrtopy` for dimensional values (see details bellow);
  3. parameters of wind, NS `fp` and NS `kappa` models are passed as dictionaries (see specification bellow).
 
 The following code snippet would set-up roughly the same simulation as
@@ -923,14 +923,14 @@ properties returning various physical values like `t` for time moment,
 are used to access innermost and outermost values of radial-distributed
 quantities. The complete list of properties can be obtained by `dir(Freddi)` or
 `dir(FreddiNeutronStar)`. Note that the most properties are lazy-evaluated and
- require some time to access first time. `EvolutionRadius` provides all the
+require some time to access first time. `EvolutionRadius` provides all the
 same properties as underlying `Freddi` or `FreddiNeutronStar` objects but with
 additional array dimension for temporal distribution, so if `Freddi.Lx` is a
 scalar then `EvolutionResult.Lx` is 1-D `numpy` array of `(Nt,)` shape,
 if `Freddi.Sigma` is 1-D array of `(Nx,)` shape, then
 `EvolutionResult.Sigma` is 2-D array of `(Nt, Nx)` shape. Also, note that if
 disk shrinks during a simulation, the missing values of `EvolutionResult`
-properties will be filled by NaN.
+properties are filled by NaN.
 
 All three classes have `flux(lmbd, region='hot', phase=None)` method which can
 be used to find spectral flux density per unit frequency for optical
