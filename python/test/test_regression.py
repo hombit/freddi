@@ -11,7 +11,7 @@ from parameterized import parameterized
 
 from freddi import Freddi
 
-from .util import DATA_DIR
+from test_util import DATA_DIR
 
 
 class RegressionTestCase(unittest.TestCase):
@@ -61,7 +61,15 @@ class RegressionTestCase(unittest.TestCase):
         config['__cgs'] = False
         return config
 
-    columns_to_compare = ('Mdot', 'Mdisk', 'Lx')
+    columns_to_compare = {
+        # column name: Freddi property name
+        'Mdot': 'Mdot',
+        'Mdisk': 'Mdisk',
+        'Sigmaout': 'last_Sigma',
+        'Teffout': 'last_Tph',
+        'Tirrout': 'last_Tirr',
+        'Lx': 'Lx',
+    }
 
     @parameterized.expand(glob.glob(os.path.join(DATA_DIR, '*.dat')))
     def test(self, data_file):
@@ -78,15 +86,13 @@ class RegressionTestCase(unittest.TestCase):
             assert_equal(result.i_t, np.arange(f.Nt + 1))
         with self.subTest('Time'):
             assert_equal(result.t, data['t'] * 86400)
-        for column in self.columns_to_compare:
+        for column, prop in self.columns_to_compare.items():
             with self.subTest(column):
-                assert_allclose(getattr(result, column), data[column], rtol=1e-4,
-                                err_msg='File: {}, column {}:'.format(data_file, column))
+                assert_allclose(getattr(result, prop), data[column], rtol=1e-4,
+                                err_msg='File: {}, column {}, property {}:'.format(data_file, column, prop))
         for i_lmbd, lmbd in enumerate(lmbd_):
             column = 'Fnu{}'.format(i_lmbd)
-            if column in data.dtype.names:
-                with self.subTest(column):
-                    assert_allclose(result.flux(lmbd), data[column], rtol=1e-4,
-                                    err_msg='File: {}, lambda {}, column {}:'.format(data_file, lmbd, column))
-            else:
-                break
+            assert column in data.dtype.names
+            with self.subTest(column):
+                assert_allclose(result.flux(lmbd), data[column], rtol=1e-4,
+                                err_msg='File: {}, lambda {}, column {}:'.format(data_file, lmbd, column))

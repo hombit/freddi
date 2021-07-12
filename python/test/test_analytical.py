@@ -1,20 +1,16 @@
 import unittest
 
 import numpy as np
+import scipy.special
 from numpy.testing import assert_allclose
 from parameterized import parameterized
 
-from .util import DAY, freddi_w_default
-
-try:
-    import scipy.special
-except ImportError:
-    scipy = None
+from test_util import DAY, freddi_w_default
 
 
 class ShakuraSunyaevSubctriticalTestCase(unittest.TestCase):
     def test(self):
-        """Shakura-Sunyaev 1973 stationary subcritical disk
+        r"""Shakura-Sunyaev 1973 stationary subcritical disk
 
         The analytical stationary solution is $F ~ (h - h_{in})$
 
@@ -32,7 +28,7 @@ class ShakuraSunyaevSubctriticalTestCase(unittest.TestCase):
 
 class ShakuraSunyaevSupercriticalTestCase(unittest.TestCase):
     def test(self):
-        """Shakura-Sunayev 1973 stationary supercritical disk with outflow
+        r"""Shakura-Sunayev 1973 stationary supercritical disk with outflow
 
         $d\dot M_w / dA = -\dot M_{crit} / (2 \pi R_{sph} r)$
 
@@ -68,9 +64,8 @@ class ShakuraSunyaevSupercriticalTestCase(unittest.TestCase):
 
 class StationaryWindATestCase(unittest.TestCase):
     @parameterized.expand([[0.1], [1.], [10.]])
-    @unittest.skipIf(scipy is None, 'No scipy module is available')
     def test(self, k_A0):
-        """Stationary disk with outflow rate proportional to accretion rate
+        r"""Stationary disk with outflow rate proportional to accretion rate
 
         Outflow rate $d\dot M / dA ~ dF/dh$:
 
@@ -101,7 +96,7 @@ class StationaryWindATestCase(unittest.TestCase):
 class StationaryWindBTestCase(unittest.TestCase):
     @parameterized.expand([[16.], [25.], [36.]])
     def test(self, k_B0):
-        """Stationary disk with outflow rate proportional to viscous torque
+        r"""Stationary disk with outflow rate proportional to viscous torque
 
         Outflow rate $d\dot M / dA ~ F$:
 
@@ -133,7 +128,7 @@ class StationaryWindBTestCase(unittest.TestCase):
 class StationaryWindCTestCase(unittest.TestCase):
     @parameterized.expand([[1.0], [2.0], [3.0]])
     def test(self, k_C0, k_hw=0.5):
-        """Stationary disk with constant outflow rate
+        r"""Stationary disk with constant outflow rate
 
         Outflow rate $d\dot M / dA$ doesn't depend on F nor dF/dh
 
@@ -162,7 +157,7 @@ class StationaryWindCTestCase(unittest.TestCase):
 
 
 class LipunovaShakuraTestCase(unittest.TestCase):
-    """Test Lipunova-Shakura 2000 quasi-stationary solutions
+    r"""Test Lipunova-Shakura 2000 quasi-stationary solutions
 
     The analytical stationary solution is $F ~ (h - h_{in}) / h * P(h)$, where
     $P(h)$ is trinomial.
@@ -228,4 +223,3 @@ class ShieldPowerLawWindTestCase(unittest.TestCase):
             assert_allclose(state.F, F, rtol=1e-3)
         with self.subTest('Wind rate'):
             assert_allclose(state.Mdot_wind, Mdotout * self._k_C / (1 + self._k_C), rtol=1e-3)
-            

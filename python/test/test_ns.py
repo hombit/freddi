@@ -1,16 +1,12 @@
 import unittest
 
 import numpy as np
+import scipy.interpolate
 from numpy.testing import assert_allclose, assert_array_equal
 
 from freddi import FreddiNeutronStar
 
-from .util import default_freddi_kwargs
-
-try:
-    import scipy.interpolate
-except ImportError:
-    scipy = None
+from test_util import default_freddi_kwargs
 
 
 class FmagnDerivativesTestCase(unittest.TestCase):
@@ -21,7 +17,6 @@ class FmagnDerivativesTestCase(unittest.TestCase):
     Rx = 1e6  # cm
     freddi_kwargs = {**default_freddi_kwargs(), 'inversebeta': inverse_beta, 'Bx': Bx, 'freqx': freqx, 'Rx': Rx}
 
-    @unittest.skipIf(scipy is None, 'No scipy module is available')
     def test_first_derivative(self):
         """Integral of dFmagn_dh == Fmagn"""
         fr = FreddiNeutronStar(**self.freddi_kwargs)
@@ -30,7 +25,6 @@ class FmagnDerivativesTestCase(unittest.TestCase):
         Fmagn = spline.antiderivative(1)(h)
         assert_allclose(fr.Fmagn - fr.Fmagn[0], Fmagn, rtol=1e-5, atol=0)
 
-    @unittest.skipIf(scipy is None, 'No scipy module is available')
     def test_second_derivative(self):
         """Integral of dF2magn_dh2 == dFmagn_dh"""
         fr = FreddiNeutronStar(**self.freddi_kwargs)

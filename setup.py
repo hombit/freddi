@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-import os
-
 from skbuild import setup
-from setuptools.command.build_ext import build_ext
 
 
 with open('Readme.md') as fh:
@@ -24,9 +21,7 @@ setup(
     packages=['freddi'],
     install_requires=['numpy'],
     setup_requires=['numpy'],
-    tests_require=['parameterized'],
     python_requires='>=3.7',
-    test_suite='test',
     classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
