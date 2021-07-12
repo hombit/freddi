@@ -1,15 +1,11 @@
 import unittest
 
 import numpy as np
+import scipy.special
 from numpy.testing import assert_allclose
 from parameterized import parameterized
 
 from .util import DAY, freddi_w_default
-
-try:
-    import scipy.special
-except ImportError:
-    scipy = None
 
 
 class ShakuraSunyaevSubctriticalTestCase(unittest.TestCase):
@@ -68,7 +64,6 @@ class ShakuraSunyaevSupercriticalTestCase(unittest.TestCase):
 
 class StationaryWindATestCase(unittest.TestCase):
     @parameterized.expand([[0.1], [1.], [10.]])
-    @unittest.skipIf(scipy is None, 'No scipy module is available')
     def test(self, k_A0):
         """Stationary disk with outflow rate proportional to accretion rate
 
