@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-import os
-
 from skbuild import setup
-from setuptools.command.build_ext import build_ext
 
 
 with open('Readme.md') as fh:
