@@ -61,7 +61,7 @@ class RegressionTestCase(unittest.TestCase):
         config['__cgs'] = False
         return config
 
-    columns_to_compare = ('Mdot', 'Mdisk', 'Lx', 'mU', 'mB', 'mV', 'mR', 'mI', 'mJ')
+    columns_to_compare = ('Mdot', 'Mdisk', 'Lx')
 
     @parameterized.expand(glob.glob(os.path.join(DATA_DIR, '*.dat')))
     def test(self, data_file):
