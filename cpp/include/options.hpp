@@ -39,6 +39,8 @@ public:
 
 class DiskStructureOptions: public DiskStructureArguments {
 public:
+	constexpr static const char caption[] = "Parameters of the disk mode";
+public:
 	DiskStructureOptions(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args);
 	static po::options_description description();
 	static pard windparamsInitializer(const po::variables_map& vm);

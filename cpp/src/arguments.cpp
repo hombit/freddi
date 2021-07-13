@@ -40,16 +40,26 @@ DiskStructureArguments::DiskStructureArguments(
 		const std::string& wind, const pard& windparams
 	):
 		opacity(opacity),
-		oprel(new OpacityRelated(opacity, bdb_args.Mx, bdb_args.alpha, mu)),
+		oprel(OpacityRelated(opacity, bdb_args.Mx, bdb_args.alpha, mu)),
 		Mdotout(Mdotout),
 		boundcond(boundcond),
 		Thot(Thot),
 		Tirr2Tvishot(Tirr2Tvishot),
 		initialcond(initialcond),
-		initial_F_function(),
+		initial_F_function(initializeInitialFFunction(oprel,
+													  bdb_args, initialcond,
+													  F0, Mdisk0, Mdot0,
+													  powerorder,
+													  gaussmu, gausssigma)),
 		wind(wind),
-		windparams(windparams) {
-	initial_F_function = [&, this]() -> std::shared_ptr<InitialFFunction> {
+		windparams(windparams) {}
+
+std::shared_ptr<DiskStructureArguments::InitialFFunction> DiskStructureArguments::initializeInitialFFunction(
+				const OpacityRelated& oprel,
+				const BasicDiskBinaryArguments &bdb_args, const std::string& initialcond,
+				std::optional<double> F0, std::optional<double> Mdisk0, std::optional<double> Mdot0,
+				std::optional<double> powerorder,
+				std::optional<double> gaussmu, std::optional<double> gausssigma) {
 		if (!F0 && !Mdisk0 && !Mdot0) {
 			throw std::runtime_error("One of F0, Mdisk0 or Mdot0 must be specified");
 		}
@@ -59,8 +69,8 @@ DiskStructureArguments::DiskStructureArguments(
 
 		if (initialcond == "linearF" || initialcond == "linear") {
 			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double a = 1. - oprel->m;
-			const double b = oprel->n;
+			const double a = 1. - oprel.m;
+			const double b = oprel.n;
 			const double x0 = h_in / (h_out - h_in);
 			double integral = 0.;
 			integrate_adaptive(
@@ -70,17 +80,17 @@ DiskStructureArguments::DiskStructureArguments(
 					},
 					integral, 0., 1., 0.01
 			);
-			const double coeff = std::pow(h_out - h_in, oprel->n + 1.) * integral / ((1. - oprel->m) * oprel->D);
+			const double coeff = std::pow(h_out - h_in, oprel.n + 1.) * integral / ((1. - oprel.m) * oprel.D);
 
 			if (Mdot0) {
 				F0 = *Mdot0 * (h_out - h_in);
-				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+				Mdisk0 = std::pow(*F0, 1. - oprel.m) * coeff;
 			} else if (Mdisk0) {
-				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel->m));
+				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel.m));
 				Mdot0 = *F0 / (h_out - h_in);
 			} else if (F0) {
 				Mdot0 = *F0 / (h_out - h_in);
-				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+				Mdisk0 = std::pow(*F0, 1. - oprel.m) * coeff;
 			} else {
 				throw std::logic_error("We couldn't be here");
 			}
@@ -97,8 +107,8 @@ DiskStructureArguments::DiskStructureArguments(
 			}
 
 			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double a = (1. - oprel->m) * *powerorder;
-			const double b = oprel->n;
+			const double a = (1. - oprel.m) * *powerorder;
+			const double b = oprel.n;
 			const double x0 = h_in / (h_out - h_in);
 			double integral = 0.;
 			integrate_adaptive(
@@ -108,12 +118,12 @@ DiskStructureArguments::DiskStructureArguments(
 					},
 					integral, 0., 1., 0.01
 			);
-			const double coeff = std::pow(h_out - h_in, oprel->n + 1.) * integral / ((1. - oprel->m) * oprel->D);
+			const double coeff = std::pow(h_out - h_in, oprel.n + 1.) * integral / ((1. - oprel.m) * oprel.D);
 
 			if (Mdisk0) {
-				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel->m));
+				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel.m));
 			} else {
-				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+				Mdisk0 = std::pow(*F0, 1. - oprel.m) * coeff;
 			}
 
 			return std::make_shared<InitialFPowerF>(*F0, 0.0, *Mdisk0, *powerorder);
@@ -141,12 +151,12 @@ DiskStructureArguments::DiskStructureArguments(
 					integral, 0., 1., 0.01
 			);
 			const double coeff = m::pow<4>(h_out - h_in) * integral /
-								 ((1. - oprel->m) * oprel->D * std::pow(h_out, 3. - oprel->n));
+								 ((1. - oprel.m) * oprel.D * std::pow(h_out, 3. - oprel.n));
 
 			if (Mdisk0) {
-				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel->m));
+				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel.m));
 			} else {
-				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+				Mdisk0 = std::pow(*F0, 1. - oprel.m) * coeff;
 			}
 
 			return std::make_shared<InitialFPowerSigma>(*F0, 0.0, *Mdisk0, *powerorder, oprel);
@@ -155,8 +165,8 @@ DiskStructureArguments::DiskStructureArguments(
 		if (initialcond == "sineF" || initialcond == "sine" ||
 			initialcond == "sinusF" || initialcond == "sinus") {
 			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double a = 1. - oprel->m;
-			const double b = oprel->n;
+			const double a = 1. - oprel.m;
+			const double b = oprel.n;
 			const double x0 = h_in / (h_out - h_in);
 			double integral = 0.;
 			integrate_adaptive(
@@ -166,17 +176,17 @@ DiskStructureArguments::DiskStructureArguments(
 					},
 					integral, 0., 1., 0.01
 			);
-			const double coeff = pow(h_out - h_in, oprel->n + 1.) * integral / ((1. - oprel->m) * oprel->D);
+			const double coeff = pow(h_out - h_in, oprel.n + 1.) * integral / ((1. - oprel.m) * oprel.D);
 
 			if (Mdot0) {
 				F0 = *Mdot0 * (h_out - h_in) * 2. / M_PI;
-				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+				Mdisk0 = std::pow(*F0, 1. - oprel.m) * coeff;
 			} else if (Mdisk0) {
-				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel->m));
+				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel.m));
 				Mdot0 = *F0 * M_PI / (2. * (h_out - h_in));
 			} else if (F0) {
 				Mdot0 = *F0 * M_PI / (2. * (h_out - h_in));
-				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+				Mdisk0 = std::pow(*F0, 1. - oprel.m) * coeff;
 			} else {
 				throw std::logic_error("We couldn't be here");
 			}
@@ -203,53 +213,41 @@ DiskStructureArguments::DiskStructureArguments(
 			}
 
 			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double a = 1. - oprel->m;
-			const double b = oprel->n;
+			const double a = 1. - oprel.m;
+			const double b = oprel.n;
 			const double x0 = h_in / (h_out - h_in);
 			double integral = 0.;
 			integrate_adaptive(
 					stepper,
-					[a, b, x0, gaussmu, gausssigma, this](const double &y, double &dydx, double x) {
+					[a, b, x0, gaussmu, gausssigma](const double &y, double &dydx, double x) {
 						dydx = exp(-m::pow<2>(x - *gaussmu) * a / (2. * m::pow<2>(*gausssigma))) *
 							   pow(x + x0, b);
 					},
 					integral, 0., 1., 0.01
 			);
-			const double coeff = std::pow(h_out - h_in, oprel->n + 1.) * integral / ((1. - oprel->m) * oprel->D);
+			const double coeff = std::pow(h_out - h_in, oprel.n + 1.) * integral / ((1. - oprel.m) * oprel.D);
 
 			if (Mdisk0) {
-				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel->m));
+				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel.m));
 			} else {
-				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+				Mdisk0 = std::pow(*F0, 1. - oprel.m) * coeff;
 			}
 
 			return std::make_shared<InitialFGaussF>(*F0, 0.0, *Mdisk0, *gaussmu, *gausssigma);
 		}
 
 		if (initialcond == "quasistat") {
-			odeint::runge_kutta_cash_karp54<double> stepper;
-			const double x0 = h_in / (h_out - h_in);
-			const double x1 = h_in / h_out;
-			double integral = 0.;
-			integrate_adaptive(
-					stepper,
-					[x0, x1, this](const double &y, double &dydx, double x) {
-						dydx = pow(this->oprel->f_F(x * (1. - x1) + x1) * x / (x * (1. - x1) + x1),
-								   1. - this->oprel->m) * pow(x + x0, this->oprel->n);
-					},
-					integral, 0., 1., 0.01
-			);
-			const double coeff = std::pow(h_out - h_in, oprel->n + 1.) * integral / ((1. - oprel->m) * oprel->D);
+			const double coeff = InitialFQuasistat::Coeff(h_in, h_out, oprel);
 
 			if (Mdot0) {
-				F0 = *Mdot0 * (h_out - h_in) / h_out * h_in / oprel->f_F(h_in / h_out);
-				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
+				F0 = *Mdot0 * (h_out - h_in) / h_out * h_in / oprel.f_F(h_in / h_out);
+				Mdisk0 = std::pow(*F0, 1. - oprel.m) * coeff;
 			} else if (Mdisk0) {
-				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel->m));
-				Mdot0 = *F0 * h_out / (h_out - h_in) * oprel->f_F(h_in / h_out) / h_in;
+				F0 = std::pow(*Mdisk0 / coeff, 1. / (1. - oprel.m));
+				Mdot0 = *F0 * h_out / (h_out - h_in) * oprel.f_F(h_in / h_out) / h_in;
 			} else if (F0) {
-				Mdisk0 = std::pow(*F0, 1. - oprel->m) * coeff;
-				Mdot0 = *F0 * h_out / (h_out - h_in) * oprel->f_F(h_in / h_out) / h_in;
+				Mdisk0 = std::pow(*F0, 1. - oprel.m) * coeff;
+				Mdot0 = *F0 * h_out / (h_out - h_in) * oprel.f_F(h_in / h_out) / h_in;
 			} else {
 				throw std::logic_error("We couldn't be here");
 			}
@@ -258,7 +256,6 @@ DiskStructureArguments::DiskStructureArguments(
 		}
 
 		throw std::runtime_error("Invalid value of initialcond");
-	}();
 }
 
 DiskStructureArguments::InitialFFunction::~InitialFFunction() {}
@@ -275,8 +272,8 @@ vecd DiskStructureArguments::InitialFPowerSigma::operator()(const vecd& h) const
 	vecd F(h.size());
 	for (size_t i = 0; i < h.size(); ++i) {
 		const double Sigma_to_Sigmaout = std::pow((h[i] - h.front()) / (h.back() - h.front()), powerorder);
-		F[i] = F0 * std::pow(h[i] / h.back(), (3. - oprel->n) / (1. - oprel->m)) *
-				std::pow(Sigma_to_Sigmaout, 1. / (1. - oprel->m));
+		F[i] = F0 * std::pow(h[i] / h.back(), (3. - oprel.n) / (1. - oprel.m)) *
+				std::pow(Sigma_to_Sigmaout, 1. / (1. - oprel.m));
 	}
 	return F;
 }
@@ -293,9 +290,25 @@ vecd DiskStructureArguments::InitialFQuasistat::operator()(const vecd& h) const 
 	vecd F(h.size());
 	for (size_t i = 0; i < h.size(); ++i) {
 		const double xi_LS2000 = h[i] / h.back();
-		F[i] = F0 * oprel->f_F(xi_LS2000) * (1. - h.front() / h[i]) / (1. - h.front() / h.back());
+		F[i] = F0 * oprel.f_F(xi_LS2000) * (1. - h.front() / h[i]) / (1. - h.front() / h.back());
 	}
 	return F;
+}
+
+double DiskStructureArguments::InitialFQuasistat::Coeff(double h_in, double h_out, const OpacityRelated &oprel) {
+	odeint::runge_kutta_cash_karp54<double> stepper;
+	const double x0 = h_in / (h_out - h_in);
+	const double x1 = h_in / h_out;
+	double integral = 0.;
+	integrate_adaptive(
+			stepper,
+			[x0, x1, &oprel](const double &y, double &dydx, double x) {
+				dydx = pow(oprel.f_F(x * (1. - x1) + x1) * x / (x * (1. - x1) + x1),
+						   1. - oprel.m) * pow(x + x0, oprel.n);
+			},
+			integral, 0., 1., 0.01
+	);
+	return std::pow(h_out - h_in, oprel.n + 1.) * integral / ((1. - oprel.m) * oprel.D);
 }
 
 vecd DiskStructureArguments::InitialFGaussF::operator()(const vecd& h) const {

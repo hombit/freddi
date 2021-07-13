@@ -33,6 +33,7 @@ public:
 	double Rx;
 	double Bx;
 	double hotspotarea;
+	double mu_magn;
 	double epsilonAlfven;
 	double inversebeta;
 	double Rdead;
@@ -48,7 +49,7 @@ public:
 	NeutronStarArguments(
 			const std::string& nsprop,
 			std::optional<double> freqx,
-			std::optional<double> Rx,
+			std::optional<double> Rx_,
 			double Bx, double hotspotarea,
 			double epsilonAlfven, double inversebeta, double Rdead,
 			const std::string& fptype, const pard& fpparams,
@@ -56,12 +57,13 @@ public:
 			const std::string& ns_grav_redshift):
 			nsprop(nsprop),
 			freqx(freqx ? *freqx : initializeFreqx(nsprop)),
-			Rx(Rx ? *Rx : initializeRx(nsprop, freqx)),
-			Bx(Bx), hotspotarea(hotspotarea),
+			Rx(Rx_ ? *Rx_ : initializeRx(nsprop, freqx)),
+			Bx(Bx), hotspotarea(hotspotarea), mu_magn(0.5 * Bx * m::pow<3>(Rx)),
 			epsilonAlfven(epsilonAlfven), inversebeta(inversebeta), Rdead(Rdead),
 			fptype(fptype), fpparams(fpparams),
 			kappat_type(kappat_type), kappat_params(kappat_params),
 			ns_grav_redshift(ns_grav_redshift) {}
+	double R_Alfven(double GM, double Mdot) const;
 };
 
 
@@ -77,6 +79,47 @@ public:
 			double Mopt_, double roche_lobe_fill_, double Topt_,
 			std::optional<double> rin_, std::optional<double> rout_, std::optional<double> risco_
 	);
+};
+
+
+class NeutronStarDiskStructureArguments: public DiskStructureArguments {
+protected:
+	class InitialFQuasistatNS: public DiskStructureArguments::InitialFFunction {
+	protected:
+		const OpacityRelated oprel;
+		const double h_in;
+	public:
+		InitialFQuasistatNS(double F0, double Mdot0, double Mdisk0, const OpacityRelated& oprel, double h_in):
+				InitialFFunction(F0, Mdot0, Mdisk0),
+				oprel(oprel),
+				h_in(h_in) {}
+		~InitialFQuasistatNS() override = default;
+		vecd operator()(const vecd& h) const override;
+		size_t first(const vecd& h) const override;
+	};
+protected:
+	static std::shared_ptr<InitialFFunction> initializeInitialFFunctionNS(
+			const OpacityRelated& oprel,
+			const NeutronStarArguments& ns_args,
+			const BasicDiskBinaryArguments &bdb_args,
+			const std::string& initialcond,
+			std::optional<double> F0, std::optional<double> Mdisk0, std::optional<double> Mdot0,
+			std::optional<double> powerorder,
+			std::optional<double> gaussmu, std::optional<double> gausssigma);
+
+public:
+	NeutronStarDiskStructureArguments(
+			const NeutronStarArguments& ns_args,
+			const BasicDiskBinaryArguments &bdb_args,
+			const std::string& opacity,
+			double Mdotout,
+			const std::string& boundcond, double Thot, double Tirr2Tvishot,
+			const std::string& initialcond,
+			std::optional<double> F0,
+			std::optional<double> Mdisk0, std::optional<double> Mdot0,
+			std::optional<double> powerorder,
+			std::optional<double> gaussmu, std::optional<double> gausssigma,
+			const std::string& wind, const pard& windparams);
 };
 
 

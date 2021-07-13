@@ -106,6 +106,7 @@ protected:
 				F0(F0), Mdot0(Mdot0), Mdisk0(Mdisk0) {}
 		virtual ~InitialFFunction() = 0;
 		virtual vecd operator()(const vecd& h) const = 0;
+		virtual size_t first(const vecd& h) const { return 0; }
 	};
 
 	class InitialFPowerF: public InitialFFunction {
@@ -128,10 +129,10 @@ protected:
 	class InitialFPowerSigma: public InitialFFunction {
 	protected:
 		double powerorder;
-		std::shared_ptr<const OpacityRelated> oprel;
+		OpacityRelated oprel;
 	public:
 		InitialFPowerSigma(double F0, double Mdot0, double Mdisk0, double powerorder,
-				std::shared_ptr<const OpacityRelated> oprel):
+				const OpacityRelated &oprel):
 				InitialFFunction(F0, Mdot0, Mdisk0),
 				powerorder(powerorder),
 				oprel(oprel) {}
@@ -148,9 +149,11 @@ protected:
 
 	class InitialFQuasistat: public InitialFFunction {
 	protected:
-		std::shared_ptr<const OpacityRelated> oprel;
+		const OpacityRelated oprel;
 	public:
-		InitialFQuasistat(double F0, double Mdot0, double Mdisk0, const std::shared_ptr<const OpacityRelated>& oprel):
+		static double Coeff(double h_in, double h_out, const OpacityRelated &oprel);
+	public:
+		InitialFQuasistat(double F0, double Mdot0, double Mdisk0, const OpacityRelated& oprel):
 				InitialFFunction(F0, Mdot0, Mdisk0),
 				oprel(oprel) {}
 		~InitialFQuasistat() override = default;
@@ -180,7 +183,7 @@ public:
 	constexpr static const double mu = 0.62;
 public:
 	std::string opacity;
-	std::shared_ptr<const OpacityRelated> oprel;
+	const OpacityRelated oprel;
 	double Mdotout;
 	std::string boundcond;
 	double Thot;
@@ -193,6 +196,13 @@ public:
 	pard windparams;
 protected:
 	std::shared_ptr<InitialFFunction> initial_F_function;
+protected:
+	static std::shared_ptr<InitialFFunction> initializeInitialFFunction(
+			const OpacityRelated& oprel,
+			const BasicDiskBinaryArguments &bdb_args, const std::string& initialcond,
+			std::optional<double> F0, std::optional<double> Mdisk0, std::optional<double> Mdot0,
+			std::optional<double> powerorder,
+			std::optional<double> gaussmu, std::optional<double> gausssigma);
 public:
 	DiskStructureArguments(
 			const BasicDiskBinaryArguments &bdb_args,
@@ -205,7 +215,24 @@ public:
 			std::optional<double> powerorder,
 			std::optional<double> gaussmu, std::optional<double> gausssigma,
 			const std::string& wind, const pard& windparams);
+	DiskStructureArguments(
+			const std::string &opacity,
+			const OpacityRelated &oprel,
+			double Mdotout,
+			const std::string &boundcond,
+			double Thot,
+			double Tirr2Tvishot,
+			const std::string &initialcond,
+			const std::shared_ptr<InitialFFunction> initial_F_function,
+			const std::string &wind, const pard &windparams):
+			opacity(opacity), oprel(oprel),
+			Mdotout(Mdotout),
+			boundcond(boundcond), Thot(Thot), Tirr2Tvishot(Tirr2Tvishot),
+			initialcond(initialcond),
+			initial_F_function(initial_F_function),
+			wind(wind), windparams(windparams) {}
 	inline vecd initial_F(const vecd& h) const { return (*initial_F_function)(h); }
+	inline size_t initial_first(const vecd& h) const { return initial_F_function->first(h); }
 };
 
 

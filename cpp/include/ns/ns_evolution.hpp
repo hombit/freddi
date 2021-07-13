@@ -56,13 +56,14 @@ private:
 		vecd Fmagn;
 		vecd dFmagn_dh;
 		vecd d2Fmagn_dh2;
-		NeutronStarStructure(const NeutronStarArguments& args_ns, FreddiEvolution* evolution);
 	protected:
 		static double initialize_redshift(const FreddiEvolution* evolution, const NeutronStarArguments& args_ns);
 		static std::shared_ptr<BasicKappaT> initialize_kappa_t(const NeutronStarArguments& args_ns);
 		vecd initialize_Fmagn(FreddiEvolution* evolution) const;
 		vecd initialize_dFmagn_dh(FreddiEvolution* evolution) const;
 		vecd initialize_d2Fmagn_dh2(FreddiEvolution* evolution) const;
+	public:
+		NeutronStarStructure(const NeutronStarArguments& args_ns, FreddiEvolution* evolution);
 	};
 
 	struct NeutronStarOptionalStructure {
@@ -212,11 +213,11 @@ public:
 // eta_ns_
 public:
 	inline double eta_ns(double Rm) const { return (*eta_ns_)(*this, Rm); }
-	inline double eta_ns() const { return eta_ns(R_alfven()); }
+	inline double eta_ns() const { return eta_ns(R_Alfven()); }
 public:
 	using FreddiEvolution::step;
 	virtual double Mdot_in() const override;
-	double R_alfven() const;
+	double R_Alfven() const;
 protected:
 	virtual void invalidate_optional_structure() override;
 	virtual void truncateInnerRadius() override;

@@ -22,7 +22,7 @@ FreddiState::DiskStructure::DiskStructure(const FreddiArguments &args, const wun
 		cosi(std::cos(args.flux->inclination / 180.0 * M_PI)),
 		distance(args.flux->distance),
 		cosiOverD2(cosi / m::pow<2>(distance)),
-		oprel(*(args.disk->oprel.get())),
+		oprel(args.disk->oprel),
 		h(initialize_h(args, Nx)),
 		R(initialize_R(h, GM)),
 		wunc(wunc) {}
@@ -57,10 +57,14 @@ FreddiState::CurrentState::CurrentState(const DiskStructure& str):
 		Mdot_out(str.args.disk->Mdotout),
 		t(str.args.calc->init_time),
 		i_t(0),
-		first(0),
+		first(initializeFirst(str)),
 		last(str.Nx - 1),
 		F(initializeF(str)),
 		F_in(0) {}
+
+size_t FreddiState::CurrentState::initializeFirst(const DiskStructure& str) {
+	return str.args.disk->initial_first(str.h);
+}
 
 vecd FreddiState::CurrentState::initializeF(const DiskStructure& str) {
 	return str.args.disk->initial_F(str.h);
