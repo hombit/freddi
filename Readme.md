@@ -113,11 +113,11 @@ installed to use dimensional input via `Freddi.from_astropy`
 
 ### Executables
 
-`Freddi` runs from the command line with inline options and/or with a configuration file. `Freddi`
-outputs file `freddi.dat` with distribution of various physical values over
-time. If `--fulldata` is specified then files `freddi_%d.dat` for each time step
-are created in the same directory with snapshot radial distributions. These
-data-files contain whitespace-separated data columns with header lines starting
+`Freddi` runs from the command line with inline options and/or with configuration 
+files. `Freddi` outputs file `freddi.dat` with distribution of various physical values 
+over time. If `--fulldata` is specified then files `freddi_%d.dat` for each time step 
+are created in the same directory with snapshot radial distributions. These data-files 
+contain whitespace-separated data columns with header lines starting
 with `#` symbol. You can set another prefix instead of `freddi` with `--prefix`
 option and change the output directory with `--dir` option. If you choose the
 Docker way and would like to specify the directory, then avoid using `--dir`
@@ -140,7 +140,9 @@ Freddi: numerical calculation of accretion disk evolution:
 
 General options:
   -h [ --help ]                    Produce help message
-  --config arg                     Set additional configuration filepath
+  --config arg                     Set filepath for additional configuration file. 
+                                   There is no need to declare a configuration 
+                                   file with the default name `freddi.ini'
   --prefix arg (=freddi)           Set prefix for output filenames. Output file
                                    with distribution of parameters over time is
                                    PREFIX.dat
@@ -159,7 +161,7 @@ Basic binary and disk parameter:
   -a [ --alpha ] arg               Alpha parameter of Shakura-Sunyaev model
   --alphacold arg                  Alpha parameter of cold disk, currently it 
                                    is used only for Sigma_minus, see 
-                                   --Qirr2Qvishot. Default is --alpha values 
+                                   --Qirr2Qvishot. Default is --alpha value 
                                    divided by ten
   -M [ --Mx ] arg                  Mass of the central object, in the units of 
                                    solar masses
