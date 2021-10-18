@@ -1,0 +1,111 @@
+name: Main CI
+
+on: [push, pull_request]
+
+jobs:
+  gcc:
+    runs-on: ubuntu-latest
+
+    container:
+      image: opensuse/tumbleweed
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: zypper install -y --no-recommends gcc-c++ cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel git
+      - name: Create ./cmake-build directory
+        run: mkdir ./cmake-build
+      - name: Build and install
+        run: |
+          cmake $GITHUB_WORKSPACE
+          make -j2 VERBOSE=1 install
+        working-directory: ./cmake-build
+      - name: Run freddi
+        run: ./freddi --fulldata --starflux
+        working-directory: ./cmake-build
+      - name: Run freddi-ns
+        run: ./freddi-ns --Mx=1.4 --alpha=0.25 --Mopt=0.5 period=1 --Mdot0=1e17 --initialcond=quasistat --Bx=1e8 --fulldata --starflux
+        working-directory: ./cmake-build
+      - name: Unit tests
+        run: ctest -V
+        working-directory: ./cmake-build
+      - name: Regression test
+        run: FREDDI=../../../cmake-build/freddi ./generate_test_data.sh && git diff --word-diff --exit-code
+        working-directory: ./python/test/data
+      - name: Check --help messages in Readme.md
+        run: FREDDI_PREFIX=./cmake-build/ ./.ci/update-help-readme.py && git diff --word-diff --exit-code
+  
+  clang:
+    runs-on: ubuntu-latest
+
+    container:
+      image: opensuse/tumbleweed
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: zypper install -y --no-recommends clang gcc cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel git
+      - name: Create ./cmake-build directory
+        run: mkdir ./cmake-build
+      - name: Build and install
+        run: |
+          cmake -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ ..
+          make -j2 VERBOSE=1 install
+        working-directory: ./cmake-build
+      - name: Run freddi
+        run: ./freddi --fulldata --starflux
+        working-directory: ./cmake-build
+      - name: Run freddi-ns
+        run: ./freddi-ns --Mx=1.4 --alpha=0.25 --Mopt=0.5 period=1 --Mdot0=1e17 --initialcond=quasistat --Bx=1e8 --fulldata --starflux
+        working-directory: ./cmake-build
+      - name: Unit tests
+        run: ctest -V
+        working-directory: ./cmake-build  
+      - name: Regression test
+        run: FREDDI=../../../cmake-build/freddi ./generate_test_data.sh && git diff --word-diff --exit-code
+        working-directory: ./python/test/data
+      - name: Check --help messages in Readme.md
+        run: FREDDI_PREFIX=./cmake-build/ ./.ci/update-help-readme.py && git diff --word-diff --exit-code
+
+  cpython:
+    runs-on: ubuntu-latest
+
+    container:
+      image: opensuse/tumbleweed
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install system dependencies
+        run: zypper install -y --no-recommends gcc-c++ cmake libboost_program_options-devel libboost_filesystem-devel libboost_test-devel libboost_python3-devel libboost_numpy3-devel python3-devel python3-numpy-devel python3-pip
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install -U pip setuptools
+          python3 -m pip install parameterized pytest numpy scipy
+      - name: Install
+        run: python3 -m pip install .
+      - name: Test
+        run: python3 -m pytest
+
+  docker-exe:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build container
+        run: docker build -t freddi .
+      - name: Run freddi
+        run: docker run --rm -t freddi freddi --fulldata --starflux
+      - name: Run freddi-ns
+        run: docker run --rm -t freddi freddi-ns --Bx=1e16 --fulldata --starflux
+
+  docker-python:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build container with wheels
+        run: docker build -f Dockerfile.python -t freddi:python .
+      - name: Build containers
+        run: for V in 3.7 3.8 3.9; do docker build -f .ci/Dockerfile-test-wheels --build-arg PY_VERSION=$V -t freddi:python$V .; done
+      - name: Run sample Python script
+        run: for V in 3.7 3.8 3.9; do docker run --rm -t freddi:python$V python -c "import freddi; freddi.Freddi(**freddi._freddi._Freddi._required_args())"; done
