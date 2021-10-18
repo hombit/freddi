@@ -24,6 +24,10 @@ during the 2002 outburst” by Lipunova & Malanchev (2017)
 `Freddi` is written on C++ and available as a couple of binary executables and
 a Python module.
 
+Note that the original `Freddi` version 1 introduced in Lipunova & Malanchev (2017)
+[2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L) is still
+available in the [`v1` git branch](https://github.com/hombit/freddi/tree/v1).
+
 ## Installation
 
 ### Executables
