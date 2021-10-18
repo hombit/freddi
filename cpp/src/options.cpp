@@ -21,7 +21,7 @@ po::options_description GeneralOptions::description() {
 	po::options_description od("General options");
 	od.add_options()
 			( "help,h", "Produce help message" )
-			( "config", po::value<std::string>(), "Set additional configuration filepath" )
+			( "config", po::value<std::string>(), "Set filepath for additional configuration file. There is no need to declare a configuration file with the default name freddi.ini" )
 			( "prefix", po::value<std::string>()->default_value(default_prefix), "Set prefix for output filenames. Output file with distribution of parameters over time is PREFIX.dat" )
 			( "stdout", "Output temporal distribution to stdout instead of PREFIX.dat file" )
 			( "dir,d", po::value<std::string>()->default_value(default_dir), "Choose the directory to write output files. It should exist" )
@@ -78,15 +78,15 @@ po::options_description BasicDiskBinaryOptions::description() {
 	po::options_description od("Basic binary and disk parameter");
 	od.add_options()
 			( "alpha,a", po::value<double>()->required(), "Alpha parameter of Shakura-Sunyaev model" )
-			( "alphacold", po::value<double>(), "Alpha parameter of cold disk, currently it is used only for Sigma_minus, see --Qirr2Qvishot. Default is --alpha values divided by ten" )  // default_alpha_to_alphacold
+			( "alphacold", po::value<double>(), "Alpha parameter of cold disk, currently it is used only for the critical maximum value of the surface density of the cold disk Sigma_minus (Lasota et al., 2008, A&A 486, 523) and the cooling front velocity (Ludwig et al., 1994, A&A 290, 473), see --Qirr2Qvishot. Default value is --alpha divided by ten" )  // default_alpha_to_alphacold
 			( "Mx,M", po::value<double>()->required(), "Mass of the central object, in the units of solar masses" )
 			( "kerr", po::value<double>()->default_value(default_kerr), "Dimensionless Kerr parameter of the black hole" )
 			( "Mopt",	po::value<double>()->required(), "Mass of the optical star, in units of solar masses" )
 			( "rochelobefill", po::value<double>()->default_value(default_roche_lobe_fill), "Dimensionless factor describing a size of the optical star. Polar radius of the star is rochelobefill * (polar radius of critical Roche lobe)" )
-			( "Topt", po::value<double>()->default_value(default_Topt), "Thermal temperature of the optical star, in units of kelvins" )
+			( "Topt", po::value<double>()->default_value(default_Topt), "Effective temperature of the optical star, in units of kelvins" )
 			( "period,P", po::value<double>()->required(), "Orbital period of the binary system, in units of days" )
-			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the gravitational radius of the central object GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
-			( "rout,R", po::value<double>(), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used defined by --Mx, --Mopt and --period values" )
+			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the gravitational radius of the central object GM/c^2. There is no need to set it for a neutron star. If it isn't set for a black hole then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
+			( "rout,R", po::value<double>(), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used defined by --Mx, --Mopt and --period values as 90% of the Roche lobe radius (Papaloizou & Pringle, 1977, MNRAS, 181, 441; see also Artymowicz & Lubow, 1994, ApJ, 421, 651)
 			( "risco", po::value<double>(), "Innermost stable circular orbit, in units of gravitational radius of the central object GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
 			;
 	return od;
