@@ -140,7 +140,10 @@ Freddi: numerical calculation of accretion disk evolution:
 
 General options:
   -h [ --help ]                    Produce help message
-  --config arg                     Set additional configuration filepath
+  --config arg                     Set filepath for additional configuration 
+                                   file. There is no need to declare a 
+                                   configuration file with the default name 
+                                   freddi.ini
   --prefix arg (=freddi)           Set prefix for output filenames. Output file
                                    with distribution of parameters over time is
                                    PREFIX.dat
@@ -158,8 +161,12 @@ General options:
 Basic binary and disk parameter:
   -a [ --alpha ] arg               Alpha parameter of Shakura-Sunyaev model
   --alphacold arg                  Alpha parameter of cold disk, currently it 
-                                   is used only for Sigma_minus, see 
-                                   --Qirr2Qvishot. Default is --alpha values 
+                                   is used only for the critical maximum value 
+                                   of the surface density of the cold disk 
+                                   Sigma_minus (Lasota et al., 2008, A&A 486, 
+                                   523) and the cooling front velocity (Ludwig 
+                                   et al., 1994, A&A 290, 473), see 
+                                   --Qirr2Qvishot. Default value is --alpha 
                                    divided by ten
   -M [ --Mx ] arg                  Mass of the central object, in the units of 
                                    solar masses
@@ -171,19 +178,23 @@ Basic binary and disk parameter:
                                    the optical star. Polar radius of the star 
                                    is rochelobefill * (polar radius of critical
                                    Roche lobe)
-  --Topt arg (=0)                  Thermal temperature of the optical star, in 
-                                   units of kelvins
+  --Topt arg (=0)                  Effective temperature of the optical star, 
+                                   in units of kelvins
   -P [ --period ] arg              Orbital period of the binary system, in 
                                    units of days
   --rin arg                        Inner radius of the disk, in the units of 
                                    the gravitational radius of the central 
-                                   object GM/c^2. If it isn't set then the 
-                                   radius of ISCO orbit is used defined by --Mx
-                                   and --kerr values
+                                   object GM/c^2. There is no need to set it 
+                                   for a neutron star. If it isn't set for a 
+                                   black hole then the radius of ISCO orbit is 
+                                   used defined by --Mx and --kerr values
   -R [ --rout ] arg                Outer radius of the disk, in units of solar 
                                    radius. If it isn't set then the tidal 
                                    radius is used defined by --Mx, --Mopt and 
-                                   --period values
+                                   --period values as 90% of the Roche lobe 
+                                   radius (Papaloizou & Pringle, 1977, MNRAS, 
+                                   181, 441; see also Artymowicz & Lubow, 1994,
+                                   ApJ, 421, 651
   --risco arg                      Innermost stable circular orbit, in units of
                                    gravitational radius of the central object 
                                    GM/c^2. If it isn't set then the radius of 
@@ -381,7 +392,10 @@ Freddi NS: numerical calculation of accretion disk evolution:
 
 General options:
   -h [ --help ]                         Produce help message
-  --config arg                          Set additional configuration filepath
+  --config arg                          Set filepath for additional 
+                                        configuration file. There is no need to
+                                        declare a configuration file with the 
+                                        default name freddi.ini
   --prefix arg (=freddi)                Set prefix for output filenames. Output
                                         file with distribution of parameters 
                                         over time is PREFIX.dat
@@ -402,9 +416,14 @@ Basic binary and disk parameter:
   -a [ --alpha ] arg                    Alpha parameter of Shakura-Sunyaev 
                                         model
   --alphacold arg                       Alpha parameter of cold disk, currently
-                                        it is used only for Sigma_minus, see 
-                                        --Qirr2Qvishot. Default is --alpha 
-                                        values divided by ten
+                                        it is used only for the critical 
+                                        maximum value of the surface density of
+                                        the cold disk Sigma_minus (Lasota et 
+                                        al., 2008, A&A 486, 523) and the 
+                                        cooling front velocity (Ludwig et al., 
+                                        1994, A&A 290, 473), see 
+                                        --Qirr2Qvishot. Default value is 
+                                        --alpha divided by ten
   -M [ --Mx ] arg                       Mass of the central object, in the 
                                         units of solar masses
   --kerr arg (=0)                       Dimensionless Kerr parameter of the 
@@ -415,19 +434,25 @@ Basic binary and disk parameter:
                                         of the optical star. Polar radius of 
                                         the star is rochelobefill * (polar 
                                         radius of critical Roche lobe)
-  --Topt arg (=0)                       Thermal temperature of the optical 
+  --Topt arg (=0)                       Effective temperature of the optical 
                                         star, in units of kelvins
   -P [ --period ] arg                   Orbital period of the binary system, in
                                         units of days
   --rin arg                             Inner radius of the disk, in the units 
                                         of the gravitational radius of the 
-                                        central object GM/c^2. If it isn't set 
-                                        then the radius of ISCO orbit is used 
-                                        defined by --Mx and --kerr values
+                                        central object GM/c^2. There is no need
+                                        to set it for a neutron star. If it 
+                                        isn't set for a black hole then the 
+                                        radius of ISCO orbit is used defined by
+                                        --Mx and --kerr values
   -R [ --rout ] arg                     Outer radius of the disk, in units of 
                                         solar radius. If it isn't set then the 
                                         tidal radius is used defined by --Mx, 
-                                        --Mopt and --period values
+                                        --Mopt and --period values as 90% of 
+                                        the Roche lobe radius (Papaloizou & 
+                                        Pringle, 1977, MNRAS, 181, 441; see 
+                                        also Artymowicz & Lubow, 1994, ApJ, 
+                                        421, 651
   --risco arg                           Innermost stable circular orbit, in 
                                         units of gravitational radius of the 
                                         central object GM/c^2. If it isn't set 
@@ -486,7 +511,12 @@ Parameters of the disk mode:
                                         h_out/h, where f is quasi-stationary 
                                         solution found in Lipunova & Shakura 
                                         2000. f(xi=0) = 0, df/dxi(xi=1) = 0
-                                          quasistat-ns: ???
+                                          quasistat-ns: Distibution of the 
+                                        initial viscous torque in the disc is  
+                                        F0 = Mdot0 * (h_out - h_in) / h_out * 
+                                        h_in / oprel.f_F(h_in / h_out), where 
+                                        f_F is taken from Lipunova & Shakura 
+                                        (2000)
                                         
   --F0 arg                              Initial maximum viscous torque in the 
                                         disk, dyn*cm. Can be overwritten via 
@@ -569,84 +599,102 @@ Parameters of the disk mode:
                                         value is 3e-13 g/(s*cm^2)
 
 Parameters of accreting neutron star:
-  --nsprop arg (=dummy)                 Neutron star geometry and radiation 
-                                        properties name and specifies default 
-                                        values of --Rx, --Risco and --freqx
+  --nsprop arg (=dummy)                 Neutron star properties name: defines 
+                                        geometry (default values of --Rx, 
+                                        --Risco, and --freqx) and 
+                                        accretion->radiation efficiency of NS
                                         
                                         Values:
-                                          dummy: NS radiation efficiency is R_g
-                                        * (1 / R_x - 1 / 2R_in), default 
-                                        --freqx is 0, default Rx is 1e6, 
-                                        default Risco is Kerr value
-                                          newt: NS radiation efficiency is a 
-                                        functions of NS frequency, that's why 
-                                        --freqx must be specified explicitly
-                                          sibgatullin-sunyaev2000: NS radiation
-                                        efficiency, and default values of Rx 
-                                        and Risco are functions of NS 
-                                        frequency, that's why --freqx must be 
-                                        specified explicitly
+                                          dummy: NS accretion->radiation 
+                                        efficiency is R_g * (1 / R_x - 1 / 
+                                        2R_in), default --freqx is 0, default 
+                                        Rx is 1e6, default Risco is Kerr value
+                                          newt: NS accretion->radiation 
+                                        efficiency is a function of NS 
+                                        frequency, calculated in Newtonian 
+                                        mechanics (see Lipunova+2021), that's 
+                                        why --freqx must be specified 
+                                        explicitly
+                                          sibgatullin-sunyaev2000: NS 
+                                        accretion->radiation efficiency and 
+                                        default values of Rx and Risco are 
+                                        functions of NS frequency, calculated 
+                                        for a specific equation of state for a 
+                                        NS with weak magnetic field 
+                                        (Sibgatullin & Sunyaev, 2000, Astronomy
+                                        Letters, 26, 699), that's why --freqx 
+                                        must be specified explicitly
   --freqx arg                           Accretor rotation frequency, Hz. This 
                                         parameter is not linked to --kerr, 
-                                        agree them yourself
+                                        which could be reconciled manually 
+                                        (currently, --kerr is not needed for 
+                                        freddi-ns)
   --Rx arg                              Accretor radius, cm
   --Bx arg                              Accretor polar magnetic induction, G
-  --hotspotarea arg (=1)                ??? Relative area of hot spot on the 
-                                        accretor
-  --epsilonAlfven arg (=1)              Factor in Alfven radius formula
-  --inversebeta arg (=0)                ???
+  --hotspotarea arg (=1)                Total area of the region on the 
+                                        accretor radiating beacuse of 
+                                        accretion, normalized by the accretor 
+                                        surface area
+  --epsilonAlfven arg (=1)              Magnetosphere radius in units of the 
+                                        Alfven radius, which is defined as 
+                                        (mu^4/G/M/sqrt(Mdot))^(1/7)
+  --inversebeta arg (=0)                Not currently in use
   --Rdead arg (=0)                      Maximum inner radius of the disk that 
-                                        can be obtained, it characterises 
-                                        minimum torque in the dead disk, cm
-  --fptype arg (=no-outflow)            ??? Accretor Mdot fraction mode fp.
+                                        can be achieved, cm
+  --fptype arg (=no-outflow)            Scenario to determine the fraction fp 
+                                        of accretied mass. The rest of the disk
+                                        inner accretion rate is propelled away.
                                         
                                         Values:
-                                          no-outflow: all the matter passing 
-                                        inner disk radius falling onto neutron 
-                                        star, fp = 1
-                                          propeller: all the matter flows away 
-                                        from both disk and neutron star, fp = 0
-                                          corotation-block: like 'no-otflow' 
-                                        when Alfven radius is smaller than 
-                                        corotation radius, like 'propeller' 
-                                        otherwise
-                                          geometrical: generalisation of 
-                                        'corotation-block' for the case of not 
-                                        co-directional of disk rotation axis 
-                                        and neutron star magnetic field axis. 
-                                        Requires --fp-geometrical-chi to be 
-                                        specified
-                                          eksi-kutlu2010: ???
-                                          romanova2018: ???, requires 
+                                          no-outflow: the matter reaching the 
+                                        inner disk radius always falls onto NS,
+                                        fp = 1
+                                          propeller: the matter always flows 
+                                        away, fp = 0
+                                          corotation-block: like 'no-outflow' 
+                                        when the inner disk radius is smaller 
+                                        than the corotation radius, like 
+                                        'propeller' otherwise
+                                          geometrical: experimental. 
+                                        Generalization of 'corotation-block' 
+                                        for the case of misaligned NS magnetic 
+                                        axis. Requires --fp-geometrical-chi to 
+                                        be specified
+                                          eksi-kutlu2010: Under construction
+                                          romanova2018: fp is an analytical 
+                                        function of the fastness, found from 
+                                        MHD simulations by Romanova et al. 
+                                        (2018, NewA, 62, 94): fp = 1 - 
+                                        par1*fastness^par2. This requires 
                                         --romanova2018-par1 and 
                                         --romanova2018-par2 to be specified
-  --fp-geometrical-chi arg              angle between disk rotation axis and 
-                                        neutron star magnetic axis for 
+  --fp-geometrical-chi arg              angle between the disk rotation axis 
+                                        and the NS magnetic axis, used for 
                                         --fptype=geometrical, degrees
-  --romanova2018-par1 arg               ??? par1 value for --fptype=romanova201
-                                        8 and --kappattype=romanova2018
-  --romanova2018-par2 arg               ??? par2 value for --fptype=romanova201
-                                        8 and --kappattype=romanova2018
-  --kappattype arg (=const)             kappa_t describes how strong is 
-                                        interaction between neutron star 
-                                        magnitosphere and disk, magnetic torque
-                                        is kappa_t(R) * mu^2 / R^3. This 
-                                        parameter describes type of radial 
-                                        destribution of this parameter
+  --romanova2018-par1 arg               par1 value for --fptype=romanova2018 
+                                        and --kappattype=romanova2018
+  --romanova2018-par2 arg               par2 value for --fptype=romanova2018 
+                                        and --kappattype=romanova2018
+  --kappattype arg (=const)             kappa_t describes how strong is the 
+                                        interaction between the NS 
+                                        magnitosphere and disk: total 
+                                        (accelerating) magnetic torque applied 
+                                        to the disc is kappa_t(R) * mu^2 / R^3.
                                         
                                         Values:
                                           const: doesn't depend on radius, 
                                         kappa_t = value. Requires 
                                         --kappat-const-value to be specified
-                                          corstep: kappa_t is 'in' inside 
-                                        corotation radius, and 'out' outside. 
-                                        Requires --kappat-corstep-in and 
-                                        --kappat-corstep-out to be specified
-                                          romanova2018: similar to corstep 
-                                        option, but the outside value is 
-                                        reduced by the portion taken away by 
-                                        wind (see Table 2 of 
-                                        Romanova+2018,NewA,62,94). Requires 
+                                          corstep: kappa_t can be different 
+                                        inside and outside the corotation 
+                                        radius. Requires --kappat-corstep-in 
+                                        and --kappat-corstep-out to be 
+                                        specified
+                                          romanova2018: experimental. Similar 
+                                        to corstep option, but the outside 
+                                        value is reduced by the portion taken 
+                                        away by the outflow (see Table 2 of 
+                                        Romanova+2018, NewA, 62, 94). Requires 
                                         --kappat-romanova2018-in, 
                                         --kappat-romanova2018-out 
                                         --romanova2018-par1 and --romanova-par2
@@ -654,22 +702,22 @@ Parameters of accreting neutron star:
   --kappat-const-value arg (=0.33333333333333331)
                                         kappa_t value for --kappattype=const
   --kappat-corstep-in arg (=0.33333333333333331)
-                                        kappa_t value inside corotation radius 
-                                        for --kappattype=corstep
+                                        kappa_t value inside the corotation 
+                                        radius for --kappattype=corstep
   --kappat-corstep-out arg (=0.33333333333333331)
-                                        kappa_t value outside corotation radius
-                                        for --kappattype=corstep
+                                        kappa_t value outside the corotation 
+                                        radius for --kappattype=corstep
   --kappat-romanova2018-in arg (=0.33333333333333331)
-                                        kappa_t value inside corotation radius 
-                                        for --kappattype=romanova2018
+                                        kappa_t value inside the corotation 
+                                        radius for --kappattype=romanova2018
   --kappat-romanova2018-out arg (=0.33333333333333331)
-                                        kappa_t value outside corotation radius
-                                        for --kappattype=romanova2018
+                                        kappa_t value outside the corotation 
+                                        radius for --kappattype=romanova2018
   --nsgravredshift arg (=off)           Neutron star gravitational redshift 
-                                        type.
+                                        flag.
                                         
                                         Values:
-                                          off: gravitational redshift doesn't 
+                                          off: gravitational redshift is not 
                                         taken into account
                                           on: redshift is (1 - R_sch / Rx), 
                                         where R_sch = 2GM/c^2
@@ -685,9 +733,9 @@ Qirr = Cirr * (H/r / 0.05)^irrindex * L * psi / (4 pi R^2), where psi is angular
                                         star
   --angulardistdisk arg (=plane)        Angular distribution of the disk X-ray 
                                         radiation. Values: isotropic, plane
-  --angulardistns arg (=isotropic)      Angular distribution type of the 
-                                        neutron star X-ray radiation. Values: 
-                                        isotropic, plane
+  --angulardistns arg (=isotropic)      Flag to calculate angular distribution 
+                                        the NS emission. Values: isotropic, 
+                                        plane
 
 Parameters of flux calculation:
   --colourfactor arg (=1.7)             Colour factor to calculate X-ray flux
