@@ -140,9 +140,7 @@ Freddi: numerical calculation of accretion disk evolution:
 
 General options:
   -h [ --help ]                    Produce help message
-  --config arg                     Set filepath for additional configuration file. 
-                                   There is no need to declare a configuration 
-                                   file with the default name `freddi.ini'
+  --config arg                     Set additional configuration filepath
   --prefix arg (=freddi)           Set prefix for output filenames. Output file
                                    with distribution of parameters over time is
                                    PREFIX.dat
@@ -161,7 +159,7 @@ Basic binary and disk parameter:
   -a [ --alpha ] arg               Alpha parameter of Shakura-Sunyaev model
   --alphacold arg                  Alpha parameter of cold disk, currently it 
                                    is used only for Sigma_minus, see 
-                                   --Qirr2Qvishot. Default is --alpha value 
+                                   --Qirr2Qvishot. Default is --alpha values 
                                    divided by ten
   -M [ --Mx ] arg                  Mass of the central object, in the units of 
                                    solar masses
