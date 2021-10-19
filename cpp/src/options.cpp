@@ -86,7 +86,7 @@ po::options_description BasicDiskBinaryOptions::description() {
 			( "Topt", po::value<double>()->default_value(default_Topt), "Effective temperature of the optical star, in units of kelvins" )
 			( "period,P", po::value<double>()->required(), "Orbital period of the binary system, in units of days" )
 			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the gravitational radius of the central object GM/c^2. There is no need to set it for a neutron star. If it isn't set for a black hole then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
-			( "rout,R", po::value<double>(), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used defined by --Mx, --Mopt and --period values as 90% of the Roche lobe radius (Papaloizou & Pringle, 1977, MNRAS, 181, 441; see also Artymowicz & Lubow, 1994, ApJ, 421, 651)
+			( "rout,R", po::value<double>(), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used defined by --Mx, --Mopt and --period values as 90% of the Roche lobe radius (Papaloizou & Pringle, 1977, MNRAS, 181, 441; see also Artymowicz & Lubow, 1994, ApJ, 421, 651" )
 			( "risco", po::value<double>(), "Innermost stable circular orbit, in units of gravitational radius of the central object GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
 			;
 	return od;
