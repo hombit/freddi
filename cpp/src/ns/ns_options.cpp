@@ -119,7 +119,7 @@ po::options_description NeutronStarOptions::description() {
 			( "Rx", po::value<double>(), "Accretor radius, cm" )
 			( "Bx", po::value<double>()->required(), "Accretor polar magnetic induction, G" )
 			( "hotspotarea", po::value<double>()->default_value(default_hotspotarea), "Total area of the region on the accretor radiating beacuse of accretion, normalized by the accretor surface area" )
-			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Magnetosphere radius in units of the Alfven radius, which is defined as (mu^4/G/M/sqrt(Mdot))^(1/7)" 
+			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Magnetosphere radius in units of the Alfven radius, which is defined as (mu^4/G/M/sqrt(Mdot))^(1/7)" ) 
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "Not currently in use" )
 			( "Rdead", po::value<double>()->default_value(default_Rdead), "Maximum inner radius of the disk that can be achieved, cm" )
 			( "fptype", po::value<std::string>()->default_value(default_fptype),
