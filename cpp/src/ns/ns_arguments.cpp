@@ -4,7 +4,10 @@
 
 constexpr const char NeutronStarArguments::default_nsprop[];
 constexpr const double NeutronStarArguments::default_hotspotarea;
+//constexpr const char NeutronStarArguments::default_Rm_definition[]; 
 constexpr const double NeutronStarArguments::default_epsilonAlfven;
+//constexpr const double NeutronStarArguments::default_chi_oblique;
+//constexpr const double NeutronStarArguments::default_gamma_GL;
 constexpr const double NeutronStarArguments::default_inversebeta;
 constexpr const double NeutronStarArguments::default_Rdead;
 constexpr const char NeutronStarArguments::default_fptype[];
@@ -48,8 +51,14 @@ double NeutronStarArguments::initializeRx(const std::string& nsprop, const std::
 }
 
 double NeutronStarArguments::R_Alfven(double GM, double Mdot) const {
-	return epsilonAlfven * std::pow(m::pow<4>(mu_magn) / (GM * m::pow<2>(Mdot)), 1./7.);
+	return epsilonAlfven * R_Alfven_basic(GM, Mdot);
 }
+double NeutronStarArguments::R_Alfven_basic(double GM, double Mdot) const {
+	return std::pow(m::pow<4>(mu_magn) / (GM * m::pow<2>(Mdot)), 1./7.);
+}
+
+
+// написать все же через трансцендентное уравнение
 
 
 double SibgatullinSunyaev2000Geometry::radiusNS(double freqx) {
@@ -101,7 +110,7 @@ std::optional<double> NeutronStarBasicDiskBinaryArguments::initializeRisco(const
 	}
 	if (ns_args.nsprop == "newt") {
 		return SibgatullinSunyaev2000Geometry::radiusISCO(ns_args.freqx);
-        }
+        	}
 	if (ns_args.nsprop == "sibgatullinsunyaev2000" || ns_args.nsprop == "sibsun2000") {
 		return SibgatullinSunyaev2000Geometry::radiusISCO(ns_args.freqx);
 	}
