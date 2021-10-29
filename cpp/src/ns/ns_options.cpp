@@ -11,10 +11,27 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 				vm["inversebeta"].as<double>(),
 				vm["Rdead"].as<double>(),
 				vm["fptype"].as<std::string>(),
+//                vm["Rm_definition"].as<std::string>(),
+//                vm["chi_oblique"].as<double>(),
 				fpparamsInitializer(vm),
 				vm["kappattype"].as<std::string>(),
 				kappatparamsInitalizer(vm),
 				vm["nsgravredshift"].as<std::string>()) {}
+
+				
+/*
+pard NeutronStarOptions::Rm_definitionInitializer(const po::variables_map& vm) {
+	const auto Rm_definition = vm["Rm_definition"].as<std::string>();
+
+	if (Rm_definition == "basic") {
+		return {};
+	}
+	if (Rm_definition == "bozzo2018") {
+		return {};
+	}
+	throw po::invalid_option_value("Unknown --Rm_definition=" + Rm_definition);
+} 				
+*/
 
 pard NeutronStarOptions::fpparamsInitializer(const po::variables_map& vm) {
 	const auto fptype = vm["fptype"].as<std::string>();
@@ -105,6 +122,8 @@ pard NeutronStarOptions::kappatparamsInitalizer(const po::variables_map &vm) {
 
 	throw po::invalid_option_value("Unknown --kappattype=" + kappattype);
 }
+
+
 
 po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star");
