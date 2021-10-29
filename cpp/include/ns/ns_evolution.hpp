@@ -52,6 +52,7 @@ private:
 //		double F_dead;
 		double inverse_beta;
 		double epsilon_Alfven;
+        //double chi_oblique;
 		double hot_spot_area;
 		vecd Fmagn;
 		vecd dFmagn_dh;
@@ -187,6 +188,7 @@ public:
 	inline double redshift() const { return ns_str_->redshift; }
 	inline double R_m_min() const { return ns_str_->R_m_min; }
 	inline double mu_magn() const { return ns_str_->mu_magn; }
+	//inline double chi_oblique() const {return ns_str_->chi_oblique;}
 	inline double R_dead() const { return ns_str_->R_dead; }
 //	inline double F_dead() const { return ns_str_->F_dead; }
 	inline double R_cor() const { return ns_str_->R_cor; }
@@ -218,6 +220,8 @@ public:
 	using FreddiEvolution::step;
 	virtual double Mdot_in() const override;
 	double R_Alfven() const;
+    double R_Alfven_basic() const;
+	double R_Magn_bozzo18() const;
 protected:
 	virtual void invalidate_optional_structure() override;
 	virtual void truncateInnerRadius() override;
