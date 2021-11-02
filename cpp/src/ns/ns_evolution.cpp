@@ -51,12 +51,14 @@ FreddiNeutronStarEvolution::NeutronStarStructure::NeutronStarStructure(
 		redshift(initialize_redshift(evolution, args_ns)),
 		R_m_min(std::max(R_x, evolution->R()[evolution->first()])),
 		mu_magn(args_ns.mu_magn),
-	//	chi_oblique(args_ns.chi_oblique),
 		R_cor(std::cbrt(evolution->GM() / m::pow<2>(2*M_PI * args_ns.freqx))),
 		R_dead(args_ns.Rdead > 0. ? args_ns.Rdead : INFINITY),
 //		F_dead((*kappa_t)(R_dead / R_cor) * m::pow<2>(mu_magn) / m::pow<3>(R_dead)),
 		inverse_beta(args_ns.inversebeta),
 		epsilon_Alfven(args_ns.epsilonAlfven),
+		Rmdefinition(args_ns.Rm_definition),
+		h2rbozzo(args_ns.h2r_bozzo),
+        chioblique(args_ns.chi_oblique),
 		hot_spot_area(args_ns.hotspotarea),
 		Fmagn(initialize_Fmagn(evolution)),
 		dFmagn_dh(initialize_dFmagn_dh(evolution)),
@@ -439,12 +441,13 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 	if ( Mdot_in() > Mdot_in_prev() ) {
 		return;
 	}
-    const int Rm_definition = 1;
-    if (Rm_definition == 1){
+    //const int Rm_definition = 1;
+    std::string Rmdef = Rmdefinition(); 
+    if (Rmdef == "bozzo"){
         R_magnetic = R_Magn_bozzo18(); 
     }
     
-    if (Rm_definition == 0){
+    if (Rmdef == "alfven"){
         R_magnetic = R_Alfven();
     }
 
@@ -503,7 +506,7 @@ double FreddiNeutronStarEvolution::R_Alfven_basic() const {
 
 
 double FreddiNeutronStarEvolution::R_Magn_bozzo18() const {
-	const double chi_oblique_rad = 0. * M_PI / 180.;
+	const double chi_oblique_rad = double(chioblique()) * M_PI / 180.;
     const double alpha = 0.5; // как его взять честно??? его надо откуда-то вызвать
 	//eta (Bozzo2018) = 0.2, 
 	const double parametr_bozzo = 2. * m::pow<2>(0.2) / alpha; // на самом деле делить на alpha, как это сделать?
@@ -512,7 +515,7 @@ double FreddiNeutronStarEvolution::R_Magn_bozzo18() const {
 	const double parametr_thetta = RCorrot  / RA;
 
     //const vecd& H = Height();//почему так нельзя?
-    const double H_to_R_temp = 0.01; //временно
+    const double H_to_R_temp = h2rbozzo(); //временно
 	const bool sign_at_inf = 1; //sign on unfunuty should be minus
 
     

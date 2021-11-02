@@ -6,13 +6,15 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 				varToOpt<double>(vm, "freqx"),
 				varToOpt<double>(vm, "Rx"),
 				vm["Bx"].as<double>(),
+                vm["Rm_definition"].as<std::string>(),             
+                vm["h2r_bozzo"].as<double>(),             
+                vm["chi_oblique"].as<double>(),
 				vm["hotspotarea"].as<double>(),
 				vm["epsilonAlfven"].as<double>(),
 				vm["inversebeta"].as<double>(),
 				vm["Rdead"].as<double>(),
 				vm["fptype"].as<std::string>(),
-//                vm["Rm_definition"].as<std::string>(),
-//                vm["chi_oblique"].as<double>(),
+               
 				fpparamsInitializer(vm),
 				vm["kappattype"].as<std::string>(),
 				kappatparamsInitalizer(vm),
@@ -137,6 +139,13 @@ po::options_description NeutronStarOptions::description() {
 			( "freqx", po::value<double>(), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, which could be reconciled manually (currently, --kerr is not needed for freddi-ns)" )
 			( "Rx", po::value<double>(), "Accretor radius, cm" )
 			( "Bx", po::value<double>()->required(), "Accretor polar magnetic induction, G" )
+            ( "Rm_definition", po::value<std::string>()->default_value(default_Rm_definition), 
+                    "Definition of magnetosphere radus used in code\n\n"
+                    "Values:\n"
+                    "  alfven: magnetosphere radius is usual Alfven radius, i.e. Rm = (mu_magn^2 / M_dot / sqrt(G Mx)) ^ 2/7, inclination --chi_oblique not included"
+                    "  bozzo: magnetosphere raduis is calculated as described in Bozzo et al. A&A 617, A126 (2018), equation 20, inclination --chi_oblique may be specified" )
+            ( "h2r_bozzo", po::value<double>()->default_value(default_h2r_bozzo), "half-thickness to radius relation. Currently used in --bozzo method. " )
+            ( "chi_oblique", po::value<double>()->default_value(default_chi_oblique), "Angle between NS magnetic axis and accretion disc axis, deg" )
 			( "hotspotarea", po::value<double>()->default_value(default_hotspotarea), "Total area of the region on the accretor radiating beacuse of accretion, normalized by the accretor surface area" )
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Magnetosphere radius in units of the Alfven radius, which is defined as (mu^4/G/M/sqrt(Mdot))^(1/7)" ) 
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "Not currently in use" )

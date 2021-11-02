@@ -16,8 +16,9 @@ namespace SibgatullinSunyaev2000Geometry {
 class NeutronStarArguments {
 public:
 	constexpr static const char default_nsprop[] = "dummy";
-	//constexpr static const char default_Rm_definition[] = "basic"; 
-	//constexpr static const double default_chi_oblique = 0.;
+    constexpr static const double default_h2r_bozzo = 0.01;
+    constexpr static const char default_Rm_definition[] = "alfven";
+	constexpr static const double default_chi_oblique = 0.;
     //constexpr static const double default_gamma_GL = 1.;
 	constexpr static const double default_hotspotarea = 1.;
 	constexpr static const double default_epsilonAlfven = 1.;
@@ -35,11 +36,12 @@ public:
 	double freqx;
 	double Rx;
 	double Bx;
+    std::string Rm_definition;
+    double h2r_bozzo;
+    double chi_oblique;
 	double hotspotarea;
 	double mu_magn;
 	double epsilonAlfven;
-	//std::string Rm_definition;
-    //double chi_oblique;
 	//double gamma_GL;
 	double inversebeta;
 	double Rdead;
@@ -56,9 +58,13 @@ public:
 			const std::string& nsprop,
 			std::optional<double> freqx,
 			std::optional<double> Rx_,
-			double Bx, double hotspotarea,
+			double Bx,
+            const std::string& Rm_definition, double h2r_bozzo, double chi_oblique, 
+            double hotspotarea,
 			double epsilonAlfven,
-		       //	const std::string& Rm_definition, double chi_oblique, double gamma_GL,
+		       //	const std::string& Rm_definition, 
+
+            //double gamma_GL,
 		       	double inversebeta, double Rdead,
 			const std::string& fptype, const pard& fpparams,
 			const std::string& kappat_type, const pard& kappat_params,
@@ -66,9 +72,11 @@ public:
 			nsprop(nsprop),
 			freqx(freqx ? *freqx : initializeFreqx(nsprop)),
 			Rx(Rx_ ? *Rx_ : initializeRx(nsprop, freqx)),
-			Bx(Bx), hotspotarea(hotspotarea), mu_magn(0.5 * Bx * m::pow<3>(Rx)),
+			Bx(Bx), 
+			Rm_definition(Rm_definition), h2r_bozzo(h2r_bozzo), chi_oblique(chi_oblique),
+			hotspotarea(hotspotarea), mu_magn(0.5 * Bx * m::pow<3>(Rx)),
 			epsilonAlfven(epsilonAlfven),
-			//Rm_definition(Rm_definition), chi_oblique(chi_oblique), gamma_GL(1.),
+			//gamma_GL(1.),
 		      	inversebeta(inversebeta), Rdead(Rdead),
 			fptype(fptype), fpparams(fpparams),
 			kappat_type(kappat_type), kappat_params(kappat_params),

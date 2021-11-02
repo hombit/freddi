@@ -3,10 +3,11 @@
 #include <ns/ns_arguments.hpp>
 
 constexpr const char NeutronStarArguments::default_nsprop[];
+constexpr const char NeutronStarArguments::default_Rm_definition[];
+constexpr const double NeutronStarArguments::default_h2r_bozzo;
+constexpr const double NeutronStarArguments::default_chi_oblique;
 constexpr const double NeutronStarArguments::default_hotspotarea;
-//constexpr const char NeutronStarArguments::default_Rm_definition[]; 
 constexpr const double NeutronStarArguments::default_epsilonAlfven;
-//constexpr const double NeutronStarArguments::default_chi_oblique;
 //constexpr const double NeutronStarArguments::default_gamma_GL;
 constexpr const double NeutronStarArguments::default_inversebeta;
 constexpr const double NeutronStarArguments::default_Rdead;

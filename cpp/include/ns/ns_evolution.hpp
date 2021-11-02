@@ -52,7 +52,9 @@ private:
 //		double F_dead;
 		double inverse_beta;
 		double epsilon_Alfven;
-        //double chi_oblique;
+        std::string Rmdefinition;
+        double h2rbozzo;
+        double chioblique;
 		double hot_spot_area;
 		vecd Fmagn;
 		vecd dFmagn_dh;
@@ -188,7 +190,9 @@ public:
 	inline double redshift() const { return ns_str_->redshift; }
 	inline double R_m_min() const { return ns_str_->R_m_min; }
 	inline double mu_magn() const { return ns_str_->mu_magn; }
-	//inline double chi_oblique() const {return ns_str_->chi_oblique;}
+	inline std::string Rmdefinition() const { return ns_str_->Rmdefinition; }
+	inline double h2rbozzo() const { return ns_str_->h2rbozzo; }
+	inline double chioblique() const { return ns_str_->chioblique; }
 	inline double R_dead() const { return ns_str_->R_dead; }
 //	inline double F_dead() const { return ns_str_->F_dead; }
 	inline double R_cor() const { return ns_str_->R_cor; }
