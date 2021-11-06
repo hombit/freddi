@@ -194,7 +194,7 @@ Basic binary and disk parameter:
                                    --period values as 90% of the Roche lobe 
                                    radius (Papaloizou & Pringle, 1977, MNRAS, 
                                    181, 441; see also Artymowicz & Lubow, 1994,
-                                   ApJ, 421, 651
+                                   ApJ, 421, 651)
   --risco arg                      Innermost stable circular orbit, in units of
                                    gravitational radius of the central object 
                                    GM/c^2. If it isn't set then the radius of 
@@ -1018,10 +1018,9 @@ the zero accretion rate at the outer boundary. The conditions are suitable
 during the outbursts in X-ray binary transients with black holes.
 
 In a binary system, the accretion disk is radially confined. In `Freddi`, the
-outer radius of the disk can be set explicitely or calculated as the position of
-the tidal truncation radius following [Paczynski
-(1997)](http://adsabs.harvard.edu/abs/1977ApJ...216..822P) for small mass ratios
-of the black using the approximation by [Suleimanov et al. (2008)](http://adsabs.harvard.edu/abs/2008A%26A...491..267S).
+outer radius of the disk can be set explicitely or calculated as 90% of the 
+Roche lobe size to aproximate the tidal truncation radius obtained by 
+[Papaloizou & Pringle (1977)](https://ui.adsabs.harvard.edu/abs/1977MNRAS.181..441P), see  --rout help for details.
 
 The parameters at the disk central plane are defined by the analytic
 approximations ([Suleimanov et al. 2007](http://adsabs.harvard.edu/abs/2007ARep...51..549S)), valid for the
