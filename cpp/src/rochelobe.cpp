@@ -13,7 +13,8 @@ using boost::math::tools::halley_iterate;
 // lambda, nu - cosines of angles
 // find_r - routine to find distance from the star where the Roche potential equals requested value, for chosen lambda and nu
 // initializeLagrangianPoint - find distance from the star to L1
-// initializePolarRadius - find distance in the polar direction where the potential equals the potential at L1
+// initializePolarRadius - find distance in the polar direction (PolarRadius) where the potential equals the potential at L1
+// fill_factor - user-defined parameter : radius of the star = fill_factor * PolarRadius
 
 RochePotential::RochePotential(const double mass_ratio):
 		mass_ratio(mass_ratio),
