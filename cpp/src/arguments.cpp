@@ -238,7 +238,25 @@ std::shared_ptr<DiskStructureArguments::InitialFFunction> DiskStructureArguments
 
 		if (initialcond == "quasistat") {
 			const double coeff = InitialFQuasistat::Coeff(h_in, h_out, oprel);
-
+			// 1. How to find F0 from Mdot0?
+			// Let f1 be the actual F(h) distribution in the disc.
+			// Then Mdot = dF/dh = F0 / hout * f1'(xi)
+			// and Mdot0 = Mdot (h=h_in) = F0 / hout * f1'(xi_in), where xi_in = h_in/h_out
+			// It can be shown that f1'(xi_in) = f_F(xi_in) * h_out / h_in / (1-h_in/h_out)
+			// Thus F0 = Mdot0 * h_in/h_out * (h_out-h_in) / f_F(xi_in)
+			//
+			// 2. As an approximation for the initial distribution of F(h), the following function
+			// is adopted : f1 (xi) = f_F(xi) * (1-h_in/h_out/xi) / (1-h_int/h_out), where 
+			// xi = h/h_out and
+			// f_F(xi) is the dimensionless function found by Lipunova & Shakura (2000)
+			// as a part of the self-similar solution of the viscous diffusion equation 
+			// in the interval [0..h_out]
+			// see Appendix B of Lipunova & Malanchev (2017), case (v).
+			// f1 is not a solution of the diffusion equation since there is no 
+			// (or we did not find) self-similar solution in the case h_in > 0.
+			// However, f1 serves as an initial distribution quite well; 
+			// it satisfies f1(xi_in)=0 and f1(xi_out) = 1
+			//
 			if (Mdot0) {
 				F0 = *Mdot0 * (h_out - h_in) / h_out * h_in / oprel.f_F(h_in / h_out);
 				Mdisk0 = std::pow(*F0, 1. - oprel.m) * coeff;
