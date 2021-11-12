@@ -14,12 +14,15 @@
 
 ## Overview
 
-The code solves 1-D evolution equation of Shakura-Sunyaev accretion disk. The
-code is developed to simulate fast-rise exponential-decay (FRED) light curves of
-low mass X-ray binaries (LMXBs) for the paper “Determination of the turbulent
-parameter in the accretion disks: effects of self-irradiation in 4U 1543-47
+The code solves 1-D evolution equation of Shakura-Sunyaev accretion alpha-disk
+around black hole or neutron star. The code is developed to simulate fast-rise 
+exponential-decay (FRED) light curves of low mass X-ray binaries (LMXBs). 
+It has been first presented in the paper “Determination of the turbulent 
+parameter in the accretion disks: effects of self-irradiation in 4U 1543-47 
 during the 2002 outburst” by Lipunova & Malanchev (2017)
-[2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L).
+[2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L). 
+Currently, the code can take into account self-irradiation of the disc, 
+winds from the disc surface, disc-magnetosphere interactions.
 
 `Freddi` is written on C++ and available as a couple of binary executables and
 a Python module.
