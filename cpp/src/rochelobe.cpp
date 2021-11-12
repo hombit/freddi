@@ -9,6 +9,13 @@
 using boost::math::tools::halley_iterate;
 
 
+// omega(r,lambda,nu) - Roche potential
+// lambda, nu - cosines of angles
+// find_r - routine to find distance from the star where the Roche potential equals requested value, for chosen lambda and nu
+// initializeLagrangianPoint - find distance from the star to L1
+// initializePolarRadius - find distance in the polar direction (PolarRadius) where the potential equals the potential at L1
+// fill_factor - user-defined parameter : radius of the star = fill_factor * PolarRadius
+
 RochePotential::RochePotential(const double mass_ratio):
 		mass_ratio(mass_ratio),
 		volume_radius(BinaryFunctions::rocheLobeVolumeRadiusSemiaxis(mass_ratio)) {}
@@ -67,6 +74,7 @@ double CriticalRocheLobe::initializeLagrangianPoint(const RochePotential& roche_
 	double q = roche_potential.mass_ratio <= 1.0 ? roche_potential.mass_ratio : 1.0 / roche_potential.mass_ratio;
 	// Initial guess is a Hill radius for small mass_ratio, one minus Hill radius for large mass_ratio and 0.5 for
 	// mass_ratio = 1
+	// x0 is the initial guess, the result lies in the interval [x1,x2]
 	double x0 = std::cbrt(q / 3.0) + (0.5 - std::cbrt(1.0/3.0)) * q;
 	double x1 = 0.5 * x0;
 	double x2 = std::min(0.5, 2 * x0);

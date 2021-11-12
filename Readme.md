@@ -14,17 +14,18 @@
 
 ## Overview
 
-The code solves 1-D evolution equation of Shakura-Sunyaev accretion disk. The
-code is developed to simulate fast-rise exponential-decay (FRED) light curves of
-low mass X-ray binaries (LMXBs) for the papers “Determination of the turbulent
-parameter in the accretion disks: effects of self-irradiation in 4U 1543-47
+The code solves 1-D evolution equation of Shakura-Sunyaev accretion alpha-disk
+around black hole or neutron star. The code is developed to simulate fast-rise 
+exponential-decay (FRED) light curves of low mass X-ray binaries (LMXBs). 
+It has been first presented in the paper “Determination of the turbulent 
+parameter in the accretion disks: effects of self-irradiation in 4U 1543-47 
 during the 2002 outburst” by Lipunova & Malanchev (2017)
-[2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L),
-“Change in the Orbital Period of a Binary System Due to an Outburst in
-a Windy Accretion Disk” by Avakyan et al (2021)
-[2021AstL...47..377A](http://adsabs.harvard.edu/abs/2021AstL...47..377A),
-and “Physical modeling of viscous disc evolution around magnetized neutron star.
-Aql X-1 2013 outburst decay” by Lipunova et al (2021)
+[2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L). 
+Currently, the code can take into account self-irradiation of the disc, 
+winds from the disc surface, disc-magnetosphere interactions introduced in
+Avakyan et al (2021)
+[2021AstL...47..377A](http://adsabs.harvard.edu/abs/2021AstL...47..377A)
+and Lipunova et al (2021)
 [2021arXiv211008076L](http://adsabs.harvard.edu/abs/2021arXiv211008076L).
 
 `Freddi` is written on C++ and available as a couple of binary executables and
@@ -200,7 +201,8 @@ Basic binary and disk parameter:
                                    --period values as 90% of the Roche lobe 
                                    radius (Papaloizou & Pringle, 1977, MNRAS, 
                                    181, 441; see also Artymowicz & Lubow, 1994,
-                                   ApJ, 421, 651
+                                   ApJ, 421, 651; http://xray.sai.msu.ru/~galja
+                                   /images/tidal_radius.pdf)
   --risco arg                      Innermost stable circular orbit, in units of
                                    gravitational radius of the central object 
                                    GM/c^2. If it isn't set then the radius of 
@@ -458,7 +460,8 @@ Basic binary and disk parameter:
                                         the Roche lobe radius (Papaloizou & 
                                         Pringle, 1977, MNRAS, 181, 441; see 
                                         also Artymowicz & Lubow, 1994, ApJ, 
-                                        421, 651
+                                        421, 651; http://xray.sai.msu.ru/~galja
+                                        /images/tidal_radius.pdf)
   --risco arg                           Innermost stable circular orbit, in 
                                         units of gravitational radius of the 
                                         central object GM/c^2. If it isn't set 
@@ -519,10 +522,10 @@ Parameters of the disk mode:
                                         2000. f(xi=0) = 0, df/dxi(xi=1) = 0
                                           quasistat-ns: Distibution of the 
                                         initial viscous torque in the disc is  
-                                        F0 = Mdot0 * (h_out - h_in) / h_out * 
-                                        h_in / oprel.f_F(h_in / h_out), where 
-                                        f_F is taken from Lipunova & Shakura 
-                                        (2000)
+                                        F = F0 * f_F(xi) * (1-h_in/h_out/xi) / 
+                                        (1-h_in/h_out), where xi=h/h_out and 
+                                        f_F(xi) is taken from Lipunova & 
+                                        Shakura (2000)
                                         
   --F0 arg                              Initial maximum viscous torque in the 
                                         disk, dyn*cm. Can be overwritten via 
@@ -1024,10 +1027,9 @@ the zero accretion rate at the outer boundary. The conditions are suitable
 during the outbursts in X-ray binary transients with black holes.
 
 In a binary system, the accretion disk is radially confined. In `Freddi`, the
-outer radius of the disk can be set explicitely or calculated as the position of
-the tidal truncation radius following [Paczynski
-(1997)](http://adsabs.harvard.edu/abs/1977ApJ...216..822P) for small mass ratios
-of the black using the approximation by [Suleimanov et al. (2008)](http://adsabs.harvard.edu/abs/2008A%26A...491..267S).
+outer radius of the disk can be set explicitely or calculated as 90% of the 
+Roche lobe size to aproximate the tidal truncation radius obtained by 
+[Papaloizou & Pringle (1977)](https://ui.adsabs.harvard.edu/abs/1977MNRAS.181..441P), see  --rout help for details.
 
 The parameters at the disk central plane are defined by the analytic
 approximations ([Suleimanov et al. 2007](http://adsabs.harvard.edu/abs/2007ARep...51..549S)), valid for the

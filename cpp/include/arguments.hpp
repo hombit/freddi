@@ -64,9 +64,12 @@ public:
 protected:
 	static inline double rinFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
 	static inline double routFromMxMoptPeriod(double Mx, double Mopt, double period) {
-		// 0.9 is approximation for r_max value from Paczyncki, 1977. He used grain model of accretting matter,
-		// so his disk should be smaller than gas disk with pressure. So, probably, r_max is better approximation
-		// than r_1 or r_2 for axial-symmetric gas disk. Also this factor is in agreement with Gilfanov & Arefiev, 2005
+		// 0.9 is the approximation for the tidal radius found by Papaloizou & Pringle, 1977. 
+		// It is close to r_max value from Paczyncki, 1977, who used the grain model of accretting matter,
+		// and such disk should be presumably smaller than a gaseous disk with pressure. r_max could be a 
+		// better approximation than r_1 or r_2 for an axial-symmetric gaseous disk. 
+		// Compare also with approximation suggested by Gilfanov & Arefiev, 2005
+		// see http://xray.sai.msu.ru/~galja/images/tidal_radius.pdf
 		return 0.9 * rocheLobeVolumeRadius(Mx, Mopt, period);
 	}
 	static inline double riscoFromMxKerr(double Mx, double kerr) { return r_kerrISCO(Mx, kerr); }
