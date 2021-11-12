@@ -16,10 +16,16 @@
 
 The code solves 1-D evolution equation of Shakura-Sunyaev accretion disk. The
 code is developed to simulate fast-rise exponential-decay (FRED) light curves of
-low mass X-ray binaries (LMXBs) for the paper “Determination of the turbulent
+low mass X-ray binaries (LMXBs) for the papers “Determination of the turbulent
 parameter in the accretion disks: effects of self-irradiation in 4U 1543-47
 during the 2002 outburst” by Lipunova & Malanchev (2017)
-[2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L).
+[2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L),
+“Change in the Orbital Period of a Binary System Due to an Outburst in
+a Windy Accretion Disk” by Avakyan et al (2021)
+[2021AstL...47..377A](http://adsabs.harvard.edu/abs/2021AstL...47..377A),
+and “Physical modeling of viscous disc evolution around magnetized neutron star.
+Aql X-1 2013 outburst decay” by Lipunova et al (2021)
+[2021arXiv211008076L](http://adsabs.harvard.edu/abs/2021arXiv211008076L).
 
 `Freddi` is written on C++ and available as a couple of binary executables and
 a Python module.
@@ -1241,7 +1247,13 @@ Copyright (c) 2016–2021, Konstantin L. Malanchev, Galina V. Lipunova & Artur L
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
 
 Please, accompany any results obtained using this code with reference to
-Lipunova & Malanchev (2017) [2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L), and for the case of windy calculations please also refer Avakyan et al. (2021) [2021arXiv210511974A](https://ui.adsabs.harvard.edu/abs/2021arXiv210511974A/).
+Lipunova & Malanchev (2017)
+[2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L),
+for the case of windy calculations please also refer Avakyan et al. (2021)
+[2021AstL...47..377A](http://adsabs.harvard.edu/abs/2021AstL...47..377A),
+and for the case of magnetised neutron star please also refer Lipunova et al. (2021)
+[2021arXiv211008076L](http://adsabs.harvard.edu/abs/2021arXiv211008076L).
+
 
 ## BibTex
 ```bibtex
@@ -1262,19 +1274,37 @@ archivePrefix = "arXiv",
   adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
-@ARTICLE{2021arXiv210511974A,
-       author = { {Avakyan}, A.~L. and {Lipunova}, G.~V. and {Malanchev}, K.~L. and {Shakura}, N.~I.},
-        title = "{Change in the orbital period of a binary system due to an outburst in a windy accretion disc}",
-      journal = {arXiv e-prints},
-     keywords = {Astrophysics - High Energy Astrophysical Phenomena},
+@ARTICLE{2021AstL...47..377A,
+       author = {{Avakyan}, A.~L. and {Lipunova}, G.~V. and {Malanchev}, K.~L. and {Shakura}, N.~I.},
+        title = "{Change in the Orbital Period of a Binary System Due to an Outburst in a Windy Accretion Disk}",
+      journal = {Astronomy Letters},
+     keywords = {X-ray binaries, wind, transients, period, accretion, Astrophysics - High Energy Astrophysical Phenomena},
          year = 2021,
-        month = may,
-          eid = {arXiv:2105.11974},
-        pages = {arXiv:2105.11974},
+        month = jun,
+       volume = {47},
+       number = {6},
+        pages = {377-389},
+          doi = {10.1134/S1063773721050017},
 archivePrefix = {arXiv},
        eprint = {2105.11974},
  primaryClass = {astro-ph.HE},
-       adsurl = {https://ui.adsabs.harvard.edu/abs/2021arXiv210511974A},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2021AstL...47..377A},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+@ARTICLE{2021arXiv211008076L,
+       author = {{Lipunova}, Galina and {Malanchev}, Konstantin and {Tsygankov}, Sergey and {Shakura}, Nikolai and {Tavleev}, Andrei and {Kolesnikov}, Dmitry},
+        title = "{Physical modeling of viscous disc evolution around magnetized neutron star. Aql X-1 2013 outburst decay}",
+      journal = {arXiv e-prints},
+     keywords = {Astrophysics - High Energy Astrophysical Phenomena, Astrophysics - Solar and Stellar Astrophysics},
+         year = 2021,
+        month = oct,
+          eid = {arXiv:2110.08076},
+        pages = {arXiv:2110.08076},
+archivePrefix = {arXiv},
+       eprint = {2110.08076},
+ primaryClass = {astro-ph.HE},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2021arXiv211008076L},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 ```
