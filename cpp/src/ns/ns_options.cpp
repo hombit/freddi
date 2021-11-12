@@ -202,7 +202,7 @@ po::options_description NeutronStarDiskStructureOptions::description() {
 	for (const auto &non_ns_option : non_ns_od.options()) {
 		if (non_ns_option->long_name() == "initialcond") {
 			od.add_options()
-					( "initialcond", po::value<std::string>()->default_value(default_initialcond), (non_ns_option->description() + "  quasistat-ns: Distibution of the initial viscous torque in the disc is  F0 = Mdot0 * (h_out - h_in) / h_out * h_in / oprel.f_F(h_in / h_out), where f_F is taken from Lipunova & Shakura (2000)\n").c_str() )
+					( "initialcond", po::value<std::string>()->default_value(default_initialcond), (non_ns_option->description() + "  quasistat-ns: Distibution of the initial viscous torque in the disc is  F = F0 * f_F(xi) * (1-h_in/h_out/xi) / (1-h_in/h_out), where xi=h/h_out and f_F(xi) is taken from Lipunova & Shakura (2000)\n").c_str() )
 					;
 		} else {
 			od.add(non_ns_option);
