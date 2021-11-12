@@ -197,7 +197,8 @@ Basic binary and disk parameter:
                                    --period values as 90% of the Roche lobe 
                                    radius (Papaloizou & Pringle, 1977, MNRAS, 
                                    181, 441; see also Artymowicz & Lubow, 1994,
-                                   ApJ, 421, 651)
+                                   ApJ, 421, 651; http://xray.sai.msu.ru/~galja
+                                   /images/tidal_radius.pdf)
   --risco arg                      Innermost stable circular orbit, in units of
                                    gravitational radius of the central object 
                                    GM/c^2. If it isn't set then the radius of 
@@ -455,7 +456,8 @@ Basic binary and disk parameter:
                                         the Roche lobe radius (Papaloizou & 
                                         Pringle, 1977, MNRAS, 181, 441; see 
                                         also Artymowicz & Lubow, 1994, ApJ, 
-                                        421, 651
+                                        421, 651; http://xray.sai.msu.ru/~galja
+                                        /images/tidal_radius.pdf)
   --risco arg                           Innermost stable circular orbit, in 
                                         units of gravitational radius of the 
                                         central object GM/c^2. If it isn't set 
@@ -516,10 +518,10 @@ Parameters of the disk mode:
                                         2000. f(xi=0) = 0, df/dxi(xi=1) = 0
                                           quasistat-ns: Distibution of the 
                                         initial viscous torque in the disc is  
-                                        F0 = Mdot0 * (h_out - h_in) / h_out * 
-                                        h_in / oprel.f_F(h_in / h_out), where 
-                                        f_F is taken from Lipunova & Shakura 
-                                        (2000)
+                                        F = F0 * f_F(xi) * (1-h_in/h_out/xi) / 
+                                        (1-h_in/h_out), where xi=h/h_out and 
+                                        f_F(xi) is taken from Lipunova & 
+                                        Shakura (2000)
                                         
   --F0 arg                              Initial maximum viscous torque in the 
                                         disk, dyn*cm. Can be overwritten via 
