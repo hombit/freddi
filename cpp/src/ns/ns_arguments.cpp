@@ -147,6 +147,7 @@ std::shared_ptr<DiskStructureArguments::InitialFFunction> NeutronStarDiskStructu
 
 	if (initialcond == "quasistat-ns" || initialcond == "quasistat_ns") {
 		if (Mdot0) {
+			// see comments to "quasistat" in arguments.cpp
 			const double Ralfven = ns_args.R_Alfven( bdb_args.Mx * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT, *Mdot0);
 			const double h_in = bdb_args.h(std::max(Ralfven, bdb_args.rin));
 			const double h_out = bdb_args.h(bdb_args.rout);
@@ -173,6 +174,8 @@ std::shared_ptr<DiskStructureArguments::InitialFFunction> NeutronStarDiskStructu
 vecd NeutronStarDiskStructureArguments::InitialFQuasistatNS::operator()(const vecd& h) const {
 	vecd F(h.size());
 	for (size_t i = first(h); i < h.size(); ++i) {
+		// see comments in arguments.cpp
+		// and Lipunova & Malanchev (2017), Appnedix B, case (v)
 		const double xi_LS2000 = h[i] / h.back();
 		F[i] = F0 * oprel.f_F(xi_LS2000) * (1. - h_in / h[i]) / (1. - h_in / h.back());
 	}
