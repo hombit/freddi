@@ -308,6 +308,7 @@ vecd DiskStructureArguments::InitialFQuasistat::operator()(const vecd& h) const 
 	// (or we did not find) self-similar solution in the case h_in > 0.
 	// However, f1 serves as an initial distribution quite well; 
 	// it satisfies f1(xi_in)=0 and f1(xi_out) = 1
+	// When h_in=0, f1==f_F
 	//
 	vecd F(h.size());
 	for (size_t i = 0; i < h.size(); ++i) {

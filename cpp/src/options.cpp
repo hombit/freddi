@@ -83,10 +83,10 @@ po::options_description BasicDiskBinaryOptions::description() {
 			( "kerr", po::value<double>()->default_value(default_kerr), "Dimensionless Kerr parameter of the black hole" )
 			( "Mopt",	po::value<double>()->required(), "Mass of the optical star, in units of solar masses" )
 			( "rochelobefill", po::value<double>()->default_value(default_roche_lobe_fill), "Dimensionless factor describing a size of the optical star. Polar radius of the star is rochelobefill * (polar radius of critical Roche lobe)" )
-			( "Topt", po::value<double>()->default_value(default_Topt), "Effective temperature of the optical star, in units of kelvins" )
+			( "Topt", po::value<double>()->default_value(default_Topt), "Effective temperature of the optical star, in units of Kelvins" )
 			( "period,P", po::value<double>()->required(), "Orbital period of the binary system, in units of days" )
-			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the gravitational radius of the central object GM/c^2. There is no need to set it for a neutron star. If it isn't set for a black hole then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
-			( "rout,R", po::value<double>(), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used defined by --Mx, --Mopt and --period values as 90% of the Roche lobe radius (Papaloizou & Pringle, 1977, MNRAS, 181, 441; see also Artymowicz & Lubow, 1994, ApJ, 421, 651; http://xray.sai.msu.ru/~galja/images/tidal_radius.pdf)" )
+			( "rin", po::value<double>(), "Inner radius of the disk, in the units of the gravitational radius of the central object GM/c^2. There is no need to set it for a neutron star. If it isn't set for a black hole then the radius of ISCO orbit is used, defined by --Mx and --kerr values" )
+			( "rout,R", po::value<double>(), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used, defined by --Mx, --Mopt and --period values as 90% of the Roche lobe radius (Papaloizou & Pringle, 1977, MNRAS, 181, 441; see also Artymowicz & Lubow, 1994, ApJ, 421, 651; http://xray.sai.msu.ru/~galja/images/tidal_radius.pdf)" )
 			( "risco", po::value<double>(), "Innermost stable circular orbit, in units of gravitational radius of the central object GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values" )
 			;
 	return od;
@@ -210,18 +210,18 @@ po::options_description DiskStructureOptions::description() {
 			( "opacity,O", po::value<std::string>()->default_value(default_opacity), "Opacity law: Kramers (varkappa ~ rho / T^7/2) or OPAL (varkappa ~ rho / T^5/2)" )
 			( "Mdotout", po::value<double>()->default_value(default_Mdotout), "Accretion rate onto the disk through its outer radius" )
 			( "boundcond", po::value<std::string>()->default_value(default_boundcond),
-					"Outer boundary movement condition\n\n"
+					"Outer-boundary movement condition\n\n"
 					"Values:\n"
 					"  Teff: outer radius of the disk moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"
 					"  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option" ) // fourSigmaCrit, MdotOut
 			( "Thot", po::value<double>()->default_value(default_Thot), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description" )
-			( "Qirr2Qvishot", po::value<double>()->default_value(m::pow<4>(default_Tirr2Tvishot)), "Minimum Qirr / Qvis ratio at the outer edge of the hot disk to switch evolution from temperature-based regime to Sigma_minus-based regime (see Eq. A.1 in Lasota et al. 2008, --alphacold value is used as alpha parameter)" )
+			( "Qirr2Qvishot", po::value<double>()->default_value(m::pow<4>(default_Tirr2Tvishot)), "Minimum Qirr / Qvis ratio at the outer edge of the hot disk to switch the control over the evolution of the hot disc radius: from temperature-based regime to Sigma-based cooling-front regime (see Lipunova et al. (2021, Section 2.4) and Eq. A.1 in Lasota et al. 2008; --alpha value is used for Sigma_plus and --alphacold value is used for Sigma_minus)" )
 			( "initialcond", po::value<std::string>()->default_value(default_initialcond),
 					"Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 					"Values:\n"
-					"  [xi = (h - h_in) / (h_out - h_in)]\n"
+					"  [NB! Here below dimensionless xi = (h - h_in) / (h_out - h_in)]\n\n"
 					"  powerF: F ~ xi^powerorder, powerorder is specified by --powerorder option\n" // power does the same
-					"  linearF: F ~ xi, specific case of powerF but can be normalised by --Mdot0, see its description for details" // linear does the same
+					"  linearF: F ~ xi, specific case of powerF but can be normalised by --Mdot0, see its description for details\n" // linear does the same
 					"  powerSigma: Sigma ~ xi^powerorder, powerorder is specified by --powerorder option\n"
 					"  sineF: F ~ sin( xi * pi/2 )\n" // sinus option does the same
 					"  gaussF: F ~ exp(-(xi-mu)**2 / 2 sigma**2), mu and sigma are specified by --gaussmu and --gausssigma options\n"
@@ -269,13 +269,13 @@ SelfIrradiationOptions::SelfIrradiationOptions(const po::variables_map &vm, cons
 }
 
 po::options_description SelfIrradiationOptions::description() {
-	po::options_description od("Parameters of self-irradiation.\nQirr = Cirr * (H/r / 0.05)^irrindex * L * psi / (4 pi R^2), where psi is angular distrbution of X-ray radiation");
+	po::options_description od("Parameters of self-irradiation.\nQirr = Cirr * (H/r / 0.05)^irrindex * L * psi / (4 pi R^2), where psi is the angular distribution of X-ray radiation");
 	od.add_options()
 			( "Cirr", po::value<double>()->default_value(default_Cirr), "Irradiation factor for the hot disk" )
 			( "irrindex", po::value<double>()->default_value(default_irrindex), "Irradiation index for the hot disk" )
 			( "Cirrcold", po::value<double>()->default_value(default_Cirr_cold), "Irradiation factor for the cold disk" )
 			( "irrindexcold", po::value<double>()->default_value(default_irrindex_cold), "Irradiation index for the cold disk" )
-			( "h2rcold", po::value<double>()->default_value(default_height_to_radius_cold), "Seme-height to radius ratio for the cold disk, it affects disk shadow in star" )
+			( "h2rcold", po::value<double>()->default_value(default_height_to_radius_cold), "Semi-height to radius ratio for the cold disk" )
 			( "angulardistdisk", po::value<std::string>()->default_value(default_angular_dist_disk), "Angular distribution of the disk X-ray radiation. Values: isotropic, plane" )
 			;
 	return od;

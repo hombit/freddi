@@ -118,12 +118,12 @@ po::options_description NeutronStarOptions::description() {
 			( "freqx", po::value<double>(), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, which could be reconciled manually (currently, --kerr is not needed for freddi-ns)" )
 			( "Rx", po::value<double>(), "Accretor radius, cm" )
 			( "Bx", po::value<double>()->required(), "Accretor polar magnetic induction, G" )
-			( "hotspotarea", po::value<double>()->default_value(default_hotspotarea), "Total area of the region on the accretor radiating beacuse of accretion, normalized by the accretor surface area" )
+			( "hotspotarea", po::value<double>()->default_value(default_hotspotarea), "Total area of the region on the accretor radiating because of accretion, normalized by the accretor surface area" )
 			( "epsilonAlfven", po::value<double>()->default_value(default_epsilonAlfven), "Magnetosphere radius in units of the Alfven radius, which is defined as (mu^4/G/M/sqrt(Mdot))^(1/7)" ) 
 			( "inversebeta", po::value<double>()->default_value(default_inversebeta), "Not currently in use" )
 			( "Rdead", po::value<double>()->default_value(default_Rdead), "Maximum inner radius of the disk that can be achieved, cm" )
 			( "fptype", po::value<std::string>()->default_value(default_fptype),
-					"Scenario to determine the fraction fp of accretied mass. The rest of the disk inner accretion rate is propelled away.\n\n"
+					"Scenario to determine the fraction fp of accreted mass. The rest of the disk inner accretion rate is propelled away.\n\n"
 					"Values:\n"
 	 				"  no-outflow: the matter reaching the inner disk radius always falls onto NS, fp = 1\n"
 	  				"  propeller: the matter always flows away, fp = 0\n"
@@ -135,7 +135,7 @@ po::options_description NeutronStarOptions::description() {
 			( "romanova2018-par1", po::value<double>(), "par1 value for --fptype=romanova2018 and --kappattype=romanova2018" )
 			( "romanova2018-par2", po::value<double>(), "par2 value for --fptype=romanova2018 and --kappattype=romanova2018" )
 			( "kappattype", po::value<std::string>()->default_value(default_kappat_type),
-					"kappa_t describes how strong is the interaction between the NS magnitosphere and disk: total (accelerating) magnetic torque applied to the disc is kappa_t(R) * mu^2 / R^3.\n\n"
+					"kappa_t describes how strong is the interaction between the NS magnetosphere and disk: total (accelerating) magnetic torque applied to the disc is kappa_t(R) * mu^2 / R^3.\n\n"
 					"Values:\n"
 					"  const: doesn't depend on radius, kappa_t = value. Requires --kappat-const-value to be specified\n"
 					"  corstep: kappa_t can be different inside and outside the corotation radius. Requires --kappat-corstep-in and --kappat-corstep-out to be specified\n"
