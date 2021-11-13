@@ -22,9 +22,8 @@ parameter in the accretion disks: effects of self-irradiation in 4U 1543-47
 during the 2002 outburst” by Lipunova & Malanchev (2017)
 [2017MNRAS.468.4735L](http://adsabs.harvard.edu/abs/2017MNRAS.468.4735L). 
 Currently, the code can take into account self-irradiation of the disc, 
-winds from the disc surface, disc-magnetosphere interactions introduced in
-Avakyan et al (2021)
-[2021AstL...47..377A](http://adsabs.harvard.edu/abs/2021AstL...47..377A)
+winds from the disc surface, disc-magnetosphere interactions. The related 
+papers are Avakyan et al (2021) [2021AstL...47..377A](http://adsabs.harvard.edu/abs/2021AstL...47..377A)
 and Lipunova et al (2021)
 [2021arXiv211008076L](http://adsabs.harvard.edu/abs/2021arXiv211008076L).
 
