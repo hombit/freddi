@@ -39,7 +39,7 @@ public:
 
 class DiskStructureOptions: public DiskStructureArguments {
 public:
-	constexpr static const char caption[] = "Parameters of the disk mode";
+	constexpr static const char caption[] = "Parameters of the disk model";
 public:
 	DiskStructureOptions(const po::variables_map& vm, const BasicDiskBinaryArguments& bdb_args);
 	static po::options_description description();
