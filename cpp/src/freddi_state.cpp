@@ -386,12 +386,19 @@ FreddiState::BasicWind::~BasicWind() = default;
 
 FreddiState::SS73CWind::SS73CWind(const FreddiState &state):
 		BasicWind(state) {
-	const double L_edd = 4. * M_PI * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT /
+	const double mu = state.args().disk->mu;
+	const double L_edd = 4. * M_PI * mu * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT /
 						 GSL_CONST_CGSM_THOMSON_CROSS_SECTION * state.GM();
 	const double Mdot_crit = L_edd / (m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta());
 	for (size_t i = 0; i < state.Nx(); ++i) {
-		C_[i] = -Mdot_crit / (2 * M_PI * state.R().front() * state.R()[i]) *
-				(4 * M_PI * m::pow<3>(state.h()[i])) / m::pow<2>(state.GM());
+		const double F_crit = 8.0 * M_PI / 3.0 * mu * GSL_CONST_CGSM_MASS_PROTON *
+				GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION / state.GM() * m::pow<3>(state.h()[i]);
+		if (state.F()[i] > F_crit) {
+			C_[i] = -Mdot_crit / (2 * M_PI * state.R().front() * state.R()[i]) *
+					(4 * M_PI * m::pow<3>(state.h()[i])) / m::pow<2>(state.GM());
+		} else {
+			C_[i] = 0.0;
+		}
 	}
 }
 
