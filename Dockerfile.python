@@ -1,12 +1,13 @@
-FROM quay.io/pypa/manylinux2010_x86_64@sha256:d3b569e6a9d99aac5a928944abefa808b6f171bf23339a8e1341c9361514cfd5 AS builder
+ARG ARCH=x86_64
+FROM quay.io/pypa/manylinux2014_${ARCH}
 
 RUN python3.7 -mpip install -U pip && python3.7 -mpip install -U numpy wheel setuptools cmake ninja scikit-build \
     && python3.8 -mpip install -U pip && python3.8 -mpip install -U numpy wheel setuptools cmake ninja scikit-build \
-    && python3.9 -mpip install -U pip && python3.9 -mpip install -U numpy wheel setuptools cmake ninja scikit-build
-#    && python3.10 -mpip install -U pip && python3.10 -mpip install -U numpy wheel setuptools cmake ninja scikit-build
+    && python3.9 -mpip install -U pip && python3.9 -mpip install -U numpy wheel setuptools cmake ninja scikit-build \
+    && python3.10 -mpip install -U pip && python3.10 -mpip install -U numpy wheel setuptools cmake ninja scikit-build
 
-ENV BOOST_VERSION "1.76.0"
-ENV BOOST_VERSION_ "1_76_0"
+ENV BOOST_VERSION "1.78.0"
+ENV BOOST_VERSION_ "1_78_0"
 
 RUN curl -LO https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.gz \
     && tar -xzf boost_${BOOST_VERSION_}.tar.gz \
@@ -16,7 +17,7 @@ RUN curl -LO https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}
     && echo "using python : 3.7 : /opt/python/cp37-cp37m/bin/python : /opt/python/cp37-cp37m/include/python3.7m : /opt/python/cp37-cp37m/lib ;" >> tools/build/src/user-config.jam \
     && echo "using python : 3.8 : /opt/python/cp38-cp38/bin/python : /opt/python/cp38-cp38/include/python3.8 : /opt/python/cp38-cp38/lib ;" >> tools/build/src/user-config.jam \
     && echo "using python : 3.9 : /opt/python/cp39-cp39/bin/python : /opt/python/cp39-cp39/include/python3.9 : /opt/python/cp39-cp39/lib ;" >> tools/build/src/user-config.jam \
-#    && echo "using python : 3.10 : /opt/python/cp310-cp310/bin/python : /opt/python/cp310-cp310/include/python3.10 : /opt/python/cp310-cp310/lib ;" >> tools/build/src/user-config.jam \
+    && echo "using python : 3.10 : /opt/python/cp310-cp310/bin/python : /opt/python/cp310-cp310/include/python3.10 : /opt/python/cp310-cp310/lib ;" >> tools/build/src/user-config.jam \
     && ./b2 -d+2 python=3.7,3.8,3.9 link=static cxxflags="-fPIC" install \
     && cd / \
     && rm -rf /boost_${BOOST_VERSION_}
@@ -35,6 +36,6 @@ WORKDIR ${SOURCE}
 RUN python3.7 setup.py sdist -d${DIST}
 RUN python3.7 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} \
     && python3.8 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} \
-    && python3.9 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD}
-#    && python3.10 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD}
+    && python3.9 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} \
+    && python3.10 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD}
 RUN ls ${BUILD}/*.whl | xargs -iZZZ python3.7 -m auditwheel repair --wheel-dir=${DIST} ZZZ
