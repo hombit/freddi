@@ -18,7 +18,7 @@ RUN curl -LO https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}
     && echo "using python : 3.8 : /opt/python/cp38-cp38/bin/python : /opt/python/cp38-cp38/include/python3.8 : /opt/python/cp38-cp38/lib ;" >> tools/build/src/user-config.jam \
     && echo "using python : 3.9 : /opt/python/cp39-cp39/bin/python : /opt/python/cp39-cp39/include/python3.9 : /opt/python/cp39-cp39/lib ;" >> tools/build/src/user-config.jam \
     && echo "using python : 3.10 : /opt/python/cp310-cp310/bin/python : /opt/python/cp310-cp310/include/python3.10 : /opt/python/cp310-cp310/lib ;" >> tools/build/src/user-config.jam \
-    && ./b2 -d+2 python=3.7,3.8,3.9,3.10 link=static cxxflags="-fPIC" install \
+    && ./b2 -d+2 python=3.7,3.8,3.9,3.10 link=static cflags="-fPIC" cxxflags="-fPIC" install \
     && cd / \
     && rm -rf /boost_${BOOST_VERSION_}
 
