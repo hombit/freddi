@@ -39,7 +39,7 @@ COPY python ${SOURCE}/python
 
 WORKDIR ${SOURCE}
 RUN python3.7 setup.py sdist -d${DIST}
-RUN NCPUS=$(lscpu | egrep 'CPU\(s\):' | awk '{ print $2 }') \
+RUN NCPUS=$(grep -c ^processor /proc/cpuinfo) \
     && python3.7  setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} -- -- -j$NCPUS \
     && rm -r _skbuild \
     && python3.8  setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} -- -- -j$NCPUS \
