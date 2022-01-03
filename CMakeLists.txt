@@ -145,7 +145,16 @@ function(CREATE_PY_EXT)
     find_package(PythonExtensions REQUIRED)
     find_package(NumPy REQUIRED)
 
-    find_package(Boost COMPONENTS python numpy filesystem REQUIRED)
+    set(PYTHON_EXE "${PYTHON_PREFIX}/bin/python")
+    set(PYTHON_VERSION_SCRIPT "import sys; vi = sys.version_info; print(f'{vi.major}{vi.minor}')")
+    execute_process(
+            COMMAND
+            ${PYTHON_EXE} -c "${PYTHON_VERSION_SCRIPT}"
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            OUTPUT_VARIABLE PYTHON_VERSION
+    )
+
+    find_package(Boost REQUIRED COMPONENTS python${PYTHON_VERSION} numpy${PYTHON_VERSION} filesystem)
 
     add_library(${TARGET} MODULE ${MIN_SRC} ${NS_MIN_SRC} ${PYWRAP_SRC})
     target_include_directories(${TARGET} PUBLIC ${Boost_INCLUDE_DIRS} ${NumPy_INCLUDE_DIRS})

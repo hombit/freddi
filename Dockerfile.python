@@ -14,9 +14,9 @@ RUN curl -LO https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}
     && rm /boost_${BOOST_VERSION_}.tar.gz \
     && cd /boost_${BOOST_VERSION_} \
     && sh ./bootstrap.sh \
-    && echo "using python : 3.7 : /opt/python/cp37-cp37m/bin/python : /opt/python/cp37-cp37m/include/python3.7m : /opt/python/cp37-cp37m/lib ;" >> tools/build/src/user-config.jam \
-    && echo "using python : 3.8 : /opt/python/cp38-cp38/bin/python : /opt/python/cp38-cp38/include/python3.8 : /opt/python/cp38-cp38/lib ;" >> tools/build/src/user-config.jam \
-    && echo "using python : 3.9 : /opt/python/cp39-cp39/bin/python : /opt/python/cp39-cp39/include/python3.9 : /opt/python/cp39-cp39/lib ;" >> tools/build/src/user-config.jam \
+    && echo "using python : 3.7  : /opt/python/cp37-cp37m/bin/python  : /opt/python/cp37-cp37m/include/python3.7m  : /opt/python/cp37-cp37m/lib  ;" >> tools/build/src/user-config.jam \
+    && echo "using python : 3.8  : /opt/python/cp38-cp38/bin/python   : /opt/python/cp38-cp38/include/python3.8    : /opt/python/cp38-cp38/lib   ;" >> tools/build/src/user-config.jam \
+    && echo "using python : 3.9  : /opt/python/cp39-cp39/bin/python   : /opt/python/cp39-cp39/include/python3.9    : /opt/python/cp39-cp39/lib   ;" >> tools/build/src/user-config.jam \
     && echo "using python : 3.10 : /opt/python/cp310-cp310/bin/python : /opt/python/cp310-cp310/include/python3.10 : /opt/python/cp310-cp310/lib ;" >> tools/build/src/user-config.jam \
     && ./b2 -d+2 python=3.7,3.8,3.9,3.10 link=static cflags="-fPIC" cxxflags="-fPIC" install \
     && cd / \
@@ -35,7 +35,11 @@ COPY python ${SOURCE}/python
 WORKDIR ${SOURCE}
 RUN python3.7 setup.py sdist -d${DIST}
 RUN python3.7 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} \
+    && rm -r _skbuild \
     && python3.8 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} \
+    && rm -r _skbuild \
     && python3.9 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} \
-    && python3.10 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD}
+    && rm -r _skbuild \
+    && python3.10 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} \
+    && rm -r _skbuild
 RUN ls ${BUILD}/*.whl | xargs -iZZZ python3.7 -m auditwheel repair --wheel-dir=${DIST} ZZZ
