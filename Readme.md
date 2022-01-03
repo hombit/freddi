@@ -1388,14 +1388,34 @@ Please keep Readme updated. You can update the help messages in the
 
 Check-list:
 
-- Create `git` tag
-- Build new `freddi` image using `Dockerfile`
-- Build new `freddi-python` image using `Dockerfile.python`
-- Run `docker run --rm -ti docker-python:VERSION sh -c "python3.7 -m twine upload /dist/*"` to upload source code distribution and x86-64 Python wheels onto PyPi.org
-- [Optional] Build executables for GitHub release
-- [Optional] Build and upload macOS wheels
-- [Optional] Build and upload Linux AArch64 wheels
-- Crate new GitHub release
+- [ ] Update version in `setup.py` and commit it
+- [ ] Create `git` tag
+  ```sh
+  git tag $VERSION
+  ```
+- [ ] Build new `freddi` image using `Dockerfile`
+  ```sh
+  docker buildx build --push --platform linux/arm64,linux/amd64 --tag ghcr.io/hombit/freddi:$VERSION .
+  docker pull ghcr.io/hombit/freddi:$VERSION
+  docker tag ghcr.io/hombit/freddi:$VERSION ghcr.io/hombit/freddi:latest
+  docker push ghcr.io/hombit/freddi:latest
+  ```
+- [ ] Build new `freddi-python` image using `Dockerfile.python`
+  ```sh
+  docker buildx build --push --platform linux/arm64,linux/amd64 --tag ghcr.io/hombit/freddi-python:$VERSION -f Dockerfile.python .
+  docker pull ghcr.io/hombit/freddi-python:$VERSION
+  docker tag ghcr.io/hombit/freddi-python:$VERSION ghcr.io/hombit/freddi-python:latest
+  docker push ghcr.io/hombit/freddi-python:latest
+  ```
+- [ ] Upload wheels onto PyPi.org
+  ```sh
+  docker run --rm -ti ghcr.io/hombit/freddi-python:$VERSION sh -c "python3.7 -m twine upload /dist/*.tar.gz" # sdist
+  docker run --rm -ti --platform linux/amd64 ghcr.io/hombit/freddi-python:$VERSION sh -c "python3.7 -m twine upload /dist/*.whl" # bdist x86_64
+  docker run --rm -ti --platform linux/arm64 ghcr.io/hombit/freddi-python:$VERSION sh -c "python3.7 -m twine upload /dist/*.whl" # bdist aarch64
+  ```
+- [ ] [Optional] Build executables for GitHub release
+- [ ] [Optional] Build and upload macOS wheels
+- [ ] Crate new GitHub release
 
 
 ## Questions and comments
