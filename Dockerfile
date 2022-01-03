@@ -1,7 +1,7 @@
 FROM ubuntu:20.04 as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
-ENV PACKAGES "g++ make cmake libboost-all-dev"
+ENV PACKAGES "g++ ninja-build cmake libboost-all-dev"
 ENV SOURCE "/tmp/source"
 ENV BUILD "/tmp/build"
 
@@ -13,8 +13,9 @@ COPY cpp ${SOURCE}/cpp
 
 RUN mkdir -p ${BUILD} \
     && cd ${BUILD} \
-    && cmake ${SOURCE} -DSTATIC_LINKING=TRUE \
-    && make -j4 install VERBOSE=1
+    && cmake -GNinja ${SOURCE} -DSTATIC_LINKING=TRUE \
+    && cmake --build . \
+    && cmake --install .
 
 
 
