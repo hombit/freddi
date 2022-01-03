@@ -1405,7 +1405,7 @@ If you have any problems, questions, or comments, please address them to
 
 ## License
 
-Copyright (c) 2016–2021, Konstantin L. Malanchev, Galina V. Lipunova & Artur L. Avakyan.
+Copyright (c) 2016–2022, Konstantin L. Malanchev, Galina V. Lipunova & Artur L. Avakyan.
 
 `Freddi` is distributed under the terms of the
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
