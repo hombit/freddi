@@ -1142,15 +1142,15 @@ plt.show()
 properties returning various physical values like `t` for time moment,
 `Mdot` for accretion rate onto central object, `R` for radius, `F` for torque,
 `Tph` for effective temperature and so on. `first_*` and `last_*` properties
-are used to access innermost and outermost values of radial-distributed
+are used to access innermost and outermost hot disk values of radial-distributed
 quantities. The complete list of properties can be obtained by `dir(Freddi)` or
 `dir(FreddiNeutronStar)`. Note that the most properties are lazy-evaluated and
-require some time to access first time. `EvolutionRadius` provides all the
+require some time to access first time. `EvolutionResult` provides all the
 same properties as underlying `Freddi` or `FreddiNeutronStar` objects but with
 additional array dimension for temporal distribution, so if `Freddi.Lx` is a
-scalar then `EvolutionResult.Lx` is 1-D `numpy` array of `(Nt,)` shape,
-if `Freddi.Sigma` is 1-D array of `(Nx,)` shape, then
-`EvolutionResult.Sigma` is 2-D array of `(Nt, Nx)` shape. Also, note that if
+scalar then `EvolutionResult.Lx` is an 1-D `numpy` array of `(Nt,)` shape,
+if `Freddi.Sigma` is an 1-D array of `(Nx,)` shape, then
+`EvolutionResult.Sigma` is an 2-D array of `(Nt, Nx)` shape. Also, note that if
 disk shrinks during a simulation, the missing values of `EvolutionResult`
 properties are filled by NaN.
 
