@@ -17,7 +17,7 @@ class NeutronStarArguments {
 public:
 	constexpr static const char default_nsprop[] = "dummy";
     constexpr static const double default_h2r_bozzo = 0.01;
-    constexpr static const char default_Rm_definition[] = "alfven";
+    constexpr static const char default_Rm_type[] = "alfven";
 	constexpr static const double default_chi_oblique = 0.;
     //constexpr static const double default_gamma_GL = 1.;
 	constexpr static const double default_hotspotarea = 1.;
@@ -36,7 +36,7 @@ public:
 	double freqx;
 	double Rx;
 	double Bx;
-    std::string Rm_definition;
+    std::string Rm_type;
     double h2r_bozzo;
     double chi_oblique;
 	double hotspotarea;
@@ -59,10 +59,9 @@ public:
 			std::optional<double> freqx,
 			std::optional<double> Rx_,
 			double Bx,
-            const std::string& Rm_definition, double h2r_bozzo, double chi_oblique, 
+            const std::string& Rm_type, double h2r_bozzo, double chi_oblique, 
             double hotspotarea,
 			double epsilonAlfven,
-		       //	const std::string& Rm_definition, 
 
             //double gamma_GL,
 		       	double inversebeta, double Rdead,
@@ -73,7 +72,7 @@ public:
 			freqx(freqx ? *freqx : initializeFreqx(nsprop)),
 			Rx(Rx_ ? *Rx_ : initializeRx(nsprop, freqx)),
 			Bx(Bx), 
-			Rm_definition(Rm_definition), h2r_bozzo(h2r_bozzo), chi_oblique(chi_oblique),
+			Rm_type(Rm_type), h2r_bozzo(h2r_bozzo), chi_oblique(chi_oblique),
 			hotspotarea(hotspotarea), mu_magn(0.5 * Bx * m::pow<3>(Rx)),
 			epsilonAlfven(epsilonAlfven),
 			//gamma_GL(1.),
@@ -83,6 +82,9 @@ public:
 			ns_grav_redshift(ns_grav_redshift) {}
 	double R_Alfven(double GM, double Mdot) const;
     double R_Alfven_basic(double GM, double Mdot) const;
+    double R_Magn_KR07(double GM, double Mdot) const;
+	double R_max_Fmagn_KR07(double GM, double Mdot) const;
+	double R_Mdot_slope_KR07(double GM, double Mdot) const;
 };
 
 

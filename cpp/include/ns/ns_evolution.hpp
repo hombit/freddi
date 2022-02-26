@@ -49,10 +49,11 @@ private:
 		double mu_magn;
 		double R_cor;
 		double R_dead;
+        double R_Alfven_basic;
 //		double F_dead;
 		double inverse_beta;
 		double epsilon_Alfven;
-        std::string Rmdefinition;
+        std::string Rmtype;
         double h2rbozzo;
         double chioblique;
 		double hot_spot_area;
@@ -67,6 +68,8 @@ private:
 		vecd initialize_d2Fmagn_dh2(FreddiEvolution* evolution) const;
 	public:
 		NeutronStarStructure(const NeutronStarArguments& args_ns, FreddiEvolution* evolution);
+        double R_Magn_KR07(FreddiEvolution* evolution) const;
+        double F_Magn_KR07(const double R) const;
 	};
 
 	struct NeutronStarOptionalStructure {
@@ -174,6 +177,7 @@ private:
 		//TODO double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return fall_from_isco(freddi, Rm); }
 		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
 	};
+    
 private:
 	std::shared_ptr<const NeutronStarStructure> ns_str_;
 	NeutronStarOptionalStructure ns_opt_str_;
@@ -190,7 +194,7 @@ public:
 	inline double redshift() const { return ns_str_->redshift; }
 	inline double R_m_min() const { return ns_str_->R_m_min; }
 	inline double mu_magn() const { return ns_str_->mu_magn; }
-	inline std::string Rmdefinition() const { return ns_str_->Rmdefinition; }
+	inline std::string Rmtype() const { return ns_str_->Rmtype; }
 	inline double h2rbozzo() const { return ns_str_->h2rbozzo; }
 	inline double chioblique() const { return ns_str_->chioblique; }
 	inline double R_dead() const { return ns_str_->R_dead; }
@@ -226,6 +230,9 @@ public:
 	double R_Alfven() const;
     double R_Alfven_basic() const;
 	double R_Magn_bozzo18() const;
+    double R_Magn_KR07() const;
+	double R_max_Fmagn_KR07() const;
+	double R_Mdot_slope_KR07() const;
 protected:
 	virtual void invalidate_optional_structure() override;
 	virtual void truncateInnerRadius() override;

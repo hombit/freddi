@@ -6,7 +6,7 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 				varToOpt<double>(vm, "freqx"),
 				varToOpt<double>(vm, "Rx"),
 				vm["Bx"].as<double>(),
-                vm["Rm_definition"].as<std::string>(),             
+                vm["Rm_type"].as<std::string>(),             
                 vm["h2r_bozzo"].as<double>(),             
                 vm["chi_oblique"].as<double>(),
 				vm["hotspotarea"].as<double>(),
@@ -22,16 +22,16 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 
 				
 /*
-pard NeutronStarOptions::Rm_definitionInitializer(const po::variables_map& vm) {
-	const auto Rm_definition = vm["Rm_definition"].as<std::string>();
+pard NeutronStarOptions::Rm_typeInitializer(const po::variables_map& vm) {
+	const auto Rm_type = vm["Rm_type"].as<std::string>();
 
-	if (Rm_definition == "basic") {
+	if (Rm_type == "basic") {
 		return {};
 	}
-	if (Rm_definition == "bozzo2018") {
+	if (Rm_type == "bozzo2018") {
 		return {};
 	}
-	throw po::invalid_option_value("Unknown --Rm_definition=" + Rm_definition);
+	throw po::invalid_option_value("Unknown --Rm_type=" + Rm_type);
 } 				
 */
 
@@ -139,7 +139,7 @@ po::options_description NeutronStarOptions::description() {
 			( "freqx", po::value<double>(), "Accretor rotation frequency, Hz. This parameter is not linked to --kerr, which could be reconciled manually (currently, --kerr is not needed for freddi-ns)" )
 			( "Rx", po::value<double>(), "Accretor radius, cm" )
 			( "Bx", po::value<double>()->required(), "Accretor polar magnetic induction, G" )
-            ( "Rm_definition", po::value<std::string>()->default_value(default_Rm_definition), 
+            ( "Rm_type", po::value<std::string>()->default_value(default_Rm_type), 
                     "Definition of magnetosphere radus used in code\n\n"
                     "Values:\n"
                     "  alfven: magnetosphere radius is usual Alfven radius, i.e. Rm = (mu_magn^2 / M_dot / sqrt(G Mx)) ^ 2/7, inclination --chi_oblique not included"
