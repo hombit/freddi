@@ -604,11 +604,31 @@ double FreddiNeutronStarEvolution::R_Magn_bozzo18() const {
 }
 
 double FreddiNeutronStarEvolution::R_Magn_KR07() const {
-	return ns_str_->args_ns.R_Magn_KR07(GM(), Mdot_in()); 
+	const double RA = R_Alfven_basic();
+    const double RC = R_cor();
+    const double alpha = 0.5; //поправить потом  это дело
+    const double chi_oblique_rad = chioblique() * M_PI / 180.;
+    const double parametr_bozzo = 1. * m::pow<2>(0.2) / alpha;
+    const double H_to_R_temp = h2rbozzo();
+
+	return std::pow((m::pow<2>(std::sin(chi_oblique_rad))*(11 * H_to_R_temp - 1 ) + 1) 
+	/ 
+	(m::pow<2>(std::sin(chi_oblique_rad))*(8./3 * H_to_R_temp - 1 ) + 1), 2./3.) * RC;
+	//return ns_str_->args_ns.R_Magn_KR07(GM(), Mdot_in()); 
 }
 
 double FreddiNeutronStarEvolution::NeutronStarStructure::R_Magn_KR07(FreddiEvolution* evolution) const {
-	return args_ns.R_Magn_KR07(evolution->GM(), evolution->Mdot_in());
+	const double RA = R_Alfven_basic;
+    const double RC = R_cor;
+    const double alpha = 0.5; //поправить потом  это дело
+    const double chi_oblique_rad = chioblique * M_PI / 180.;
+    const double parametr_bozzo = 1. * m::pow<2>(0.2) / alpha;
+    const double H_to_R_temp = h2rbozzo;
+
+	return std::pow((m::pow<2>(std::sin(chi_oblique_rad))*(11 * H_to_R_temp - 1 ) + 1) 
+	/ 
+	(m::pow<2>(std::sin(chi_oblique_rad))*(8./3 * H_to_R_temp - 1 ) + 1), 2./3.) * RC;
+	//return args_ns.R_Magn_KR07(evolution->GM(), evolution->Mdot_in());
     
 }
 
