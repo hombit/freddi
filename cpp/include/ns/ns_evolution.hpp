@@ -233,6 +233,7 @@ public:
     double R_Magn_KR07() const;
 	double R_max_Fmagn_KR07() const;
 	double R_Mdot_slope_KR07() const;
+	double F_Magn_KR07(const double R) const;
 protected:
 	virtual void invalidate_optional_structure() override;
 	virtual void truncateInnerRadius() override;
