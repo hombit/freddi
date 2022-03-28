@@ -117,10 +117,11 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 
 	out << "### Derived values\n"
 		<< "# alpha_cold = " << freddi->args().basic->alphacold << "\n"
-		<< "# Tidal radius = " << freddi->args().basic->rout / solar_radius << " Rsun\n"
-		<< "# ISCO radius = " << freddi->args().basic->risco << " cm\n";
+		<< "# Tidal radius = " << cmToSun(freddi->args().basic->rout) << " Rsun\n"
+		<< "# ISCO radius = " << freddi->args().basic->risco << " cm\n"
+        << "# tau = " << sToDay(freddi->args().calc->tau) << " days\n";
 
-	out << std::flush;
+    out << std::flush;
 }
 
 
