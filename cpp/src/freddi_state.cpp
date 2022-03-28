@@ -351,7 +351,7 @@ double FreddiState::flux_star(const double lambda, const double phase) {
 	return star_.luminosity({inclination(), phase}, lambda) / (FOUR_M_PI * m::pow<2>(distance()));
 }
 
-double FreddiState::flux_star(const Passband& passband, const double phase) {
+double FreddiState::flux_star(const EnergyPassband& passband, const double phase) {
 	return star_.luminosity({inclination(), phase}, passband) / (FOUR_M_PI * m::pow<2>(distance()));
 }
 

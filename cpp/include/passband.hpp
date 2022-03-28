@@ -8,7 +8,12 @@
 
 #include "util.hpp"
 
-class Passband {
+enum DetectorType {
+    PhotonCounter,
+    Energy,
+};
+
+class EnergyPassband {
 public:
 	struct PassbandPoint {
 		double lambda;
@@ -18,7 +23,7 @@ public:
 	};
 private:
 	static std::string nameFromPath(const std::string& filepath);
-	static std::vector<PassbandPoint> dataFromFile(const std::string& filepath);
+	static std::vector<PassbandPoint> dataFromFile(const std::string& filepath, DetectorType detector_type);
 	static vecd lambdasFromData(const std::vector<PassbandPoint> data);
 	static vecd transmissionsFromData(const std::vector<PassbandPoint> data);
 	static std::function<double (size_t)> widthFrequencyIntegrationFunction(const vecd& lambdas, const vecd& transmissions);
@@ -30,13 +35,13 @@ public:
 	const double t_dl;
 	const double t_dnu;
 public:
-	Passband(const std::string& name, const std::vector<PassbandPoint>& data):
+	EnergyPassband(const std::string& name, const std::vector<PassbandPoint>& data):
 			name(name), data(data),
 			lambdas(lambdasFromData(data)), transmissions(transmissionsFromData(data)),
 			t_dl(trapz(lambdas, transmissions, 0, data.size() - 1)),
 			t_dnu(trapz(lambdas, widthFrequencyIntegrationFunction(lambdas, transmissions), 0, data.size() - 1)) {};
-	Passband(const std::string& filepath):
-			Passband(nameFromPath(filepath), dataFromFile(filepath)) {};
+	EnergyPassband(const std::string& filepath, DetectorType detector_type):
+            EnergyPassband(nameFromPath(filepath), dataFromFile(filepath, detector_type)) {};
 	inline double bb_lambda(double temp) const { return bb_integral(temp) / t_dl; }
 	inline double bb_nu(double temp) const { return bb_integral(temp) / t_dnu; }
 protected:

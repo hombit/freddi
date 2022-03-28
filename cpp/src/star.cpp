@@ -107,7 +107,7 @@ double Star::luminosity(const UnitVec3& direction, double lambda) {
 			direction) * FOUR_M_PI;
 }
 
-double Star::luminosity(const UnitVec3& direction, const Passband& passband) {
+double Star::luminosity(const UnitVec3& direction, const EnergyPassband& passband) {
 	return integrate([this, &passband](size_t i) -> double { return passband.bb_nu(Teff()[i]); },
 			direction) * FOUR_M_PI;
 }

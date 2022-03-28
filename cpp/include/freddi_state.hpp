@@ -404,7 +404,7 @@ public:
 	template <DiskIntegrationRegion Region> double flux_region(double lambda) {
 		return I_lambda<Region>(lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2();
 	}
-	template <DiskIntegrationRegion Region> double flux_region(const Passband& passband) {
+	template <DiskIntegrationRegion Region> double flux_region(const EnergyPassband& passband) {
 		const double intens = trapz(
 				passband.lambdas,
 				[this, &passband](const size_t i) -> double {
@@ -415,11 +415,11 @@ public:
 		return intens * cosiOverD2() / passband.t_dnu;
 	}
 	inline double flux(const double lambda) { return flux_region<HotRegion>(lambda); }
-	inline double flux(const Passband& passband) { return flux_region<HotRegion>(passband); }
+	inline double flux(const EnergyPassband& passband) { return flux_region<HotRegion>(passband); }
 	double flux_star(double lambda, double phase);
-	double flux_star(const Passband& passband, double phase);
+	double flux_star(const EnergyPassband& passband, double phase);
 	inline double flux_star(double lambda) { return flux_star(lambda, phase_opt()); }
-	inline double flux_star(const Passband& passband) { return flux_star(passband, phase_opt()); }
+	inline double flux_star(const EnergyPassband& passband) { return flux_star(passband, phase_opt()); }
 	inline double Mdisk() { return lazy_integrate<HotRegion>(opt_str_.Mdisk, Sigma()); }
 	double Mdot_wind();
 	double Sigma_minus(double r) const;

@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(testStar_luminosity_passband) {
 			GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT * 4. * M_PI * m::pow<2>(solar_radius) * m::pow<4>(temp);
 	Star sun(temp, solar_radius, 5);
 
-	std::vector<Passband::PassbandPoint> passband_data;
+	std::vector<EnergyPassband::PassbandPoint> passband_data;
 	const double lambda_min = angstromToCm(100);
 	const double lambda_max = angstromToCm(100000);
 	const double lambda_count = 1000;
@@ -56,11 +56,11 @@ BOOST_AUTO_TEST_CASE(testStar_luminosity_passband) {
 		const double lambda = lambda_min * std::pow(lambda_max / lambda_min, static_cast<double>(i) / static_cast<double>(lambda_count - 1));
 		passband_data.emplace_back(lambda, 1.0);
 	}
-	const Passband white_filter("white", passband_data);
+	const EnergyPassband white_filter("white", passband_data);
 	BOOST_CHECK_CLOSE(sun.luminosity({0.0, 0.0}, white_filter) * white_filter.t_dnu, solar_lum, 1);
 
 	const double lambda_V = angstromToCm(5510);
-	const Passband narrow_filter("V", {{lambda_V, 1.0}, {lambda_V * 1.0001, 1.0}});
+	const EnergyPassband narrow_filter("V", {{lambda_V, 1.0}, {lambda_V * 1.0001, 1.0}});
 	BOOST_CHECK_CLOSE(sun.luminosity({0.0, 0.0}, narrow_filter), sun.luminosity({0.0, 0.0}, lambda_V), 0.01);
 }
 
