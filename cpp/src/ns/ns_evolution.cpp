@@ -165,7 +165,7 @@ vecd FreddiNeutronStarEvolution::NeutronStarStructure::initialize_d2Fmagn_dh2(Fr
 	double brackets1, brackets2;
 	for (size_t i = 0; i < evolution->Nx(); i++) {
 		brackets1 = 14. /m::pow<4>(evolution->R()[i]) - 20. * std::pow(R_cor, 1.5) / std::pow(evolution->R()[i], 5.5);
-        brackets2 = - 112./m::pow<4>(evolution->R()[i]) - 220. * std::pow(R_cor, 1.5) / std::pow(evolution->R()[i], 5.5);
+        brackets2 = 112./m::pow<4>(evolution->R()[i]) - 220. * std::pow(R_cor, 1.5) / std::pow(evolution->R()[i], 5.5);
 		d2Fmagn_dh2_[i] = k  * (m::pow<2>(std::cos(chi_oblique_rad)) * brackets1 + H_to_R_temp * m::pow<2>(std::sin(chi_oblique_rad)) * brackets2);
 	}
 	return d2Fmagn_dh2_;
@@ -500,7 +500,7 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
     }
     
     if (Rmtype() == "Kluzniak" || Rmtype() == "kluzniak"){
-		//std::cout << R_Magn_KR07() << "," << R_Mdot_slope_KR07() << std::endl;
+		//std::cout << R_Magn_KR07() << "*" << R_max_Fmagn_KR07() << std::endl;
         //R_magnetic = std::max(R_Magn_KR07(), R_Mdot_slope_KR07());
 		R_magnetic = R_Magn_KR07();
     }
@@ -556,10 +556,12 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
             }
         } else {
 			if (Rmtype() == "Kluzniak" || Rmtype() == "kluzniak"){
-            	new_F_in = Mdot_KR07*(std::pow(GM()*R_m, 0.5)-std::pow(GM()*R0_KR07, 0.5)) - F_Magn_KR07(R_m) + F_Magn_KR07(R0_KR07);
+            	/*new_F_in = Mdot_KR07*(std::pow(GM()*R_m, 0.5)-std::pow(GM()*R0_KR07, 0.5)) - F_Magn_KR07(R_m) + F_Magn_KR07(R0_KR07);
 				std::cout << R0_KR07 << " " << R_m << " " << new_F_in << " " << Mdot_KR07 << " " 
 				<< Mdot_KR07*(std::pow(GM()*R_m, 0.5)-std::pow(GM()*R0_KR07, 0.5)) <<  " " <<  F_Magn_KR07(R_m) - F_Magn_KR07(R0_KR07) << " " <<
 				(Mdot_KR07*(std::pow(GM()*R_m, 0.5)-std::pow(GM()*R0_KR07, 0.5)))/(F_Magn_KR07(R_m) - F_Magn_KR07(R0_KR07)) << std::endl;
+				*/
+			new_F_in = 0;
 			} else {
 				new_F_in = 0;
 			}
@@ -639,7 +641,7 @@ double FreddiNeutronStarEvolution::R_Magn_KR07() const {
     const double H_to_R_temp = h2rbozzo();
 
 	double guess = 0.9;
-    std::uintmax_t maxit = 300;
+    std::uintmax_t maxit = 1000;
     double left = 0.;
     double right = 3.;
     boost::math::tools::eps_tolerance<double> tol(10);
@@ -654,9 +656,6 @@ double FreddiNeutronStarEvolution::R_Magn_KR07() const {
 			},
                  left, right, tol, maxit);
 	double omega = r.first;
-	std::cout << parametr_bozzo * (m::pow<2>(std::cos(chi_oblique_rad)) * (1. - omega) + 
-			H_to_R_temp * (11. - 8. * omega) * m::pow<2>(std::sin(chi_oblique_rad)) ) * 
-			std::pow(RA/RC, 3.5) - 0.5 * std::pow(omega, 10./3.) << "*" << std::endl;
     return std::pow(r.first, 2./3.) * RC;
 	//return ns_str_->args_ns.R_Magn_KR07(GM(), Mdot_in()); 
 }
@@ -669,7 +668,7 @@ double FreddiNeutronStarEvolution::F_Magn_KR07(const double R) const {
 	double brackets1, brackets2;
 	double Fmagn;
 	brackets1 = 3. / m::pow<3>(R) - 2. * std::pow(R_cor(), 1.5) / std::pow(R, 4.5);
-	brackets2 = 8. / m::pow<3>(R) - 22. * std::pow(R_cor(), 1.5) / std::pow(R, 4.5);
+	brackets2 = 24. / m::pow<3>(R) - 22. * std::pow(R_cor(), 1.5) / std::pow(R, 4.5);
 	Fmagn = k  * (m::pow<2>(std::cos(chi_oblique_rad)) * brackets1 + H_to_R_temp * m::pow<2>(std::sin(chi_oblique_rad)) * brackets2);
 	return Fmagn;
     
@@ -715,7 +714,7 @@ double FreddiNeutronStarEvolution::R_max_Fmagn_KR07() const { // R : Fmagn -> ma
 }
 
 double FreddiNeutronStarEvolution::R_Mdot_slope_KR07() const { // R : dFmag_dh = Mdot 
-    const double RA = R_Alfven_basic();
+    const double RA = R_Alfven_basic();                        // Not used now
     const double RC = R_cor();
 	const double R_max = R_max_Fmagn_KR07();
     const double alpha = args().basic->alpha; 
@@ -754,7 +753,7 @@ double FreddiNeutronStarEvolution::NeutronStarStructure::F_Magn_KR07(const doubl
 	    double brackets1, brackets2;
         double Fmagn;
         brackets1 = 3. / m::pow<3>(R) - 2. * std::pow(R_cor, 1.5) / std::pow(R, 4.5);
-        brackets2 = 8. / m::pow<3>(R) - 22. * std::pow(R_cor, 1.5) / std::pow(R, 4.5);
+        brackets2 = 24. / m::pow<3>(R) - 22. * std::pow(R_cor, 1.5) / std::pow(R, 4.5);
 		Fmagn = k  * (m::pow<2>(std::cos(chi_oblique_rad)) * brackets1 + H_to_R_temp * m::pow<2>(std::sin(chi_oblique_rad)) * brackets2);
         return Fmagn;
     

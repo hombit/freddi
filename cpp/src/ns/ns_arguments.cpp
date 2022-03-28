@@ -86,6 +86,7 @@ double NeutronStarArguments::R_Magn_KR07(double GM, double Mdot) const {
 				- 0.5 * std::pow(omega, 10./3.); 
 			},
                  left, right, tol, maxit);
+				 std::cout << std::pow(r.first, 2./3.) * RC << std::endl;
     return std::pow(r.first, 2./3.) * RC;
     
 }
@@ -272,7 +273,7 @@ vecd NeutronStarDiskStructureArguments::InitialFQuasistatNS::operator()(const ve
 	for (size_t i = first(h); i < h.size(); ++i) {
 		const double xi_LS2000 = h[i] / h.back();
 		F[i] = F0 * oprel.f_F(xi_LS2000) * (1. - h_in / h[i]) / (1. - h_in / h.back());
-		//h[first(h)] does not equal h_in since h_in goes from solvation of equation, but h[first(h)] is the nearest mesh node.
+		//h[first(h)] does not equal h_in since h_in is calculated analitically, but h[first(h)] is the nearest mesh node.
 		//It leads to the fact that F_vis(h[first(h)])!=0 in initial distribution.
 	}
 	return F;
