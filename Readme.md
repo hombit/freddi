@@ -429,11 +429,11 @@ Parameters of flux calculation:
                                    spectral flux density Fnu [erg/s/cm^2/Hz] is
                                    produced
                                    
-  --passband arg                   Path of a file containing tabulated 
-                                   passband, the first column for wavelength in
-                                   Angstrom, the second column for transmission
-                                   factor, columns should be separated by 
-                                   spaces
+  --passband arg                   Path of a file containing tabulated passband
+                                   for a photon counter detector, the first 
+                                   column for wavelength in Angstrom, the 
+                                   second column for transmission factor, 
+                                   columns should be separated by spaces
                                    
 
 Parameters of disk evolution calculation:
@@ -926,10 +926,11 @@ Parameters of flux calculation:
                                         Fnu [erg/s/cm^2/Hz] is produced
                                         
   --passband arg                        Path of a file containing tabulated 
-                                        passband, the first column for 
-                                        wavelength in Angstrom, the second 
-                                        column for transmission factor, columns
-                                        should be separated by spaces
+                                        passband for a photon counter detector,
+                                        the first column for wavelength in 
+                                        Angstrom, the second column for 
+                                        transmission factor, columns should be 
+                                        separated by spaces
                                         
 
 Parameters of disk evolution calculation:

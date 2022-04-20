@@ -73,7 +73,7 @@ boost::shared_ptr<FluxArguments> make_flux_arguments(
 			inclination, ephemeris_t0, distance,
 			false, false,
 			vecd(),
-			std::vector<Passband>());
+			std::vector<EnergyPassband>());
 }
 
 boost::shared_ptr<CalculationArguments> make_calculation_arguments(

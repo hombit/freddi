@@ -57,7 +57,7 @@ public:
 class FluxOptions: public FluxArguments {
 protected:
 	static vecd lambdasInitializer(const po::variables_map& vm);
-	static std::vector<Passband> passbandsInitializer(const po::variables_map& vm);
+	static std::vector<EnergyPassband> passbandsInitializer(const po::variables_map& vm);
 public:
 	FluxOptions(const po::variables_map& vm);
 	static po::options_description description();

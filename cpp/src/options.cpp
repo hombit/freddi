@@ -305,17 +305,17 @@ vecd FluxOptions::lambdasInitializer(const po::variables_map &vm) {
 	return lambdas;
 }
 
-std::vector<Passband> FluxOptions::passbandsInitializer(const po::variables_map& vm) {
+std::vector<EnergyPassband> FluxOptions::passbandsInitializer(const po::variables_map& vm) {
 	if (vm.count("passband") == 0) {
 		return {};
 	}
 	auto filepaths = vm["passband"].as<std::vector<std::string>>();
-	std::vector<Passband> passbands;
+	std::vector<EnergyPassband> passbands;
 	for (const auto &filepath : filepaths) {
 		try {
-			passbands.emplace_back(filepath);
+			passbands.emplace_back(filepath, PhotonCounter);
 		} catch (const std::ios_base::failure& e) {
-			throw po::invalid_option_value("Passband file doesn't exist");
+			throw po::invalid_option_value("EnergyPassband file doesn't exist");
 		}
 	}
 	return passbands;
@@ -334,7 +334,7 @@ po::options_description FluxOptions::description() {
 			( "colddiskflux", "Add Fnu for cold disk into output file. Default output is for hot disk only\n" )
 			( "starflux", "Add Fnu for irradiated optical star into output file. See --Topt, --starlod and --h2rcold options. Default is output for the hot disk only\n" )
 			( "lambda", po::value<vecd>()->multitoken()->composing(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced\n" )
-			( "passband", po::value<std::vector<std::string>>()->multitoken()->composing(), "Path of a file containing tabulated passband, the first column for wavelength in Angstrom, the second column for transmission factor, columns should be separated by spaces\n" )
+			( "passband", po::value<std::vector<std::string>>()->multitoken()->composing(), "Path of a file containing tabulated passband for a photon counter detector, the first column for wavelength in Angstrom, the second column for transmission factor, columns should be separated by spaces\n" )
 			;
 	return od;
 }

@@ -284,7 +284,7 @@ public:
 	bool cold_disk;
 	bool star;
 	vecd lambdas;
-	std::vector<Passband> passbands;
+	std::vector<EnergyPassband> passbands;
 public:
 	FluxArguments(
 			double colourfactor,
@@ -293,7 +293,7 @@ public:
 			double inclination, double ephemeris_t0, double distance,
 	        bool cold_disk, bool star,
 	        const vecd& lambdas,
-	        const std::vector<Passband>& passbands):
+	        const std::vector<EnergyPassband>& passbands):
 			colourfactor(colourfactor),
 			emin(emin), emax(emax),
 			star_albedo(star_albedo),
