@@ -273,6 +273,7 @@ vecd NeutronStarDiskStructureArguments::InitialFQuasistatNS::operator()(const ve
 	for (size_t i = first(h); i < h.size(); ++i) {
 		const double xi_LS2000 = h[i] / h.back();
 		F[i] = F0 * oprel.f_F(xi_LS2000) * (1. - h_in / h[i]) / (1. - h_in / h.back());
+		//F is Fsum, modification of F will be done in constructor of F. 
 		//h[first(h)] does not equal h_in since h_in is calculated analitically, but h[first(h)] is the nearest mesh node.
 		//It leads to the fact that F_vis(h[first(h)])!=0 in initial distribution.
 	}

@@ -68,7 +68,8 @@ private:
 		vecd initialize_d2Fmagn_dh2(FreddiEvolution* evolution) const;
 	public:
 		NeutronStarStructure(const NeutronStarArguments& args_ns, FreddiEvolution* evolution);
-        double R_Magn_KR07(FreddiEvolution* evolution) const;
+        //double R_Magn_KR07(FreddiEvolution* evolution) const;
+		//inline double R_Magn_KR07(FreddiEvolution* evolution) const { return args_ns.R_Magn_KR07(evolution->GM(), evolution->Mdot_in()); }
         double F_Magn_KR07(const double R) const;
 	};
 
@@ -206,6 +207,7 @@ public:
 	inline const vecd& Fmagn() const { return ns_str_->Fmagn; }
 	inline const vecd& dFmagn_dh() const { return ns_str_->dFmagn_dh; }
 	inline const vecd& d2Fmagn_dh2() const { return ns_str_->d2Fmagn_dh2; }
+	inline double R_Magn_KR07() const { return ns_str_->args_ns.R_Magn_KR07(GM(), Mdot_in()); }
 // ns_opt_str_
 public:
 	double Lbol_ns() const;
@@ -230,7 +232,7 @@ public:
 	double R_Alfven() const;
     double R_Alfven_basic() const;
 	double R_Magn_bozzo18() const;
-    double R_Magn_KR07() const;
+    //double R_Magn_KR07() const;
 	double R_max_Fmagn_KR07() const;
 	double R_Mdot_slope_KR07() const;
 	double F_Magn_KR07(const double R) const;
