@@ -416,6 +416,12 @@ double FreddiNeutronStarEvolution::Lx_ns_rest_frame() {
 }
 
 
+
+double FreddiNeutronStarEvolution::Fx_ns() {
+    return Lx_ns() * angular_dist_ns(cosi()) / (FOUR_M_PI * m::pow<2>(distance()));
+}
+
+
 void FreddiNeutronStarEvolution::invalidate_optional_structure() {
 	FreddiEvolution::invalidate_optional_structure();
 	ns_opt_str_ = NeutronStarOptionalStructure();

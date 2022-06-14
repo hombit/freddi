@@ -69,6 +69,7 @@ class RegressionTestCase(unittest.TestCase):
         'Teffout': 'last_Tph',
         'Tirrout': 'last_Tirr',
         'Lx': 'Lx',
+        'Fx': 'Fx',
     }
 
     @parameterized.expand(glob.glob(os.path.join(DATA_DIR, '*.dat')))

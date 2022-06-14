@@ -209,7 +209,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"TphXmax", "keV", "Maximum effective temperature of the disk", [freddi]() {return kToKev(*std::max_element(freddi->Tph_X().begin() + freddi->first(), freddi->Tph_X().begin() + freddi->last() + 1));}},
 			{"Lx", "erg/s", "X-ray luminosity of the disk in the given energy range [emin, emax]", [freddi]() {return freddi->Lx();}},
 			{"Lbol", "erg/s", "Bolometric luminosity of the disk", [freddi]() {return freddi->Lbol_disk();}},
-			{"Fx", "erg/s/cm^2", "X-ray flux of the disk in the given energy range [emin, emax]", [freddi]() {return freddi->Lx() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
+			{"Fx", "erg/s/cm^2", "X-ray flux of the disk in the given energy range [emin, emax]", [freddi]() {return freddi->Fx();}},
 			{"Fbol", "erg/s/cm^2", "Bolometric flux of the disk", [freddi]() {return freddi->Lbol_disk() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
 	};
 	const bool cold_disk = freddi->args().flux->cold_disk;
