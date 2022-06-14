@@ -203,6 +203,7 @@ public:
 	double T_hot_spot() const;
 	double Lx_ns();
 	double Lx_ns_rest_frame();
+    double Fx_ns();
 // angular_dist_ns_
 public:
 	inline double angular_dist_ns(const double mu) { return ns_irr_source_->angular_dist(mu); }

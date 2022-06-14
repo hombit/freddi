@@ -322,5 +322,6 @@ void wrap_evolution() {
 		.add_property("T_hot_spot", &FreddiNeutronStarEvolution::T_hot_spot)
 		.add_property("Lbol_ns", &FreddiNeutronStarEvolution::Lbol_ns)
 		.add_property("Lx_ns", &FreddiNeutronStarEvolution::Lx_ns)
+        .add_property("Fx_ns", &FreddiNeutronStarEvolution::Fx_ns);
 	;
 }
