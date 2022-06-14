@@ -389,6 +389,7 @@ protected:
 	virtual const vecd& Qx();
 public:
 	double Lx();
+    double Fx();
 	const vecd& W();
 	const vecd& Sigma();
 	const vecd& Tph();

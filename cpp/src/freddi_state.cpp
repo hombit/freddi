@@ -176,6 +176,11 @@ double FreddiState::Lx() {
 }
 
 
+double FreddiState::Fx() {
+    return Lx() * angular_dist_disk(cosi()) / (FOUR_M_PI * m::pow<2>(distance()));
+}
+
+
 const vecd& FreddiState::W() {
 	if (!opt_str_.W) {
 		auto x = wunc()(h(), F(), first(), last());

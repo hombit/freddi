@@ -23,6 +23,7 @@ void wrap_state() {
 		.add_property("Mdot", &FreddiState::Mdot_in)
 		.add_property("Mdot_out", &FreddiState::Mdot_out)
 		.add_property("Lx", &FreddiState::Lx)
+        .add_property("Fx", &FreddiState::Fx)
 		.add_property("t", &FreddiState::t)
 		.add_property("i_t", &FreddiState::i_t)
 		.add_property("Nt", &FreddiState::Nt)
