@@ -63,10 +63,10 @@ double NeutronStarArguments::R_Alfven_basic(double GM, double Mdot) const {
 	return std::pow(m::pow<4>(mu_magn) / (GM * m::pow<2>(Mdot)), 1./7.);
 }
 
-double NeutronStarArguments::R_Magn_KR07(double GM, double Mdot) const {
+double NeutronStarArguments::R_Magn_KR07(double GM, double alpha, double Mdot) const {
 	const double RA = R_Alfven_basic(GM, Mdot);
     const double RC = std::cbrt(GM / m::pow<2>(2*M_PI * freqx));
-    const double alpha = 0.5; //поправить потом  это дело
+    //const double alpha = 0.5; //поправить потом  это дело
     const double chi_oblique_rad = chi_oblique * M_PI / 180.;
     const double parametr_bozzo = m::pow<2>(0.2) / alpha;
     const double H_to_R_temp = h2r_bozzo;
@@ -91,10 +91,10 @@ double NeutronStarArguments::R_Magn_KR07(double GM, double Mdot) const {
     
 }
 
-double NeutronStarArguments::R_max_Fmagn_KR07(double GM, double Mdot) const {
+double NeutronStarArguments::R_max_Fmagn_KR07(double GM, double alpha, double Mdot) const {
 	const double RA = R_Alfven_basic(GM, Mdot);
     const double RC = std::cbrt(GM / m::pow<2>(2*M_PI * freqx));
-    const double alpha = 0.5; //поправить потом  это дело
+    //const double alpha = 0.5; //поправить потом  это дело
     const double chi_oblique_rad = chi_oblique * M_PI / 180.;
     const double parametr_bozzo = m::pow<2>(0.2) / alpha;
     const double H_to_R_temp = h2r_bozzo;
@@ -104,15 +104,15 @@ double NeutronStarArguments::R_max_Fmagn_KR07(double GM, double Mdot) const {
 	(m::pow<2>(std::sin(chi_oblique_rad))*(8. * H_to_R_temp - 1. ) + 1.), 2./3.) * RC;
 }
 
-double NeutronStarArguments::R_Mdot_slope_KR07(double GM, double Mdot) const {
+double NeutronStarArguments::R_Mdot_slope_KR07(double GM, double alpha, double Mdot) const {
 	const double RA = R_Alfven_basic(GM, Mdot);
     const double RC = std::cbrt(GM / m::pow<2>(2*M_PI * freqx));
-    const double alpha = 0.5; //поправить потом  это дело
+    //const double alpha = 0.5; //поправить потом  это дело
     const double chi_oblique_rad = chi_oblique * M_PI / 180.;
     const double parametr_bozzo = m::pow<2>(0.2) / alpha;
     const double H_to_R_temp = h2r_bozzo;
-	const double Rmax = R_max_Fmagn_KR07(GM, Mdot);
-	const double R0 = R_Magn_KR07(GM, Mdot); // We assume that Rmax > R0
+	const double Rmax = R_max_Fmagn_KR07(GM, alpha, Mdot);
+	const double R0 = R_Magn_KR07(GM, alpha, Mdot); // We assume that Rmax > R0
 
 	
     std::uintmax_t maxit = 300;
@@ -235,7 +235,7 @@ std::shared_ptr<DiskStructureArguments::InitialFFunction> NeutronStarDiskStructu
 		if (Mdot0) {
             double Ralfven;
             if (ns_args.Rm_type == "kluzniak" || ns_args.Rm_type == "Kluzniak"){
-				double R0 = ns_args.R_Magn_KR07(bdb_args.Mx * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT, *Mdot0);
+				double R0 = ns_args.R_Magn_KR07(bdb_args.Mx * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT, bdb_args.alpha, *Mdot0);
 				/*double Rmax = ns_args.R_max_Fmagn_KR07(bdb_args.Mx * GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT, *Mdot0);
 				if (R0 >= Rmax) {
 					Ralfven = R0;

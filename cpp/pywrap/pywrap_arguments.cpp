@@ -105,14 +105,16 @@ boost::shared_ptr<FreddiArguments> make_freddi_arguments(
 
 boost::shared_ptr<NeutronStarArguments> make_neutron_star_arguments(
 		const std::string& nsprop,
-		const object& freqx, const object& Rx, double Bx, double hotspotarea,
+		const object& freqx, const object& Rx, double Bx, const std::string& Rm_type,
+		double hotspotarea, double h2r_bozzo, double chi_oblique,
 		double epsilonAlfven, double inversebeta, double Rdead,
 		const std::string& fptype, const object& fpparams_,
 		const std::string& kappat_type, const object& kappat_params_,
 		const std::string& ns_grav_redshift) {
 	return boost::make_shared<NeutronStarArguments>(
 			nsprop,
-			objToOpt<double>(freqx), objToOpt<double>(Rx), Bx, hotspotarea,
+			objToOpt<double>(freqx), objToOpt<double>(Rx), Bx, Rm_type,
+			hotspotarea, h2r_bozzo, chi_oblique,
 			epsilonAlfven, inversebeta, Rdead,
 			fptype, mapping_to_map(fpparams_),
 			kappat_type, mapping_to_map(kappat_params_),

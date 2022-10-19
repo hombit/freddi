@@ -71,6 +71,7 @@ private:
         //double R_Magn_KR07(FreddiEvolution* evolution) const;
 		//inline double R_Magn_KR07(FreddiEvolution* evolution) const { return args_ns.R_Magn_KR07(evolution->GM(), evolution->Mdot_in()); }
         double F_Magn_KR07(const double R) const;
+		double dF_dh_Magn_KR07(const double R, const double GM) const;
 	};
 
 	struct NeutronStarOptionalStructure {
@@ -207,7 +208,7 @@ public:
 	inline const vecd& Fmagn() const { return ns_str_->Fmagn; }
 	inline const vecd& dFmagn_dh() const { return ns_str_->dFmagn_dh; }
 	inline const vecd& d2Fmagn_dh2() const { return ns_str_->d2Fmagn_dh2; }
-	inline double R_Magn_KR07() const { return ns_str_->args_ns.R_Magn_KR07(GM(), Mdot_in()); }
+	inline double R_Magn_KR07() const { return ns_str_->args_ns.R_Magn_KR07(GM(), args().basic->alpha, Mdot_in()); }
 // ns_opt_str_
 public:
 	double Lbol_ns() const;
@@ -236,6 +237,7 @@ public:
 	double R_max_Fmagn_KR07() const;
 	double R_Mdot_slope_KR07() const;
 	double F_Magn_KR07(const double R) const;
+	double dF_dh_Magn_KR07(const double R) const;
 protected:
 	virtual void invalidate_optional_structure() override;
 	virtual void truncateInnerRadius() override;

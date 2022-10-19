@@ -82,9 +82,9 @@ public:
 			ns_grav_redshift(ns_grav_redshift) {}
 	double R_Alfven(double GM, double Mdot) const;
     double R_Alfven_basic(double GM, double Mdot) const;
-    double R_Magn_KR07(double GM, double Mdot) const;
-	double R_max_Fmagn_KR07(double GM, double Mdot) const;
-	double R_Mdot_slope_KR07(double GM, double Mdot) const;
+    double R_Magn_KR07(double GM, double alpha, double Mdot) const;
+	double R_max_Fmagn_KR07(double GM,  double alpha, double Mdot) const;
+	double R_Mdot_slope_KR07(double GM, double alpha, double Mdot) const;
 };
 
 
