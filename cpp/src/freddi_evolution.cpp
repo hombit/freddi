@@ -13,10 +13,7 @@ using namespace std::placeholders;
 FreddiEvolution::FreddiEvolution(const FreddiArguments &args):
 		FreddiState(args, std::bind(&FreddiEvolution::wunction, this, _1, _2, _3, _4)) {}
 
-
-void FreddiEvolution::step(const double tau) {
-	truncateInnerRadius();
-	FreddiState::step(tau);
+void FreddiEvolution::nonlinear_diffusion(const double tau) {
 	nonlinear_diffusion_nonuniform_wind_1_2(
 			args().calc->tau, args().calc->eps,
 			F_in(), Mdot_out(),
@@ -24,8 +21,19 @@ void FreddiEvolution::step(const double tau) {
 			wunc(),
 			h(), current_.F,
 			first(), last());
+}
+
+void FreddiEvolution::step(const double tau) {
+	truncateInnerRadius();
+	//std::cout << "truncateInnerRadius" << std::endl;
+	FreddiState::step(tau);
+	//std::cout << "step" << std::endl;
+	nonlinear_diffusion(tau);
+	//std::cout << "nonlineardiffusion" << std::endl;
 	truncateOuterRadius();
+	//std::cout << "truncateOuterRadius" << std::endl;
 	star_.set_sources(star_irr_sources());
+	//std::cout << "set_sources" << std::endl;
 }
 
 

@@ -248,6 +248,7 @@ public:
 	explicit FreddiNeutronStarEvolution(const FreddiNeutronStarEvolution&) = default;
 	virtual const vecd& Qx() override;
 	virtual double Lbol_disk() const override;
+	virtual void nonlinear_diffusion(const double tau) override;
 public:
 	using iterator = EvolutionIterator<FreddiNeutronStarEvolution>;
 	inline iterator begin() { return {this}; }

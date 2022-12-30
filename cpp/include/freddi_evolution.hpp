@@ -50,6 +50,7 @@ public:
 	FreddiEvolution(const FreddiArguments& args);
 	explicit FreddiEvolution(const FreddiEvolution&) = default;
 	virtual void step(double tau);
+	virtual void nonlinear_diffusion(const double tau);
 	inline void step() { return step(args().calc->tau); }
 public:
 	using iterator = EvolutionIterator<FreddiEvolution>;

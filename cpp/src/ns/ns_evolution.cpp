@@ -1,9 +1,11 @@
 #include <exception>
 
 #include <boost/math/tools/roots.hpp>
+#include <boost/math/tools/minima.hpp>
 
 #include "exceptions.hpp"
 #include "ns/ns_evolution.hpp"
+#include "nonlinear_diffusion.hpp"
 
 #include <fstream>
 
@@ -478,7 +480,7 @@ void FreddiNeutronStarEvolution::invalidate_optional_structure() {
 
 
 void FreddiNeutronStarEvolution::truncateInnerRadius() {
- 
+	//std::cout << " BeforeMdot=" << Mdot_in() << std::endl;
     //const auto& Rm_definition = args_ns.Rm_definition;
 	if (R_dead() <= 0.) {
 		return;
@@ -536,8 +538,8 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
 
 	if (Rmtype() == "Kluzniak" || Rmtype() == "kluzniak"){
 		if ((R()[ii+1] >= R_max_Fmagn_KR07()) || (ii == first())) {
-    		R_m = R()[ii];
-    		current_.first = ii;
+    		R_m = R()[ii+1];
+    		current_.first = ii+1;
 		} else {
 			R_m = R()[ii+1];
     		current_.first = ii+1;
@@ -549,36 +551,157 @@ void FreddiNeutronStarEvolution::truncateInnerRadius() {
     double new_F_in = 0;
 
 	double R0_KR07 = R_magnetic;
-	std::cout << R0_KR07 << " " << R_m << " " << R_m/R0_KR07 << std::endl;
+	//std::cout << R0_KR07 << " " << R_m << " " << R_m/R0_KR07 << std::endl;
 	double Mdot_KR07 = Mdot_in();
-        if (inverse_beta() <= 0.) {
-            if (R_m <= R_cor()) {
+    if (inverse_beta() <= 0.) {
+        if (R_m <= R_cor()) {
                 new_F_in = kappa_t(R_m) * m::pow<2>(mu_magn()) / m::pow<3>(R_cor());
-            } else {
+        } else {
     //			new_F_in = F_dead() * m::pow<3>(R_dead() / R_m);
                 new_F_in = kappa_t(R_m) * m::pow<2>(mu_magn()) / m::pow<3>(R_m);
-            }
-        } else {
+        }
+    } else {
 			if (Rmtype() == "Kluzniak" || Rmtype() == "kluzniak"){
             	//new_F_in = Mdot_KR07*(std::pow(GM()*R_m, 0.5)-std::pow(GM()*R0_KR07, 0.5)) - F_Magn_KR07(R_m) + F_Magn_KR07(R0_KR07);
 				/*std::cout << R0_KR07 << " " << R_m << " " << new_F_in << " " << Mdot_KR07 << " " 
 				<< Mdot_KR07*(std::pow(GM()*R_m, 0.5)-std::pow(GM()*R0_KR07, 0.5)) <<  " " <<  F_Magn_KR07(R_m) - F_Magn_KR07(R0_KR07) << " " <<
 				(Mdot_KR07*(std::pow(GM()*R_m, 0.5)-std::pow(GM()*R0_KR07, 0.5)))/(F_Magn_KR07(R_m) - F_Magn_KR07(R0_KR07)) << std::endl;
 				*/
-//			new_F_in = Mdot_KR07*(std::pow(GM()*R_m, 0.5)-std::pow(GM()*R0_KR07, 0.5)) - F_Magn_KR07(R_m) + F_Magn_KR07(R0_KR07);
-			new_F_in = 0;
+//				new_F_in = Mdot_KR07*(std::pow(GM()*R_m, 0.5)-std::pow(GM()*R0_KR07, 0.5)) - F_Magn_KR07(R_m) + F_Magn_KR07(R0_KR07);
+//				new_F_in = 0; On December 2022 we find iteratively this condition in the nonlinear_diffusion().
+				//std::cout << " AfterMdot=" << Mdot_in() << std::endl;
+				return;
 			} else {
 				new_F_in = 0;
 			}
-        }
-        current_.F_in = new_F_in;
+    }
+
+    current_.F_in = new_F_in;    
+		
+}
+
+/*void FreddiNeutronStarEvolution::nonlinear_diffusion(const double tau) {
+	vecd Fvis_start = current_.F;
+	double Fvis0 = abs(Fvis_start[first()] + F_Magn_KR07(R()[first()]) 
+	- F_Magn_KR07(R()[first()+1]) - Mdot_in()*(h()[first()]-std::pow(GM()*R()[first()+1],0.5)));
+
+	double guess = 0;
+    std::uintmax_t maxit = 300;
+    double left = -1.;
+    double right = 20.;
+    boost::math::tools::eps_tolerance<double> tol(10);
+	std::cout.precision(10);
+    
+	std::cout << " Mdot=" << Mdot_in() << " R_Magn=" << R_Magn_KR07() <<std::endl;
+    
+    std::pair<double, double> r = boost::math::tools::toms748_solve(
+        [this, &Fvis_start, tau, Fvis0](double fin){
+		current_.F = Fvis_start;
+		nonlinear_diffusion_nonuniform_wind_1_2(
+		args().calc->tau, args().calc->eps,
+		fin*Fvis0, Mdot_out(),
+		windA(), windB(), windC(),
+		wunc(),
+		h(), current_.F,
+		first(), last());
+		double Answer = (current_.F[first()] + F_Magn_KR07(R()[first()]) 
+	- F_Magn_KR07(R_Magn_KR07()) - Mdot_in()*(h()[first()]-std::pow(GM()*R_Magn_KR07(),0.5)))/Fvis0;
+		if (current_.F[first()+1]-current_.F[first()] <= 0){
+
+			Answer=1.;
+		} 
+		std::cout << " Mdot=" << Mdot_in() << " Answer=" << Answer 
+		<< " R[first]=" << R()[first()] << " R_Magn=" << R_Magn_KR07() 
+		<< " fin=" << fin << std::endl;
+		return Answer;
+			}, left, right, tol, maxit);
+
+	current_.F = Fvis_start;
+	nonlinear_diffusion_nonuniform_wind_1_2(
+		args().calc->tau, args().calc->eps,
+		r.first*Fvis0, Mdot_out(),
+		windA(), windB(), windC(),
+		wunc(),
+		h(), current_.F,
+		first(), last());
+		double Answer = (current_.F[first()] + F_Magn_KR07(R()[first()]) 
+	- F_Magn_KR07(R_Magn_KR07()) - Mdot_in()*(h()[first()]-std::pow(GM()*R_Magn_KR07(),0.5)))/Fvis0;
+	std::cout << " *Mdot=" << Mdot_in() << " Answer=" << Answer 
+		<< " R[first]=" << R()[first()] << " R_Magn=" << R_Magn_KR07() 
+		<< " fin=" << r.first*Fvis0 << std::endl;
+	std::cout << "**********************************************" << std::endl;
+}*/
+
+void FreddiNeutronStarEvolution::nonlinear_diffusion(const double tau) {
+	vecd Fvis_start = current_.F;
+	double Fvis0 = abs(Fvis_start[first()] + F_Magn_KR07(R()[first()]) 
+	- F_Magn_KR07(R()[first()+1]) - Mdot_in()*(h()[first()]-std::pow(GM()*R()[first()+1],0.5)));
+
+	double guess = 0;
+    std::uintmax_t maxit = 30;
+    double left = -20.;
+    double right = 20.;
+	std::cout.precision(10);
+    
+	//std::cout << " Mdot=" << Mdot_in() << " R_Magn=" << R_Magn_KR07() <<std::endl;
+	int bits = 10;
+	std::pair<double, double> r = boost::math::tools::brent_find_minima(
+		[this, &Fvis_start, tau, Fvis0](double fin){
+		current_.F = Fvis_start;
+		double lam = 0.;
+		nonlinear_diffusion_nonuniform_wind_1_2(
+		args().calc->tau, args().calc->eps,
+		fin*Fvis0, Mdot_out(),
+		windA(), windB(), windC(),
+		wunc(),
+		h(), current_.F,
+		first(), last());
+		double Answer = (current_.F[first()] + F_Magn_KR07(R()[first()]) 
+	- F_Magn_KR07(R_Magn_KR07()) - Mdot_in()*(h()[first()]-std::pow(GM()*R_Magn_KR07(),0.5)))/Fvis0;
+		double Answer_div = (current_.F[first()+1]-current_.F[first()])/Fvis0; 
+		/*if (current_.F[first()+1]-current_.F[first()] <= 0){
+
+			Answer = std::pow(1000.*Answer_div, 2);
+		}*/
+		/*std::cout << " Mdot=" << Mdot_in() << " Answer=" << Answer 
+		<< " R[first]=" << R()[first()] << " R_Magn=" << R_Magn_KR07() 
+		<< " fin=" << fin << " Answer_div=" << Answer_div <<  std::endl;
+		*/
+		return std::pow(Answer, 2) + lam*std::pow(Answer_div, 2);} //+ lam*std::pow(10.- Answer_div, 2)
+		, left, right, bits, maxit);
+	
+	current_.F = Fvis_start;
+	nonlinear_diffusion_nonuniform_wind_1_2(
+		args().calc->tau, args().calc->eps,
+		r.first*Fvis0, Mdot_out(),
+		windA(), windB(), windC(),
+		wunc(),
+		h(), current_.F,
+		first(), last());
+		double Answer = (current_.F[first()] + F_Magn_KR07(R()[first()]) 
+	- F_Magn_KR07(R_Magn_KR07()) - Mdot_in()*(h()[first()]-std::pow(GM()*R_Magn_KR07(),0.5)))/Fvis0;
+	/*std::cout << " *Mdot=" << Mdot_in() << " Answer=" << Answer 
+		<< " R[first]=" << R()[first()] << " R_Magn=" << R_Magn_KR07() 
+		<< " fin=" << r.first*Fvis0 << std::endl;*/
+	if (current_.F[first()] > current_.F[first()+1]){
+			std::cout << "NO=derivation " << (current_.F[first()+1] - current_.F[first()])/(h()[first()+1]-h()[first()])/Mdot_in() << std::endl;
+		}	
+	for (size_t i = first(); i < h().size(); ++i) {
+//		  current_.F[i] += F_Magn_KR07(R_Magn_KR07()) - Fmagn()[i];	// F_sum --> F_vis
+        if (current_.F[i] < 0){
+			std::cout << "NO=<0 " << current_.F[i] << std::endl;
+			break;
+		}
+//        std::cout << "Fmagn[" << i << "]=" << Fmagn()[i] << std::endl;
+	}
+	//std::cout << "**********************************************" << std::endl;
 }
 
 double FreddiNeutronStarEvolution::Mdot_in() const {
 	const double dF_dh = (F()[first() + 1] - F()[first()]) / (h()[first() + 1] - h()[first()]);
-	//const double dFmag_dh = (F_Magn_KR07(R()[first() + 1]) - F_Magn_KR07(R()[first()])) / (h()[first() + 1] - h()[first()]);
-	//return dF_dh + dFmag_dh;
-	return dF_dh + dFmagn_dh()[first()]; //F is F_vis
+	const double dFmag_dh = (F_Magn_KR07(R()[first() + 1]) - F_Magn_KR07(R()[first()])) / (h()[first() + 1] - h()[first()]);
+	return dF_dh + dFmag_dh;
+	//return dF_dh + dFmagn_dh()[first()]; //F is F_vis
     //return dF_dh;
 	//return dF_dh + dF_dh_Magn_KR07(R_Magn_KR07()); //F is F_vis
 }
