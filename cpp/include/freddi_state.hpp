@@ -424,6 +424,7 @@ public:
 	double Mdot_wind();
 	double Sigma_minus(double r) const;
 	double Sigma_plus(double r) const;
+	double Teff_plus(double r) const;
 	double R_cooling_front(double r);
 	double v_cooling_front(double r);
 };
