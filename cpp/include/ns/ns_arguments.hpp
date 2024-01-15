@@ -114,6 +114,7 @@ public:
 			const std::string& opacity,
 			double Mdotout,
 			const std::string& boundcond, double Thot, double Tirr2Tvishot,
+			double Rhot_Mdotzero_factor, const std::string& check_state_approach, const std::string& check_Sigma_approach,
 			const std::string& initialcond,
 			std::optional<double> F0,
 			std::optional<double> Mdisk0, std::optional<double> Mdot0,

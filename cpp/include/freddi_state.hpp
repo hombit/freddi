@@ -427,6 +427,7 @@ public:
 	double Teff_plus(double r) const;
 	double R_cooling_front(double r);
 	double v_cooling_front(double r);
+	int ring_state_vertical(const int i);
 };
 
 #endif //FREDDI_FREDDI_STATE_HPP

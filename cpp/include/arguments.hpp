@@ -180,6 +180,9 @@ public:
 	constexpr static const char default_boundcond[] = "Teff";
 	constexpr static const double default_Thot = 0.;
 	constexpr static const double default_Tirr2Tvishot = 0.;
+	constexpr static const double default_Rhot_Mdotzero_factor = 1.;
+        constexpr static const char default_check_state_approach[] = "before2024";
+        constexpr static const char default_check_Sigma_approach[] = "simple";
 	constexpr static const char default_initialcond[] = "powerF";
 	constexpr static const char default_wind[] = "no";
 public:
@@ -191,6 +194,9 @@ public:
 	std::string boundcond;
 	double Thot;
 	double Tirr2Tvishot;
+	double Rhot_Mdotzero_factor;
+	std::string check_state_approach;
+	std::string check_Sigma_approach;
 	double F0;
 	double Mdisk0;
 	double Mdot0;
@@ -212,6 +218,7 @@ public:
 			const std::string& opacity,
 			double Mdotout,
 			const std::string& boundcond, double Thot, double Tirr2Tvishot,
+			double Rhot_Mdotzero_factor, const std::string& check_state_approach, const std::string& check_Sigma_approach,
 			const std::string& initialcond,
 			std::optional<double> F0,
 			std::optional<double> Mdisk0, std::optional<double> Mdot0,
@@ -225,12 +232,18 @@ public:
 			const std::string &boundcond,
 			double Thot,
 			double Tirr2Tvishot,
+			double Rhot_Mdotzero_factor,
+			const std::string &check_state_approach,
+			const std::string &check_Sigma_approach,
 			const std::string &initialcond,
 			const std::shared_ptr<InitialFFunction> initial_F_function,
 			const std::string &wind, const pard &windparams):
 			opacity(opacity), oprel(oprel),
 			Mdotout(Mdotout),
 			boundcond(boundcond), Thot(Thot), Tirr2Tvishot(Tirr2Tvishot),
+			Rhot_Mdotzero_factor(Rhot_Mdotzero_factor),
+			check_state_approach(check_state_approach), 
+			check_Sigma_approach(check_Sigma_approach),
 			initialcond(initialcond),
 			initial_F_function(initial_F_function),
 			wind(wind), windparams(windparams) {}

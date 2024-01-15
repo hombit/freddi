@@ -101,6 +101,9 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 				vm["boundcond"].as<std::string>(),
 				vm["Thot"].as<double>(),
 				std::pow(vm["Qirr2Qvishot"].as<double>(), 0.25),
+				vm["Rhot_Mdotzero_factor"].as<double>(),     
+				vm["check_state_approach"].as<std::string>(),       
+				vm["check_Sigma_approach"].as<std::string>(),       
 				vm["initialcond"].as<std::string>(),
 				varToOpt<double>(vm, "F0"),
 				varToOpt<double>(vm, "Mdisk0"),
@@ -216,6 +219,15 @@ po::options_description DiskStructureOptions::description() {
 					"  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option\n" ) // fourSigmaCrit, MdotOut
 			( "Thot", po::value<double>()->default_value(default_Thot), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description\n" )
 			( "Qirr2Qvishot", po::value<double>()->default_value(m::pow<4>(default_Tirr2Tvishot)), "Minimum Qirr / Qvis ratio at the outer edge of the hot disk to switch the control over the evolution of the hot disk radius: from temperature-based regime to Sigma-based cooling-front regime (see Lipunova et al. (2021, Section 2.4) and Eq. A.1 in Lasota et al. 2008; --alpha value is used for Sigma_plus and --alphacold value is used for Sigma_minus)\n" )
+			("Rhot_Mdotzero_factor", po::value<double>()->default_value(default_Rhot_Mdotzero_factor), "We check conditions for cooling front at current radius mpltiplied by Rhot_Mdotzero_factor\n" )
+			("check_state_approach", po::value<std::string>()->default_value(default_check_state_approach), "Type of checking whether the ring is hot or cold\n\n"
+					"Values:\n"
+					" before2024: original version, as published in Lipunova&Malanchev (2017); Lipunova et al (2022); Avakyan et al (2024)\n"
+					" logic: included option for checking conditions at radius different from the radius where accretion rate is zero. See Rhot_Mdotzero_factor and check_Sigma_approach\n")
+			("check_Sigma_approach", po::value<std::string>()->default_value(default_check_Sigma_approach), "Type of checking Sigma for hot or cold state\n\n"
+					"Values:\n"
+					" simple: assume that Sigma is proportional to R^(-3/4) between radius where Mdot = 0 and the cooling fron radius\n"   
+					" Menou99a: assume that Sigma is 4.3 times less at the cooling front comparing to radius where Mdot = 0; See fig.8 of Menou et al. (1999 MNRAS 305, 79)\n" )
 			( "initialcond", po::value<std::string>()->default_value(default_initialcond),
 					"Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 					"Values:\n"
@@ -254,7 +266,6 @@ po::options_description DiskStructureOptions::description() {
 	return od;
 }
 
-
 SelfIrradiationOptions::SelfIrradiationOptions(const po::variables_map &vm, const DiskStructureArguments &dsa_args):
 		SelfIrradiationArguments(
 				vm["Cirr"].as<double>(),
@@ -280,7 +291,6 @@ po::options_description SelfIrradiationOptions::description() {
 			;
 	return od;
 }
-
 
 FluxOptions::FluxOptions(const po::variables_map &vm):
 		FluxArguments(

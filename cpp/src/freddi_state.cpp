@@ -686,12 +686,14 @@ std::unique_ptr<IrrSource> FreddiState::PlaneFreddiIrradiationSource::irr_source
 }
 
 double FreddiState::Sigma_minus(double r) const {
+	// maximum density on the cold branch
 	// Lasota et al., A&A 486, 523–528 (2008), Eq A.1, DOI: 10.1051/0004-6361:200809658
 	return 74.6 * std::pow(args().basic->alphacold / 0.1, -0.83) * std::pow(r / 1e10, 1.18)
 		* std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, -0.40);
 }
 
-double FreddiState::Sigma_plus(double r) const {
+double FreddiState::Sigma_plus(double r) const { 
+        // minimum density on the hot branch
 	// Lasota et al., A&A 486, 523–528 (2008), Eq A.1, DOI: 10.1051/0004-6361:200809658
 	return 39.9 * std::pow(args().basic->alpha / 0.1, -0.80) * std::pow(r / 1e10, 1.11)
 		* std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, -0.37);
