@@ -427,7 +427,8 @@ public:
 	double Teff_plus(double r) const;
 	double R_cooling_front(double r);
 	double v_cooling_front(double r);
-	int ring_state_vertical(const int i);
+	int ring_state_vertical(const int i); // check ring hot (1) or cold (0)
+	int Tirr_exceed_critical(const int i); // check Tirr > Tcrit (1) or not (0)
 };
 
 #endif //FREDDI_FREDDI_STATE_HPP

@@ -188,7 +188,7 @@ NeutronStarDiskStructureOptions::NeutronStarDiskStructureOptions(const po::varia
 				std::pow(vm["Qirr2Qvishot"].as<double>(), 0.25),
 				vm["Rhot_Mdotzero_factor"].as<double>(),     
 				vm["check_state_approach"].as<std::string>(),       
-				vm["check_Sigma_approach"].as<std::string>(),     		  
+				vm["check_Sigma_approach"].as<std::string>(),     		vm["check_Temp_approach"].as<std::string>(),    
 				vm["initialcond"].as<std::string>(),
 				varToOpt<double>(vm, "F0"),
 				varToOpt<double>(vm, "Mdisk0"),

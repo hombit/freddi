@@ -28,17 +28,54 @@ void FreddiEvolution::step(const double tau) {
 	star_.set_sources(star_irr_sources());
 }
 
+int FreddiState::Tirr_exceed_critical(const int ii) {
+    // returns 1 for Tirr > Tcrit, 0  - otherwise
+    
+    double radius_popravka = args().disk->Rhot_Mdotzero_factor;
+    double Rcheck = std::min( R().at(ii-1) * radius_popravka, args().basic->rout);
+    double radius_popravka_variable = Rcheck/R().at(ii-1);
+    
+    radius_popravka = radius_popravka_variable;
+    
+    double Tcrit;
+    if (args().disk->check_Temp_approach == "const") { 
+	
+	Tcrit = args().disk->Thot * pow(radius_popravka,0.5);
+	
+    } else if (args().disk->check_Temp_approach == "Tavleev") { 
+        double Qirr_Qvis = pow(Tirr().at(ii) / Tph_vis().at(ii),4.)*radius_popravka ; 
+	if (Qirr_Qvis > 1.) { 
+		Tcrit = (9040. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ;
+	} else {
+		Tcrit = (9040. - 2216.) * pow(radius_popravka,0.5) ;
+	}
+	// DEBUG:
+	//if (radius_popravka > 1.01) {
+	//	Tcrit = 10000. * pow(radius_popravka,0.5); 
+	//}
+    } else {
+	throw std::invalid_argument("Wrong check_Temp_approach [const/Tavleev]");
+    }
+    if ( Tirr().at(ii) >= Tcrit ) {
+	return 1;
+    } else {
+	return 0;
+    }
+    throw std::invalid_argument("Logical error at Tirr_exceed_critical");
+    return 0;
+}
+
 int FreddiState::ring_state_vertical(const int ii) {
     // returns 1 for hot, 0 for cold
     
     double radius_popravka = args().disk->Rhot_Mdotzero_factor;
-    
+        
     // R().at(ii) is the radius where Mdot = 0
     // multiplied by radius_popravka, gives the hot zone radius
     // Sigma_minus is the maximum density on the cold branch  
     // Sigma_plus is the minimum density on the hot branch     = Sigma_min(Menou+1999)
     
-    if ( Tirr().at(ii)/pow(radius_popravka,0.5) > args().disk->Thot) {
+    if ( Tirr_exceed_critical(ii) ) {
 	// if irradiation temperature is greater than critical, disc cannot be cold
 	return 1;
     } else {
@@ -51,7 +88,7 @@ int FreddiState::ring_state_vertical(const int ii) {
 	    // check if surface density at front is less than critical hot Sigma_plus
 	    double sigma_factor;
 	    if (args().disk->check_Sigma_approach == "Menou99a") {
-		sigma_factor = 4.3 ; // See fig.8 of Menou+1999 
+		sigma_factor = 4.3 ; // See fig.8 of Menou+1999; this correctly work only for constant radius_popravka 
 	    } else if (args().disk->check_Sigma_approach == "simple") {
 		sigma_factor = pow(radius_popravka, -0.75);
 	    } else {
@@ -151,9 +188,9 @@ void FreddiEvolution::truncateOuterRadius() {
 		    
 	} else if (args().disk->boundcond == "Tirr") {
 	    
-	    double Rcheck;
-	    Rcheck = std::min( R().at(ii-1)*radius_popravka, args().basic->rout);
-	    double radius_popravka_variable = Rcheck/R().at(ii-1);
+// 	    double Rcheck;
+// 	    Rcheck = std::min( R().at(ii-1)*radius_popravka, args().basic->rout);
+// 	    double radius_popravka_variable = Rcheck/R().at(ii-1);
 	    // DEBUG std::cout << radius_popravka_variable << " " << 9040. - 2216.* 1./(pow(Tirr().at(ii-1) / Tph_vis().at(ii-1),4.)*radius_popravka_variable) <<  "\n" << std::endl;
 	// irradiation is important, the boundary is at fixed Tir
 		do {
@@ -165,7 +202,8 @@ void FreddiEvolution::truncateOuterRadius() {
 // 		    std::cout << args().disk->Thot << "\n" << std::endl;
 		// old: 
 // 		 } while( Tirr().at(ii)/pow(radius_popravka,0.5) < args().disk->Thot);
-		 } while( Tirr().at(ii)/pow(radius_popravka_variable,0.5) < args().disk->Thot);
+		// } while( Tirr().at(ii)/pow(radius_popravka_variable,0.5) < args().disk->Thot);
+		} while (Tirr_exceed_critical(ii) == 0);   
 //		} while( Tirr().at(ii)/pow(radius_popravka_variable,0.5) < 9040. - 2216.* 1./(pow(Tirr().at(ii) / Tph_vis().at(ii),4.)*radius_popravka_variable) );  //variable Tcrit does not correspond to SIM model
 	} else{
 		throw std::invalid_argument("Wrong boundcond");

@@ -103,7 +103,8 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 				std::pow(vm["Qirr2Qvishot"].as<double>(), 0.25),
 				vm["Rhot_Mdotzero_factor"].as<double>(),     
 				vm["check_state_approach"].as<std::string>(),       
-				vm["check_Sigma_approach"].as<std::string>(),       
+				vm["check_Sigma_approach"].as<std::string>(),
+				vm["check_Temp_approach"].as<std::string>(),
 				vm["initialcond"].as<std::string>(),
 				varToOpt<double>(vm, "F0"),
 				varToOpt<double>(vm, "Mdisk0"),
@@ -223,11 +224,15 @@ po::options_description DiskStructureOptions::description() {
 			("check_state_approach", po::value<std::string>()->default_value(default_check_state_approach), "Type of checking whether the ring is hot or cold\n\n"
 					"Values:\n"
 					" before2024: original version, as published in Lipunova&Malanchev (2017); Lipunova et al (2022); Avakyan et al (2024)\n"
-					" logic: included option for checking conditions at radius different from the radius where accretion rate is zero. See Rhot_Mdotzero_factor and check_Sigma_approach\n")
+					" logic: included option for checking conditions at radius different from the radius where accretion rate is zero. See Rhot_Mdotzero_factor check_Sigma_approach, and check_Temp_approach\n")
 			("check_Sigma_approach", po::value<std::string>()->default_value(default_check_Sigma_approach), "Type of checking Sigma for hot or cold state\n\n"
 					"Values:\n"
 					" simple: assume that Sigma is proportional to R^(-3/4) between radius where Mdot = 0 and the cooling fron radius\n"   
 					" Menou99a: assume that Sigma is 4.3 times less at the cooling front comparing to radius where Mdot = 0; See fig.8 of Menou et al. (1999 MNRAS 305, 79)\n" )
+			("check_Temp_approach", po::value<std::string>()->default_value(default_check_Temp_approach), "Type of checking irradiation temperature for hot or cold state\n\n"
+					"Values:\n"
+					" const: assume that critical Tirr is constant, see --Thot, and --boundcond\n"   
+					" Tavleed: assume that critical Tirr depends on Qvis/Qirr, see Tavleev et al (2023)\n" )
 			( "initialcond", po::value<std::string>()->default_value(default_initialcond),
 					"Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 					"Values:\n"
