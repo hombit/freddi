@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 as builder
+FROM ubuntu:22.04 as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV PACKAGES "g++ ninja-build cmake libboost-all-dev"
@@ -19,7 +19,7 @@ RUN mkdir -p ${BUILD} \
 
 
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 LABEL maintainer="Konstantin Malanchev <malanchev@sai.msu.ru>"
 
