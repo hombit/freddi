@@ -6,13 +6,16 @@ FROM quay.io/pypa/manylinux2014_aarch64 AS base_arm64
 
 FROM base_$TARGETARCH
 
-RUN python3.7     -mpip install -U pip && python3.7  -mpip install -U numpy wheel setuptools cmake ninja scikit-build \
-    && python3.8  -mpip install -U pip && python3.8  -mpip install -U numpy wheel setuptools cmake ninja scikit-build \
-    && python3.9  -mpip install -U pip && python3.9  -mpip install -U numpy wheel setuptools cmake ninja scikit-build \
-    && python3.10 -mpip install -U pip && python3.10 -mpip install -U numpy wheel setuptools cmake ninja scikit-build
+# Install numpy for Boost
+RUN python3.7     -mpip install -U numpy \
+    && python3.8  -mpip install -U numpy \
+    && python3.9  -mpip install -U numpy \
+    && python3.10 -mpip install -U numpy \
+    && python3.11 -mpip install -U numpy \
+    && python3.12 -mpip install -U numpy
 
-ENV BOOST_VERSION "1.78.0"
-ENV BOOST_VERSION_ "1_78_0"
+ENV BOOST_VERSION "1.84.0"
+ENV BOOST_VERSION_ "1_84_0"
 
 RUN curl -LO https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.gz \
     && tar -xzf boost_${BOOST_VERSION_}.tar.gz \
@@ -23,29 +26,31 @@ RUN curl -LO https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}
     && echo "using python : 3.8  : /opt/python/cp38-cp38/bin/python   : /opt/python/cp38-cp38/include/python3.8    : /opt/python/cp38-cp38/lib   ;" >> tools/build/src/user-config.jam \
     && echo "using python : 3.9  : /opt/python/cp39-cp39/bin/python   : /opt/python/cp39-cp39/include/python3.9    : /opt/python/cp39-cp39/lib   ;" >> tools/build/src/user-config.jam \
     && echo "using python : 3.10 : /opt/python/cp310-cp310/bin/python : /opt/python/cp310-cp310/include/python3.10 : /opt/python/cp310-cp310/lib ;" >> tools/build/src/user-config.jam \
-    && ./b2 -d+2 python=3.7,3.8,3.9,3.10 link=static cflags="-fPIC" cxxflags="-fPIC" install \
+    && echo "using python : 3.11 : /opt/python/cp311-cp311/bin/python : /opt/python/cp311-cp311/include/python3.11 : /opt/python/cp311-cp311/lib ;" >> tools/build/src/user-config.jam \
+    && echo "using python : 3.12 : /opt/python/cp312-cp312/bin/python : /opt/python/cp312-cp312/include/python3.12 : /opt/python/cp312-cp312/lib ;" >> tools/build/src/user-config.jam \
+    && ./b2 -d+2 python=3.7,3.8,3.9,3.10,3.11,3.12 link=static cflags="-fPIC" cxxflags="-fPIC" install \
     && cd / \
     && rm -rf /boost_${BOOST_VERSION_}
 
-RUN python3.7 -m pip install -U auditwheel twine
+RUN python3.12 -m pip install -U auditwheel twine
 
 ENV SOURCE "/tmp/source"
 ENV BUILD "/tmp/build"
 ENV DIST "/dist"
+
+ENV SKBUILD_CONFIGURE_OPTIONS="-DSTATIC_LINKING=TRUE"
 
 COPY CMakeLists.txt freddi.ini pyproject.toml setup.py MANIFEST.in Readme.md ${SOURCE}/
 COPY cpp ${SOURCE}/cpp
 COPY python ${SOURCE}/python
 
 WORKDIR ${SOURCE}
-RUN python3.7 setup.py sdist -d${DIST}
-RUN NCPUS=$(grep -c ^processor /proc/cpuinfo) \
-    && python3.7  setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} -- -- -j$NCPUS \
-    && rm -r _skbuild \
-    && python3.8  setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} -- -- -j$NCPUS \
-    && rm -r _skbuild \
-    && python3.9  setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} -- -- -j$NCPUS \
-    && rm -r _skbuild \
-    && python3.10 setup.py bdist_wheel -DSTATIC_LINKING=TRUE -d${BUILD} -- -- -j$NCPUS \
-    && rm -r _skbuild
-RUN ls ${BUILD}/*.whl | xargs -iZZZ python3.7 -m auditwheel repair --wheel-dir=${DIST} ZZZ
+RUN python3.12 -mbuild -o${DIST}
+RUN    python3.7  -mbuild -o${DIST} \
+    && python3.8  -mbuild -o${DIST} \
+    && python3.9  -mbuild -o${DIST} \
+    && python3.10 -mbuild -o${DIST} \
+    && python3.11 -mbuild -o${DIST} \
+    && python3.12 -mbuild -o${DIST}
+
+RUN ls ${BUILD}/*.whl | xargs -iZZZ python3.12 -m auditwheel repair --wheel-dir=${DIST} ZZZ
