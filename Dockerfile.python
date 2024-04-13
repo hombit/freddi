@@ -45,12 +45,12 @@ COPY cpp ${SOURCE}/cpp
 COPY python ${SOURCE}/python
 
 WORKDIR ${SOURCE}
-RUN python3.12 -mbuild -o${DIST}
-RUN    python3.7  -mbuild -o${DIST} \
-    && python3.8  -mbuild -o${DIST} \
-    && python3.9  -mbuild -o${DIST} \
-    && python3.10 -mbuild -o${DIST} \
-    && python3.11 -mbuild -o${DIST} \
-    && python3.12 -mbuild -o${DIST}
+RUN python3.12 -mbuild --sdist -o${DIST}
+RUN    python3.7  -mbuild -o${BUILD} \
+    && python3.8  -mbuild -o${BUILD} \
+    && python3.9  -mbuild -o${BUILD} \
+    && python3.10 -mbuild -o${BUILD} \
+    && python3.11 -mbuild -o${BUILD} \
+    && python3.12 -mbuild -o${BUILD}
 
 RUN ls ${BUILD}/*.whl | xargs -iZZZ python3.12 -m auditwheel repair --wheel-dir=${DIST} ZZZ

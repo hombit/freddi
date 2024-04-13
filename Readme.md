@@ -1411,8 +1411,8 @@ Check-list:
 - [ ] Upload wheels onto PyPi.org
   ```sh
   docker run --rm -ti ghcr.io/hombit/freddi-python:$VERSION sh -c "python3.12 -m twine upload /dist/*.tar.gz" # sdist
-  docker run --rm -ti --platform linux/amd64 ghcr.io/hombit/freddi-python:$VERSION sh -c "python3.12 -m twine upload /dist/*.whl /dist/*.tar.gz" # bdist x86_64
-  docker run --rm -ti --platform linux/arm64 ghcr.io/hombit/freddi-python:$VERSION sh -c "python3.12 -m twine upload /dist/*.whl" # aarch64
+  docker run --rm -ti --platform linux/amd64 ghcr.io/hombit/freddi-python:$VERSION sh -c "python3.12 -m twine upload /dist/*.whl" # bdist x86_64
+  docker run --rm -ti --platform linux/arm64 ghcr.io/hombit/freddi-python:$VERSION sh -c "python3.12 -m twine upload /dist/*.whl" # bdist aarch64
   ```
 - [ ] [Optional] Build executables for GitHub release
 - [ ] [Optional] Build and upload macOS wheels
