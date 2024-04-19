@@ -60,7 +60,8 @@ FreddiNeutronStarEvolution::NeutronStarStructure::NeutronStarStructure(
 		dFmagn_dh(initialize_dFmagn_dh(evolution)),
 		d2Fmagn_dh2(initialize_d2Fmagn_dh2(evolution)) {
 	if (args_ns.Rdead > 0. && args_ns.Rdead < R_cor) {
-		throw std::logic_error("R_dead is positive and less than R_cor, it is unacceptably");
+		throw std::logic_error("R_dead is positive and less than R_cor, it is unacceptable");
+		std::cout << "R_dead="<< args_ns.Rdead << " R_cor=" << R_cor << "\n" << std::endl;
 	}
 }
 
@@ -492,11 +493,12 @@ const vecd& FreddiNeutronStarEvolution::Qx() {
 		vecd x(Nx());
 		const vecd& K = Kirr();
 		const vecd& H = Height();
+		const vecd& Shad = Shadow();
 		const double L_disk = Lbol_disk();
 		const double L_ns = Lbol_ns();
 		for (size_t i = first(); i < Nx(); i++) {
 			const double mu = H[i] / R()[i];
-			x[i] = K[i] * (L_disk * angular_dist_disk(mu) + L_ns * angular_dist_ns(mu)) / (4. * M_PI * m::pow<2>(R()[i]));
+			x[i] = (1.0 - Shad[i]) * K[i] * (L_disk * angular_dist_disk(mu) + L_ns * angular_dist_ns(mu)) / (4. * M_PI * m::pow<2>(R()[i]));
 		}
 		opt_str_.Qx = std::move(x);
 	}

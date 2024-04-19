@@ -24,6 +24,8 @@ constexpr const double DiskStructureArguments::default_Mdotout;
 constexpr const char DiskStructureArguments::default_initialcond[];
 constexpr const double DiskStructureArguments::default_Thot;
 constexpr const char DiskStructureArguments::default_boundcond[];
+constexpr const char DiskStructureArguments::default_scatter_by_corona[];
+constexpr const char DiskStructureArguments::default_DIM_front_approach[];
 constexpr const double DiskStructureArguments::mu;
 constexpr const char DiskStructureArguments::default_wind[];
 
@@ -32,8 +34,11 @@ DiskStructureArguments::DiskStructureArguments(
 		const std::string& opacity,
 		double Mdotout,
 		const std::string& boundcond, double Thot, double Tirr2Tvishot,
-		double Rhot_Mdotzero_factor, const std::string& check_state_approach, const std::string& check_Sigma_approach,
+		double Rfront_Mdotzero_factor, double DIM_front_Mdot_factor, const std::string& check_state_approach, 
+		const std::string& check_Sigma_approach,
 		const std::string& check_Temp_approach,
+		const std::string& DIM_front_approach,
+		const std::string& scatter_by_corona,
 		const std::string& initialcond,
 		std::optional<double> F0,
 		std::optional<double> Mdisk0, std::optional<double> Mdot0,
@@ -47,8 +52,8 @@ DiskStructureArguments::DiskStructureArguments(
 		boundcond(boundcond),
 		Thot(Thot),
 		Tirr2Tvishot(Tirr2Tvishot),
-		Rhot_Mdotzero_factor(Rhot_Mdotzero_factor),
-		check_state_approach(check_state_approach),check_Sigma_approach(check_Sigma_approach), check_Temp_approach(check_Temp_approach),
+		Rfront_Mdotzero_factor(Rfront_Mdotzero_factor), DIM_front_Mdot_factor(DIM_front_Mdot_factor), check_state_approach(check_state_approach),check_Sigma_approach(check_Sigma_approach), check_Temp_approach(check_Temp_approach),
+		DIM_front_approach(DIM_front_approach),scatter_by_corona(scatter_by_corona),
 		initialcond(initialcond),
 		initial_F_function(initializeInitialFFunction(oprel,
 													  bdb_args, initialcond,
@@ -376,3 +381,4 @@ constexpr const unsigned int CalculationArguments::default_Nx;
 constexpr const unsigned int CalculationArguments::default_Nt_for_tau;
 constexpr const char CalculationArguments::default_gridscale[];
 constexpr const unsigned short CalculationArguments::default_starlod;
+constexpr const int CalculationArguments::default_verb_level;

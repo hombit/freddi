@@ -243,12 +243,16 @@ private:
 	public:
 		double Mdot_out;
 		double Mdot_in_prev = -INFINITY;
+		double Mdot_outer_boundary;
 		double t;
 		size_t i_t;
 		size_t first;
 		size_t last;
 		vecd F;
 		double F_in;
+		double R_dotM0_before_shift = 0.0;
+		double maxR_Qirr_no_role = 0.0;
+		//double DIM_front_Mdot_factor = 0.0;
 		explicit CurrentState(const DiskStructure& str);
 		CurrentState(const CurrentState&) = default;
 		CurrentState& operator=(const CurrentState&) = default;
@@ -261,7 +265,7 @@ private:
 		boost::optional<double> Mdisk;
 		boost::optional<double> Lx;
 		boost::optional<double> Mdot_wind;
-		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height;
+		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height, Shadow;
 	};
 
 protected:
@@ -304,6 +308,7 @@ public:
 // current_
 public:
 	inline double Mdot_out() const { return current_.Mdot_out; }
+	inline double Mdot_outer_boundary() const { return current_.Mdot_outer_boundary; }
 	inline double F_in() const { return current_.F_in; }
 	inline const vecd& F() const { return current_.F; }
 	inline double t() const { return current_.t; }
@@ -311,15 +316,26 @@ public:
 	inline size_t first() const { return current_.first; }
 	inline size_t last() const { return current_.last; }
 	inline double Mdot_in_prev() const { return current_.Mdot_in_prev; }
+	inline double R_dotM0_before_shift()  const { return current_.R_dotM0_before_shift; }
+	inline double maxR_Qirr_no_role()  const  { return current_.maxR_Qirr_no_role; }
+	//inline double DIM_front_Mdot_factor()  const  { return current_.DIM_front_Mdot_factor; }
 protected:
 	inline void set_Mdot_in_prev(double Mdot_in) { current_.Mdot_in_prev = Mdot_in; }
 	inline void set_Mdot_in_prev() { set_Mdot_in_prev(Mdot_in()); }
+	inline void set_Mdot_outer_boundary(double Mdot_boundary) { current_.Mdot_outer_boundary = Mdot_boundary; }
+	inline void set_R_dotM0_before_shift(double r) { current_.R_dotM0_before_shift = r; }
+	inline void set_maxR_Qirr_no_role(double r) {current_.maxR_Qirr_no_role = r;}
+	//inline void set_DIM_front_Mdot_factor(double r) { current_.DIM_front_Mdot_factor = r; }
 	virtual IrradiatedStar::sources_t star_irr_sources();
 public:
 	inline double omega_R(double r) const { return std::sqrt(GM() / (r*r*r)); }
 	inline double omega_i(size_t i) const { return omega_R(R()[i]); }
 	virtual double Mdot_in() const;
 	virtual double Lbol_disk() const;
+	virtual double Rfront_Rhot(double r, double z_r) const;
+	virtual double obtain_Mdot_outer_boundary();
+	virtual double Tirr_critical(double r, int ii);
+	virtual void verify_disc_mass(double tau);
 	double phase_opt() const;
 // wind_
 public:
@@ -397,6 +413,7 @@ public:
 	const vecd& Tirr();
 	const vecd& Kirr();
 	const vecd& Height();
+	const vecd& Shadow();
 	double Luminosity(const vecd& T, double nu1, double nu2) const;
 	inline double magnitude(const double lambda, const double F0) {
 		return -2.5 * std::log10(I_lambda<HotRegion>(lambda) * cosiOverD2() / F0);
@@ -425,9 +442,11 @@ public:
 	double Sigma_minus(double r) const;
 	double Sigma_plus(double r) const;
 	double Teff_plus(double r) const;
-	double R_cooling_front(double r);
-	double v_cooling_front(double r);
-	int ring_state_vertical(const int i); // check ring hot (1) or cold (0)
+	double R_cooling_front(double r, double sigma_at_r);
+	double R_vis_struct (double r, double z2r_at_r);
+	double v_cooling_front(double r, double sigma_at_r);
+	double v_visc(double r, double z2r);
+	int check_ring_is_cold(const int i); // check ring hot (1) or cold (0)
 	int Tirr_exceed_critical(const int i); // check Tirr > Tcrit (1) or not (0)
 };
 

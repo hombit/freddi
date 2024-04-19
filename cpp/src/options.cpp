@@ -101,10 +101,13 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 				vm["boundcond"].as<std::string>(),
 				vm["Thot"].as<double>(),
 				std::pow(vm["Qirr2Qvishot"].as<double>(), 0.25),
-				vm["Rhot_Mdotzero_factor"].as<double>(),     
+				vm["Rfront_Mdotzero_factor"].as<double>(), 
+				vm["DIM_front_Mdot_factor"].as<double>(),        
 				vm["check_state_approach"].as<std::string>(),       
 				vm["check_Sigma_approach"].as<std::string>(),
 				vm["check_Temp_approach"].as<std::string>(),
+				vm["DIM_front_approach"].as<std::string>(),
+				vm["scatter_by_corona"].as<std::string>(),
 				vm["initialcond"].as<std::string>(),
 				varToOpt<double>(vm, "F0"),
 				varToOpt<double>(vm, "Mdisk0"),
@@ -217,14 +220,16 @@ po::options_description DiskStructureOptions::description() {
 					"Outer-boundary movement condition\n\n"
 					"Values:\n"
 					"  Teff: outer radius of the disk moves inwards to keep photosphere temperature of the disk larger than some value. This value is specified by --Thot option\n"
-					"  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option\n" ) // fourSigmaCrit, MdotOut
+					"  Tirr: outer radius of the disk moves inwards to keep irradiation flux of the disk larger than some value. The value of this minimal irradiation flux is [Stefan-Boltzmann constant] * Tirr^4, where Tirr is specified by --Thot option\n" 
+					"  DIM: Tirr is checked when Qirr/Qvis>Qirr2Qvishot at Rfront or at R(dotM=0),see option scatter_by_corona (yes or no, respectively); cooling front moves afterwards\n")
 			( "Thot", po::value<double>()->default_value(default_Thot), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description\n" )
 			( "Qirr2Qvishot", po::value<double>()->default_value(m::pow<4>(default_Tirr2Tvishot)), "Minimum Qirr / Qvis ratio at the outer edge of the hot disk to switch the control over the evolution of the hot disk radius: from temperature-based regime to Sigma-based cooling-front regime (see Lipunova et al. (2021, Section 2.4) and Eq. A.1 in Lasota et al. 2008; --alpha value is used for Sigma_plus and --alphacold value is used for Sigma_minus)\n" )
-			("Rhot_Mdotzero_factor", po::value<double>()->default_value(default_Rhot_Mdotzero_factor), "We check conditions for cooling front at current radius mpltiplied by Rhot_Mdotzero_factor\n" )
+			("Rfront_Mdotzero_factor", po::value<double>()->default_value(default_Rfront_Mdotzero_factor), "We check conditions for cooling front at current radius multiplied by Rfront_Mdotzero_factor\n" )
+			("DIM_front_Mdot_factor", po::value<double>()->default_value(default_DIM_front_Mdot_factor), "  = -Mdot(Rfront)/Mdot_in, see DIM_front_approach\n" )
 			("check_state_approach", po::value<std::string>()->default_value(default_check_state_approach), "Type of checking whether the ring is hot or cold\n\n"
 					"Values:\n"
 					" before2024: original version, as published in Lipunova&Malanchev (2017); Lipunova et al (2022); Avakyan et al (2024)\n"
-					" logic: included option for checking conditions at radius different from the radius where accretion rate is zero. See Rhot_Mdotzero_factor check_Sigma_approach, and check_Temp_approach\n")
+					" logic: included option for checking conditions at radius different from the radius where accretion rate is zero. See boundcond, DIM_front_approach, scatter_by_corona,  check_Sigma_approach, and check_Temp_approach\n")
 			("check_Sigma_approach", po::value<std::string>()->default_value(default_check_Sigma_approach), "Type of checking Sigma for hot or cold state\n\n"
 					"Values:\n"
 					" simple: assume that Sigma is proportional to R^(-3/4) between radius where Mdot = 0 and the cooling fron radius\n"   
@@ -232,7 +237,16 @@ po::options_description DiskStructureOptions::description() {
 			("check_Temp_approach", po::value<std::string>()->default_value(default_check_Temp_approach), "Type of checking irradiation temperature for hot or cold state\n\n"
 					"Values:\n"
 					" const: assume that critical Tirr is constant, see --Thot, and --boundcond\n"   
-					" Tavleed: assume that critical Tirr depends on Qvis/Qirr, see Tavleev et al (2023)\n" )
+					" Tavleev: assume that critical Tirr depends on Qvis/Qirr, see Tavleev et al (2023)\n" 
+					" Hameury: synthetic approach to study agreement with DIM\n")
+			("DIM_front_approach", po::value<std::string>()->default_value(default_DIM_front_approach), "Type of condition on accretion rate at hot disc radius\n\n"
+					"Values:\n"
+					" maxFvis: Rhot corresponds to dot M = 0 \n"   
+					" outflow: there is an outflow from the hot zone at Rhot, see Rfront_Mdotzero_factor\n")
+			("scatter_by_corona", po::value<std::string>()->default_value(default_scatter_by_corona), "Presence of scattering material above the disc allowing irradiation beyond highest H/R. This flag determines 1) when DIM_front_approach=outflow starts to work; 2) Tirr=0 when scatter_by_corona=\"no\" and the ring is not seen directly from the centre.\n\n"
+					"Values:\n"
+					" yes - condition 'outflow' for DIM_front_approach takes effect always when Rhot<Rtid\n"   
+					" no  - condition 'outflow' for DIM_front_approach takes effect when Rhot<Rtid and Tirr<Tirr_crit at R where dot M = 0 (i.e. only when cooling front began to move)\n")
 			( "initialcond", po::value<std::string>()->default_value(default_initialcond),
 					"Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 					"Values:\n"
@@ -285,14 +299,14 @@ SelfIrradiationOptions::SelfIrradiationOptions(const po::variables_map &vm, cons
 }
 
 po::options_description SelfIrradiationOptions::description() {
-	po::options_description od("Parameters of self-irradiation:\nQirr = Cirr * (H/r / 0.05)^irrindex * L * psi / (4 pi R^2), where psi is the angular distribution of X-ray radiation\n");
+	po::options_description od("Parameters of self-irradiation:\nQirr = (1-shadow) * Cirr * (H/r / 0.05)^irrindex * L * psi / (4 pi R^2), where psi is the angular distribution of X-ray radiation; shadow can be 0 (default) or 1. When scatter_by_corona=\"no\", if h/r1 < max (h/r, r<r1), the ring r1 is not irradiatied from the centre: shadow = 1 \n");
 	od.add_options()
 			( "Cirr", po::value<double>()->default_value(default_Cirr), "Irradiation factor for the hot disk\n" )
 			( "irrindex", po::value<double>()->default_value(default_irrindex), "Irradiation index for the hot disk\n" )
 			( "Cirrcold", po::value<double>()->default_value(default_Cirr_cold), "Irradiation factor for the cold disk\n" )
 			( "irrindexcold", po::value<double>()->default_value(default_irrindex_cold), "Irradiation index for the cold disk\n" )
 			( "h2rcold", po::value<double>()->default_value(default_height_to_radius_cold), "Semi-height to radius ratio for the cold disk\n" )
-			( "angulardistdisk", po::value<std::string>()->default_value(default_angular_dist_disk), "Angular distribution of the disk X-ray radiation. Values: isotropic, plane\n" )
+			( "angulardistdisk", po::value<std::string>()->default_value(default_angular_dist_disk), "Angular distribution of the disk X-ray radiation. Values: isotropic (Psi=1), plane (Psi=2z/R)\n" )
 			;
 	return od;
 }
@@ -362,7 +376,8 @@ CalculationOptions::CalculationOptions(const po::variables_map &vm):
 				tauInitializer(vm),
 				vm["Nx"].as<unsigned int>(),
 				vm["gridscale"].as<std::string>(),
-				vm["starlod"].as<unsigned int>()) {
+				vm["starlod"].as<unsigned int>(),
+				vm["verb_level"].as<int>()     ) {
 	if (gridscale != "log" && gridscale != "linear") {
 		throw po::invalid_option_value("Invalid --gridscale value");
 	}
@@ -384,6 +399,7 @@ po::options_description CalculationOptions::description() {
 			( "Nx",	po::value<unsigned int>()->default_value(default_Nx), "Size of calculation grid\n" )
 			( "gridscale", po::value<std::string>()->default_value(default_gridscale), "Type of grid for angular momentum h: log or linear\n" )
 			( "starlod", po::value<unsigned int>()->default_value(default_starlod), "Level of detail of the optical star 3-D model. The optical star is represented by a triangular tile, the number of tiles is 20 * 4^starlod\n" )
+			( "verb_level",	po::value<int>()->default_value(default_verb_level), "Verbose level of the code, 0 is muted and default\n" )
 			;
 	return od;
 }

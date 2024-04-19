@@ -62,7 +62,7 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 	out.precision(precision);
 
 	outputHeader(output.os, short_fields);
-
+	
 	out << "### Parameters\n";
 	for (const auto &it : vm) {
 		auto &value = it.second.value();
@@ -85,6 +85,12 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 				   << *v
 				   << "\n";
 		} else if (auto v = boost::any_cast<unsigned int>(&value)) {
+			out << "# "
+				   << it.first.c_str()
+				   << "="
+				   << *v
+				   << "\n";
+		} else if (auto v = boost::any_cast<int>(&value)) {
 			out << "# "
 				   << it.first.c_str()
 				   << "="
@@ -118,9 +124,9 @@ BasicFreddiFileOutput::BasicFreddiFileOutput(const std::shared_ptr<FreddiEvoluti
 	out << "### Derived values\n"
 		<< "# alpha_cold = " << freddi->args().basic->alphacold << "\n"
 		<< "# Tidal radius = " << freddi->args().basic->rout / solar_radius << " Rsun\n"
-		<< "# ISCO radius = " << freddi->args().basic->risco << " cm\n";
-
-	out << std::flush;
+		<< "# ISCO radius = " << freddi->args().basic->risco << " cm\n"
+		<< "# rin = " << freddi->args().basic->rin << " cm\n";
+	out << std::flush;	
 }
 
 
@@ -139,13 +145,15 @@ void BasicFreddiFileOutput::shortDump() {
 }
 
 void BasicFreddiFileOutput::diskStructureDump() {
+        
 	auto filename = (freddi->args().general->dir + "/" + freddi->args().general->prefix
 			+ "_" + std::to_string(freddi->i_t()) + ".dat");
 	std::ofstream full_output(filename);
 	full_output.precision(precision);
-
+	
 	full_output << disk_structure_header
 			<< "### t = " << sToDay(freddi->t()) << " days"
+			<< "\n### Mdot = " << freddi->Mdot_in() << " g/s"
 			<< std::endl;
 
 	const size_t last = freddi->args().flux->cold_disk ? freddi->Nx() - 1 : freddi->last();
@@ -200,7 +208,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Mdisk", "g", "Mass of the hot disk", [freddi]() {return freddi->Mdisk();}},
 			{"Rhot", "Rsun", "Radius of the hot disk", [freddi]() {return cmToSun(freddi->R()[freddi->last()]);}},
 			{"Sigmaout", "g/cm^2", "Surface density at the outer radius of the hot disk", [freddi]() {return freddi->Sigma()[freddi->last()];}},
-			{"Kirrout", "float", "Irradiation coefficient Kirr at the outer radius of the hot disk", [freddi]() {return freddi->Kirr()[freddi->last()];}},
+			{"Kirrout", "float", "Irradiation coefficient Kirr at the outer radius of the hot disk w/o angular distribution: = Cirr * (z/[R*0.05])^irrindex", [freddi]() {return freddi->Kirr()[freddi->last()];}},
 			{"H2R", "float", "Relative semiheight at the outer radius of the hot disk", [freddi]() {return freddi->Height()[freddi->last()] / freddi->R()[freddi->last()];}},
 			{"Teffout", "K", "Effective tempreture at the outer radius of the hot disk", [freddi]() {return freddi->Tph()[freddi->last()];}},
 			{"Tirrout", "K", "Irradiation temperature (Qirr / sigma_SB)^1/4 at the outer radius of the hot disk", [freddi]() {return freddi->Tirr()[freddi->last()];}},
@@ -210,6 +218,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Lbol", "erg/s", "Bolometric luminosity of the disk", [freddi]() {return freddi->Lbol_disk();}},
 			{"Fx", "erg/s/cm^2", "X-ray flux of the disk in the given energy range [emin, emax]", [freddi]() {return freddi->Lx() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
 			{"Fbol", "erg/s/cm^2", "Bolometric flux of the disk", [freddi]() {return freddi->Lbol_disk() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
+			{"Rfront_Rhot", "float", "Ratio of cooling front radius to radius with dotM=0", [freddi]() {return freddi->Rfront_Rhot(freddi->R()[freddi->last()], freddi->Height()[freddi->last()] / freddi->R()[freddi->last()]);}},
 	};
 	const bool cold_disk = freddi->args().flux->cold_disk;
 	const bool star = freddi->args().flux->star;

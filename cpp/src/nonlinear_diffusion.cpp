@@ -1,5 +1,5 @@
 #include "nonlinear_diffusion.hpp"
-
+#include "exceptions.hpp"  // gvlipunova added for DiscEqFailException, did not know where else....
 
 double mean_square_rel(const vecd &A, const vecd &B, size_t first, size_t last){
 	double rv = 0;
@@ -66,7 +66,10 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 
 	vecd alpha(last + 1), beta(last + 1);
 	double c;
+	int iter_sol = 0;
+	int maxiter = 100;
 	do {
+		iter_sol++;
 		K_0 = K_1;
 		alpha[first + 1] = 0.;
 		beta[first + 1] = left_bounder_cond;
@@ -85,5 +88,9 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 		for (size_t i = 1; i <= last - 1; ++i) {
 			K_1[i] = frac[i] * W[i] / y[i];
 		}
-	} while (max_dif_rel(K_1, K_0, 1, last - 1) > eps);
+	} while ((max_dif_rel(K_1, K_0, 1, last - 1) > eps) && (iter_sol <=maxiter));
+	 if (iter_sol >= maxiter) { 
+	     throw std::invalid_argument("Disc equation failed to converge.");
+	     throw DiscEqFailException();
+	} 
 }

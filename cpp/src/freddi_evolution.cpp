@@ -7,6 +7,8 @@
 #include "exceptions.hpp"
 #include "nonlinear_diffusion.hpp"
 
+#define VERB_LEVEL_MESSAGES 30 
+
 using namespace std::placeholders;
 
 
@@ -15,104 +17,27 @@ FreddiEvolution::FreddiEvolution(const FreddiArguments &args):
 
 
 void FreddiEvolution::step(const double tau) {
+	//if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "cA_ t="<< [freddi]() {return sToDay(current_.t);}  <<"\n" << std::endl;}
+	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A_ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
 	truncateInnerRadius();
 	FreddiState::step(tau);
+	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A__ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
 	nonlinear_diffusion_nonuniform_wind_1_2(
 			args().calc->tau, args().calc->eps,
-			F_in(), Mdot_out(),
+			F_in(), Mdot_outer_boundary(),
 			windA(), windB(), windC(),
 			wunc(),
 			h(), current_.F,
 			first(), last());
+	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A___ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
 	truncateOuterRadius();
 	star_.set_sources(star_irr_sources());
 }
 
-int FreddiState::Tirr_exceed_critical(const int ii) {
-    // returns 1 for Tirr > Tcrit, 0  - otherwise
-    
-    double radius_popravka = args().disk->Rhot_Mdotzero_factor;
-    double Rcheck = std::min( R().at(ii-1) * radius_popravka, args().basic->rout);
-    double radius_popravka_variable = Rcheck/R().at(ii-1);
-    
-    radius_popravka = radius_popravka_variable;
-    
-    double Tcrit;
-    if (args().disk->check_Temp_approach == "const") { 
-	
-	Tcrit = args().disk->Thot * pow(radius_popravka,0.5);
-	
-    } else if (args().disk->check_Temp_approach == "Tavleev") { 
-        double Qirr_Qvis = pow(Tirr().at(ii) / Tph_vis().at(ii),4.)*radius_popravka ; 
-	if (Qirr_Qvis > 1.) { 
-		Tcrit = (9040. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ;
-	} else {
-		Tcrit = (9040. - 2216.) * pow(radius_popravka,0.5) ;
-	}
-	// DEBUG:
-	//if (radius_popravka > 1.01) {
-	//	Tcrit = 10000. * pow(radius_popravka,0.5); 
-	//}
-    } else {
-	throw std::invalid_argument("Wrong check_Temp_approach [const/Tavleev]");
-    }
-    if ( Tirr().at(ii) >= Tcrit ) {
-	return 1;
-    } else {
-	return 0;
-    }
-    throw std::invalid_argument("Logical error at Tirr_exceed_critical");
-    return 0;
-}
 
-int FreddiState::ring_state_vertical(const int ii) {
-    // returns 1 for hot, 0 for cold
-    
-    double radius_popravka = args().disk->Rhot_Mdotzero_factor;
-        
-    // R().at(ii) is the radius where Mdot = 0
-    // multiplied by radius_popravka, gives the hot zone radius
-    // Sigma_minus is the maximum density on the cold branch  
-    // Sigma_plus is the minimum density on the hot branch     = Sigma_min(Menou+1999)
-    
-    if ( Tirr_exceed_critical(ii) ) {
-	// if irradiation temperature is greater than critical, disc cannot be cold
-	return 1;
-    } else {
-	// check if surface density at front is larger than critical cold Sigma_minus
-	// 
-	if (Sigma().at(ii)/pow(radius_popravka, -0.75) >  Sigma_minus(R().at(ii) * radius_popravka)) {
-	    // disc cannot be cold if density is greater than critical for cold state
-	    return 1;
-	} else {
-	    // check if surface density at front is less than critical hot Sigma_plus
-	    double sigma_factor;
-	    if (args().disk->check_Sigma_approach == "Menou99a") {
-		sigma_factor = 4.3 ; // See fig.8 of Menou+1999; this correctly work only for constant radius_popravka 
-	    } else if (args().disk->check_Sigma_approach == "simple") {
-		sigma_factor = pow(radius_popravka, -0.75);
-	    } else {
-		throw std::invalid_argument("Wrong check_Sigma_approach [Menou99a/simple]");
-	    }
-	    if ( Sigma().at(ii)/sigma_factor < Sigma_plus(R().at(ii)*radius_popravka) ) {
-		//disc cannot be hot if density is lower than critical for hot state
-		return 0;
-	    } else {
-		// check cooling front position
-		if (radius_popravka * R().at(ii) > R_cooling_front ( radius_popravka*R().at(ii)) ) {
-		    //radius is beyond front 
-		    return 0;
-		} else {
-		    return 1;
-		}
-	    }
-	}
-    }
-    throw std::invalid_argument("ring_state_vertical: logic mistake");
-    return 1;
-}
 
 void FreddiEvolution::truncateOuterRadius() {
+	
 	if (args().disk->Thot <= 0. ){
 		return;
 	}
@@ -124,90 +49,17 @@ void FreddiEvolution::truncateOuterRadius() {
 	if (Mdot_in() > Mdot_in_prev()) {
 		return;
 	}
-
+	
 	auto ii = last() + 1;
 	
+	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout  <<"c_A last ii =  "<< last()  <<" last R=" <<R()[last()] <<" \n" << std::endl;}
 	
-	double radius_popravka =  args().disk->Rhot_Mdotzero_factor; //1.8; 2.1; 1.7;
 	
-	if (Tirr().at(last()) / Tph_vis().at(last()) < args().disk->Tirr2Tvishot/pow(radius_popravka,0.25)) {
-	// when irradiation is not important
-	// (A) hot disc extends as far as Sigma>Sigma_max_cold(alpha_cold) and not farther than R_cooling_front and Tirr >= Thot  and Teff_vis >=Teff_plus (condition below is the opposite)
-	// or (B) hot disk cannot exist for Sigma< Sigma_crit_hot (=Sigma+) while Tirr > Tcrit: this condition ensures fast
-	// convergence to small disc radius in the case without irradiation    
-	    //DEBUG std::cout << Tirr().at(last()) << "\n" << std::endl;
-	    
-	    
-		do {
-			ii--;
-			if (ii <= first()) throw RadiusCollapseException();
-		  } while( 
-		        // conditions for cold zone:
-		        //(A) (1)  hot disc extends not farther than R_cooling_front
-		        // sent to DIM team
-		        ((args().disk->check_state_approach == "before2024") &&
-				(
-				    ( radius_popravka * R().at(ii) > R_cooling_front ( radius_popravka*R().at(ii)) ) 
-				    
-				// Sigma_minus is the maximum density on the cold branch  
-				// Sigma_plus is the minimum density on the hot branch     = Sigma_min(Menou+1999)
-				// (2) hot disc extends as far as Sigma>Sigma_max_cold(alpha_cold)    
-	// 			&& ( Sigma().at(ii)/pow(radius_popravka,0.75) < Sigma_minus(R().at(ii)) ) 
-			//	&& ( Sigma().at(ii) < Sigma_minus(R().at(ii)) ) 
-			//	&& ( Sigma().at(ii)/4.3 < Sigma_minus(R().at(ii)) *  pow(radius_popravka,1.18) )  // error?
-				&& ((args().disk->check_Sigma_approach == "Menou99a") && ( Sigma().at(ii)/4.3 < Sigma_plus(R().at(ii)) *  pow(radius_popravka,1.11) ))  // see Fig. 8 of Menou+99
-				
-	//			 && ( Tirr().at(ii)/pow(radius_popravka,0.5) < args().disk->Thot ) 
-				// && ( Tirr().at(ii)/pow(radius_popravka,0.5) < 9040. - 2216.* 1./(pow(Tirr().at(ii) / Tph_vis().at(ii),4.)*radius_popravka) )   // this is valid only if Tirr>Tvis
-				
-				// (3) in the cold disc temperature < critical
-				&& ( Tirr().at(ii)/pow(radius_popravka,0.5) < args().disk->Thot) //6800 was  
-				)) 
-			|| 
-			( (args().disk->check_state_approach == "logic") && ( ring_state_vertical(ii) == 0) )
-			
-			// (B)
-			// || (
-			//    ( Sigma().at(ii) < Sigma_plus(R().at(ii)) ) 
-			//    && ( Tirr().at(ii) < args().disk->Thot ) 
-			//)
-			
-			// (3) next line is added according to Tavleev+23 results: it overrides the line above if Thot=10000. In fact, the line above should be deleted.
-		//	&& ( Tirr().at(ii) < 9040. - 2216. ) 
-			// (4 - possibly wrong) next line is added to prevent cooling wave when effective viscous temperature is too high:
-			//&& ( Tph_vis().at(ii) < Teff_plus(R().at(ii)) )
-		);
-		//} while( ( R().at(ii) > R_cooling_front ( R().at(ii)) ) && ( Sigma().at(ii) < Sigma_minus(R().at(ii)) ) );
-	} else if (args().disk->boundcond == "Teff") {
-	// irradiation is important, the boundary is at fixed Teff
-		do {
-			ii--;
-			if (ii <= first()) throw RadiusCollapseException();
-		} while( Tph().at(ii) < args().disk->Thot );
-		    
-		    
-	} else if (args().disk->boundcond == "Tirr") {
-	    
-// 	    double Rcheck;
-// 	    Rcheck = std::min( R().at(ii-1)*radius_popravka, args().basic->rout);
-// 	    double radius_popravka_variable = Rcheck/R().at(ii-1);
-	    // DEBUG std::cout << radius_popravka_variable << " " << 9040. - 2216.* 1./(pow(Tirr().at(ii-1) / Tph_vis().at(ii-1),4.)*radius_popravka_variable) <<  "\n" << std::endl;
-	// irradiation is important, the boundary is at fixed Tir
-		do {
-			ii--;
-			if (ii <= first()) throw RadiusCollapseException();
-		//} while( Tirr().at(ii) < 9040. - 2216.* Tph_vis().at(ii) / Tirr().at(ii) ); 
-		    // according to Tavleev+23 results; it is applicable in quasi-stationary disc (without cooling wave)
-// 		    std::cout << Tirr().at(ii) << "\n" << std::endl;
-// 		    std::cout << args().disk->Thot << "\n" << std::endl;
-		// old: 
-// 		 } while( Tirr().at(ii)/pow(radius_popravka,0.5) < args().disk->Thot);
-		// } while( Tirr().at(ii)/pow(radius_popravka_variable,0.5) < args().disk->Thot);
-		} while (Tirr_exceed_critical(ii) == 0);   
-//		} while( Tirr().at(ii)/pow(radius_popravka_variable,0.5) < 9040. - 2216.* 1./(pow(Tirr().at(ii) / Tph_vis().at(ii),4.)*radius_popravka_variable) );  //variable Tcrit does not correspond to SIM model
-	} else{
-		throw std::invalid_argument("Wrong boundcond");
-	}
+	do {
+	    ii--;
+	    if (ii <= first()) throw RadiusCollapseException();
+	}  while ( check_ring_is_cold(ii) );
+	
 
 	if ( ii <= last() - 1 ){
 		current_.last = ii;
@@ -223,3 +75,6 @@ vecd FreddiEvolution::wunction(const vecd &h, const vecd &F, size_t _first, size
 	}
 	return W;
 };
+
+
+#undef VERB_LEVEL_MESSAGES

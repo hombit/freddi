@@ -8,6 +8,7 @@
 #include "arguments.hpp"
 #include "nonlinear_diffusion.hpp"
 #include "orbit.hpp"
+#define VERB_LEVEL_MESSAGES 30 
 
 
 FreddiState::DiskStructure::DiskStructure(const FreddiArguments &args, const wunc_t& wunc):
@@ -146,12 +147,61 @@ void FreddiState::replaceArgs(const FreddiArguments &args) {
 
 void FreddiState::step(double tau) {
 	set_Mdot_in_prev();
+	set_Mdot_outer_boundary(obtain_Mdot_outer_boundary());
+	verify_disc_mass(tau);
 	invalidate_optional_structure();
+	
 	current_.i_t ++;
 	current_.t += tau;
 	wind_->update(*this);
 }
 
+
+void FreddiState::verify_disc_mass (double tau) {
+	if (args().calc->verb_level > VERB_LEVEL_MESSAGES-5) {std::cout << "+++ Mdisk("<< current_.t<<") = " << Mdisk() << " Rlast+1=" << R()[last()+1] << " delta_M_shift= " <<2.0 * M_PI * R()[last()] * Sigma()[last()] *(R()[last()+1]-R()[last()]) << "\n" << std::endl;               }
+	if (args().calc->verb_level > VERB_LEVEL_MESSAGES-5) {std::cout << "+++2 Mdot_in=" << Mdot_in() << " Mdot_out=" << obtain_Mdot_outer_boundary()<<" Mdisk+Mdot*tau=" << Mdisk()+(Mdot_in() - obtain_Mdot_outer_boundary()) * tau << "\n" << std::endl;               }
+	if ( (args().calc->verb_level > VERB_LEVEL_MESSAGES-5) && (R()[last()+1]>0)) {std::cout << "+++  Mdisk+Mdot*tau+Sigma*2*Pi*R*dR =" << Mdisk()+(Mdot_in() + Mdot_in_prev()*2.3)  * tau  + 2.0 * M_PI * R()[last()] * Sigma()[last()] *(1.-3./4. * (R()[last()+1]-R()[last()])/(R()[last()+1]+R()[last()])  ) * (R()[last()+1]-R()[last()]) << "\n+++" << (1.-3./4. * (R()[last()+1]-R()[last()])/(R()[last()+1]+R()[last()])  ) * (R()[last()+1]-R()[last()]) << std::endl;               }
+}
+
+
+
+double FreddiState::obtain_Mdot_outer_boundary() {
+    
+    if (args().disk->DIM_front_approach == "outflow") {
+	//if (args().disk->boundcond == "Hameury") {
+	if (args().disk->scatter_by_corona == "yes") {
+	    // assuming there is scatter above the disc
+	    if (last() == Nx()-1) {
+		return Mdot_out();
+	    } else  {
+		return -1.0*args().disk->DIM_front_Mdot_factor*Mdot_in();
+		//-1.5 make Rfront/RMdot0 = 2
+		// -2.5; -2.3 makes very close to Hameury with =Tcrit = (8840. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ; and Tcrit = 10300.;
+	    }
+	}
+	//if (args().disk->boundcond == "Hameury_no_scatter") {
+	if (args().disk->scatter_by_corona == "no") {
+	    // if there is no scattering, the disc zone beyond maximum of Fvis (where dotM=0) is in the shadow
+	    // This means its temperature
+	    // if irradiation temperature is greater than critical, disc cannot be cold
+	    // Tirr is checked at Thot or Tfront, depending on option boundcond (scatter/no scatter),see Tirr_critical. 
+	    // If there is no scattering, the disc beyond r, where dotM=0, is in the shadow from the direct central radiation
+	    std::cout << "T irr_last=" << Tirr().at(last()) << std::endl;
+	    if ((last() == Nx()-1) or  (  Tirr().at(last()) >= Tirr_critical (R().at(last()), last()) ) ) {
+		return Mdot_out();
+	    } else  {
+	   //     std::cout << "CF!" << std::endl;
+		return -1.0*args().disk->DIM_front_Mdot_factor*Mdot_in();
+		//-1.5 make Rfront/RMdot0 = 2
+		// -2.5; -2.3 makes very close to Hameury with =Tcrit = (8840. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ; and Tcrit = 10300.;
+	    }
+	}
+	
+    } 
+    // DIM_front_approach == "maxFvis" :
+    return Mdot_out();
+    
+}
 
 double FreddiState::Mdot_in() const {
 	return (F()[first() + 1] - F()[first()]) / (h()[first() + 1] - h()[first()]);
@@ -161,6 +211,7 @@ double FreddiState::Mdot_in() const {
 double FreddiState::Lbol_disk() const {
 	return eta() * Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
 }
+
 
 
 double FreddiState::phase_opt() const {
@@ -228,13 +279,15 @@ const vecd& FreddiState::Tirr() {
 
 
 const vecd& FreddiState::Qx() {
+
 	if (!opt_str_.Qx) {
 		vecd x(Nx());
 		const vecd& K = Kirr();
 		const vecd& H = Height();
+		const vecd& Shad = Shadow();
 		const double Lbol = Lbol_disk();
 		for (size_t i = first(); i < Nx(); i++) {
-			x[i] = K[i] * Lbol * angular_dist_disk(H[i] / R()[i]) / (4. * M_PI * m::pow<2>(R()[i]));
+			x[i] = (1.0 - Shad[i]) * K[i] * Lbol * angular_dist_disk(H[i] / R()[i]) / (4. * M_PI * m::pow<2>(R()[i]));
 		}
 		opt_str_.Qx = std::move(x);
 	}
@@ -271,6 +324,28 @@ const vecd& FreddiState::Height() {
 	}
 	return *opt_str_.Height;
 }
+
+
+const vecd& FreddiState::Shadow() {
+        vecd x(Nx());
+        double max_H2R = 0.0;
+        for (size_t i = first(); i < Nx(); i++) {
+        	const double Hrelative= Height()[i]/R()[i];
+        	max_H2R = std::max(Hrelative, max_H2R);
+		if (Hrelative >= max_H2R) {
+       			x[i] = 0.0;
+		} else {
+		    if (args().disk->scatter_by_corona == "no") {
+			x[i] = 1.0;
+		    }
+		}
+        }
+        std::cout << "max= " << max_H2R << "H2R last = " << Height()[last()]/R()[last()]  << "last = " << last() << std::endl;
+        opt_str_.Shadow = std::move(x);
+        return *opt_str_.Shadow;
+}
+
+
 
 
 const vecd& FreddiState::Tph_vis() {
@@ -701,30 +776,402 @@ double FreddiState::Sigma_plus(double r) const {
 
 //@@@@@ 28/09/2023
 double FreddiState::Teff_plus(double r) const {
-	// Lasota et al., A&A 486, 523–528 (2008), Eq A.1, DOI: 10.1051/0004-6361:200809658
-	return 6890 *  std::pow(r / 1e10, -0.09) 
-		* std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, 0.03);
+    // minimum temperature on the hot branch; Tavleev+23:
+    double  A = 7341.;
+    double beta = 0.0290;
+    double gamma = -0.00484;
+    double delta = -0.08426;
+    return A * std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, beta) * std::pow(args().basic->alpha , gamma) * std::pow(r / 1e10, delta);
+    
+    // Lasota et al., A&A 486, 523–528 (2008), Eq A.1, DOI: 10.1051/0004-6361:200809658
+    return 6890 *  std::pow(r / 1e10, -0.09) 
+    * std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, 0.03);
+}
+
+// double FreddiState::Teff_minus(double r) const {
+//     // maximum temperature on the cold branch Tavleev+23:
+//     double  A = 6152.;
+//     double beta = 0.0315;
+//     double gamma = 0.00165;
+//     double delta = -0.08977;
+//     return A * std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, beta) * std::pow(args().basic->alpha , gamma) * std::pow(r / 1e10, delta);
+//     
+// }
+
+double FreddiState::v_visc(double r, double z2r_at_r) {
+	//oprel().Height(R()[i], F()[i])
+	return  args().basic->alpha/oprel().Pi3 *  m::pow<2>(z2r_at_r)  * std::sqrt(GM()/r); 
+	//Height2R()[]
+}
+
+double FreddiState::R_vis_struct (double r, double z2r_at_r)  {
+        // estimate the radius, to which viscous process can reach in time tau
+        return  r - v_visc(r, z2r_at_r) * args().calc->tau;       
 }
 
 
-double FreddiState::v_cooling_front(double r) {
+double FreddiState::v_cooling_front(double r, double sigma_at_r) {
         // The cooling-front velocity depends on the ratio between the current Sigma and critical Sigmas
         // Ludwig et al., A&A 290, 473-486 (1994), section 3
+        // https://ui.adsabs.harvard.edu/abs/1994A%26A...290..473L
         // units: cm/s
         const double Sigma_plus_ = Sigma_plus(r);
-        const double sigma =  std::log( Sigma()[last()] / Sigma_plus_ ) /  std::log( Sigma_minus(r)/Sigma_plus_ ) ;
-        return 1e5 * (1.439-5.305*sigma+10.440*m::pow<2>(sigma)-10.55*m::pow<3>(sigma)+4.142*m::pow<4>(sigma))
+        
+        //double sigma =  std::log( Sigma()[last()] / Sigma_plus_ ) /  std::log( Sigma_minus(r)/Sigma_plus_ ) ;
+        //sigma = 0; 
+	//Sigma_plus is the minimum density on the hot branch
+        
+        double sigma =   std::log( sigma_at_r / Sigma_plus_ ) /  std::log( Sigma_minus(r)/Sigma_plus_ ) ;
+	if (sigma<0.) {sigma=0.0;}
+
+        double v = 1e5 * (1.439-5.305*sigma+10.440*m::pow<2>(sigma)-10.55*m::pow<3>(sigma)+4.142*m::pow<4>(sigma))
                * std::pow(args().basic->alpha / 0.2, 0.85-0.69*sigma) 
                * std::pow(args().basic->alphacold / 0.05, 0.05+0.69*sigma)
                * std::pow(r / 1e10, 0.035)
                * std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, -0.012);
+        if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_R v = " << v << " r=" << r << " Sigma="<< sigma_at_r << " sigma=" << sigma<< "\n" << std::endl;               }
+	
+        return v;
 }
 
-double FreddiState::R_cooling_front(double r)  {
+double FreddiState::R_cooling_front (double r, double sigma_at_r)  {
+        // estimate the radius, where cooling front could reach, starting from r, if it moved with corresponding velocity
         // previous location of Rhot moves with the cooling-front velocity:
-        return  R()[last()] - v_cooling_front(r) * args().calc->tau;       
+        return  r - v_cooling_front(r, sigma_at_r) * args().calc->tau;       
+	
+	
+        return  R()[last()] - v_cooling_front(r,sigma_at_r) * args().calc->tau;   
         //return  R()[last()] - v_cooling_front(R()[last()]) * args().calc->tau  ; 
         // this variant leads to more abrupt evolution, since the front velocity is larger
 }
+
+
+
+double FreddiState::Rfront_Rhot (double r, double z_r) const {
+
+	if (args().disk->Rfront_Mdotzero_factor == 1.0) {return 1.0;}
+	// call: Rfront_Rhot(R().at(ii-1)) or Rfront_Rhot( R().at(ii) )
+	double Rfront_Rhot=1.0;
+	double Rfront_Rhot_variable = std::min(args().disk->Rfront_Mdotzero_factor, args().basic->rout/r);
+        
+       /* if (Rfront_Rhot_variable < args().disk->Rfront_Mdotzero_factor) { 		       
+	    if (current_.R_dotM0_before_shift == 0.) {
+		set_R_dotM0_before_shift(r);
+	}
+       } */
+	/*	
+		// at start: (1) R_dotM0 = Rout or (2) Rhot_prev < Rout, (2C)  if 2 Rhot_prev > Rout
+		// (1-) no scatter -> R_dotM0(t) moves with v_visc;
+// 		      (a) Qirr Yes : Rfront = R_dotM0(t)
+// 		      (b) Qirr No : * Rfront increases from R_fotM0(t) until factor = 2
+		// (1+) scatter ->  
+// 		 	(a) Qirr Yes : * Rfront increases from R_fotM0(t) until factor = 2
+// 		        (b) Qirr No : * Rfront increases from R_fotM0(t) until factor = 2
+// 		(2C) At the beginning disc should collapse:
+// 		(2C-) no scatter :
+// 		    (a) Qirr Yes : Rhot = R_dotM0
+// 		    (b) Qirr No : Rhot <= 2  R_dotM0 at t=0 and optionally still moves
+// 		(2C+) scatter:
+// 		    Qirr Yes : * Rhot <= 2 R_dotM0  at t=0 and optionally still moves
+// 		    Qirr No : * Rhot <= 2 R_dotM0  at t=0 and optionally still moves
+// 		(2-) no scatter 
+// 		    Qirr Yes :
+// 		    Qirr No :
+// 		(2+) scatter
+// 		    Qirr Yes :
+// 		    Qirr No :
+		// Fmaximum cannot move faster than v_visc
+		// notice initial position of Fmaximum
+		return Rfront_Rhot_variable;
+		
+	    }
+	    if (current_.R_dotM0_before_shift > 0.) && (r > current_.R_dotM0_before_shift/args().disk->Rfront_Mdotzero_factor) {
+		// Fmaximum moves until it shifts so that Rfront_Rhot_variable = 2:
+		double R_dotM0 = R_vis_struct(current_.R_dotM0_before_shift,z_r)
+		
+		Rfront_Rhot_variable = std::max (args().disk->Rfront_Mdotzero_factor, current_.R_dotM0_before_shift/R_dotM0);
+	    }
+	}
+	*/
+	//if (args().disk->boundcond == "scatter_by_corona") {
+	if (args().disk->scatter_by_corona == "yes") {    
+	    Rfront_Rhot = Rfront_Rhot_variable;
+	} 
+	//if (args().disk->boundcond == "no_scatter_by_corona") {
+	if (args().disk->scatter_by_corona == "no") {    
+	    if (current_.maxR_Qirr_no_role == 0.) {
+		// no scattering and irradiation's role is significant
+		Rfront_Rhot = 1.; // the disk beyond dot M = 0 is shadowed 
+	    } else {
+		// no scattering and irradiation's role is NOT significant
+		// then conditions of the hot zone are checked  at radius > r (dotM=0)
+		Rfront_Rhot_variable = std::min( args().disk->Rfront_Mdotzero_factor, current_.maxR_Qirr_no_role / r);
+		Rfront_Rhot = Rfront_Rhot_variable;
+		//Rfront_Rhot=1.; //??????????????????
+		
+		// здесь надо написать так, чтобы 
+	/*	if (Rfront_Rhot_variable < args().disk->Rfront_Mdotzero_factor) { 		       
+		    if (current_.R_dotM0_before_shift == 0.) {
+			set_R_dotM0_before_shift(r);
+			// Fmaximum cannot move faster than v_visc
+			// notice initial position of Fmaximum
+			return Rfront_Rhot_variable;
+			
+		    }
+		    if ((current_.R_dotM0_before_shift > 0.) && (r > current_.R_dotM0_before_shift/args().disk->Rfront_Mdotzero_factor)) {
+			// Fmaximum moves until it shifts so that Rfront_Rhot_variable = 2:
+			double R_dotM0 = R_vis_struct(current_.R_dotM0_before_shift,z_r)
+			return std::max (args().disk->Rfront_Mdotzero_factor, current_.R_dotM0_before_shift/R_dotM0);
+		    }
+		}
+		*/
+	    }
+	}
+	return Rfront_Rhot;
+}
+
+
+double FreddiState::Tirr_critical (double r, int ii)  {
+    // determine critical level Tirr which keeps the ring hot.
+    // if we analyse r=Rfront,  we should take into account that Rfront
+    // is farther than   r ==  R().at(ii) 
+    //   
+    // it might be possible that function can take no arguments, if it calculates only at R()[last()] and use Tirr().at(last()) / Tph_vis().at(last())
+    // newest approach: radius_popravka = 1
+    
+    if (args().disk->boundcond == "Teff") {
+	// never gets here
+	throw std::invalid_argument("Why do you ask critical irradiation temperature if you set boundcond == Teff? Choose boundcond among Tirr/no_scatter_by_corona/scatter_by_corona\n");
+    }
+
+    // henceforth, only two possibilities remain: boundcond = "Tirr" or "no_scatter_by_corona"
+    
+    double radius_popravka = Rfront_Rhot( r,  oprel().Height(R()[ii], F()[ii])/r);
+    
+    if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout <<  " c_E  R_last=" << R()[last()] << " R_ii="<< R()[ii] << " R_dotM0_before_shift=" << current_.R_dotM0_before_shift << " pop ="<<  radius_popravka  <<"\n" << std::endl;}
+    
+    
+    // Qirr/Qvis increases linearly with radius, if Qvis ~ r^(-3/4) which is not exactly true beyond radius where dotM=0, because Fvis is not proportional to h there
+    //thus, generally, Qirr_Qvis is the lower estimate 
+    double Qirr_Qvis = pow(Tirr().at(ii) / Tph_vis().at(ii),4.)*radius_popravka ; 
+    
+    // determine radius, inside which irradiation is not significant:
+    if ( (Qirr_Qvis < pow(args().disk->Tirr2Tvishot,4.) ) && (current_.maxR_Qirr_no_role == 0.) ) { 
+	set_maxR_Qirr_no_role (r); 
+    }  
+    
+   //if ((obtain_Mdot_outer_boundary() < 0.0 ) && (args().disk->scatter_by_corona == "no")){
+   //	Shadow()[ii] = 1.0;
+   //}
+   
+    
+    double Tcrit; // value to return
+    
+    if (args().disk->check_Temp_approach == "const") { 
+	 // since we calculate critical level for irradiation temperature, we use the fact that Tirr ~ R(-1/2) (This is abs true only if Cirr = const)
+	Tcrit = args().disk->Thot * pow(radius_popravka,0.5);
+	
+// 	if (args().disk->boundcond == "no_scatter_by_corona") {
+	if (args().disk->scatter_by_corona == "n_o") {    
+	    // do not take into account Tirr if Qirr/Qvis< critical_value
+	    // and override previous assignment; instant return
+	    if (Qirr_Qvis < pow(args().disk->Tirr2Tvishot,4.)) {
+		if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_Y Qirr/Qvis<crit \n" << std::endl;}
+		// like the critical temperature is always too big 
+		return 1e10;
+	    } else
+		// ( Tirr )
+	    {
+		if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_W Qirr/Qvis=\n" <<Qirr_Qvis <<"\n"<<  std::endl;} 
+	    }
+	}
+	
+    } else if ((args().disk->check_Temp_approach == "Tavleev")  || (args().disk->check_Temp_approach == "Hameury") ) { 
+        
+        //if (args().disk->boundcond == "no_scatter_by_corona") {
+	if (args().disk->scatter_by_corona == "n_o") {    
+	    // if there is no scattering, the Rfront is in the shadow
+	    // do not take into account Tirr if Qirr/Qvis < critical_value:
+	    if (Qirr_Qvis < pow(args().disk->Tirr2Tvishot,4.)) {
+		if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_V Qirr/Qvis=\n" <<Qirr_Qvis <<"\n"<<  std::endl;} 
+		// cooling wave will be going with irradiation having no effect; 
+		// return a large value of Tcrit
+		// like the critical temperature is always too big 
+		return 1e10;
+	    }
+	}
+
+	if (Qirr_Qvis > 1.) { 
+	        // since we calculate critical level for irradiation temperature, we use the fact that Tirr ~ R(-1/2) (This is completely true only if Cirr = const)
+		Tcrit = (9040. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ;
+		if (args().disk->check_Temp_approach == "Hameury") {
+		    Tcrit = (8640. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ; 
+		}
+		if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_F Qirr/Qvis>1 with Tcrit(Rhot)=" << Tcrit << " ii="<<ii<<"\n" << std::endl;}
+
+	} else {
+		Tcrit = (9040. - 2216.) * pow(radius_popravka,0.5) ;
+		if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_G Qirr/Qvis<1 with Tcrit(Rhot)=" << Tcrit << " ii="<<ii<<"\n" << std::endl;}
+
+	}
+	if (args().disk->check_Temp_approach == "Hameury") {
+	    if (ii < Nx()-1) {
+		// 
+		// if Rhot is less than Rtid, then critical temperature is fixed:
+		// this behaviour is established for solution to agree with Hameury'solution
+		Tcrit =  10300.; // Hameury email
+	    }
+	}
+    } else {
+	throw std::invalid_argument("Wrong check_Temp_approac: Choose const or Tavleev or Hameury\n");
+    }
+    if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_H pop ="<<  radius_popravka << " Tirr(Rhot) = " << Tirr().at(ii) << " and Tcrit=" << Tcrit<< "\n" << std::endl;}
+    
+    return Tcrit;
+    
+}
+
+//int FreddiState::ring_state_vertical(const int ii) {
+int FreddiState::check_ring_is_cold(const int ii) {    
+    // returns 1 for hot, 0 for cold
+    
+    // R().at(ii), the radius where Mdot = 0, or ?
+    // multiplied by radius_popravka, gives the hot zone radius
+    // Sigma_minus is the maximum density on the cold branch  
+    // Sigma_plus is the minimum density on the hot branch     = Sigma_min(Menou+1999)
+
+    
+    if (args().disk->boundcond == "Teff") {
+	if (Tph().at(ii) >= args().disk->Thot) {
+	    return 0; // HOT
+	} else {
+	    return 1; // COLD
+	}
+    }
+    
+    if ((args().disk->boundcond == "Tirr") || (args().disk->boundcond == "Tirr_Ham??eury")) {
+	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "boundcond=Tirr="<<Tirr_critical (R().at(ii), ii) << std::endl;}
+	if (Tirr().at(ii) >= Tirr_critical (R().at(ii), ii)) {
+	    set_R_dotM0_before_shift( R().at(ii) );
+	    return 0; // HOT
+	} else {
+	    return 1; // COLD
+
+	}
+    }
+   
+   // only no_scatter_by_corona is possible ; everything else should be removed here:
+    if (!(args().disk->boundcond == "DIM")) { 
+	throw std::invalid_argument("Wrong boundcond at check_ring_is_cold() in freddi_state");
+    }
+    
+    
+    if (  Tirr().at(ii) >= Tirr_critical (R().at(ii), ii) ) {
+	// if irradiation temperature is greater than critical, disc cannot be cold
+	// Tirr is checked at Thot or Tfront, depending on option boundcond (scatter/no scatter),see Tirr_critical. 
+	// If there is no scattering, the disc beyond r, where dotM=0, is in the shadow from the direct central radiation
+	// In practice, temperature of the disc at R, where dotM=0, is checked against the critical temperature multiplied by some factor
+	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_K Tirr high - HOT \n" << std::endl;}
+	// memorise radius before shift of the hot boundary
+	set_R_dotM0_before_shift( R().at(ii) );
+	return 0; // HOT
+    } else  {
+	// check_Sigma_approach -> "cold-front-approach" ?
+	// Menou99a -> Sigma_Menou99 ?
+	// if (args().disk->check_Sigma_approach == "Menou99a") { ?
+	// when irradiation stops preventing hot-zone shrinking, 
+	// then conditions at Rfront matter:
+	// newest approach: radius_popravka = 1
+	
+	double radius_popravka = Rfront_Rhot( R().at(ii), oprel().Height(R()[ii], F()[ii])/R().at(ii));
+	
+	
+	// calculate sigma_popravka:
+	double sigma_factor;
+	if (radius_popravka == 1. ) {
+	    // check the conditions at r where Mdot=0
+	    sigma_factor = 1.;
+	} else {
+	    if (args().disk->check_Sigma_approach == "Menou99a") {
+		sigma_factor = 1./4.3 ; // See fig.8 of Menou+1999; this correctly work only for constant radius_popravka 
+	    } else if (args().disk->check_Sigma_approach == "simple") {
+		sigma_factor = pow(radius_popravka, -0.75);
+	    } else if (args().disk->check_Sigma_approach == "critical_Teff") {
+		
+	    } else {
+		throw std::invalid_argument("Wrong check_Sigma_approach [Menou99a/simple/critical_Teff]");
+	    }
+	}
+	
+	// check if surface density at front is larger than critical cold Sigma_minus
+	// 
+	if (Sigma().at(ii)/pow(radius_popravka, -0.75) >  Sigma_minus(R().at(ii) * radius_popravka)) {
+	    // disc cannot be cold if density is greater than critical for cold state
+	    if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_L pop ="<<  radius_popravka <<  " Sigma is high - HOT \n" << std::endl;}
+	    set_R_dotM0_before_shift( R().at(ii) );
+	    return 0; // HOT
+	} else {
+	    
+	    if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_S Sigma is  LOW -> cooling wave OR collapse ii="<<ii<<" pop =" << radius_popravka <<"sigma_minus=" << Sigma_minus(R().at(ii) * radius_popravka) <<  std::endl;}
+	    
+	    // check if surface density at front is less than critical hot Sigma_plus:
+	    if ( Sigma().at(ii)*sigma_factor < Sigma_plus(R().at(ii)*radius_popravka) ) {
+		//ring cannot be hot if density is lower than critical for hot state
+		// and if cooling front had time to reach this radius
+		if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_M Sigma is < Sigma_hot_crit sigma_outer ="<<  last() << " -- " << args().calc->Nx-1 <<"\n" << std::endl;}
+		// last = Nx-1 means that code collapses to a starting Rhot : all outer disc is cast COLD
+		if ( (last() == args().calc->Nx-1) || (current_.R_dotM0_before_shift == 0.) ) {
+		    if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_O pop ="<<  radius_popravka << " Sigma is low and R_dotM0_before_shift=" << current_.R_dotM0_before_shift<< "- COLD \n" << std::endl;}
+		    return 1; // COLD
+		} else {
+		    //throw std::invalid_argument("check_ring_is_cold: logic mistake 1");
+		}    
+		
+// 		if ( last() < args().calc->Nx-1) { 
+// 		    if (Sigma_plus(R().at(ii+1))== 0.)  { Sigma().at(ii)
+// 			// Sigma is low BUT ring is HOT
+// 			// that means that the front is propagating and it is propagating with 
+// 			// meaningful velocity.
+// 			// otherwise we search for a starting Rhot which position can be anything 
+// 			if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_N pop ="<<  radius_popravka << " Sigma is low BUT HOT  " <<  Sigma_plus(R().at(ii+1)) << "\n"<< std::endl;}
+// 			return 0;
+// 		    }
+// 		}
+// 		r????eturn 1;
+	    } 
+// 	    else {
+		
+		//  R_cooling_front = r - v_cooling_front(r, sigma_at_r) * args().calc->tau;   
+//   		if (radius_popravka <= args().disk->Rfront_Mdotzero_factor) {
+// 		    if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_PP pop ="<< radius_popravka <<  " radius_popravka < Rfront_Mdotzero_factor->COLD \n" << std::endl;}
+//   		    return 1;
+//   		}
+
+		// check cooling front position; cooling front is moving from last Rout
+		
+		if  (current_.R_dotM0_before_shift == 0 ) {
+		     // COLD ; just collapse to initial position:
+		    return 1;
+		}
+		if ((radius_popravka * R().at(ii) > R_cooling_front ( Rfront_Rhot(R()[last()], oprel().Height(R()[last()], F()[last()])/R()[last()] ) * R()[last()] , Sigma().at(last())*sigma_factor) )  && ( last() < args().calc->Nx-1)  ){
+		    //radius is beyond front 
+		    if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "++c_P pop ="<< radius_popravka <<  " beyond front - COLD \n" << std::endl;}
+		    // COLD
+		    return 1;
+		} else {
+		    if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "++c_Q pop ="<<  radius_popravka <<  " inwards front - HOT \n" << std::endl;}
+		    // in fact front starts from a greater distance?
+		    set_R_dotM0_before_shift( R().at(ii) );
+		    // HOT
+		    return 0;
+		}
+//	   }
+	}
+    }
+    throw std::invalid_argument("check_ring_is_cold: logic mistake 2");
+    return 0;
+}
+
+#undef VERB_LEVEL_MESSAGES
 
 

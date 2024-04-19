@@ -175,15 +175,18 @@ protected:
 		vecd operator()(const vecd& h) const override;
 	};
 public:
-	constexpr static const char default_opacity[] = "Kramers";
+	constexpr static const char default_opacity[] = "OPAL";
 	constexpr static const double default_Mdotout = 0.;
 	constexpr static const char default_boundcond[] = "Teff";
 	constexpr static const double default_Thot = 0.;
 	constexpr static const double default_Tirr2Tvishot = 0.;
-	constexpr static const double default_Rhot_Mdotzero_factor = 1.;
+	constexpr static const double default_Rfront_Mdotzero_factor = 1.;
+	constexpr static const double default_DIM_front_Mdot_factor = 2.3;
         constexpr static const char default_check_state_approach[] = "before2024";
         constexpr static const char default_check_Sigma_approach[] = "simple";
 	constexpr static const char default_check_Temp_approach[] = "const";
+	constexpr static const char default_DIM_front_approach[] = "maxFvis";
+	constexpr static const char default_scatter_by_corona[] = "yes";
 	constexpr static const char default_initialcond[] = "powerF";
 	constexpr static const char default_wind[] = "no";
 public:
@@ -195,10 +198,13 @@ public:
 	std::string boundcond;
 	double Thot;
 	double Tirr2Tvishot;
-	double Rhot_Mdotzero_factor;
+	double Rfront_Mdotzero_factor;
+	double DIM_front_Mdot_factor;
 	std::string check_state_approach;
 	std::string check_Sigma_approach;
 	std::string check_Temp_approach;
+	std::string DIM_front_approach;
+	std::string scatter_by_corona;
 	double F0;
 	double Mdisk0;
 	double Mdot0;
@@ -219,14 +225,25 @@ public:
 			const BasicDiskBinaryArguments &bdb_args,
 			const std::string& opacity,
 			double Mdotout,
-			const std::string& boundcond, double Thot, double Tirr2Tvishot,
-			double Rhot_Mdotzero_factor, const std::string& check_state_approach, const std::string& check_Sigma_approach, const std::string& check_Temp_approach,
+			const std::string& boundcond, 
+			double Thot, 
+			double Tirr2Tvishot,
+			double Rfront_Mdotzero_factor, 
+			double DIM_front_Mdot_factor, 
+			const std::string& check_state_approach, 
+			const std::string& check_Sigma_approach, 
+			const std::string& check_Temp_approach,
+			const std::string& DIM_front_approach,
+			const std::string& scatter_by_corona,
 			const std::string& initialcond,
 			std::optional<double> F0,
-			std::optional<double> Mdisk0, std::optional<double> Mdot0,
+			std::optional<double> Mdisk0, 
+			std::optional<double> Mdot0,
 			std::optional<double> powerorder,
-			std::optional<double> gaussmu, std::optional<double> gausssigma,
-			const std::string& wind, const pard& windparams);
+			std::optional<double> gaussmu, 
+			std::optional<double> gausssigma,
+			const std::string& wind, 
+			const pard& windparams);
 	DiskStructureArguments(
 			const std::string &opacity,
 			const OpacityRelated &oprel,
@@ -234,23 +251,34 @@ public:
 			const std::string &boundcond,
 			double Thot,
 			double Tirr2Tvishot,
-			double Rhot_Mdotzero_factor,
+			double Rfront_Mdotzero_factor,
+			double DIM_front_Mdot_factor,
 			const std::string &check_state_approach,
 			const std::string &check_Sigma_approach,
 			const std::string &check_Temp_approach,
+			const std::string &DIM_front_approach,
+			const std::string &scatter_by_corona,
 			const std::string &initialcond,
 			const std::shared_ptr<InitialFFunction> initial_F_function,
-			const std::string &wind, const pard &windparams):
-			opacity(opacity), oprel(oprel),
+			const std::string &wind, 
+			const pard &windparams):
+			opacity(opacity), 
+			oprel(oprel),
 			Mdotout(Mdotout),
-			boundcond(boundcond), Thot(Thot), Tirr2Tvishot(Tirr2Tvishot),
-			Rhot_Mdotzero_factor(Rhot_Mdotzero_factor),
+			boundcond(boundcond), 
+			Thot(Thot), 
+			Tirr2Tvishot(Tirr2Tvishot),
+			Rfront_Mdotzero_factor(Rfront_Mdotzero_factor),
+			DIM_front_Mdot_factor(DIM_front_Mdot_factor),
 			check_state_approach(check_state_approach), 
 			check_Sigma_approach(check_Sigma_approach),
 			check_Temp_approach(check_Temp_approach),
+			DIM_front_approach(DIM_front_approach),
+			scatter_by_corona(scatter_by_corona),
 			initialcond(initialcond),
 			initial_F_function(initial_F_function),
-			wind(wind), windparams(windparams) {}
+			wind(wind), 
+			windparams(windparams) {}
 	inline vecd initial_F(const vecd& h) const { return (*initial_F_function)(h); }
 	inline size_t initial_first(const vecd& h) const { return initial_F_function->first(h); }
 };
@@ -328,6 +356,7 @@ public:
 	constexpr static const unsigned int default_Nt_for_tau = 200;
 	constexpr static const char default_gridscale[] = "log";
 	constexpr static const unsigned short default_starlod = 3;
+	constexpr static const int default_verb_level = 0;
 public:
 	double init_time;
 	double time;
@@ -335,18 +364,19 @@ public:
 	unsigned int Nx;
 	std::string gridscale;
 	unsigned short starlod = 3;
+	int verb_level;
 	double eps;
 public:
 	CalculationArguments(
 			double inittime,
 			double time, std::optional<double> tau,
-			unsigned int Nx, const std::string& gridscale, const unsigned short starlod,
-			double eps=1e-6):
+			unsigned int Nx, const std::string& gridscale, const unsigned short starlod, int verb_level,
+		        double eps=1e-6):
 			init_time(inittime),
 			time(time),
 			tau(tau ? *tau : time / default_Nt_for_tau),
 			Nx(Nx), gridscale(gridscale), starlod(starlod),
-			eps(eps) {}
+			verb_level(verb_level), eps(eps) {}
 };
 
 

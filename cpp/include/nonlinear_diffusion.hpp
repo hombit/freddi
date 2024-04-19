@@ -7,7 +7,7 @@
 #include <exception>	// std::exception
 #include <functional>	// std::function
 #include <vector>
-
+#include <iostream>
 
 typedef std::vector<double> vecd;
 

@@ -87,6 +87,10 @@ double OpacityRelated::Height(double R, double F) const {
 }
 
 
+// double OpacityRelated::f_F(double xi) const {
+// 	return a0 * xi + a1 * pow(xi, k) + a2 * pow(xi, l);
+// }
+
 double OpacityRelated::f_F(double xi) const {
 	return a0 * xi + a1 * pow(xi, k) + a2 * pow(xi, l);
 }

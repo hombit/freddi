@@ -14,7 +14,7 @@ double efficiency_of_accretion(double kerr);
 
 class BlackHoleFunctions {
 public:
-	static inline double r_kerrISCO(const double Mx, const double kerr) { return rgToCm(r_kerrISCORg(kerr), Mx); }
+	static inline double r_kerrISCO(const double Mx, const double kerr) {   return rgToCm(r_kerrISCORg(kerr), Mx); }
 };
 
 
