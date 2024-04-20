@@ -10,6 +10,9 @@
 #include "orbit.hpp"
 #define VERB_LEVEL_MESSAGES 30 
 
+// NOTES: 2 lines marked by // @XRPCALCApril24
+//  have to be edited uncommented shadow=0, Tirr_crit=1e10 for scatter=no
+// to revive the version used for XRPs in April 2024
 
 FreddiState::DiskStructure::DiskStructure(const FreddiArguments &args, const wunc_t& wunc):
 		args(args),
@@ -186,7 +189,7 @@ double FreddiState::obtain_Mdot_outer_boundary() {
 	    // if irradiation temperature is greater than critical, disc cannot be cold
 	    // Tirr is checked at Thot or Tfront, depending on option boundcond (scatter/no scatter),see Tirr_critical. 
 	    // If there is no scattering, the disc beyond r, where dotM=0, is in the shadow from the direct central radiation
-	    std::cout << "T irr_last=" << Tirr().at(last()) << std::endl;
+	    
 	    if ((last() == Nx()-1) or  (  Tirr().at(last()) >= Tirr_critical (R().at(last()), last()) ) ) {
 		return Mdot_out();
 	    } else  {
@@ -339,8 +342,9 @@ const vecd& FreddiState::Shadow() {
 			x[i] = 1.0;
 		    }
 		}
+		// x[i] = 0.0; // @XRPCALCApril24
         }
-        std::cout << "max= " << max_H2R << "H2R last = " << Height()[last()]/R()[last()]  << "last = " << last() << std::endl;
+        //std::cout << "max= " << max_H2R << "H2R last = " << Height()[last()]/R()[last()]  << "last = " << last() << std::endl;
         opt_str_.Shadow = std::move(x);
         return *opt_str_.Shadow;
 }
@@ -960,11 +964,6 @@ double FreddiState::Tirr_critical (double r, int ii)  {
 	set_maxR_Qirr_no_role (r); 
     }  
     
-   //if ((obtain_Mdot_outer_boundary() < 0.0 ) && (args().disk->scatter_by_corona == "no")){
-   //	Shadow()[ii] = 1.0;
-   //}
-   
-    
     double Tcrit; // value to return
     
     if (args().disk->check_Temp_approach == "const") { 
@@ -972,7 +971,7 @@ double FreddiState::Tirr_critical (double r, int ii)  {
 	Tcrit = args().disk->Thot * pow(radius_popravka,0.5);
 	
 // 	if (args().disk->boundcond == "no_scatter_by_corona") {
-	if (args().disk->scatter_by_corona == "n_o") {    
+	if (args().disk->scatter_by_corona == "no_") {    // @XRPCALCApril24
 	    // do not take into account Tirr if Qirr/Qvis< critical_value
 	    // and override previous assignment; instant return
 	    if (Qirr_Qvis < pow(args().disk->Tirr2Tvishot,4.)) {
@@ -989,7 +988,7 @@ double FreddiState::Tirr_critical (double r, int ii)  {
     } else if ((args().disk->check_Temp_approach == "Tavleev")  || (args().disk->check_Temp_approach == "Hameury") ) { 
         
         //if (args().disk->boundcond == "no_scatter_by_corona") {
-	if (args().disk->scatter_by_corona == "n_o") {    
+	if (args().disk->scatter_by_corona == "no_") { //   @XRPCALCApril24
 	    // if there is no scattering, the Rfront is in the shadow
 	    // do not take into account Tirr if Qirr/Qvis < critical_value:
 	    if (Qirr_Qvis < pow(args().disk->Tirr2Tvishot,4.)) {
