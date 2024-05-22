@@ -46,8 +46,8 @@ available in the [`v1` git branch](https://github.com/hombit/freddi/tree/v1).
 If you are familiar with [Docker](http://docker.com) then you can use
 pre-compiled binaries inside Docker container:
 ```sh
-docker run -v "`pwd`":/data --rm -ti ghcr.io/hombit/freddi freddi -d/data
-docker run -v "`pwd`":/data --rm -ti ghcr.io/hombit/freddi freddi-ns --Bx=1e8 -d/data
+docker run -v $(pwd):/data --rm -ti ghcr.io/hombit/freddi freddi -d/data
+docker run -v $(pwd):/data --rm -ti ghcr.io/hombit/freddi freddi-ns --Bx=1e8 -d/data
 ```
 
 #### Build from source
@@ -991,7 +991,6 @@ The following arguments instruct `Freddi` to calculate the decay of the outburst
 in the disk with the constant outer radius equal to 1 solar radius. The Kerr
 black hole at the distance of 5 kpc has the mass of 9 solar masses, and the
 Kerr's parameter is 0.4. The outer disk is irradiated with Cirr=1e-3.
-**Discuss all options used in the example***
 
 ```sh
 ./freddi --alpha=0.5 --Mx=9 --rout=1 --period=0.5 --Mopt=0.5 --time=50 \
@@ -1000,6 +999,15 @@ Kerr's parameter is 0.4. The outer disk is irradiated with Cirr=1e-3.
   --initialcond=quasistat --windtype=Woods1996 --windXi_max=10 --windT_ic=1e8 \
   --windPow=1 
 ```
+
+Here we run a simmulation with for a nine sollar mass blac hole (Kerr parameter is 0.4),
+surrended by an accretion disc with α=0.5, outer radius equals one sollar radius.
+Initial torque profile corresponds to one described by Lipunova&Shakura 2000,
+while outer torque equals 2\*10^37 dyn\*cm. The irradiation parameter equals 10^-3.
+We run simmulations for 50 days, with time step of 0.25 days and spatial grid with
+1000 nodes. Disk opacity is described by a power-law κ∼ρ/T^5/2. Disk has a thermal
+wind following Woods et al 1996, with invert compton temperature of hundred million
+kelvins.
 
 ### Python
 
@@ -1014,8 +1022,8 @@ These classes accept keyword-only arguments which have the same names and
 meanings as [command line options](#usage-executables-options), but with three
 major exceptions:
  1. Python package doesn't provide any file output functionality, that's why output arguments like `config`, `dir`, `fulldata`, `starflux`, `lambda` or `passband` are missed;
- 2. all values are assumed to be in CGS units, but you can use `Freddi.from_asrtopy` for dimensional values (see details bellow);
- 3. parameters of wind, NS `fp` and NS `kappa` models are passed as dictionaries (see specification bellow).
+ 2. all values are assumed to be in CGS units, but you can use `Freddi.from_asrtopy` for dimensional values (see the details bellow);
+ 3. parameters of wind, NS `fp` and NS `kappa` models are passed as dictionaries (see the specifications bellow).
 
 The following code snippet would set-up roughly the same simulation as
 [the command-line example](#usage-executables-example)
@@ -1027,8 +1035,8 @@ freddi = Freddi(
     alpha=0.5, Mx=9*2e33, rout=1*7e10, period=0.5*86400, Mopt=0.5*2e33,
     time=50*86400, tau=0.25*86400, F0=2e+37, colourfactor=1.7, Nx=1000,
     distance=5*3e21, gridscale='log', kerr=0.4, Cirr=0.001, opacity='OPAL',
-    initialcond='quasistat', wind='Woods1996',
-    windparams=dict(Xi_max=10, T_iC=1e8, W_pow=1),
+    initialcond='quasistat', windtype='Woods1996',
+    windparams=dict(Xi_max=10, T_ic=1e8, Pow=1),
 )
 ```
 
@@ -1045,8 +1053,8 @@ freddi = Freddi.from_astropy(
     alpha=0.5, Mx=9*u.Msun, rout=1*u.Rsun, period=0.5*u.day, Mopt=0.5*u.Msun,
     time=50*u.day, tau=0.25*u.day, F0=2e+37, colourfactor=1.7, Nx=1000,
     distance=5*u.kpc, gridscale='log', kerr=0.4, Cirr=0.001, opacity='OPAL',
-    initialcond='quasistat', wind='Woods1996',
-    windparams=dict(Xi_max=10, T_iC=1e8*u.K, W_pow=1),
+    initialcond='quasistat', windtype='Woods1996',
+    windparams=dict(Xi_max=10, T_ic=1e8, Pow=1),
 )
 ```
 
@@ -1088,7 +1096,7 @@ freddi = Freddi.from_astropy(
 )
 
 for state in freddi:
-    print(f't = {state.t} s, Mdot = {state.Mdot:g} g/s')
+    print(f't = {state.t:>7.0f} s, Mdot = {state.Mdot:5.3e} g/s')
 assert state.t == freddi.t
 ```
 
@@ -1342,7 +1350,7 @@ Note, that we require C++17 standard (while not having idiomatic C++17 code),
 and require code to be compiled by modern GCC and CLang on Linux. Please write
 unit tests where you can and use `ctest` to check they pass.
 
-The Python project is specified by `pyproject.toml` (which just lists build
+The Python project is specified by `pyproject.toml` (which lists build
 requirements), `setup.py` and `MANIFEST.in` files, we use
 [`scikit-build`](https://scikit-build.readthedocs.io/) as a build system.
 `scikit-build` uses Python-related section of `CMakeLists.txt` to build C++
@@ -1356,7 +1364,7 @@ you use.
 `python/test` contains some tests, you can run them by `python3 setup.py test`.
 - `test_freddi.py` and `test_ns.py` contain unit tests for Python source;
 - `test_analytical.py` contains integration tests to compare analytical solutions of the equation of disk viscous evolution with the numerical solutions of `Freddi`;
-- `regression.py` contains regression tests to be sure that 1) the `Freddi` output is stable, and 2) the Python code gives the same results as binary executables do.
+- `regression.py` contains regression tests to be sure that 1) the `Freddi` output is stable vs previous commits, and 2) the Python code gives the same results as binary executables do.
 
 The regression test data are located in `python/test/data`. Sometimes you need
 to update these regression data, for example when you introduce new
@@ -1426,7 +1434,7 @@ If you have any problems, questions, or comments, please address them to
 
 ## License
 
-Copyright (c) 2016–2022, Konstantin L. Malanchev, Galina V. Lipunova & Artur L. Avakyan.
+Copyright (c) 2016–2024, Konstantin L. Malanchev, Galina V. Lipunova & Artur L. Avakyan.
 
 `Freddi` is distributed under the terms of the
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
