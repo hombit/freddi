@@ -200,6 +200,13 @@ const vecd& FreddiState::Sigma() {
 		}
 		opt_str_.Sigma = std::move(x);
 	}
+
+    std::cout << "Sigma values: [";
+    for (const auto& value : *opt_str_.Sigma) {
+        std::cout << value << "  ";
+    }
+    std::cout << "]" << std::endl;
+
 	return *opt_str_.Sigma;
 }
 
