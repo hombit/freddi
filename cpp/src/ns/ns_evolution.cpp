@@ -493,7 +493,7 @@ vecd FreddiNeutronStarEvolution::windC() const {
 }
 
 
-const vecd& FreddiNeutronStarEvolution::Qx() {
+const vecd& FreddiNeutronStarEvolution::Qx() const {
 	if (!opt_str_.Qx) {
 		vecd x(Nx());
 		const vecd& K = Kirr();

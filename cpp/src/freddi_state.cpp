@@ -168,7 +168,7 @@ double FreddiState::phase_opt() const {
 }
 
 
-double FreddiState::Lx() {
+double FreddiState::Lx() const {
 	if (!opt_str_.Lx) {
 		opt_str_.Lx = Luminosity(Tph_X(), args().flux->emin, args().flux->emax) / m::pow<4>(args().flux->colourfactor);
 	}
@@ -176,12 +176,12 @@ double FreddiState::Lx() {
 }
 
 
-double FreddiState::Fx() {
+double FreddiState::Fx() const {
     return Lx() * angular_dist_disk(cosi()) / (FOUR_M_PI * m::pow<2>(distance()));
 }
 
 
-const vecd& FreddiState::W() {
+const vecd& FreddiState::W() const {
 	if (!opt_str_.W) {
 		auto x = wunc()(h(), F(), first(), last());
 		x.resize(Nx(), 0.0);
@@ -191,7 +191,7 @@ const vecd& FreddiState::W() {
 }
 
 
-const vecd& FreddiState::Sigma() {
+const vecd& FreddiState::Sigma() const {
 	if (!opt_str_.Sigma) {
 		vecd x(Nx());
 		const vecd& WW = W();
@@ -204,7 +204,7 @@ const vecd& FreddiState::Sigma() {
 }
 
 
-const vecd& FreddiState::Tph() {
+const vecd& FreddiState::Tph() const {
 	if (!opt_str_.Tph) {
 		vecd x(Nx());
 		const vecd& Tvis = Tph_vis();
@@ -218,7 +218,7 @@ const vecd& FreddiState::Tph() {
 }
 
 
-const vecd& FreddiState::Tirr() {
+const vecd& FreddiState::Tirr() const {
 	if (!opt_str_.Tirr) {
 		vecd x(Nx());
 		const vecd& QxQx = Qx();
@@ -231,7 +231,7 @@ const vecd& FreddiState::Tirr() {
 }
 
 
-const vecd& FreddiState::Qx() {
+const vecd& FreddiState::Qx() const {
 	if (!opt_str_.Qx) {
 		vecd x(Nx());
 		const vecd& K = Kirr();
@@ -246,7 +246,7 @@ const vecd& FreddiState::Qx() {
 }
 
 
-const vecd& FreddiState::Kirr() {
+const vecd& FreddiState::Kirr() const {
 	if(!opt_str_.Kirr) {
 		vecd x(Nx());
 		const vecd& H = Height();
@@ -262,7 +262,7 @@ const vecd& FreddiState::Kirr() {
 }
 
 
-const vecd& FreddiState::Height() {
+const vecd& FreddiState::Height() const {
 	if (!opt_str_.Height) {
 		vecd x(Nx());
 		for (size_t i = first(); i <= last(); i++) {
@@ -277,7 +277,7 @@ const vecd& FreddiState::Height() {
 }
 
 
-const vecd& FreddiState::Tph_vis() {
+const vecd& FreddiState::Tph_vis() const {
 	if (!opt_str_.Tph_vis) {
 		vecd x(Nx(), 0.0);
 		for (size_t i = first(); i <= last(); i++) {
@@ -289,7 +289,7 @@ const vecd& FreddiState::Tph_vis() {
 	return *opt_str_.Tph_vis;
 }
 
-const vecd& FreddiState::Tph_X() {
+const vecd& FreddiState::Tph_X() const {
 	if (!opt_str_.Tph_X) {
 		vecd x(Nx(), 0.0);
 		const double Mdot = std::fabs((F()[first()+1] - F()[first()]) / (h()[first()+1] - h()[first()]));
@@ -328,7 +328,7 @@ const vecd& FreddiState::Tph_X() {
 */
 
 
-double FreddiState::lazy_magnitude(boost::optional<double>& m, double lambda, double F0) {
+double FreddiState::lazy_magnitude(boost::optional<double>& m, double lambda, double F0) const {
 	if (!m) {
 		m = magnitude(lambda, F0);
 	}
@@ -352,16 +352,16 @@ IrradiatedStar::sources_t FreddiState::star_irr_sources() {
 }
 
 
-double FreddiState::flux_star(const double lambda, const double phase) {
+double FreddiState::flux_star(const double lambda, const double phase) const {
 	return star_.luminosity({inclination(), phase}, lambda) / (FOUR_M_PI * m::pow<2>(distance()));
 }
 
-double FreddiState::flux_star(const EnergyPassband& passband, const double phase) {
+double FreddiState::flux_star(const EnergyPassband& passband, const double phase) const {
 	return star_.luminosity({inclination(), phase}, passband) / (FOUR_M_PI * m::pow<2>(distance()));
 }
 
 
-double FreddiState::Mdot_wind() {
+double FreddiState::Mdot_wind() const {
 	auto dMdot_dh = [this](const size_t i) -> double {
 		double dFdh;
 		if (i == first()) {
@@ -701,7 +701,7 @@ double FreddiState::Sigma_plus(double r) const {
 		* std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, -0.37);
 }
 
-double FreddiState::v_cooling_front(double r) {
+double FreddiState::v_cooling_front(double r) const {
         // The cooling-front velocity depends on the ratio between the current Sigma and critical Sigmas
         // Ludwig et al., A&A 290, 473-486 (1994), section 3
         // units: cm/s
@@ -714,7 +714,7 @@ double FreddiState::v_cooling_front(double r) {
                * std::pow(args().basic->Mx / GSL_CONST_CGSM_SOLAR_MASS, -0.012);
 }
 
-double FreddiState::R_cooling_front(double r)  {
+double FreddiState::R_cooling_front(double r) const {
         // previous location of Rhot moves with the cooling-front velocity:
         return  R()[last()] - v_cooling_front(r) * args().calc->tau;       
         //return  R()[last()] - v_cooling_front(R()[last()]) * args().calc->tau  ; 
