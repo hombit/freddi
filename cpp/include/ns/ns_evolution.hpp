@@ -205,7 +205,7 @@ public:
 	double Lx_ns_rest_frame();
 // angular_dist_ns_
 public:
-	inline double angular_dist_ns(const double mu) { return ns_irr_source_->angular_dist(mu); }
+	inline double angular_dist_ns(const double mu) const { return ns_irr_source_->angular_dist(mu); }
 // fp_
 public:
 	inline double fp(double radius) const { return (*fp_)(*this, radius); }
@@ -226,8 +226,9 @@ protected:
 public:
 	FreddiNeutronStarEvolution(const FreddiNeutronStarArguments& args);
 	explicit FreddiNeutronStarEvolution(const FreddiNeutronStarEvolution&) = default;
-	virtual const vecd& Qx() override;
+	virtual const vecd& Qx() const override;
 	virtual double Lbol_disk() const override;
+	//virtual void nonlinear_diffusion(const double tau) override;
 public:
 	using iterator = EvolutionIterator<FreddiNeutronStarEvolution>;
 	inline iterator begin() { return {this}; }

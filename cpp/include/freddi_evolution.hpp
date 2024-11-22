@@ -40,6 +40,7 @@ public:
 };
 
 
+
 class FreddiEvolution: public FreddiState {
 protected:
 	virtual void truncateOuterRadius();
@@ -49,6 +50,7 @@ protected:
 public:
 	FreddiEvolution(const FreddiArguments& args);
 	explicit FreddiEvolution(const FreddiEvolution&) = default;
+	virtual void nonlinear_diffusion(const double tau);
 	virtual void step(double tau);
 	inline void step() { return step(args().calc->tau); }
 public:

@@ -16,12 +16,7 @@ FreddiEvolution::FreddiEvolution(const FreddiArguments &args):
 		FreddiState(args, std::bind(&FreddiEvolution::wunction, this, _1, _2, _3, _4)) {}
 
 
-void FreddiEvolution::step(const double tau) {
-	//if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "cA_ t="<< [freddi]() {return sToDay(current_.t);}  <<"\n" << std::endl;}
-	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A_ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
-	truncateInnerRadius();
-	FreddiState::step(tau);
-	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A__ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
+void FreddiEvolution::nonlinear_diffusion(const double tau) {
 	nonlinear_diffusion_nonuniform_wind_1_2(
 			args().calc->tau, args().calc->eps,
 			F_in(), Mdot_outer_boundary(),
@@ -29,8 +24,29 @@ void FreddiEvolution::step(const double tau) {
 			wunc(),
 			h(), current_.F,
 			first(), last());
+}
+		
+void FreddiEvolution::step(const double tau) {
+	//if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "cA_ t="<< [freddi]() {return sToDay(current_.t);}  <<"\n" << std::endl;}
+	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A_ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
+	truncateInnerRadius();
+	
+	FreddiState::step(tau);
+	
+	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A__ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
+	
+	nonlinear_diffusion(tau);
+	/*nonlinear_diffusion_nonuniform_wind_1_2(
+			args().calc->tau, args().calc->eps,
+			F_in(), Mdot_outer_boundary(),
+			windA(), windB(), windC(),
+			wunc(),
+			h(), current_.F,
+			first(), last());*/
+	
 	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A___ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
 	truncateOuterRadius();
+	//truncateInnerRadius();//added @@
 	star_.set_sources(star_irr_sources());
 }
 

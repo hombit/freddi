@@ -168,7 +168,7 @@ void FreddiState::verify_disc_mass (double tau) {
 
 
 
-double FreddiState::obtain_Mdot_outer_boundary() {
+double FreddiState::obtain_Mdot_outer_boundary() const {
     
     if (args().disk->DIM_front_approach == "outflow") {
 	//if (args().disk->boundcond == "Hameury") {
@@ -177,7 +177,7 @@ double FreddiState::obtain_Mdot_outer_boundary() {
 	    if (last() == Nx()-1) {
 		return Mdot_out();
 	    } else  {
-		return -1.0*args().disk->DIM_front_Mdot_factor*Mdot_in();
+		return -1.0*args().disk->DIM_front_Mdot_factor*Mdot_in() + Mdot_out();
 		//-1.5 make Rfront/RMdot0 = 2
 		// -2.5; -2.3 makes very close to Hameury with =Tcrit = (8840. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ; and Tcrit = 10300.;
 	    }
@@ -222,7 +222,7 @@ double FreddiState::phase_opt() const {
 }
 
 
-double FreddiState::Lx() {
+double FreddiState::Lx() const {
 	if (!opt_str_.Lx) {
 		opt_str_.Lx = Luminosity(Tph_X(), args().flux->emin, args().flux->emax) / m::pow<4>(args().flux->colourfactor);
 	}
@@ -230,7 +230,12 @@ double FreddiState::Lx() {
 }
 
 
-const vecd& FreddiState::W() {
+double FreddiState::Fx() const {
+    return Lx() * angular_dist_disk(cosi()) / (FOUR_M_PI * m::pow<2>(distance()));
+}
+
+
+const vecd& FreddiState::W() const {
 	if (!opt_str_.W) {
 		auto x = wunc()(h(), F(), first(), last());
 		x.resize(Nx(), 0.0);
@@ -240,7 +245,7 @@ const vecd& FreddiState::W() {
 }
 
 
-const vecd& FreddiState::Sigma() {
+const vecd& FreddiState::Sigma() const {
 	if (!opt_str_.Sigma) {
 		vecd x(Nx());
 		const vecd& WW = W();
@@ -253,7 +258,7 @@ const vecd& FreddiState::Sigma() {
 }
 
 
-const vecd& FreddiState::Tph() {
+const vecd& FreddiState::Tph() const {
 	if (!opt_str_.Tph) {
 		vecd x(Nx());
 		const vecd& Tvis = Tph_vis();
@@ -267,7 +272,7 @@ const vecd& FreddiState::Tph() {
 }
 
 
-const vecd& FreddiState::Tirr() {
+const vecd& FreddiState::Tirr() const {
 	if (!opt_str_.Tirr) {
 		vecd x(Nx());
 		const vecd& QxQx = Qx();
@@ -281,7 +286,7 @@ const vecd& FreddiState::Tirr() {
 }
 
 
-const vecd& FreddiState::Qx() {
+const vecd& FreddiState::Qx() const {
 
 	if (!opt_str_.Qx) {
 		vecd x(Nx());
@@ -298,7 +303,7 @@ const vecd& FreddiState::Qx() {
 }
 
 
-const vecd& FreddiState::Kirr() {
+const vecd& FreddiState::Kirr() const {
 	if(!opt_str_.Kirr) {
 		vecd x(Nx());
 		const vecd& H = Height();
@@ -314,7 +319,7 @@ const vecd& FreddiState::Kirr() {
 }
 
 
-const vecd& FreddiState::Height() {
+const vecd& FreddiState::Height() const {
 	if (!opt_str_.Height) {
 		vecd x(Nx());
 		for (size_t i = first(); i <= last(); i++) {
@@ -329,7 +334,7 @@ const vecd& FreddiState::Height() {
 }
 
 
-const vecd& FreddiState::Shadow() {
+const vecd& FreddiState::Shadow() const {
         vecd x(Nx());
         double max_H2R = 0.0;
         for (size_t i = first(); i < Nx(); i++) {
@@ -352,7 +357,7 @@ const vecd& FreddiState::Shadow() {
 
 
 
-const vecd& FreddiState::Tph_vis() {
+const vecd& FreddiState::Tph_vis() const {
 	if (!opt_str_.Tph_vis) {
 		vecd x(Nx(), 0.0);
 		for (size_t i = first(); i <= last(); i++) {
@@ -364,7 +369,7 @@ const vecd& FreddiState::Tph_vis() {
 	return *opt_str_.Tph_vis;
 }
 
-const vecd& FreddiState::Tph_X() {
+const vecd& FreddiState::Tph_X() const {
 	if (!opt_str_.Tph_X) {
 		vecd x(Nx(), 0.0);
 		const double Mdot = std::fabs((F()[first()+1] - F()[first()]) / (h()[first()+1] - h()[first()]));
@@ -403,7 +408,7 @@ const vecd& FreddiState::Tph_X() {
 */
 
 
-double FreddiState::lazy_magnitude(boost::optional<double>& m, double lambda, double F0) {
+double FreddiState::lazy_magnitude(boost::optional<double>& m, double lambda, double F0) const {
 	if (!m) {
 		m = magnitude(lambda, F0);
 	}
@@ -427,16 +432,16 @@ IrradiatedStar::sources_t FreddiState::star_irr_sources() {
 }
 
 
-double FreddiState::flux_star(const double lambda, const double phase) {
+double FreddiState::flux_star(const double lambda, const double phase) const {
 	return star_.luminosity({inclination(), phase}, lambda) / (FOUR_M_PI * m::pow<2>(distance()));
 }
 
-double FreddiState::flux_star(const Passband& passband, const double phase) {
+double FreddiState::flux_star(const Passband& passband, const double phase) const {
 	return star_.luminosity({inclination(), phase}, passband) / (FOUR_M_PI * m::pow<2>(distance()));
 }
 
 
-double FreddiState::Mdot_wind() {
+double FreddiState::Mdot_wind() const {
 	auto dMdot_dh = [this](const size_t i) -> double {
 		double dFdh;
 		if (i == first()) {
@@ -583,6 +588,7 @@ void FreddiState::Shields1986Wind::update(const FreddiState& state) {
     const auto disk = state.args().disk;
     //  1983ApJ...271...70B page 4
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
+    // should the angular distribution be a factor here???
     //  1983ApJ...271...70B page 3
     const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_ic);
     const double L_edd = (4.0 * M_PI * state.GM()* 2.0 * disk->mu * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION);
@@ -660,20 +666,23 @@ void FreddiState::Woods1996AGNWind::update(const FreddiState& state) {
         C_[i] = -2.0 *(2e42/(state.args().basic->Mx))*(C_0/1e13) * C0 * le * m::pow<2>(xi1) * f_L * g_R * ExP ;		}
     }
 
-
+     
+    
 
 FreddiState::Woods1996ShieldsApproxWind::Woods1996ShieldsApproxWind(const FreddiState& state):
 BasicWind(state),
         Xi_max(state.args().disk->windparams.at("Xi_max")),
         T_ic(state.args().disk->windparams.at("T_ic")),
-        Pow(state.args().disk->windparams.at("Pow")) {
+        Pow(state.args().disk->windparams.at("Pow")),
+        IrAngDis(state.args().disk->windparams.at("IrAngDis")) {
     update(state);
 }
 
 void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
     BasicWind::update(state);
     const auto disk = state.args().disk;
-    const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
+    
+    const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta() ;
     const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_ic);
     //const double VeL = std::sqrt(state.GM()/R_iC) ;
     //const double C_iC = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_ic)/( GSL_CONST_CGSM_MASS_PROTON));
@@ -682,12 +691,18 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
     const double L_crit = (1.0 / 8.0) * std::sqrt(GSL_CONST_CGSM_MASS_ELECTRON / (disk->mu * GSL_CONST_CGSM_MASS_PROTON)) * std::sqrt((GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT* GSL_CONST_CGSM_SPEED_OF_LIGHT ) / (GSL_CONST_CGSM_BOLTZMANN * T_ic)) * L_edd;
     const double el = L/L_crit;
     
+    
    //std::cerr << "\t" << Lcrit << "\t" << L_crit   << "\t" << std::endl;
 
     //std::cerr << "\t" << L << " \t" << L_edd << "\t" << L/L_edd  << "\t" << L_crit << "\t" << R_iC << "\t" << state.eta() << "\t" << std::endl;
 
     for (size_t i = state.first(); i <= state.last(); ++i) {
         if (state.R()[i] > 0.1*R_iC) {
+	    
+	    if (IrAngDis) {
+		// Take account of the central flux angular distribution:
+		//el *= angular_dist_disk(state.Height()[i] / state.R()[i]) ; //  angular_dist_disk(state.Height()[i] / state.R()[i]) ; // disk_irr_source_->angular_dist(mu)
+	    }
             //  1986ApJ...306...90S page 2
             const double xi = state.R()[i] / R_iC;
             const double xi1 = R_iC / state.R()[i];
@@ -710,6 +725,7 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
 
     }
 }
+
 
 FreddiState::PeriodPaperWind::PeriodPaperWind(const FreddiState& state):
 	BasicWind(state),
@@ -802,19 +818,19 @@ double FreddiState::Teff_plus(double r) const {
 //     
 // }
 
-double FreddiState::v_visc(double r, double z2r_at_r) {
+double FreddiState::v_visc(double r, double z2r_at_r) const {
 	//oprel().Height(R()[i], F()[i])
 	return  args().basic->alpha/oprel().Pi3 *  m::pow<2>(z2r_at_r)  * std::sqrt(GM()/r); 
 	//Height2R()[]
 }
 
-double FreddiState::R_vis_struct (double r, double z2r_at_r)  {
+double FreddiState::R_vis_struct (double r, double z2r_at_r) const {
         // estimate the radius, to which viscous process can reach in time tau
         return  r - v_visc(r, z2r_at_r) * args().calc->tau;       
 }
 
 
-double FreddiState::v_cooling_front(double r, double sigma_at_r) {
+double FreddiState::v_cooling_front(double r, double sigma_at_r) const {
         // The cooling-front velocity depends on the ratio between the current Sigma and critical Sigmas
         // Ludwig et al., A&A 290, 473-486 (1994), section 3
         // https://ui.adsabs.harvard.edu/abs/1994A%26A...290..473L
@@ -838,7 +854,7 @@ double FreddiState::v_cooling_front(double r, double sigma_at_r) {
         return v;
 }
 
-double FreddiState::R_cooling_front (double r, double sigma_at_r)  {
+double FreddiState::R_cooling_front (double r, double sigma_at_r) const {
         // estimate the radius, where cooling front could reach, starting from r, if it moved with corresponding velocity
         // previous location of Rhot moves with the cooling-front velocity:
         return  r - v_cooling_front(r, sigma_at_r) * args().calc->tau;       
@@ -935,7 +951,7 @@ double FreddiState::Rfront_Rhot (double r, double z_r) const {
 }
 
 
-double FreddiState::Tirr_critical (double r, int ii)  {
+double FreddiState::Tirr_critical (double r, int ii) const {
     // determine critical level Tirr which keeps the ring hot.
     // if we analyse r=Rfront,  we should take into account that Rfront
     // is farther than   r ==  R().at(ii) 
@@ -1031,7 +1047,7 @@ double FreddiState::Tirr_critical (double r, int ii)  {
 }
 
 //int FreddiState::ring_state_vertical(const int ii) {
-int FreddiState::check_ring_is_cold(const int ii) {    
+int FreddiState::check_ring_is_cold(const int ii) const {    
     // returns 1 for hot, 0 for cold
     
     // R().at(ii), the radius where Mdot = 0, or ?

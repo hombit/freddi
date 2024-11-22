@@ -190,10 +190,14 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 		if (vm.count("windPow") == 0) {
 			throw po::error("--windPow is required if --windtype=Woods1996");
 		}
+		if (vm.count("wind_Irr_ang_distribution") == 0) {
+			//vm["wind_Irr_ang_distribution"] = 0;
+		}
 		return {
 				{"Xi_max", vm["windXi_max"].as<double>()},
 				{"T_ic", vm["windT_ic"].as<double>()},
-				{"Pow", vm["windPow"].as<double>()}
+				{"Pow", vm["windPow"].as<double>()},
+				{"IrAngDis", vm["wind_Irr_ang_distribution"].as<double>()}
 		};
 	}
 	if (windtype == "toy"){
@@ -271,7 +275,7 @@ po::options_description DiskStructureOptions::description() {
 					"  Janiuk2015: super-Eddington wind from Janiuk et al 2015. Requires --windA_0 and --windB_1 to be specified\n"
 					"  Shields1986: thermal wind from Begelman et al. 1983 and Shields et al. 1986. Requires --windXi_max, --windT_ic and --windPow to be specified\n"
 					"  Woods1996AGN: thermal AGN wind from Woods et al. 1996. Requires --windC_0 and --windT_ic to be specified\n"
-					"  Woods1996: thermal wind from Woods et al. 1996. Requires --windXi_max, --windT_ic and --windPow to be specified\n"
+					"  Woods1996: thermal wind from Woods et al. 1996. Requires --windXi_max, --windT_ic and --windPow to be specified. Optional parameter --wind_Irr_ang_distribution (0: isotropical central luminosity (default); 1: central luminosity is self-consistently described by option --angulardistdisk) \n"
 					"  toy: a toy wind model used in arXiv:2105.11974, the mass loss rate is proportional to the central accretion rate. Requires --windC_w to be specified\n")
 			( "windC_w", po::value<double>(), "The ratio of the mass loss rate due to wind to the central accretion rate, |Mwind|/Macc\n")
 			( "windR_w", po::value<double>(), "The ratio of the wind launch radius to the outer disk radius, Rwind/Rout\n")		

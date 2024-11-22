@@ -164,7 +164,6 @@ private:
 		const double Xi_max;
 		const double T_ic;
 		const double Pow;
-		const double IrAngDis;
 	public:
 		explicit Woods1996ShieldsApproxWind(const FreddiState& state);
 		~Woods1996ShieldsApproxWind() override = default;
@@ -232,10 +231,12 @@ private:
 		OpacityRelated oprel;
 		vecd h;
 		vecd R;
+		vecd Shadow;
 		wunc_t wunc;
 	private:
 		static vecd initialize_h(const FreddiArguments& args, size_t Nx);
 		static vecd initialize_R(const vecd& h, double GM);
+		static vecd initialize_Shadow(const vecd& h);
 	public:
 		DiskStructure(const FreddiArguments& args, const wunc_t& wunc);
 	};
@@ -272,11 +273,11 @@ private:
 protected:
 	std::shared_ptr<const DiskStructure> str_;
 	CurrentState current_;
-	mutable DiskOptionalStructure opt_str_;
+	DiskOptionalStructure opt_str_;
 	std::unique_ptr<BasicWind> wind_;
 	std::shared_ptr<BasicFreddiIrradiationSource> disk_irr_source_;
 	RocheLobe star_roche_lobe_;
-	mutable IrradiatedStar star_;
+	IrradiatedStar star_;
 public:
 	FreddiState(const FreddiArguments& args, const wunc_t& wunc);
 	explicit FreddiState(const FreddiState&);
@@ -334,8 +335,8 @@ public:
 	virtual double Mdot_in() const;
 	virtual double Lbol_disk() const;
 	virtual double Rfront_Rhot(double r, double z_r) const;
-	virtual double obtain_Mdot_outer_boundary() const;
-	virtual double Tirr_critical(double r, int ii) const;
+	virtual double obtain_Mdot_outer_boundary();
+	virtual double Tirr_critical(double r, int ii);
 	virtual void verify_disc_mass(double tau);
 	double phase_opt() const;
 // wind_
@@ -379,19 +380,19 @@ protected:
 	template <DiskIntegrationRegion Region> double integrate(const vecd& x, const std::function<double (size_t)>& func) const {
 		return trapz(x, func, region_first<Region>(), region_last<Region>());
 	}
-	template <DiskIntegrationRegion Region> double lazy_integrate(boost::optional<double>& x, const vecd& values) const {
+	template <DiskIntegrationRegion Region> double lazy_integrate(boost::optional<double>& x, const vecd& values) {
 		if (!x) {
 			x = integrate<Region>(values);
 		}
 		return *x;
 	}
-	template<DiskIntegrationRegion Region> double lazy_integrate(boost::optional<double> &opt, const vecd& x, const std::function<double (size_t)>& values) const {
+	template<DiskIntegrationRegion Region> double lazy_integrate(boost::optional<double> &opt, const vecd& x, const std::function<double (size_t)>& values) {
 		if (!opt) {
 			opt = integrate<Region>(x, values);
 		}
 		return *opt;
 	}
-	template <DiskIntegrationRegion Region> double I_lambda(double lambda) const {
+	template <DiskIntegrationRegion Region> double I_lambda(double lambda) {
 		const vecd* T;
 		if constexpr(Region == HotRegion) {
 			T = &Tph();
@@ -402,28 +403,27 @@ protected:
 		}
 		return integrate<Region>([T, lambda](const size_t i) -> double { return Spectrum::Planck_lambda((*T)[i], lambda); });
 	}
-	double lazy_magnitude(boost::optional<double>& m, double lambda, double F0) const;
-	virtual const vecd& Qx() const;
+	double lazy_magnitude(boost::optional<double>& m, double lambda, double F0);
+	virtual const vecd& Qx();
 public:
-	double Lx() const;
-	double Fx() const;
-	const vecd& W() const;
-	const vecd& Sigma() const;
-	const vecd& Tph() const;
-	const vecd& Tph_vis() const;
-	const vecd& Tph_X() const;
-	const vecd& Tirr() const;
-	const vecd& Kirr() const;
-	const vecd& Height() const;
-	const vecd& Shadow() const;
+	double Lx();
+	const vecd& W();
+	const vecd& Sigma();
+	const vecd& Tph();
+	const vecd& Tph_vis();
+	const vecd& Tph_X();
+	const vecd& Tirr();
+	const vecd& Kirr();
+	const vecd& Height();
+	const vecd& Shadow();
 	double Luminosity(const vecd& T, double nu1, double nu2) const;
-	inline double magnitude(const double lambda, const double F0) const {
+	inline double magnitude(const double lambda, const double F0) {
 		return -2.5 * std::log10(I_lambda<HotRegion>(lambda) * cosiOverD2() / F0);
 	}
-	template <DiskIntegrationRegion Region> double flux_region(double lambda) const {
+	template <DiskIntegrationRegion Region> double flux_region(double lambda) {
 		return I_lambda<Region>(lambda) * m::pow<2>(lambda) / GSL_CONST_CGSM_SPEED_OF_LIGHT * cosiOverD2();
 	}
-	template <DiskIntegrationRegion Region> double flux_region(const Passband& passband) const {
+	template <DiskIntegrationRegion Region> double flux_region(const Passband& passband) {
 		const double intens = trapz(
 				passband.lambdas,
 				[this, &passband](const size_t i) -> double {
@@ -433,23 +433,23 @@ public:
 				passband.data.size() - 1);
 		return intens * cosiOverD2() / passband.t_dnu;
 	}
-	inline double flux(const double lambda) const { return flux_region<HotRegion>(lambda); }
-	inline double flux(const Passband& passband) const  { return flux_region<HotRegion>(passband); }
-	double flux_star(double lambda, double phase) const;
-	double flux_star(const Passband& passband, double phase) const;
-	inline double flux_star(double lambda) const { return flux_star(lambda, phase_opt()); }
-	inline double flux_star(const Passband& passband) const { return flux_star(passband, phase_opt()); }
-	inline double Mdisk() const { return lazy_integrate<HotRegion>(opt_str_.Mdisk, Sigma()); }
-	double Mdot_wind() const;
+	inline double flux(const double lambda) { return flux_region<HotRegion>(lambda); }
+	inline double flux(const Passband& passband) { return flux_region<HotRegion>(passband); }
+	double flux_star(double lambda, double phase);
+	double flux_star(const Passband& passband, double phase);
+	inline double flux_star(double lambda) { return flux_star(lambda, phase_opt()); }
+	inline double flux_star(const Passband& passband) { return flux_star(passband, phase_opt()); }
+	inline double Mdisk() { return lazy_integrate<HotRegion>(opt_str_.Mdisk, Sigma()); }
+	double Mdot_wind();
 	double Sigma_minus(double r) const;
 	double Sigma_plus(double r) const;
 	double Teff_plus(double r) const;
-	double R_cooling_front(double r, double sigma_at_r) const;
-	double R_vis_struct (double r, double z2r_at_r) const;
-	double v_cooling_front(double r, double sigma_at_r) const;
-	double v_visc(double r, double z2r) const;
-	int check_ring_is_cold(const int i) const; // check ring hot (1) or cold (0)
-	int Tirr_exceed_critical(const int i) const; // check Tirr > Tcrit (1) or not (0)
+	double R_cooling_front(double r, double sigma_at_r);
+	double R_vis_struct (double r, double z2r_at_r);
+	double v_cooling_front(double r, double sigma_at_r);
+	double v_visc(double r, double z2r);
+	int check_ring_is_cold(const int i); // check ring hot (1) or cold (0)
+	int Tirr_exceed_critical(const int i); // check Tirr > Tcrit (1) or not (0)
 };
 
 #endif //FREDDI_FREDDI_STATE_HPP
