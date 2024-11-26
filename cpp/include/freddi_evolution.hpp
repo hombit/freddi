@@ -46,6 +46,10 @@ protected:
 	virtual void truncateOuterRadius();
 	virtual void truncateInnerRadius() {}
 protected:
+    // To be used inside truncateOuterRadius only
+    // It is not const because it changes R_dotM0_before_shift
+    bool check_ring_is_cold(const int i); // check ring hot (false) or cold (true)
+protected:
 	virtual vecd wunction(const vecd& h, const vecd& F, size_t first, size_t last) const;
 public:
 	FreddiEvolution(const FreddiArguments& args);

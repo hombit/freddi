@@ -448,7 +448,6 @@ public:
 	double R_vis_struct (double r, double z2r_at_r) const;
 	double v_cooling_front(double r, double sigma_at_r) const;
 	double v_visc(double r, double z2r) const;
-	int check_ring_is_cold(const int i) const; // check ring hot (1) or cold (0)
 	int Tirr_exceed_critical(const int i) const; // check Tirr > Tcrit (1) or not (0)
 };
 
