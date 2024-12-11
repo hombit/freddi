@@ -103,7 +103,7 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 				std::pow(vm["Qirr2Qvishot"].as<double>(), 0.25),
 				vm["Rfront_Mdotzero_factor"].as<double>(), 
 				vm["DIM_front_Mdot_factor"].as<double>(),        
-				vm["check_state_approach"].as<std::string>(),       
+				//vm["check_state_approach"].as<std::string>(),       
 				vm["check_Sigma_approach"].as<std::string>(),
 				vm["check_Temp_approach"].as<std::string>(),
 				vm["DIM_front_approach"].as<std::string>(),
@@ -230,10 +230,10 @@ po::options_description DiskStructureOptions::description() {
 			( "Qirr2Qvishot", po::value<double>()->default_value(m::pow<4>(default_Tirr2Tvishot)), "Minimum Qirr / Qvis ratio at the outer edge of the hot disk to switch the control over the evolution of the hot disk radius: from temperature-based regime to Sigma-based cooling-front regime (see Lipunova et al. (2021, Section 2.4) and Eq. A.1 in Lasota et al. 2008; --alpha value is used for Sigma_plus and --alphacold value is used for Sigma_minus)\n" )
 			("Rfront_Mdotzero_factor", po::value<double>()->default_value(default_Rfront_Mdotzero_factor), "We check conditions for cooling front at current radius multiplied by Rfront_Mdotzero_factor\n" )
 			("DIM_front_Mdot_factor", po::value<double>()->default_value(default_DIM_front_Mdot_factor), "  = -Mdot(Rfront)/Mdot_in, see DIM_front_approach\n" )
-			("check_state_approach", po::value<std::string>()->default_value(default_check_state_approach), "Type of checking whether the ring is hot or cold\n\n"
-					"Values:\n"
-					" before2024: original version, as published in Lipunova&Malanchev (2017); Lipunova et al (2022); Avakyan et al (2024)\n"
-					" logic: included option for checking conditions at radius different from the radius where accretion rate is zero. See boundcond, DIM_front_approach, scatter_by_corona,  check_Sigma_approach, and check_Temp_approach\n")
+			//("check_state_approach", po::value<std::string>()->default_value(default_check_state_approach), "Type of checking whether the ring is hot or cold\n\n"
+			//		"Values:\n"
+			//		" before2024: original version, as published in Lipunova&Malanchev (2017); Lipunova et al (2022); Avakyan et al (2024)\n"
+			//		" logic: included option for checking conditions at radius different from the radius where accretion rate is zero. See boundcond, DIM_front_approach, scatter_by_corona,  check_Sigma_approach, and check_Temp_approach\n")
 			("check_Sigma_approach", po::value<std::string>()->default_value(default_check_Sigma_approach), "Type of checking Sigma for hot or cold state\n\n"
 					"Values:\n"
 					" simple: assume that Sigma is proportional to R^(-3/4) between radius where Mdot = 0 and the cooling fron radius\n"   

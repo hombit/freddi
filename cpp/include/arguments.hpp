@@ -182,7 +182,7 @@ public:
 	constexpr static const double default_Tirr2Tvishot = 0.;
 	constexpr static const double default_Rfront_Mdotzero_factor = 1.;
 	constexpr static const double default_DIM_front_Mdot_factor = 2.3;
-        constexpr static const char default_check_state_approach[] = "before2024";
+        //constexpr static const char default_check_state_approach[] = "before2024";
         constexpr static const char default_check_Sigma_approach[] = "simple";
 	constexpr static const char default_check_Temp_approach[] = "const";
 	constexpr static const char default_DIM_front_approach[] = "maxFvis";
@@ -200,7 +200,7 @@ public:
 	double Tirr2Tvishot;
 	double Rfront_Mdotzero_factor;
 	double DIM_front_Mdot_factor;
-	std::string check_state_approach;
+	//std::string check_state_approach;
 	std::string check_Sigma_approach;
 	std::string check_Temp_approach;
 	std::string DIM_front_approach;
@@ -230,7 +230,7 @@ public:
 			double Tirr2Tvishot,
 			double Rfront_Mdotzero_factor, 
 			double DIM_front_Mdot_factor, 
-			const std::string& check_state_approach, 
+			//const std::string& check_state_approach, 
 			const std::string& check_Sigma_approach, 
 			const std::string& check_Temp_approach,
 			const std::string& DIM_front_approach,
@@ -253,7 +253,7 @@ public:
 			double Tirr2Tvishot,
 			double Rfront_Mdotzero_factor,
 			double DIM_front_Mdot_factor,
-			const std::string &check_state_approach,
+			//const std::string &check_state_approach,
 			const std::string &check_Sigma_approach,
 			const std::string &check_Temp_approach,
 			const std::string &DIM_front_approach,
@@ -270,7 +270,7 @@ public:
 			Tirr2Tvishot(Tirr2Tvishot),
 			Rfront_Mdotzero_factor(Rfront_Mdotzero_factor),
 			DIM_front_Mdot_factor(DIM_front_Mdot_factor),
-			check_state_approach(check_state_approach), 
+			//check_state_approach(check_state_approach), 
 			check_Sigma_approach(check_Sigma_approach),
 			check_Temp_approach(check_Temp_approach),
 			DIM_front_approach(DIM_front_approach),
