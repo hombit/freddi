@@ -180,9 +180,9 @@ bool FreddiEvolution::check_ring_is_cold(const int ii) {
                     if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_O pop ="<<  radius_popravka << " Sigma is low and R_dotM0_before_shift=" << current_.R_dotM0_before_shift<< "- COLD \n" << std::endl;}
                     return 1; // COLD
                 } else {
-                    //throw std::invalid_argument("check_ring_is_cold: logic mistake 1");
+                    throw std::invalid_argument("check_ring_is_cold: logic mistake 1");
                 }
-
+            }
 // 		if ( last() < args().calc->Nx-1) {
 // 		    if (Sigma_plus(R().at(ii+1))== 0.)  { Sigma().at(ii)
 // 			// Sigma is low BUT ring is HOT
@@ -194,8 +194,9 @@ bool FreddiEvolution::check_ring_is_cold(const int ii) {
 // 		    }
 // 		}
 // 		r????eturn 1;
-            }
-// 	    else {
+           
+                
+            
 
             //  R_cooling_front = r - v_cooling_front(r, sigma_at_r) * args().calc->tau;
 //   		if (radius_popravka <= args().disk->Rfront_Mdotzero_factor) {
@@ -203,12 +204,16 @@ bool FreddiEvolution::check_ring_is_cold(const int ii) {
 //   		    return 1;
 //   		}
 
-            // check cooling front position; cooling front is moving from last Rout
-
-            if  (current_.R_dotM0_before_shift == 0 ) {
+            
+            // here below Sigma > Sigma_plus
+            
+            
+            if  (current_.R_dotM0_before_shift == 0 ) {   // and 
                 // COLD ; just collapse to initial position:
                 return 1;
             }
+            
+            
             if ((radius_popravka * R().at(ii) > R_cooling_front ( Rfront_Rhot(R()[last()], oprel().Height(R()[last()], F()[last()])/R()[last()] ) * R()[last()] , Sigma().at(last())*sigma_factor) )  && ( last() < args().calc->Nx-1)  ){
                 //radius is beyond front
                 if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "++c_P pop ="<< radius_popravka <<  " beyond front - COLD \n" << std::endl;}
@@ -221,7 +226,6 @@ bool FreddiEvolution::check_ring_is_cold(const int ii) {
                 // HOT
                 return false;
             }
-//	   }
         }
     }
     throw std::invalid_argument("check_ring_is_cold: logic mistake 2");

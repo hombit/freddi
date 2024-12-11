@@ -170,30 +170,37 @@ void FreddiState::verify_disc_mass (double tau) {
 
 double FreddiState::obtain_Mdot_outer_boundary() const {
     
+    
+    if (last() == Nx()-1) {
+	// hot radius is at the outer geometrical radius
+	return Mdot_out();
+    }
+    
+    // if the hot radius is less than geometrical and there is a cold ring, then it is important whether there is a scattering corona or not
+     
+    
     if (args().disk->DIM_front_approach == "outflow") {
-	//if (args().disk->boundcond == "Hameury") {
+	// there is an outward mass flow at the front; this negative rate  = factor * inner accretion rate during self-similar stage
+	
 	if (args().disk->scatter_by_corona == "yes") {
-	    // assuming there is scatter above the disc
-	    if (last() == Nx()-1) {
-		return Mdot_out();
-	    } else  {
-		return -1.0*args().disk->DIM_front_Mdot_factor*Mdot_in() + Mdot_out();
-		//-1.5 make Rfront/RMdot0 = 2
-		// -2.5; -2.3 makes very close to Hameury with =Tcrit = (8840. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ; and Tcrit = 10300.;
-	    }
+	    // there is scattering above the disc
+	    // there is actually an option to add Mdot_out() here .....
+	    return -1.0*args().disk->DIM_front_Mdot_factor*Mdot_in();
+	    //-1.5 make Rfront/RMdot0 = 2
+	    // -2.5; -2.3 makes very close to Hameury with =Tcrit = (8840. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ; and Tcrit = 10300.;
 	}
-	//if (args().disk->boundcond == "Hameury_no_scatter") {
+	
 	if (args().disk->scatter_by_corona == "no") {
-	    // if there is no scattering, the disc zone beyond maximum of Fvis (where dotM=0) is in the shadow
-	    // This means its temperature
-	    // if irradiation temperature is greater than critical, disc cannot be cold
-	    // Tirr is checked at Thot or Tfront, depending on option boundcond (scatter/no scatter),see Tirr_critical. 
-	    // If there is no scattering, the disc beyond r, where dotM=0, is in the shadow from the direct central radiation
+	    // if there is no scattering, the disc zone beyond maximum of Fvis (where dotM=0) is in the shadow from the direct central radiation
+	    // 
+	    // if irradiation temperature at Rhot is greater than critical, disc cannot be cold; but the ring outside Fvis=max is cold
+	    // that means at Rhot Mdot = 0;
+	    // Tirr is checked at Rhot,see Tirr_critical. 
 	    
-	    if ((last() == Nx()-1) or  (  Tirr().at(last()) >= Tirr_critical (R().at(last()), last()) ) ) {
-		return Mdot_out();
+	    if (  Tirr().at(last()) >= Tirr_critical (R().at(last()), last())  ) {
+		return (0.);
 	    } else  {
-	   //     std::cout << "CF!" << std::endl;
+		 // if irradiation is unable to keep the disc hot, there is a smooth transition zone up to R hot and there is an outflow at Rhot
 		return -1.0*args().disk->DIM_front_Mdot_factor*Mdot_in();
 		//-1.5 make Rfront/RMdot0 = 2
 		// -2.5; -2.3 makes very close to Hameury with =Tcrit = (8840. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ; and Tcrit = 10300.;
@@ -201,7 +208,9 @@ double FreddiState::obtain_Mdot_outer_boundary() const {
 	}
 	
     } 
-    // DIM_front_approach == "maxFvis" :
+    
+    // if DIM_front_approach is not DIM, then just return transfer rate
+    // DIM_front_approach == "maxFvis" : Mdot = 0 at the front; it is actually is set as incoming to the disc Mdot_ot;
     return Mdot_out();
     
 }
@@ -341,10 +350,10 @@ const vecd& FreddiState::Shadow() const {
         	const double Hrelative= Height()[i]/R()[i];
         	max_H2R = std::max(Hrelative, max_H2R);
 		if (Hrelative >= max_H2R) {
-       			x[i] = 0.0;
+       			x[i] = 0.0; // no shadow
 		} else {
 		    if (args().disk->scatter_by_corona == "no") {
-			x[i] = 1.0;
+			x[i] = 1.0; // the ring is in shadow, Qx will be 0
 		    }
 		}
 		// x[i] = 0.0; // @XRPCALCApril24
