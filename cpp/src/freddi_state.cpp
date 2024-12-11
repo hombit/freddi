@@ -951,6 +951,20 @@ double FreddiState::Rfront_Rhot (double r, double z_r) const {
 }
 
 
+
+void  FreddiState::find_R_max_where_Qirr_works () {
+    // determine radius inside Rhot, outside of  which irradiation is  significant:
+    // call  R_max_where_Qirr_works at the end of step in truncateOuterRadius
+    set_maxR_Qirr_no_role (0.);
+    for (size_t i = first(); i < last(); i++) {
+	if ( ( Tirr().at(i) / Tph_vis().at(i) > args().disk->Tirr2Tvishot ) &&                                                    (maxR_Qirr_no_role() == 0.) ) { 
+	    set_maxR_Qirr_no_role (R()[i]); 
+	}  
+    }
+}
+//current_.
+
+
 double FreddiState::Tirr_critical (double r, int ii) const {
     // determine critical level Tirr which keeps the ring hot.
     // if we analyse r=Rfront,  we should take into account that Rfront
@@ -976,9 +990,10 @@ double FreddiState::Tirr_critical (double r, int ii) const {
     double Qirr_Qvis = m::pow<4>(Tirr().at(ii) / Tph_vis().at(ii))*radius_popravka ;
     
     // determine radius, inside which irradiation is not significant:
-    if ( (Qirr_Qvis < m::pow<4>(args().disk->Tirr2Tvishot) ) && (current_.maxR_Qirr_no_role == 0.) ) {
+    //find_R_max_where_Qirr_works();
+    /*OLD   if ( (Qirr_Qvis < m::pow<4>(args().disk->Tirr2Tvishot) ) && (current_.maxR_Qirr_no_role == 0.) ) {
 	set_maxR_Qirr_no_role (r); 
-    }  
+    }*/  
     
     double Tcrit; // value to return
     

@@ -102,6 +102,9 @@ bool FreddiEvolution::check_ring_is_cold(const int ii) {
         }
     }
 
+    // determine radius, inside which irradiation is not significant:
+    find_R_max_where_Qirr_works();
+    
     if ((args().disk->boundcond == "Tirr") || (args().disk->boundcond == "Tirr_Ham??eury")) {
         if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "boundcond=Tirr="<<Tirr_critical (R().at(ii), ii) << std::endl;}
         if (Tirr().at(ii) >= Tirr_critical (R().at(ii), ii)) {

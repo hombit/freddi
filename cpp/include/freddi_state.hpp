@@ -335,7 +335,8 @@ public:
 	virtual double Lbol_disk() const;
 	virtual double Rfront_Rhot(double r, double z_r) const;
 	virtual double obtain_Mdot_outer_boundary() const;
-	virtual double Tirr_critical(double r, int ii) const;
+	virtual double Tirr_critical(double r, int ii) const ;
+	virtual void find_R_max_where_Qirr_works () ;
 	virtual void verify_disc_mass(double tau);
 	double phase_opt() const;
 // wind_
