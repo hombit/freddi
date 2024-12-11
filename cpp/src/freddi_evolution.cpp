@@ -74,7 +74,7 @@ void FreddiEvolution::truncateOuterRadius() {
 	do {
 	    ii--;
 	    if (ii <= first()) throw RadiusCollapseException();
-	}  while ( !check_ring_is_cold(ii) );
+	}  while ( check_ring_is_cold(ii) );
 	
 
 	if ( ii <= last() - 1 ){
