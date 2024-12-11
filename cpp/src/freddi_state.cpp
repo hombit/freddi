@@ -1040,6 +1040,7 @@ double FreddiState::Tirr_critical (double r, int ii) const {
 		if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_F Qirr/Qvis>1 with Tcrit(Rhot)=" << Tcrit << " ii="<<ii<<"\n" << std::endl;}
 
 	} else {
+	        Tcrit = (9040. - 2216.) * pow(radius_popravka,0.5) ;
 		if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_G Qirr/Qvis<1 with Tcrit(Rhot)=" << Tcrit << " ii="<<ii<<"\n" << std::endl;}
 
 	}
