@@ -177,6 +177,7 @@ double FreddiState::obtain_Mdot_outer_boundary() const {
     }
     
     // if the hot radius is less than geometrical and there is a cold ring, then it is important whether there is a scattering corona or not
+    // and if flag DIM_front_approach == "outflow"
      
     
     if (args().disk->DIM_front_approach == "outflow") {
@@ -1010,7 +1011,6 @@ double FreddiState::Tirr_critical (double r, int ii) const {
 	 // since we calculate critical level for irradiation temperature, we use the fact that Tirr ~ R(-1/2) (This is abs true only if Cirr = const)
 	Tcrit = args().disk->Thot * sqrt(radius_popravka);
 	
-// 	if (args().disk->boundcond == "no_scatter_by_corona") {
 	if (args().disk->scatter_by_corona == "no_") {    // @XRPCALCApril24
 	    // do not take into account Tirr if Qirr/Qvis< critical_value
 	    // and override previous assignment; instant return
@@ -1027,7 +1027,6 @@ double FreddiState::Tirr_critical (double r, int ii) const {
 	
     } else if ((args().disk->check_Temp_approach == "Tavleev")  || (args().disk->check_Temp_approach == "Hameury") ) { 
         
-        //if (args().disk->boundcond == "no_scatter_by_corona") {
 	if (args().disk->scatter_by_corona == "no_") { //   @XRPCALCApril24
 	    // if there is no scattering, the Rfront is in the shadow
 	    // do not take into account Tirr if Qirr/Qvis < critical_value:

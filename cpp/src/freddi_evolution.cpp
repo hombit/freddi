@@ -116,7 +116,6 @@ bool FreddiEvolution::check_ring_is_cold(const int ii) {
         }
     }
 
-    // only no_scatter_by_corona is possible ; everything else should be removed here:
     if (!(args().disk->boundcond == "DIM")) {
         throw std::invalid_argument("Wrong boundcond at check_ring_is_cold() in freddi_state");
     }
@@ -124,9 +123,8 @@ bool FreddiEvolution::check_ring_is_cold(const int ii) {
 
     if (  Tirr().at(ii) >= Tirr_critical (R().at(ii), ii) ) {
         // if irradiation temperature is greater than critical, disc cannot be cold
-        // Tirr is checked at Thot or Tfront, depending on option boundcond (scatter/no scatter),see Tirr_critical.
         // If there is no scattering, the disc beyond r, where dotM=0, is in the shadow from the direct central radiation
-        // In practice, temperature of the disc at R, where dotM=0, is checked against the critical temperature multiplied by some factor
+        
         if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_K Tirr high - HOT \n" << std::endl;}
         // memorise radius before shift of the hot boundary
         set_R_dotM0_before_shift( R().at(ii) );
