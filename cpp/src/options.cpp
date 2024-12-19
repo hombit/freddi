@@ -105,7 +105,7 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 				vm["DIM_front_Mdot_factor"].as<double>(),        
 				//vm["check_state_approach"].as<std::string>(),       
 				vm["check_Sigma_approach"].as<std::string>(),
-				vm["check_Temp_approach"].as<std::string>(),
+				vm["Tirr_crit_approach"].as<std::string>(),
 				vm["DIM_front_approach"].as<std::string>(),
 				vm["scatter_by_corona"].as<std::string>(),
 				vm["initialcond"].as<std::string>(),
@@ -190,14 +190,14 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 		if (vm.count("windPow") == 0) {
 			throw po::error("--windPow is required if --windtype=Woods1996");
 		}
-		if (vm.count("wind_Irr_ang_distribution") == 0) {
-			//vm["wind_Irr_ang_distribution"] = 0;
-		}
+// 		if (vm.count("wind_Irr_ang_distribution") == 0) {
+// 			vm["wind_Irr_ang_distribution"] = 0;
+// 		}
 		return {
 				{"Xi_max", vm["windXi_max"].as<double>()},
 				{"T_ic", vm["windT_ic"].as<double>()},
 				{"Pow", vm["windPow"].as<double>()},
-				{"IrAngDis", vm["wind_Irr_ang_distribution"].as<double>()}
+				{"IrAngDis", vm["wind_Irr_ang_distribution"].as<int>()}
 		};
 	}
 	if (windtype == "toy"){
@@ -228,17 +228,11 @@ po::options_description DiskStructureOptions::description() {
 					"  DIM: Tirr is checked when Qirr/Qvis>Qirr2Qvishot at Rfront or at R(dotM=0),see option scatter_by_corona (yes or no, respectively); cooling front moves afterwards\n")
 			( "Thot", po::value<double>()->default_value(default_Thot), "Minimum photosphere or irradiation temperature at the outer edge of the hot disk, Kelvin. For details see --boundcond description\n" )
 			( "Qirr2Qvishot", po::value<double>()->default_value(m::pow<4>(default_Tirr2Tvishot)), "Minimum Qirr / Qvis ratio at the outer edge of the hot disk to switch the control over the evolution of the hot disk radius: from temperature-based regime to Sigma-based cooling-front regime (see Lipunova et al. (2021, Section 2.4) and Eq. A.1 in Lasota et al. 2008; --alpha value is used for Sigma_plus and --alphacold value is used for Sigma_minus)\n" )
-			("Rfront_Mdotzero_factor", po::value<double>()->default_value(default_Rfront_Mdotzero_factor), "We check conditions for cooling front at current radius multiplied by Rfront_Mdotzero_factor\n" )
-			("DIM_front_Mdot_factor", po::value<double>()->default_value(default_DIM_front_Mdot_factor), "  = -Mdot(Rfront)/Mdot_in, see DIM_front_approach\n" )
 			//("check_state_approach", po::value<std::string>()->default_value(default_check_state_approach), "Type of checking whether the ring is hot or cold\n\n"
 			//		"Values:\n"
 			//		" before2024: original version, as published in Lipunova&Malanchev (2017); Lipunova et al (2022); Avakyan et al (2024)\n"
-			//		" logic: included option for checking conditions at radius different from the radius where accretion rate is zero. See boundcond, DIM_front_approach, scatter_by_corona,  check_Sigma_approach, and check_Temp_approach\n")
-			("check_Sigma_approach", po::value<std::string>()->default_value(default_check_Sigma_approach), "Type of checking Sigma for hot or cold state\n\n"
-					"Values:\n"
-					" simple: assume that Sigma is proportional to R^(-3/4) between radius where Mdot = 0 and the cooling fron radius\n"   
-					" Menou99a: assume that Sigma is 4.3 times less at the cooling front comparing to radius where Mdot = 0; See fig.8 of Menou et al. (1999 MNRAS 305, 79)\n" )
-			("check_Temp_approach", po::value<std::string>()->default_value(default_check_Temp_approach), "Type of checking irradiation temperature for hot or cold state\n\n"
+			//		" logic: included option for checking conditions at radius different from the radius where accretion rate is zero. See boundcond, DIM_front_approach, scatter_by_corona,  check_Sigma_approach, and Tirr_crit_approach\n")
+			("Tirr_crit_approach", po::value<std::string>()->default_value(default_Tirr_crit_approach), "Type of checking irradiation temperature for hot or cold state\n\n"
 					"Values:\n"
 					" const: assume that critical Tirr is constant, see --Thot, and --boundcond\n"   
 					" Tavleev: assume that critical Tirr depends on Qvis/Qirr, see Tavleev et al (2023)\n" 
@@ -247,10 +241,16 @@ po::options_description DiskStructureOptions::description() {
 					"Values:\n"
 					" maxFvis: Rhot corresponds to dot M = 0 \n"   
 					" outflow: there is an outflow from the hot zone at Rhot, see Rfront_Mdotzero_factor\n")
+			("DIM_front_Mdot_factor", po::value<double>()->default_value(default_DIM_front_Mdot_factor), "  = -Mdot(Rfront)/Mdot_in, see DIM_front_approach\n" )
 			("scatter_by_corona", po::value<std::string>()->default_value(default_scatter_by_corona), "Presence of scattering material above the disc allowing irradiation beyond highest H/R. This flag determines 1) when DIM_front_approach=outflow starts to work; 2) Tirr=0 when scatter_by_corona=\"no\" and the ring is not seen directly from the centre.\n\n"
 					"Values:\n"
 					" yes - condition 'outflow' for DIM_front_approach takes effect always when Rhot<Rtid\n"   
 					" no  - condition 'outflow' for DIM_front_approach takes effect when Rhot<Rtid and Tirr<Tirr_crit at R where dot M = 0 (i.e. only when cooling front began to move)\n")
+			("Rfront_Mdotzero_factor", po::value<double>()->default_value(default_Rfront_Mdotzero_factor), "Redundant! Do not change! We check conditions for cooling front at current radius multiplied by Rfront_Mdotzero_factor.\n" )
+			("check_Sigma_approach", po::value<std::string>()->default_value(default_check_Sigma_approach), "Redundant! Does not take effect when Rfront_Mdotzero_factor=1. Type of checking Sigma for hot or cold state\n\n"
+					"Values:\n"
+					" simple: assume that Sigma is proportional to R^(-3/4) between radius where Mdot = 0 and the cooling fron radius\n"   
+					" Menou99a: assume that Sigma is 4.3 times less at the cooling front comparing to radius where Mdot = 0; See fig.8 of Menou et al. (1999 MNRAS 305, 79)\n" )
 			( "initialcond", po::value<std::string>()->default_value(default_initialcond),
 					"Type of the initial condition for viscous torque F or surface density Sigma\n\n"
 					"Values:\n"
@@ -275,7 +275,7 @@ po::options_description DiskStructureOptions::description() {
 					"  Janiuk2015: super-Eddington wind from Janiuk et al 2015. Requires --windA_0 and --windB_1 to be specified\n"
 					"  Shields1986: thermal wind from Begelman et al. 1983 and Shields et al. 1986. Requires --windXi_max, --windT_ic and --windPow to be specified\n"
 					"  Woods1996AGN: thermal AGN wind from Woods et al. 1996. Requires --windC_0 and --windT_ic to be specified\n"
-					"  Woods1996: thermal wind from Woods et al. 1996. Requires --windXi_max, --windT_ic and --windPow to be specified. Optional parameter --wind_Irr_ang_distribution (0: isotropical central luminosity (default); 1: central luminosity is self-consistently described by option --angulardistdisk) \n"
+					"  Woods1996: thermal wind from Woods et al. 1996. Requires --windXi_max, --windT_ic and --windPow to be specified. See also parameter --wind_Irr_ang_distribution (0: isotropical central luminosity (default); 1: central luminosity is self-consistently described by option --angulardistdisk) \n"
 					"  toy: a toy wind model used in arXiv:2105.11974, the mass loss rate is proportional to the central accretion rate. Requires --windC_w to be specified\n")
 			( "windC_w", po::value<double>(), "The ratio of the mass loss rate due to wind to the central accretion rate, |Mwind|/Macc\n")
 			( "windR_w", po::value<double>(), "The ratio of the wind launch radius to the outer disk radius, Rwind/Rout\n")		
@@ -285,6 +285,7 @@ po::options_description DiskStructureOptions::description() {
 			( "windT_ic", po::value<double>(), "Inverse Compton temperature, K. Characterizes the hardness of the irradiating spectrum\n")
 			( "windPow", po::value<double>(), "Multiplicative coefficient to control wind power\n")
 			( "windC_0", po::value<double>(), "Characteristic column density of the wind mass loss rate from Woods et al. 1996 model, g/(s*cm^2). For AGN approx value is 3e-13 g/(s*cm^2)\n")
+			( "wind_Irr_ang_distribution", po::value<int>()->default_value(default_wind_Irr_ang_distribution), "Flag to take into account (1), or not (0, default), the angular distribution of central X-rays when calculating the illuminating X-ray flux which drives the thermal wind.\n" )
 			;
 	return od;
 }
@@ -297,8 +298,8 @@ SelfIrradiationOptions::SelfIrradiationOptions(const po::variables_map &vm, cons
 				vm["irrindexcold"].as<double>(),
 				vm["h2rcold"].as<double>(),
 				vm["angulardistdisk"].as<std::string>()) {
-	if (Cirr <= 0. && dsa_args.boundcond == "Tirr") {
-		throw po::error("Set positive --Cirr when --boundcond=Tirr");
+	if (Cirr <= 0. && ((dsa_args.boundcond == "Tirr") || (dsa_args.boundcond == "DIM")) ) {
+		throw po::error("Set positive --Cirr when --boundcond=Tirr or DIM");
 	}
 }
 

@@ -115,7 +115,7 @@ public:
 			double Mdotout,
 			const std::string& boundcond, double Thot, double Tirr2Tvishot,
 			double Rfront_Mdotzero_factor, double DIM_front_Mdot_factor, //const std::string& check_state_approach, 
-			const std::string& check_Sigma_approach, const std::string& check_Temp_approach,
+			const std::string& check_Sigma_approach, const std::string& Tirr_crit_approach,
 			const std::string& DIM_front_approach, const std::string& scatter_by_corona,
 			const std::string& initialcond,
 			std::optional<double> F0,

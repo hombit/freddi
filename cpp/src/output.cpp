@@ -17,6 +17,7 @@ FileOrStdoutStream::FileOrStdoutStream(const std::string& filename):
 
 template <class T>
 void outputHeader(std::basic_ostream<char>& os, const T& fields) {
+    
 	os << "#" << fields.at(0).name;
 	for (size_t i = 1; i < fields.size(); ++i) {
 		os << "\t" << fields[i].name;

@@ -83,10 +83,8 @@ void FreddiEvolution::truncateOuterRadius() {
 	}
 }
 
-
-//int FreddiState::ring_state_vertical(const int ii) {
 bool FreddiEvolution::check_ring_is_cold(const int ii) {
-    // returns false for hot, true for cold
+    // returns true for cold and false for hot
 
     // R().at(ii), the radius where Mdot = 0, or ?
     // multiplied by radius_popravka, gives the hot zone radius
@@ -135,8 +133,8 @@ bool FreddiEvolution::check_ring_is_cold(const int ii) {
         // if (args().disk->check_Sigma_approach == "Menou99a") { ?
         // when irradiation stops preventing hot-zone shrinking,
         // then conditions at Rfront matter:
+        
         // newest approach: radius_popravka = 1
-
         double radius_popravka = Rfront_Rhot( R().at(ii), oprel().Height(R()[ii], F()[ii])/R().at(ii));
 
 
@@ -176,10 +174,11 @@ bool FreddiEvolution::check_ring_is_cold(const int ii) {
                 // last = Nx-1 means that code collapses to a starting Rhot : all outer disc is cast COLD
                 if ( (last() == args().calc->Nx-1) || (current_.R_dotM0_before_shift == 0.) ) {
                     if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_O pop ="<<  radius_popravka << " Sigma is low and R_dotM0_before_shift=" << current_.R_dotM0_before_shift<< "- COLD \n" << std::endl;}
-                    return 1; // COLD
+//                     return 1; // COLD
                 } else {
-                    throw std::invalid_argument("check_ring_is_cold: logic mistake 1");
+                    //throw std::invalid_argument("check_ring_is_cold: logic mistake 1");
                 }
+                return 1; // COLD
             }
 // 		if ( last() < args().calc->Nx-1) {
 // 		    if (Sigma_plus(R().at(ii+1))== 0.)  { Sigma().at(ii)
@@ -192,9 +191,6 @@ bool FreddiEvolution::check_ring_is_cold(const int ii) {
 // 		    }
 // 		}
 // 		r????eturn 1;
-           
-                
-            
 
             //  R_cooling_front = r - v_cooling_front(r, sigma_at_r) * args().calc->tau;
 //   		if (radius_popravka <= args().disk->Rfront_Mdotzero_factor) {
@@ -208,21 +204,22 @@ bool FreddiEvolution::check_ring_is_cold(const int ii) {
             
             if  (current_.R_dotM0_before_shift == 0 ) {   // and 
                 // COLD ; just collapse to initial position:
-                return 1;
+                if (last() != args().calc->Nx-1) {
+                    throw std::invalid_argument("check_ring_is_cold: logic mistake 1.5");
+                }
+                return 1;  // COLD
             }
             
             
             if ((radius_popravka * R().at(ii) > R_cooling_front ( Rfront_Rhot(R()[last()], oprel().Height(R()[last()], F()[last()])/R()[last()] ) * R()[last()] , Sigma().at(last())*sigma_factor) )  && ( last() < args().calc->Nx-1)  ){
                 //radius is beyond front
                 if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "++c_P pop ="<< radius_popravka <<  " beyond front - COLD \n" << std::endl;}
-                // COLD
-                return 1;
+                return 1;// COLD
             } else {
                 if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "++c_Q pop ="<<  radius_popravka <<  " inwards front - HOT \n" << std::endl;}
                 // in fact front starts from a greater distance?
                 set_R_dotM0_before_shift( R().at(ii) );
-                // HOT
-                return false;
+                return false;// HOT
             }
         }
     }

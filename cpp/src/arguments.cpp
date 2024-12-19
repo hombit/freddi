@@ -28,6 +28,7 @@ constexpr const char DiskStructureArguments::default_scatter_by_corona[];
 constexpr const char DiskStructureArguments::default_DIM_front_approach[];
 constexpr const double DiskStructureArguments::mu;
 constexpr const char DiskStructureArguments::default_wind[];
+constexpr const int DiskStructureArguments::default_wind_Irr_ang_distribution;
 
 DiskStructureArguments::DiskStructureArguments(
 		const BasicDiskBinaryArguments &bdb_args,
@@ -37,7 +38,7 @@ DiskStructureArguments::DiskStructureArguments(
 		double Rfront_Mdotzero_factor, double DIM_front_Mdot_factor, 
 		//const std::string& check_state_approach, 
 		const std::string& check_Sigma_approach,
-		const std::string& check_Temp_approach,
+		const std::string& Tirr_crit_approach,
 		const std::string& DIM_front_approach,
 		const std::string& scatter_by_corona,
 		const std::string& initialcond,
@@ -54,7 +55,7 @@ DiskStructureArguments::DiskStructureArguments(
 		Thot(Thot),
 		Tirr2Tvishot(Tirr2Tvishot),
 		Rfront_Mdotzero_factor(Rfront_Mdotzero_factor), DIM_front_Mdot_factor(DIM_front_Mdot_factor), //check_state_approach(check_state_approach),
-		check_Sigma_approach(check_Sigma_approach), check_Temp_approach(check_Temp_approach),
+		check_Sigma_approach(check_Sigma_approach), Tirr_crit_approach(Tirr_crit_approach),
 		DIM_front_approach(DIM_front_approach),scatter_by_corona(scatter_by_corona),
 		initialcond(initialcond),
 		initial_F_function(initializeInitialFFunction(oprel,

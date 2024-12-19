@@ -173,11 +173,14 @@ double FreddiState::obtain_Mdot_outer_boundary() const {
     
     if (last() == Nx()-1) {
 	// hot radius is at the outer geometrical radius
+	// Rhot = Rtid
 	return Mdot_out();
     }
     
-    // if the hot radius is less than geometrical and there is a cold ring, then it is important whether there is a scattering corona or not
-    // and if flag DIM_front_approach == "outflow"
+    // if the hot radius is less than geometrical and there is a cold ring, 
+    // Rhot<Rtid
+    // then it is important whether there is a scattering corona or not
+    //                      and if flag DIM_front_approach == "outflow"
      
     
     if (args().disk->DIM_front_approach == "outflow") {
@@ -195,7 +198,7 @@ double FreddiState::obtain_Mdot_outer_boundary() const {
 	    // if there is no scattering, the disc zone beyond maximum of Fvis (where dotM=0) is in the shadow from the direct central radiation
 	    // 
 	    // if irradiation temperature at Rhot is greater than critical, disc cannot be cold; but the ring outside Fvis=max is cold
-	    // that means at Rhot Mdot = 0;
+	    // that means  that  Mdot = 0  at Rhot;
 	    // Tirr is checked at Rhot,see Tirr_critical. 
 	    
 	    if (  Tirr().at(last()) >= Tirr_critical (R().at(last()), last())  ) {
@@ -699,7 +702,7 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
     //const double m_ch0 = disk->Mdot0 / (M_PI * state.R().back()*state.R().back());
     const double L_edd = (4.0 * M_PI * state.GM()* 2.0 * disk->mu * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION);
     const double L_crit = (1.0 / 8.0) * std::sqrt(GSL_CONST_CGSM_MASS_ELECTRON / (disk->mu * GSL_CONST_CGSM_MASS_PROTON)) * std::sqrt((GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT* GSL_CONST_CGSM_SPEED_OF_LIGHT ) / (GSL_CONST_CGSM_BOLTZMANN * T_ic)) * L_edd;
-    const double el = L/L_crit;
+    double el = L/L_crit;
     
     
    //std::cerr << "\t" << Lcrit << "\t" << L_crit   << "\t" << std::endl;
@@ -708,10 +711,11 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
 
     for (size_t i = state.first(); i <= state.last(); ++i) {
         if (state.R()[i] > 0.1*R_iC) {
-	    
 	    if (IrAngDis) {
 		// Take account of the central flux angular distribution:
-		//el *= angular_dist_disk(state.Height()[i] / state.R()[i]) ; //  angular_dist_disk(state.Height()[i] / state.R()[i]) ; // disk_irr_source_->angular_dist(mu)
+		el *= state.angular_dist_disk(state.Height()[i] / state.R()[i]) ; 
+		//  angular_dist_disk(state.Height()[i] / state.R()[i]) ; 
+		// disk_irr_source_->angular_dist(mu)
 	    }
             //  1986ApJ...306...90S page 2
             const double xi = state.R()[i] / R_iC;
@@ -1007,7 +1011,7 @@ double FreddiState::Tirr_critical (double r, int ii) const {
     
     double Tcrit; // value to return
     
-    if (args().disk->check_Temp_approach == "const") { 
+    if (args().disk->Tirr_crit_approach == "const") { 
 	 // since we calculate critical level for irradiation temperature, we use the fact that Tirr ~ R(-1/2) (This is abs true only if Cirr = const)
 	Tcrit = args().disk->Thot * sqrt(radius_popravka);
 	
@@ -1025,7 +1029,7 @@ double FreddiState::Tirr_critical (double r, int ii) const {
 	    }
 	}
 	
-    } else if ((args().disk->check_Temp_approach == "Tavleev")  || (args().disk->check_Temp_approach == "Hameury") ) { 
+    } else if ((args().disk->Tirr_crit_approach == "Tavleev")  || (args().disk->Tirr_crit_approach == "Hameury") ) { 
         
 	if (args().disk->scatter_by_corona == "no_") { //   @XRPCALCApril24
 	    // if there is no scattering, the Rfront is in the shadow
@@ -1042,7 +1046,7 @@ double FreddiState::Tirr_critical (double r, int ii) const {
 	if (Qirr_Qvis > 1.) { 
 	        // since we calculate critical level for irradiation temperature, we use the fact that Tirr ~ R(-1/2) (This is completely true only if Cirr = const)
 		Tcrit = (9040. - 2216.* 1./Qirr_Qvis ) * sqrt(radius_popravka) ;
-		if (args().disk->check_Temp_approach == "Hameury") {
+		if (args().disk->Tirr_crit_approach == "Hameury") {
 		    Tcrit = (8640. - 2216.* 1./Qirr_Qvis ) * sqrt(radius_popravka) ;
 		}
 		if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_F Qirr/Qvis>1 with Tcrit(Rhot)=" << Tcrit << " ii="<<ii<<"\n" << std::endl;}
@@ -1052,7 +1056,7 @@ double FreddiState::Tirr_critical (double r, int ii) const {
 		if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_G Qirr/Qvis<1 with Tcrit(Rhot)=" << Tcrit << " ii="<<ii<<"\n" << std::endl;}
 
 	}
-	if (args().disk->check_Temp_approach == "Hameury") {
+	if (args().disk->Tirr_crit_approach == "Hameury") {
 	    if (ii < Nx()-1) {
 		// 
 		// if Rhot is less than Rtid, then critical temperature is fixed:
