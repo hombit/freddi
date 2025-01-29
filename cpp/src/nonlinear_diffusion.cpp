@@ -90,7 +90,7 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 		}
 	} while ((max_dif_rel(K_1, K_0, 1, last - 1) > eps) && (iter_sol <=maxiter));
 	 if (iter_sol >= maxiter) { 
-	     throw std::invalid_argument("Disc equation failed to converge.");
+	     throw std::invalid_argument("Disc equation failed to converge. If you set --initialcond=gaussF, try move gausssigma and gaussmu parameters");
 	     throw DiscEqFailException();
 	} 
 }
