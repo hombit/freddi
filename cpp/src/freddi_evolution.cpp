@@ -24,9 +24,11 @@ void FreddiEvolution::nonlinear_diffusion(const double tau) {
 			wunc(),
 			h(), current_.F,
 			first(), last());
+        
 }
 		
 void FreddiEvolution::step(const double tau) {
+         
 	//if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "cA_ t="<< [freddi]() {return sToDay(current_.t);}  <<"\n" << std::endl;}
 	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A_ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
 	truncateInnerRadius();

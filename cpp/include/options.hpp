@@ -91,7 +91,7 @@ std::optional<T> varToOpt(const po::variables_map& vm, const std::string& name) 
 template <typename Options>
 bool parseOptions(po::variables_map& vm, int ac, char* av[]) {
 	const std::string default_config_filename = "freddi.ini";
-
+	
 	const char* xdg_config_home = getenv("XDG_CONFIG_HOME");
 	std::string config_home;
 	if (xdg_config_home) {
@@ -123,14 +123,14 @@ bool parseOptions(po::variables_map& vm, int ac, char* av[]) {
 		std::ifstream config(path);
 		po::store(po::parse_config_file(config, desc), vm);
 	}
-
+	
 	try {
 		po::notify(vm);
 	} catch(po::error& e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 		return false;
 	}
-
+	
 	return true;
 }
 

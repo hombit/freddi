@@ -19,6 +19,7 @@ GeneralOptions::GeneralOptions(const po::variables_map& vm):
 
 po::options_description GeneralOptions::description() {
 	po::options_description od("General options:");
+	
 	od.add_options()
 			( "help,h", "Produce help message\n" )
 			( "config", po::value<std::string>(), "Set filepath for additional configuration file. There is no need to declare a configuration file with the default name freddi.ini\n" )
@@ -76,6 +77,7 @@ std::optional<double> BasicDiskBinaryOptions::riscoInitializer(const po::variabl
 
 po::options_description BasicDiskBinaryOptions::description() {
 	po::options_description od("Basic binary and disk parameters\n");
+	
 	od.add_options()
 			( "alpha,a", po::value<double>()->required(), "Alpha parameter of Shakura-Sunyaev model\n" )
 			( "alphacold", po::value<double>(), "Alpha parameter of cold disk, currently it is used only for the critical maximum value of the surface density of the cold disk Sigma_minus (Lasota et al., 2008, A&A 486, 523) and the cooling front velocity (Ludwig et al., 1994, A&A 290, 473), see --Qirr2Qvishot. Default value is --alpha divided by ten\n" )  // default_alpha_to_alphacold
@@ -89,6 +91,7 @@ po::options_description BasicDiskBinaryOptions::description() {
 			( "rout,R", po::value<double>(), "Outer radius of the disk, in units of solar radius. If it isn't set then the tidal radius is used, defined by --Mx, --Mopt and --period values as 90% of the Roche lobe radius (Papaloizou & Pringle, 1977, MNRAS, 181, 441; see also Artymowicz & Lubow, 1994, ApJ, 421, 651; http://xray.sai.msu.ru/~galja/images/tidal_radius.pdf)\n" )
 			( "risco", po::value<double>(), "Innermost stable circular orbit, in units of gravitational radius of the central object GM/c^2. If it isn't set then the radius of ISCO orbit is used defined by --Mx and --kerr values\n" )
 			;
+			
 	return od;
 }
 
@@ -217,6 +220,7 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 
 po::options_description DiskStructureOptions::description() {
 	po::options_description od(DiskStructureOptions::caption);
+	
 	od.add_options()
 			( "opacity,O", po::value<std::string>()->default_value(default_opacity), "Opacity law: Kramers (varkappa ~ rho / T^7/2) or OPAL (varkappa ~ rho / T^5/2)\n" )
 			( "Mdotout", po::value<double>()->default_value(default_Mdotout), "Accretion rate onto the disk through its outer radius\n" )
@@ -287,6 +291,7 @@ po::options_description DiskStructureOptions::description() {
 			( "windC_0", po::value<double>(), "Characteristic column density of the wind mass loss rate from Woods et al. 1996 model, g/(s*cm^2). For AGN approx value is 3e-13 g/(s*cm^2)\n")
 			( "wind_Irr_ang_distribution", po::value<int>()->default_value(default_wind_Irr_ang_distribution), "Flag to take into account (1), or not (0, default), the angular distribution of central X-rays when calculating the illuminating X-ray flux which drives the thermal wind.\n" )
 			;
+			
 	return od;
 }
 
@@ -305,6 +310,7 @@ SelfIrradiationOptions::SelfIrradiationOptions(const po::variables_map &vm, cons
 
 po::options_description SelfIrradiationOptions::description() {
 	po::options_description od("Parameters of self-irradiation:\nQirr = (1-shadow) * Cirr * (H/r / 0.05)^irrindex * L * psi / (4 pi R^2), where psi is the angular distribution of X-ray radiation; shadow can be 0 (default) or 1. When scatter_by_corona=\"no\", if h/r1 < max (h/r, r<r1), the ring r1 is not irradiatied from the centre: shadow = 1 \n");
+	
 	od.add_options()
 			( "Cirr", po::value<double>()->default_value(default_Cirr), "Irradiation factor for the hot disk\n" )
 			( "irrindex", po::value<double>()->default_value(default_irrindex), "Irradiation index for the hot disk\n" )
@@ -313,6 +319,7 @@ po::options_description SelfIrradiationOptions::description() {
 			( "h2rcold", po::value<double>()->default_value(default_height_to_radius_cold), "Semi-height to radius ratio for the cold disk\n" )
 			( "angulardistdisk", po::value<std::string>()->default_value(default_angular_dist_disk), "Angular distribution of the disk X-ray radiation. Values: isotropic (Psi=1), plane (Psi=2z/R)\n" )
 			;
+			
 	return od;
 }
 
@@ -334,6 +341,7 @@ vecd FluxOptions::lambdasInitializer(const po::variables_map &vm) {
 	if (vm.count("lambda") == 0) {
 		return vecd();
 	}
+	
 	vecd lambdas(vm["lambda"].as<vecd>());
 	transform(lambdas.begin(), lambdas.end(), lambdas.begin(), angstromToCm);
 	return lambdas;
@@ -352,6 +360,7 @@ std::vector<Passband> FluxOptions::passbandsInitializer(const po::variables_map&
 			throw po::invalid_option_value("Passband file doesn't exist");
 		}
 	}
+	
 	return passbands;
 }
 
@@ -370,6 +379,7 @@ po::options_description FluxOptions::description() {
 			( "lambda", po::value<vecd>()->multitoken()->composing(), "Wavelength to calculate Fnu, Angstrom. You can use this option multiple times. For each lambda one additional column with values of spectral flux density Fnu [erg/s/cm^2/Hz] is produced\n" )
 			( "passband", po::value<std::vector<std::string>>()->multitoken()->composing(), "Path of a file containing tabulated passband, the first column for wavelength in Angstrom, the second column for transmission factor, columns should be separated by spaces\n" )
 			;
+			
 	return od;
 }
 
@@ -386,6 +396,7 @@ CalculationOptions::CalculationOptions(const po::variables_map &vm):
 	if (gridscale != "log" && gridscale != "linear") {
 		throw po::invalid_option_value("Invalid --gridscale value");
 	}
+	
 }
 
 std::optional<double> CalculationOptions::tauInitializer(const po::variables_map& vm) {
@@ -416,22 +427,36 @@ FreddiOptions::FreddiOptions(const po::variables_map& vm) {
 		&& (vm.count("Mx") == 0 || vm.count("Topt") == 0 || vm.count("Mopt") == 0 || vm.count("period") == 0)) {
 		throw po::invalid_option_value("--starflux requires --Mx, --Mopt and --period to be specified");
 	}
-
+	
 	general.reset(new GeneralOptions(vm));
+	
 	basic.reset(new BasicDiskBinaryOptions(vm));
+	
 	disk.reset(new DiskStructureOptions(vm, *basic));
+	
 	irr.reset(new SelfIrradiationOptions(vm, *disk));
+	
 	flux.reset(new FluxOptions(vm));
+	
 	calc.reset(new CalculationOptions(vm));
+	
+	
 }
 
 po::options_description FreddiOptions::description() {
 	po::options_description desc("Freddi: numerical calculation of accretion disk evolution");
+	
 	desc.add(GeneralOptions::description());
+	
 	desc.add(BasicDiskBinaryOptions::description());
+	
 	desc.add(DiskStructureOptions::description());
+	
 	desc.add(SelfIrradiationOptions::description());
+	
 	desc.add(FluxOptions::description());
+	
 	desc.add(CalculationOptions::description());
+	
 	return desc;
 }

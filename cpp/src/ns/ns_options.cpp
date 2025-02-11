@@ -18,7 +18,6 @@ NeutronStarOptions::NeutronStarOptions(const po::variables_map &vm):
 
 pard NeutronStarOptions::fpparamsInitializer(const po::variables_map& vm) {
 	const auto fptype = vm["fptype"].as<std::string>();
-
 	if (fptype == "no-outflow") {
 		return {};
 	}
@@ -51,13 +50,12 @@ pard NeutronStarOptions::fpparamsInitializer(const po::variables_map& vm) {
 			{"par2", par2},
 		};
 	}
-
 	throw po::invalid_option_value("Unknown --fptype=" + fptype);
 }
 
 pard NeutronStarOptions::kappatparamsInitalizer(const po::variables_map &vm) {
 	const auto kappattype = vm["kappattype"].as<std::string>();
-
+        
 	if (kappattype == "const") {
 		if (vm.count("kappat-const-value") == 0) {
 			throw po::error("--kappat-const-value is required if --kappattype=const");
@@ -108,6 +106,7 @@ pard NeutronStarOptions::kappatparamsInitalizer(const po::variables_map &vm) {
 
 po::options_description NeutronStarOptions::description() {
 	po::options_description od("Parameters of accreting neutron star:\n");
+	
 	od.add_options()
 			( "nsprop", po::value<std::string>()->default_value(default_nsprop),
 					"Neutron star properties name: defines geometry (default values of --Rx, --Risco, and --freqx) and accretion->radiation efficiency of NS\n\n"
@@ -151,6 +150,7 @@ po::options_description NeutronStarOptions::description() {
 					"  off: gravitational redshift is not taken into account\n"
 					"  on: redshift is (1 - R_sch / Rx), where R_sch = 2GM/c^2\n" )
 			;
+			
 	return od;
 }
 
@@ -171,6 +171,7 @@ NeutronStarBasicDiskBinaryOptions::NeutronStarBasicDiskBinaryOptions(const po::v
 				BasicDiskBinaryOptions::riscoInitializer(vm)) {}
 
 po::options_description NeutronStarBasicDiskBinaryOptions::description() {
+	
 	return BasicDiskBinaryOptions::description();
 }
 
@@ -204,7 +205,9 @@ NeutronStarDiskStructureOptions::NeutronStarDiskStructureOptions(const po::varia
 
 po::options_description NeutronStarDiskStructureOptions::description() {
 	auto non_ns_od = DiskStructureOptions::description();
+	
 	po::options_description od(DiskStructureOptions::caption);
+	
 	for (const auto &non_ns_option : non_ns_od.options()) {
 		if (non_ns_option->long_name() == "initialcond") {
 			od.add_options()
@@ -214,6 +217,7 @@ po::options_description NeutronStarDiskStructureOptions::description() {
 			od.add(non_ns_option);
 		}
 	}
+	
 	return od;
 }
 
@@ -227,6 +231,7 @@ NeutronStarSelfIrradiationOptions::NeutronStarSelfIrradiationOptions(const po::v
 				vm["h2rcold"].as<double>(),
 				vm["angulardistdisk"].as<std::string>(),
 				vm["angulardistns"].as<std::string>()) {
+	
 	if (Cirr <= 0. && dsa_args.boundcond == "Tirr") {
 		throw po::error("Set positive --Cirr when --boundcond=Tirr");
 	}
@@ -243,7 +248,6 @@ po::options_description NeutronStarSelfIrradiationOptions::description() {
 
 FreddiNeutronStarOptions::FreddiNeutronStarOptions(const po::variables_map &vm) {
 	ns.reset(new NeutronStarOptions(vm));
-
 	general.reset(new GeneralOptions(vm));
 	basic.reset(new NeutronStarBasicDiskBinaryOptions(vm, *ns));
 	disk.reset(new NeutronStarDiskStructureOptions(vm, *ns, *basic));

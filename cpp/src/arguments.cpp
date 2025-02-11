@@ -75,7 +75,7 @@ std::shared_ptr<DiskStructureArguments::InitialFFunction> DiskStructureArguments
 		if (!F0 && !Mdisk0 && !Mdot0) {
 			throw std::runtime_error("One of F0, Mdisk0 or Mdot0 must be specified");
 		}
-
+		
 		const double h_in = bdb_args.h(bdb_args.rin);
 		const double h_out = bdb_args.h(bdb_args.rout);
 
