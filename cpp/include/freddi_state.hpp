@@ -332,8 +332,9 @@ public:
 	inline double omega_R(double r) const { return std::sqrt(GM() / (r*r*r)); }
 	inline double omega_i(size_t i) const { return omega_R(R()[i]); }
 	virtual double Mdot_in() const;
-	virtual double Lbol_disk() const;
-	virtual double Rfront_Rhot(double r, double z_r) const;
+    virtual double Mdot_out_from_F() const;
+    virtual double Lbol_disk() const;
+    virtual double Rfront_Rhot(double r, double z_r) const;
 	virtual double obtain_Mdot_outer_boundary() const;
 	virtual double Tirr_critical(double r, int ii) const ;
 	virtual void find_R_max_where_Qirr_works () ;

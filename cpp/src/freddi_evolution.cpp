@@ -6,6 +6,7 @@
 #include "arguments.hpp"
 #include "exceptions.hpp"
 #include "nonlinear_diffusion.hpp"
+#include <boost/math/tools/minima.hpp>
 
 #define VERB_LEVEL_MESSAGES 30 
 
@@ -26,6 +27,86 @@ void FreddiEvolution::nonlinear_diffusion(const double tau) {
 			first(), last());
         
 }
+
+void FreddiEvolution::nonlinear_diffusion_outer_condition_depends_Mdotin(const double tau) {
+    
+    vecd Fvis_start = current_.F;
+
+    //set_Mdot_outer_boundary(obtain_Mdot_outer_boundary());
+    double current_Mdot_outer_boundary = Mdot_outer_boundary();
+    //std::printf("(1) current_Mdot_outer_boundary: %e | Mdot_in: %e  %e\n",  current_Mdot_outer_boundary, Mdot_in(),current_Mdot_outer_boundary/Mdot_in() );
+
+	std::uintmax_t maxit = 100;
+	double left = 0.2;
+	double right = 2.;
+    
+	std::cout.precision(10);
+    int bits = 12;
+    int iteration = 0;
+    //double Mdot_out_from_F ;
+    //double Mdot_in;
+    // 2. Define the lambda (the function to minimize)
+	auto objective_function = [this, &iteration, &Fvis_start, &current_Mdot_outer_boundary, tau](double coef) {
+		iteration++;
+		
+        // Reset state for this specific guess
+		current_.F = Fvis_start;
+        //current_Mdot_outer_boundary = Mdot_outer_boundary();
+        //std::printf("2a Mdot_in: %e Mdot_out: %e coef=%.6f\n",   Mdot_in(), current_Mdot_outer_boundary/Mdot_in(),coef);
+        
+        //printf (" Fs before: %e %e %e %e\n", current_.F[first()], current_.F[first()+1], current_.F[last()-1], current_.F[last()]);
+		// Run the physics
+		nonlinear_diffusion_nonuniform_wind_1_2(
+			args().calc->tau, args().calc->eps,
+			F_in(), coef*current_Mdot_outer_boundary,
+			windA(), windB(), windC(),
+			wunc(),
+			h(), current_.F,
+			first(), last()
+		);
+
+
+        //printf (" Fs  after: %e %e %e %e\n", current_.F[first()], current_.F[first()+1], current_.F[last()-1], current_.F[last()]);
+
+        //double coef_after = current_Mdot_outer_boundary/Mdot_in();
+        double Mdot_calc_from_F = Mdot_out_from_F();
+        //Mdot_out_from_F = Mdot_calc_from_F;
+        //Mdot_in = Mdot_in();
+        //std::printf("2b Mdot_in: %e Mdot_out_calc: %e coef_after %e\n",   Mdot_in(),  Mdot_calc_from_F, coef_after);
+        
+		// Calculate from Mdot_in  appropriate Mdot_out_boundary
+        set_Mdot_outer_boundary(obtain_Mdot_outer_boundary());
+
+        double iter_Mdot_outer_boundary = Mdot_outer_boundary();
+        
+
+		double Answer = iter_Mdot_outer_boundary;
+		// compare two values of Mdot_out_boundary
+		double Answer_div = 1.0 - iter_Mdot_outer_boundary / Mdot_calc_from_F;
+		
+		//double result = std::pow(Answer_div, 2);
+        double result = std::fabs(Answer_div);
+		// 3. Print INSIDE the lambda so it logs every step Brent takes
+		//std::printf("Iter: %3d| coef: %f | now_Mdot_outer_boundary: %e | result: %e | previous_Mdot_outer_bound: %e Mdot_out_from_F %e check %e\n", iteration, coef, Answer, result, current_Mdot_outer_boundary, Mdot_calc_from_F, Mdot_calc_from_F/Mdot_in());
+        //std::printf("Iter: %3d| coef: %f \n", iteration, coef);
+		return result; 
+	};
+    // 4. Now call the solver using the name of the lambda
+	std::pair<double, double> brent_result = boost::math::tools::brent_find_minima(objective_function, left, right, bits, maxit);
+    // The final result found by Brent
+    
+	//std::cout << "---------------SEARCH FINISHED. Best : " << brent_result.first << " Min Error: " << brent_result.second << std::endl;
+    
+    double m1 = Mdot_out_from_F();
+    double m2 = Mdot_in();
+    
+    if (std::fabs((std::fabs(m1/m2) - args().disk->DIM_front_Mdot_factor)> 0.01 ))  {
+
+         std::printf("(W) RESULT factor current_Mdot_outer_boundary/Mdot_in:  %e for Mdot_in=%; required=%.3e\n", m1/m2,  m2, args().disk->DIM_front_Mdot_factor);
+         //std::getchar();  
+    }
+    
+}
 		
 void FreddiEvolution::step(const double tau) {
          
@@ -37,8 +118,13 @@ void FreddiEvolution::step(const double tau) {
 	
 	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A__ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
 	
-	nonlinear_diffusion(tau);
-	/*nonlinear_diffusion_nonuniform_wind_1_2(
+	if (Mdot_outer_boundary() == 0.0) {
+        nonlinear_diffusion(tau);
+    } else {
+        nonlinear_diffusion_outer_condition_depends_Mdotin(tau);
+    }
+	
+    /*nonlinear_diffusion_nonuniform_wind_1_2(
 			args().calc->tau, args().calc->eps,
 			F_in(), Mdot_outer_boundary(),
 			windA(), windB(), windC(),

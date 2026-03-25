@@ -220,9 +220,15 @@ double FreddiState::obtain_Mdot_outer_boundary() const {
 }
 
 double FreddiState::Mdot_in() const {
+	//std::cout << "****\n" << std::endl;
 	return (F()[first() + 1] - F()[first()]) / (h()[first() + 1] - h()[first()]);
 }
 
+
+double FreddiState::Mdot_out_from_F() const {
+	//std::cout << "*calc out Mdot ***\n" << std::endl;
+	return (F()[last()] - F()[last()-1] ) / (h()[last()] - h()[last()-1]);
+}
 
 double FreddiState::Lbol_disk() const {
 	return eta() * Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);

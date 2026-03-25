@@ -535,6 +535,7 @@ void FreddiNeutronStarEvolution::nonlinear_diffusion(const double tau) {
 */
 
 double FreddiNeutronStarEvolution::Mdot_in() const {
+	//std::cout << "NS *** in Mdot_in "<< " inner:" << F()[first()] <<" inner+1:" << F()[first() + 1] << std::endl;
 	const double dF_dh = (F()[first() + 1] - F()[first()]) / (h()[first() + 1] - h()[first()]);
 	return dF_dh + dFmagn_dh()[first()];
 }

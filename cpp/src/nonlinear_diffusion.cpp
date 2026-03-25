@@ -28,7 +28,7 @@ double max_dif_rel(const vecd &A, const vecd &B, size_t first, size_t last){
 
 // \frac{dw}{dt}=\frac{d^2y}{dx^2} + A\frac{dy}{dx} + By + C, y=y(x,t) — ?, w = w (x,y)
 
-void nonlinear_diffusion_nonuniform_wind_1_2 (
+void nonlinear_diffusion_nonuniform_wind_1_2_ (
 		const double tau,
 		const double eps, // relative error for w
 		const double left_bounder_cond, // y(left_border,Time+tau) = left_bounder_cond
@@ -68,6 +68,7 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 	double c;
 	int iter_sol = 0;
 	int maxiter = 100;
+	int flag_F_negative = 0;
 	do {
 		iter_sol++;
 		K_0 = K_1;
@@ -78,19 +79,128 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 			alpha[i + 1] = b[i] / (c - alpha[i] * a[i]);
 			beta[i + 1] = (beta[i] * a[i] + f[i]) / (c - alpha[i] * a[i]);
 		}
+		//std::printf("right_bound_cond: %e\n", right_bounder_cond );
 		y[last] = ((x[last] - x[last - 1]) * right_bounder_cond + f[last] + beta[last] * a[last]) /
 				   (c0[last] + K_1[last] - alpha[last] * a[last]);
 		for (size_t i = last - 1; i > first; --i) {
 			y[i] = alpha[i + 1] * y[i + 1] + beta[i + 1];
+			if (i == last-1) {std::printf("ys: %e %e\n", y[i], y[i+1] );}
 		}
+		if (y[last]<0) {flag_F_negative = 1; }
 		y[first] = left_bounder_cond;
 		W = wunc(x, y, first + 1, last);
 		for (size_t i = 1; i <= last - 1; ++i) {
 			K_1[i] = frac[i] * W[i] / y[i];
 		}
 	} while ((max_dif_rel(K_1, K_0, 1, last - 1) > eps) && (iter_sol <=maxiter));
+	 std::printf ("flag_F_negative=%d  ", flag_F_negative);
 	 if (iter_sol >= maxiter) { 
 	     throw std::invalid_argument("Disc equation failed to converge. If you set --initialcond=gaussF, try move gausssigma and gaussmu parameters");
 	     throw DiscEqFailException();
 	} 
+}
+
+void nonlinear_diffusion_nonuniform_wind_1_2 (
+        const double tau,
+        const double eps,
+        const double left_bounder_cond,
+        const double right_bounder_cond, // original input
+        const vecd &A,
+        const vecd &B,
+        const vecd &C,
+        const std::function<vecd (const vecd &, const vecd &, size_t, size_t)>& wunc,
+        const vecd &x,
+        vecd &y,
+        size_t first, size_t last 
+) {
+    // 1. Create a working copy of the right boundary condition and the initial y state
+    double current_right_bc = right_bounder_cond;
+    vecd initial_y_guess = y; // Save state to reset if we have to retry
+    
+    bool physics_valid = false;
+    int retry_count = 0;
+    const int max_retries = 100; // Prevent infinite loop if F stays negative
+
+    while (!physics_valid && retry_count < max_retries) {
+        // Reset y to the state it was in before this specific attempt
+        y = initial_y_guess;
+        
+        // --- Original Logic Starts ---
+        auto W = wunc(x, y, first + 1, last);
+        vecd K_0(last + 1), K_1(last + 1), frac(last + 1), a(last + 1), b(last + 1), c0(last + 1), f(last + 1);
+        
+        for (size_t i = first + 1; i <= last - 1; ++i) {
+            a[i] = (x[i + 1] - x[i]) / (x[i + 1] - x[i - 1]) * (2.0 - A[i] * (x[i + 1] - x[i]));
+            b[i] = (x[i] - x[i - 1]) / (x[i + 1] - x[i - 1]) * (2.0 + A[i] * (x[i] - x[i - 1]));
+            c0[i] = 2.0 - A[i] * (x[i + 1] - 2 * x[i] + x[i - 1]) - B[i] * (x[i + 1] - x[i]) * (x[i] - x[i - 1]);
+            frac[i] = (x[i + 1] - x[i]) * (x[i] - x[i - 1]) / tau;
+        }
+        
+        a[last] = 1 - 0.5 * A[last] * (x[last] - x[last - 1]);
+        c0[last] = a[last] - 0.5 * B[last] * (x[last] - x[last - 1]) * (x[last] - x[last - 1]);
+        frac[last] = (x[last] - x[last - 1]) * (x[last] - x[last - 1]) * 0.5 / tau;
+        
+        for (size_t i = first + 1; i <= last; ++i) {
+            f[i] = frac[i] * (W[i] + tau * C[i]);
+        }
+        for (size_t i = first + 1; i <= last - 1; ++i) {
+            K_1[i] = f[i] / y[i];
+        }
+        K_1[last] = frac[last] * W[last] / y[last];
+
+        vecd alpha(last + 1), beta(last + 1);
+        double c;
+        int iter_sol = 0;
+        int maxiter = 100;
+        int flag_F_negative = 0;
+
+        do {
+            iter_sol++;
+            K_0 = K_1;
+            alpha[first + 1] = 0.;
+            beta[first + 1] = left_bounder_cond;
+            for (size_t i = first + 1; i <= last - 1; ++i) {
+                c = c0[i] + K_1[i];
+                alpha[i + 1] = b[i] / (c - alpha[i] * a[i]);
+                beta[i + 1] = (beta[i] * a[i] + f[i]) / (c - alpha[i] * a[i]);
+            }
+
+            // Use the current_right_bc instead of the constant input
+            y[last] = ((x[last] - x[last - 1]) * current_right_bc + f[last] + beta[last] * a[last]) /
+                       (c0[last] + K_1[last] - alpha[last] * a[last]);
+            
+            flag_F_negative = 0; // Reset flag for this iteration
+            for (size_t i = last - 1; i > first; --i) {
+                y[i] = alpha[i + 1] * y[i + 1] + beta[i + 1];
+                if (y[i] < 0) flag_F_negative = 1; // Check all points for physical validity
+            }
+            if (y[last] < 0) flag_F_negative = 1;
+
+            y[first] = left_bounder_cond;
+            W = wunc(x, y, first + 1, last);
+            for (size_t i = 1; i <= last - 1; ++i) {
+                K_1[i] = frac[i] * W[i] / y[i];
+            }
+        } while ((max_dif_rel(K_1, K_0, 1, last - 1) > eps) && (iter_sol <= maxiter));
+        // --- Original Logic Ends ---
+
+        // Check if we need to restart due to unphysical results
+        if (flag_F_negative == 1) {
+            current_right_bc *= 0.99; // Decrease by 1%
+            retry_count++;
+            //std::printf("Unphysical F detected. Retrying with right_bc = %e (Retry %d)\n", current_right_bc, retry_count);
+			//std::getchar();
+			iter_sol = 0;
+        } else {
+            physics_valid = true; // Success!
+        }
+
+        if (iter_sol >= maxiter) {
+            throw std::invalid_argument("Disc equation failed to converge within maxiter.");
+        }
+    }
+
+    if (retry_count >= max_retries) {
+        throw std::runtime_error("Exceeded max retries attempting to fix negative F.");
+    }
 }
