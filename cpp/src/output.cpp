@@ -221,6 +221,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Fx", "erg/s/cm^2", "X-ray flux of the disk in the given energy range [emin, emax]", [freddi]() {return freddi->Lx() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
 			{"Fbol", "erg/s/cm^2", "Bolometric flux of the disk", [freddi]() {return freddi->Lbol_disk() * freddi->angular_dist_disk(freddi->cosi()) / (FOUR_M_PI * m::pow<2>(freddi->distance()));}},
 			{"Rfront_Rhot", "float", "Ratio of cooling front radius to radius with dotM=0", [freddi]() {return freddi->Rfront_Rhot(freddi->R()[freddi->last()], freddi->Height()[freddi->last()] / freddi->R()[freddi->last()]);}},
+			{"Mdot_Rhot_Mdot_in", "float", "Accretion rate at the cooling front radius divided by central accretion rate", [freddi]() {return freddi->Mdot_out_from_F()/freddi->Mdot_in();}},
 	};
 	const bool cold_disk = freddi->args().flux->cold_disk;
 	const bool star = freddi->args().flux->star;

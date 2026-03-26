@@ -35,7 +35,7 @@ void FreddiEvolution::nonlinear_diffusion_outer_condition_depends_Mdotin(const d
     //set_Mdot_outer_boundary(obtain_Mdot_outer_boundary());
     double current_Mdot_outer_boundary = Mdot_outer_boundary();
     //std::printf("(1) current_Mdot_outer_boundary: %e | Mdot_in: %e  %e\n",  current_Mdot_outer_boundary, Mdot_in(),current_Mdot_outer_boundary/Mdot_in() );
-
+    
 	std::uintmax_t maxit = 100;
 	double left = 0.2;
 	double right = 2.;
@@ -102,7 +102,7 @@ void FreddiEvolution::nonlinear_diffusion_outer_condition_depends_Mdotin(const d
     
     if (std::fabs((std::fabs(m1/m2) - args().disk->DIM_front_Mdot_factor)> 0.01 ))  {
 
-         std::printf("(W) RESULT factor current_Mdot_outer_boundary/Mdot_in:  %e for Mdot_in=%; required=%.3e\n", m1/m2,  m2, args().disk->DIM_front_Mdot_factor);
+         std::printf("(W) RESULT factor current_Mdot_outer_boundary/Mdot_in:  %e for Mdot_in=%e; required=%.3e\n", m1/m2,  m2, args().disk->DIM_front_Mdot_factor);
          //std::getchar();  
     }
     
