@@ -156,23 +156,23 @@ private:
 		virtual Woods1996AGNWind* clone() const override { return new Woods1996AGNWind(*this); }
 		virtual void update(const FreddiState&) override;
 	};
-
-	class Woods1996ShieldsApproxWind : public BasicWind {
-	//D. T. Woods, R. I. Klein, J. I. Castor, C. F. McKee, and J. B. Bell. X-Ray–heated Coronae andWinds from Accretion Disks: Time-dependent Two-dimensional Hydrodynamics with AdaptiveMesh Refinement. ApJ, 461:767, April 1996
-	//doi:10.1086/177101
-	private:
-		// windparams
-		const double Xi_max;
-		const double T_ic;
-		const double Pow;
-		const double IrAngDis;
-	public:
-		explicit Woods1996ShieldsApproxWind(const FreddiState& state);
-		~Woods1996ShieldsApproxWind() override = default;
-		Woods1996ShieldsApproxWind(const Woods1996ShieldsApproxWind&) = default;
-		virtual Woods1996ShieldsApproxWind* clone() const override { return new Woods1996ShieldsApproxWind(*this); }
-		virtual void update(const FreddiState&) override;
-	};
+	public: // to make it accesible in ns_evolution
+		class Woods1996ShieldsApproxWind : public BasicWind {
+		//D. T. Woods, R. I. Klein, J. I. Castor, C. F. McKee, and J. B. Bell. X-Ray–heated Coronae andWinds from Accretion Disks: Time-dependent Two-dimensional Hydrodynamics with AdaptiveMesh Refinement. ApJ, 461:767, April 1996
+		//doi:10.1086/177101
+		protected:
+			// windparams , changed from private to protectes to make them accesible in ns_evolution
+			const double Xi_max;
+			const double T_ic;
+			const double Pow;
+			const double IrAngDis;
+		public:
+			explicit Woods1996ShieldsApproxWind(const FreddiState& state);
+			~Woods1996ShieldsApproxWind() override = default;
+			Woods1996ShieldsApproxWind(const Woods1996ShieldsApproxWind&) = default;
+			virtual Woods1996ShieldsApproxWind* clone() const override { return new Woods1996ShieldsApproxWind(*this); }
+			virtual void update(const FreddiState&) override;
+		};
 	
 	class PeriodPaperWind : public BasicWind {
 	// Avakyan, 2021

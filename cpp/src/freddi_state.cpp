@@ -835,7 +835,8 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
     BasicWind::update(state);
     const auto disk = state.args().disk;
     
-    const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta() ;
+    // const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta() ;
+	const double L = state.Lbol_disk();
     const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_ic);
     //const double VeL = std::sqrt(state.GM()/R_iC) ;
     //const double C_iC = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_ic)/( GSL_CONST_CGSM_MASS_PROTON));
@@ -844,18 +845,13 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
     const double L_crit = (1.0 / 8.0) * std::sqrt(GSL_CONST_CGSM_MASS_ELECTRON / (disk->mu * GSL_CONST_CGSM_MASS_PROTON)) * std::sqrt((GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT* GSL_CONST_CGSM_SPEED_OF_LIGHT ) / (GSL_CONST_CGSM_BOLTZMANN * T_ic)) * L_edd;
     double el = L/L_crit;
     
-    
-   //std::cerr << "\t" << Lcrit << "\t" << L_crit   << "\t" << std::endl;
-
-    //std::cerr << "\t" << L << " \t" << L_edd << "\t" << L/L_edd  << "\t" << L_crit << "\t" << R_iC << "\t" << state.eta() << "\t" << std::endl;
-
     for (size_t i = state.first(); i <= state.last(); ++i) {
         if (state.R()[i] > 0.1*R_iC) {
 	    if (IrAngDis) {
-		// Take account of the central flux angular distribution:
-		el *= state.angular_dist_disk(state.Height()[i] / state.R()[i]) ; 
-		//  angular_dist_disk(state.Height()[i] / state.R()[i]) ; 
-		// disk_irr_source_->angular_dist(mu)
+			// Take account of the central flux angular distribution:
+			el *= state.angular_dist_disk(state.Height()[i] / state.R()[i]) ; 
+			//  angular_dist_disk(state.Height()[i] / state.R()[i]) ; 
+			// disk_irr_source_->angular_dist(mu)
 	    }
             //  1986ApJ...306...90S page 2
             const double xi = state.R()[i] / R_iC;
@@ -865,13 +861,11 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
             const double C0 = (4.0 * M_PI * m::pow<3>(state.h()[i])) / (m::pow<2>(state.GM()));
             const double Fr =
                     L / (4.0 * M_PI * m::pow<2>(state.R()[i]) * Xi_max * C_ch * GSL_CONST_CGSM_SPEED_OF_LIGHT);
-//const double Fc = std::pow(((1.0 + ( ((0.125 * el + 0.00382)/ xi) *((0.125 * el + 0.00382)/ xi) ))/( 1 + 1/( (el*el*el*el*(1 + 262.0*xi*xi))*(el*el*el*el*(1 + 262.0*xi*xi)) ) ) ), 1.0/6.0) ;
+
             const double Fc = ((std::pow((1 + m::pow<2>(((0.125 * el + 0.00382) * xi1))), (1.0 / 6.0))) /
                                std::pow((1 + m::pow<-2>((m::pow<4>(el)* (1.0 + 262.0 * m::pow<2>(xi))))),
                                         (1.0 / 6.0)));
-	    //const double Fc = ((std::pow((1 + std::pow(((0.125 * el + 0.00382) * xi1), 2.0)), (1.0 / 6.0))) /
-              //                 std::pow((1 + std::pow((el * el * el * el * (1.0 + 262.0 * xi * xi)), -2.0)),
-                //                        (1.0 / 6.0)));
+	    
             const double Expo = std::exp(-(((1.0 - (1 / std::sqrt(1.0 + 0.25 * m::pow<2>(xi1)))) *
                                             (1.0 - (1 / std::sqrt(1.0 + 0.25 * m::pow<2>(xi1))))) / (2.0 * xi)));
             C_[i] = - 2.0 * Pow * C0 * Fr * Fc * Expo;

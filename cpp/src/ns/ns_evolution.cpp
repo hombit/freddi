@@ -399,8 +399,8 @@ double FreddiNeutronStarEvolution::Lbol_ns() const {
 
 
 double FreddiNeutronStarEvolution::Lbol_ns_rest_frame() const {
-        double Mdot = Mdot_in();
-        if (Mdot < 0.0) Mdot = 0.0;
+    double Mdot = Mdot_in();
+    if (Mdot < 0.0) Mdot = 0.0;
 	return eta_ns() * fp() * Mdot * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT);
 }
 
@@ -558,18 +558,17 @@ vecd FreddiNeutronStarEvolution::windC() const {
 	return C;
 }
 
-
 const vecd& FreddiNeutronStarEvolution::Qx() const {
 	if (!opt_str_.Qx) {
 		vecd x(Nx());
-		const vecd& K = Kirr();
+		const vecd& K = Kirr(); // Shadow is included in Kirr, see Kirr()
 		const vecd& H = Height();
 		const vecd& Shad = Shadow();
 		const double L_disk = Lbol_disk();
 		const double L_ns = Lbol_ns();
 		for (size_t i = first(); i < Nx(); i++) {
 			const double mu = H[i] / R()[i];
-			x[i] = (1.0 - Shad[i]) * K[i] * (L_disk * angular_dist_disk(mu) + L_ns * angular_dist_ns(mu)) / (4. * M_PI * m::pow<2>(R()[i]));
+			x[i] = K[i] * (L_disk * angular_dist_disk(mu) + L_ns * angular_dist_ns(mu)) / (4. * M_PI * m::pow<2>(R()[i]));
 		}
 		opt_str_.Qx = std::move(x);
 	}
@@ -592,4 +591,84 @@ const vecd& FreddiNeutronStarEvolution::Tph_X() {
 
 double FreddiNeutronStarEvolution::Lbol_disk() const {
 	return (F()[first()] + 0.5 * Mdot_in() * h()[first()]) * omega_i(first());
+}
+
+
+// FreddiNeutronStarEvolution::Woods1996ShieldsApproxWind::Woods1996ShieldsApproxWind(const FreddiState& state):
+// BasicWind(state),
+//         Xi_max(state.args().disk->windparams.at("Xi_max")),
+//         T_ic(state.args().disk->windparams.at("T_ic")),
+//         Pow(state.args().disk->windparams.at("Pow")),
+//         IrAngDis(state.args().disk->windparams.at("IrAngDis")) {
+//     update(state);
+// }
+// FreddiNeutronStarEvolution::Woods1996ShieldsApproxWind::Woods1996ShieldsApproxWind(const FreddiNeutronStarEvolution& ev):
+//     // 1. Initialize the parent class (which takes FreddiState, but ev IS a state)
+//     FreddiEvolution::Woods1996ShieldsApproxWind(ev),
+//     // 2. Initialize our specific reference to the NS evolution
+//     ev_(ev),
+//     // 3. Initialize your physics parameters
+//     Xi_max(ev.args().disk->windparams.at("Xi_max")),
+//     T_ic(ev.args().disk->windparams.at("T_ic")),
+//     Pow(ev.args().disk->windparams.at("Pow")),
+//     IrAngDis(ev.args().disk->windparams.at("IrAngDis")) 
+// {
+//     // Note: No need to call update(ev) here if the base class already does it, 
+//     // but it doesn't hurt.
+// }
+
+
+void FreddiNeutronStarEvolution::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
+    // 1. Run the specialized parent update (not the grandparent BasicWind)
+    FreddiEvolution::Woods1996ShieldsApproxWind::update(state);
+    
+    // 2. Physics logic
+    const double L_disk = state.Lbol_disk();
+    const double L_ns   = ev_.Lbol_ns(); // Use ev_ here!
+
+    const auto disk = state.args().disk;
+    
+    
+    // R_iC = (GM * mu * m_p) / (k_B * T_ic)
+    
+	// TODO
+	// !!!!!!!!!!!!!!!! T_ic for disc and NS should be different!!!!!!!!!!!!!!!!!!!
+
+    const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_ic);
+    //const double VeL = std::sqrt(state.GM()/R_iC) ;
+    //const double C_iC = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_ic)/( GSL_CONST_CGSM_MASS_PROTON));
+    //const double m_ch0 = disk->Mdot0 / (M_PI * state.R().back()*state.R().back());
+    const double L_edd = (4.0 * M_PI * state.GM()* 2.0 * disk->mu * GSL_CONST_CGSM_MASS_PROTON * GSL_CONST_CGSM_SPEED_OF_LIGHT / GSL_CONST_CGSM_THOMSON_CROSS_SECTION);
+    const double L_crit = (1.0 / 8.0) * std::sqrt(GSL_CONST_CGSM_MASS_ELECTRON / (disk->mu * GSL_CONST_CGSM_MASS_PROTON)) * std::sqrt((GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT* GSL_CONST_CGSM_SPEED_OF_LIGHT ) / (GSL_CONST_CGSM_BOLTZMANN * T_ic)) * L_edd;
+    
+	double el = L_disk/L_crit;
+    double el_ns = L_ns/L_crit;
+    
+	for (size_t i = state.first(); i <= state.last(); ++i) {
+        if (state.R()[i] > 0.1*R_iC) {
+	    if (IrAngDis) {
+			// Take account of the central flux angular distribution:
+			el *= state.angular_dist_disk(state.Height()[i] / state.R()[i]) ; 
+			el_ns *= ev_.angular_dist_ns(state.Height()[i] / state.R()[i]) ;
+			//  angular_dist_disk(state.Height()[i] / state.R()[i]) ; 
+			// disk_irr_source_->angular_dist(mu)
+	    }
+            //  1986ApJ...306...90S page 2
+            const double xi = state.R()[i] / R_iC;
+            const double xi1 = R_iC / state.R()[i];
+            const double T_ch = T_ic * std::pow(el, 2.0 / 3.0) * std::pow(xi, -2.0 / 3.0);
+            const double C_ch = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_ch) / (disk->mu * GSL_CONST_CGSM_MASS_PROTON));
+            const double C0 = (4.0 * M_PI * m::pow<3>(state.h()[i])) / (m::pow<2>(state.GM()));
+            const double Fr_disk = L_disk / (4.0 * M_PI * m::pow<2>(state.R()[i]) * Xi_max * C_ch * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+
+            const double Fc = ((std::pow((1 + m::pow<2>(((0.125 * el + 0.00382) * xi1))), (1.0 / 6.0))) /
+                               std::pow((1 + m::pow<-2>((m::pow<4>(el)* (1.0 + 262.0 * m::pow<2>(xi))))),
+                                        (1.0 / 6.0)));
+	    
+            const double Expo = std::exp(-(((1.0 - (1 / std::sqrt(1.0 + 0.25 * m::pow<2>(xi1)))) *
+                                            (1.0 - (1 / std::sqrt(1.0 + 0.25 * m::pow<2>(xi1))))) / (2.0 * xi)));
+            C_[i] = - 2.0 * Pow * C0 * Fr_disk * Fc * Expo;
+        }
+
+    }
 }

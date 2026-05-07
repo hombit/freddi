@@ -171,6 +171,60 @@ private:
 		//TODO double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return fall_from_isco(freddi, Rm); }
 		double RiscoIsFurthest(const FreddiNeutronStarEvolution& freddi, double Rm) const override { return small_magnetosphere(freddi, Rm); }
 	};
+
+	// -----------------------------to add the possibility launch wind by irradiation from NS -------------------------
+// class Woods1996ShieldsApproxWind : public FreddiEvolution::Woods1996ShieldsApproxWind {
+//     public:
+//         using FreddiEvolution::Woods1996ShieldsApproxWind::Woods1996ShieldsApproxWind;
+//         ~Woods1996ShieldsApproxWind() override = default;
+//         Woods1996ShieldsApproxWind(const Woods1996ShieldsApproxWind&) = default;
+        
+//         // The clone method ensures we return the specific NS version of this wind
+//         virtual Woods1996ShieldsApproxWind* clone() const override { 
+//             return new Woods1996ShieldsApproxWind(*this); 
+//         }
+        
+//         // The update method you need to implement in the .cpp file
+//         virtual void update(const FreddiState& state) override;
+//     };
+
+// 	class Woods1996ShieldsApproxWind : public FreddiEvolution::Woods1996ShieldsApproxWind {
+// private:
+//     const FreddiNeutronStarEvolution& ns_parent; // Store a reference to the parent
+// public:
+//     // Update constructor to take the NS evolution object
+//     Woods1996ShieldsApproxWind(const FreddiNeutronStarEvolution& ns_evolution) 
+//         : FreddiEvolution::Woods1996ShieldsApproxWind(ns_evolution), ns_parent(ns_evolution) {}
+    
+//     // ...
+// };
+	// ------------------------------------------------------
+class Woods1996ShieldsApproxWind : public FreddiEvolution::Woods1996ShieldsApproxWind {
+private:
+    // Store a reference to the specific NS evolution object
+    const FreddiNeutronStarEvolution& ev_;
+
+public:
+    // 1. Explicit constructor to initialize the reference
+    explicit Woods1996ShieldsApproxWind(const FreddiNeutronStarEvolution& ev) :
+        FreddiEvolution::Woods1996ShieldsApproxWind(ev), // Initialize base class
+        ev_(ev)                                         // Initialize our reference
+    {}
+
+    ~Woods1996ShieldsApproxWind() override = default;
+
+    // 2. The copy constructor needs to handle the reference
+    Woods1996ShieldsApproxWind(const Woods1996ShieldsApproxWind& other) = default;
+    
+    // 3. The clone method
+    virtual Woods1996ShieldsApproxWind* clone() const override { 
+        return new Woods1996ShieldsApproxWind(*this); 
+    }
+    
+    virtual void update(const FreddiState& state) override;
+};
+//___________________________________________________________________
+
 private:
 	std::shared_ptr<const NeutronStarStructure> ns_str_;
 	NeutronStarOptionalStructure ns_opt_str_;
