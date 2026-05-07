@@ -243,7 +243,6 @@ double FreddiState::Lbol_disk() const {
 }
 
 
-
 double FreddiState::phase_opt() const {
 	return 2.0 * M_PI * (t() - args().flux->ephemeris_t0) / args().basic->period;
 }
@@ -574,52 +573,20 @@ const vecd& FreddiState::Mdot_wind_running() const {
 }
 
 
-// const vecd& FreddiState::Mdot_wind_running() const {
-// //double FreddiState::Mdot_wind_running(int ii) const {
-//     // 1. Prepare the coordinate subset (h values)
-//     std::vector<double> h_subset;
-//     for (size_t i = first(); i <= ii; ++i) {
-//         h_subset.push_back(h()[i]);
-//     }
-// 	printf("h_subset size = %zu\n", h_subset.size());
-// 	getchar();
-//     // 2. Define the integrand lambda
-//     // This takes the current index 'i' as an argument
-//     auto dMdot_dh_func = [this](size_t i) -> double {
-//         double dFdh;
-//         // Boundary checks based on the global grid limits
-//         if (i == first()) {
-//             dFdh = (F()[i+1] - F()[i]) / (h()[i+1] - h()[i]);
-//         } else if (i == last()) {
-//             dFdh = (F()[i] - F()[i-1]) / (h()[i] - h()[i-1]);
-//         } else {
-//             const double d0 = h()[i] - h()[i-1];
-//             const double d1 = h()[i+1] - h()[i];
-//             // Three-point stencil for non-uniform grid
-//             dFdh = (F()[i+1] * d0 * d0 / (d0 + d1) +
-//                     F()[i] * (d1 - d0) -
-//                     F()[i-1] * d1 * d1 / (d0 + d1)) / (d0 * d1);
-//         }
-// 		// if (windC()[i] != 0.0) {
-// 		// 	printf("windC()[%zu] = %e\n", i, windC()[i]);
-// 		// 	getchar();
-// 		// }
-// 		printf("i=%zu, d0=%e, d1=%e, dFdh=%e, F[i]=%e, windA=%e, windB=%e, windC=%e\n", i, h()[i] - h()[i-1], h()[i+1] - h()[i], dFdh, F()[i], windA()[i], windB()[i], windC()[i]);
-//         return -(windA()[i] * dFdh + windB()[i] * F()[i] + windC()[i]);
-//     };
-
-//     // 3. Integrate using your helper
-//     // Ensure lazy_integrate is designed to handle this range
-// 	printf("Integrating Mdot_wind_running up to index %d\n", ii);
-// 	printf("%e\n", lazy_integrate<HotRegion>(opt_str_.Mdot_wind_running, h_subset, dMdot_dh_func));
-// 	getchar();
-//     return lazy_integrate<HotRegion>(opt_str_.Mdot_wind_running, h_subset, dMdot_dh_func);
+// double FreddiState::R_IC() const { 
+//     return wind_ ? wind_->R_IC() : 0.0; 
 // }
 
+FreddiState::BasicWind::BasicWind(const FreddiState &state) :
+    A_(state.Nx(), 0.), 
+    B_(state.Nx(), 0.), 
+    C_(state.Nx(), 0.), 
+    Vwind_(state.v_wind()), // state.v_wind() returns the esc velocity vector
+    R_IC_((state.GM() * state.args().disk->mu * GSL_CONST_CGSM_MASS_PROTON) / 
+          (GSL_CONST_CGSM_BOLTZMANN * state.args().disk->windparams.at("T_ic"))) 
+{}
 
-FreddiState::BasicWind::BasicWind(const FreddiState &state):
-		A_(state.Nx(), 0.), B_(state.Nx(), 0.), C_(state.Nx(), 0.), Vwind_(state.v_wind())  {}
-		// Vwind_ calls FreddiState::v_wind(), which returns structure_.v_esc
+
 FreddiState::BasicWind::~BasicWind() = default;
 
 FreddiState::SS73CWind::SS73CWind(const FreddiState &state):
@@ -749,8 +716,6 @@ void FreddiState::Shields1986Wind::update(const FreddiState& state) {
     const double P_iC = L / (4.0 * M_PI * m::pow<2>(R_iC) * Xi_max * GSL_CONST_CGSM_SPEED_OF_LIGHT);
     const double el = L/L_crit;
     
-    	std::cerr << R_iC << "\t" << disk->mu << "\t" << P_iC << "\t" << state.eta() << "\t" << state.Mdot_in() << "\t" <<  L << "\t" << L_edd << "\t" << L_crit << "\t" <<  GSL_CONST_CGSM_MASS_ELECTRON << std::endl; 
-	//std::cerr << "\t" << L << "\t" << R_iC  << "\t" << L_edd << "\t" << C_ch << "\t" << P_0 << "\t" << m_ch0 << std::endl;
 
     for (size_t i = state.first(); i <= state.last(); ++i) {
         //  1986ApJ...306...90S page 2
@@ -801,8 +766,6 @@ void FreddiState::Woods1996AGNWind::update(const FreddiState& state) {
             f_L = std::pow((0.1/le), 0.15) ;
     }
 
-
-    //std::cerr << "\t" << L << "\t" << R_iC  << "\t" << L_edd << std::endl;
 
     for (size_t i = state.first(); i <= state.last(); ++i) {
         //
@@ -891,6 +854,7 @@ void FreddiState::PeriodPaperWind::update(const FreddiState& state) {
 	C_[i] = - 2.0 * C_w * Mdot;
     }
 }
+
 
 FreddiState::BasicFreddiIrradiationSource::~BasicFreddiIrradiationSource() {}
 

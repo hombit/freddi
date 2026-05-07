@@ -26,6 +26,7 @@ private:
 	class BasicWind {
 	protected:
 		vecd A_, B_, C_, Vwind_;
+    	double R_IC_; 
 	public:
 		explicit BasicWind(const FreddiState&);
 		virtual ~BasicWind() = 0;
@@ -34,7 +35,7 @@ private:
 		inline const vecd& A() const { return A_; }
 		inline const vecd& B() const { return B_; }
 		inline const vecd& C() const { return C_; }
-		//inline const vecd& Vwind() const { return Vwind_; }
+		inline double R_IC() const { return R_IC_; } 
 	};
 
 	class NoWind: public BasicWind {

@@ -632,7 +632,8 @@ void FreddiNeutronStarEvolution::Woods1996ShieldsApproxWind::update(const Freddi
     // R_iC = (GM * mu * m_p) / (k_B * T_ic)
     
 	// TODO
-	// !!!!!!!!!!!!!!!! T_ic for disc and NS should be different!!!!!!!!!!!!!!!!!!!
+	// 1) !!!!!!!!!!!!!!!! T_ic for disc and NS should be different!!!!!!!!!!!!!!!!!!!
+	// 2) check how shadow works!
 
     const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_ic);
     //const double VeL = std::sqrt(state.GM()/R_iC) ;

@@ -58,6 +58,7 @@ public:
 	virtual void nonlinear_diffusion_outer_condition_depends_Mdotin(const double tau);
 	virtual void step(double tau);
 	inline void step() { return step(args().calc->tau); }
+	double R_IC() const { return wind_->R_IC(); }
 public:
 	using iterator = EvolutionIterator<FreddiEvolution>;
 	inline iterator begin() { return {this}; }

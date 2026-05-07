@@ -223,6 +223,8 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Rfront_Rhot", "float", "Ratio of cooling front radius to radius with dotM=0", [freddi]() {return freddi->Rfront_Rhot(freddi->R()[freddi->last()], freddi->Height()[freddi->last()] / freddi->R()[freddi->last()]);}},
 			{"Mdot_Rhot", "g/s", "Accretion rate at the cooling front radius", [freddi]() {return freddi->Mdot_out_from_F();}},
 			{"Mdot_wind", "g/s", "Wind mass loss from two sides",  [freddi]() {return freddi->Mdot_wind();}},
+			{"R_IC", "cm", "Compton radius", [freddi]() {return freddi->R_IC();}},
+			
 	};
 	const bool cold_disk = freddi->args().flux->cold_disk;
 	const bool star = freddi->args().flux->star;

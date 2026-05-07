@@ -107,6 +107,10 @@ void FreddiEvolution::nonlinear_diffusion_outer_condition_depends_Mdotin(const d
     }
     
 }
+
+// double FreddiEvolution::R_IC() const { 
+//     return wind_ ? wind_->R_IC() : 0.0; 
+// }
 		
 void FreddiEvolution::step(const double tau) {
          
