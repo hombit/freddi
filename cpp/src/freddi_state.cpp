@@ -29,6 +29,7 @@ FreddiState::DiskStructure::DiskStructure(const FreddiArguments &args, const wun
 		oprel(args.disk->oprel),
 		h(initialize_h(args, Nx)),
 		R(initialize_R(h, GM)),
+		v_esc(initialize_v_esc(h, GM)),
 		wunc(wunc) {}
 
 vecd FreddiState::DiskStructure::initialize_h(const FreddiArguments& args, size_t Nx) {
@@ -56,6 +57,14 @@ vecd FreddiState::DiskStructure::initialize_R(const vecd& h, double GM) {
 	return R;
 }
 
+vecd FreddiState::DiskStructure::initialize_v_esc(const vecd& h, double GM) {
+    vecd v_esc(h.size());
+    for (size_t i = 0; i < h.size(); i++) {
+        // v_esc = sqrt( 2 * G * M / R )
+		v_esc[i] = std::sqrt(2.0) * GM / h[i];
+    }
+    return v_esc;
+}
 
 FreddiState::CurrentState::CurrentState(const DiskStructure& str):
 		Mdot_out(str.args.disk->Mdotout),
@@ -181,35 +190,34 @@ double FreddiState::obtain_Mdot_outer_boundary() const {
     // Rhot<Rtid
     // then it is important whether there is a scattering corona or not
     //                      and if flag DIM_front_approach == "outflow"
-     
-    
+  
     if (args().disk->DIM_front_approach == "outflow") {
 	// there is an outward mass flow at the front; this negative rate  = factor * inner accretion rate during self-similar stage
 	
-	if (args().disk->scatter_by_corona == "yes") {
-	    // there is scattering above the disc
-	    // there is actually an option to add Mdot_out() here .....
-	    return -1.0*args().disk->DIM_front_Mdot_factor*Mdot_in();
-	    //-1.5 make Rfront/RMdot0 = 2
-	    // -2.5; -2.3 makes very close to Hameury with =Tcrit = (8840. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ; and Tcrit = 10300.;
-	}
-	
-	if (args().disk->scatter_by_corona == "no") {
-	    // if there is no scattering, the disc zone beyond maximum of Fvis (where dotM=0) is in the shadow from the direct central radiation
-	    // 
-	    // if irradiation temperature at Rhot is greater than critical, disc cannot be cold; but the ring outside Fvis=max is cold
-	    // that means  that  Mdot = 0  at Rhot;
-	    // Tirr is checked at Rhot,see Tirr_critical. 
-	    
-	    if (  Tirr().at(last()) >= Tirr_critical (R().at(last()), last())  ) {
-		return (0.);
-	    } else  {
-		 // if irradiation is unable to keep the disc hot, there is a smooth transition zone up to R hot and there is an outflow at Rhot
-		return -1.0*args().disk->DIM_front_Mdot_factor*Mdot_in();
-		//-1.5 make Rfront/RMdot0 = 2
-		// -2.5; -2.3 makes very close to Hameury with =Tcrit = (8840. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ; and Tcrit = 10300.;
-	    }
-	}
+		if (args().disk->scatter_by_corona == "yes") {
+			// there is scattering above the disc
+			// there is actually an option to add Mdot_out() here .....
+			return -1.0*args().disk->DIM_front_Mdot_factor*Mdot_in();
+			//-1.5 make Rfront/RMdot0 = 2
+			// -2.5; -2.3 makes very close to Hameury with =Tcrit = (8840. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ; and Tcrit = 10300.;
+		}
+		
+		if (args().disk->scatter_by_corona == "no") {
+			// if there is no scattering, the disc zone beyond maximum of Fvis (where dotM=0) is in the shadow from the direct central radiation
+			// 
+			// if irradiation temperature at Rhot is greater than critical, disc cannot be cold; but the ring outside Fvis=max is cold
+			// that means  that  Mdot = 0  at Rhot;
+			// Tirr is checked at Rhot,see Tirr_critical. 
+			
+			if (  Tirr().at(last()) >= Tirr_critical (R().at(last()), last())  ) {
+			return (0.);
+			} else  {
+			// if irradiation is unable to keep the disc hot, there is a smooth transition zone up to R hot and there is an outflow at Rhot
+			return -1.0*args().disk->DIM_front_Mdot_factor*Mdot_in();
+			//-1.5 make Rfront/RMdot0 = 2
+			// -2.5; -2.3 makes very close to Hameury with =Tcrit = (8840. - 2216.* 1./Qirr_Qvis ) * pow(radius_popravka,0.5) ; and Tcrit = 10300.;
+			}
+		}
 	
     } 
     
@@ -309,12 +317,11 @@ const vecd& FreddiState::Qx() const {
 
 	if (!opt_str_.Qx) {
 		vecd x(Nx());
-		const vecd& K = Kirr();
+		const vecd& K = Kirr(); // Shadow is included in Kirr, see Kirr()
 		const vecd& H = Height();
-		const vecd& Shad = Shadow();
 		const double Lbol = Lbol_disk();
 		for (size_t i = first(); i < Nx(); i++) {
-			x[i] = (1.0 - Shad[i]) * K[i] * Lbol * angular_dist_disk(H[i] / R()[i]) / (4. * M_PI * m::pow<2>(R()[i]));
+			x[i] = K[i] * Lbol * angular_dist_disk(H[i] / R()[i]) / (4. * M_PI * m::pow<2>(R()[i]));
 		}
 		opt_str_.Qx = std::move(x);
 	}
@@ -323,14 +330,48 @@ const vecd& FreddiState::Qx() const {
 
 
 const vecd& FreddiState::Kirr() const {
+	
 	if(!opt_str_.Kirr) {
 		vecd x(Nx());
-		const vecd& H = Height();
-		for (size_t i = first(); i <= last(); i++) {
-			x[i] = args().irr->Cirr * std::pow(H[i] / (R()[i] * 0.05), args().irr->irrindex);
-		}
-		for (size_t i = last() + 1; i < Nx(); i++) {
-			x[i] = args().irr->Cirr_cold * std::pow(H[i] / (R()[i] * 0.05), args().irr->irrindex_cold);
+		const vecd& Shad = Shadow();
+		if (args().irr->irradiation_type == "scatter_dependent") {
+			for (size_t i = first(); i <= Nx(); i++) {
+				// uniform formula for the whole disc
+				// Cirr = etaX * wind_Column_density *kappa_Thomson * angular_distribution / 2, see Qx()
+				// here we calculate Kirr = etaX * wind_Column_density *kappa_Thomson / 2
+				// scattering_opacity usually is kappa_Thomson 
+				//  $X=0.735$ $Y=0.248$ and $Z=0.017$, with $Z/X$ = 0.023 (GREVESSE and A.J. SAUVAL 1988)
+				// printf("Column_density_wind()[i] = %e\n", Column_density_wind()[i]);
+				// getchar();
+				x[i] = args().irr->etaX * args().irr->scattering_opacity * Column_density_wind()[i] / 2;
+			}
+		} else if  (args().irr->irradiation_type == "direct_analytic") {
+			const vecd& H = Height();
+			x[0] = 0.0; // no irradiation at the inner boundary
+			for (size_t i = first()+1; i <= last(); i++) {
+				// CIRR = eta_X * (dz/dr -z/r) * angular_distribution 
+				x[i] = (1.0 - Shad[i]) * args().irr->etaX * ((H[i]-H[i-1]) / (R()[i] - R()[i-1]) - H[i] / R()[i] );
+			}
+			for (size_t i = last() + 1; i < Nx(); i++) {
+				x[i] = (1.0 - Shad[i]) * args().irr->etaX * ((H[i]-H[i-1]) / (R()[i] - R()[i-1]) - H[i] / R()[i] );
+			}
+		} else if  (args().irr->irradiation_type == "constant_Cirr") {
+			const vecd& H = Height();
+			// if scatter_by_corona = yes, then there is no shadow
+			// if there is scattering, then the cold part of the disc is irradiated by scattered radiation, so we use the same formula as for hot part
+			for (size_t i = first(); i <= last(); i++) {
+				x[i] =  args().irr->Cirr * std::pow(H[i] / (R()[i] * 0.05), args().irr->irrindex);
+				if (args().disk->scatter_by_corona == "no") {
+					x[i] *= (1.0 - Shad[i]);
+				}
+			}
+			for (size_t i = last() + 1; i < Nx(); i++) {
+				x[i] = args().irr->Cirr_cold * std::pow(H[i] / (R()[i] * 0.05), args().irr->irrindex_cold);
+				if (args().disk->scatter_by_corona == "no") {
+					x[i] *= (1.0 - Shad[i]);
+				}
+			}
+
 		}
 		opt_str_.Kirr = std::move(x);
 	}
@@ -359,16 +400,13 @@ const vecd& FreddiState::Shadow() const {
         for (size_t i = first(); i < Nx(); i++) {
         	const double Hrelative= Height()[i]/R()[i];
         	max_H2R = std::max(Hrelative, max_H2R);
-		if (Hrelative >= max_H2R) {
+			if (Hrelative >= max_H2R) {
        			x[i] = 0.0; // no shadow
-		} else {
-		    if (args().disk->scatter_by_corona == "no") {
-			x[i] = 1.0; // the ring is in shadow, Qx will be 0
-		    }
-		}
-		// x[i] = 0.0; // @XRPCALCApril24
+			} else {
+				x[i] = 1.0; // shadowed by the disc itself
+			}
+			// x[i] = 0.0; // @XRPCALCApril24
         }
-        //std::cout << "max= " << max_H2R << "H2R last = " << Height()[last()]/R()[last()]  << "last = " << last() << std::endl;
         opt_str_.Shadow = std::move(x);
         return *opt_str_.Shadow;
 }
@@ -478,14 +516,110 @@ double FreddiState::Mdot_wind() const {
 		// Wind loss rate sign is opposite disk loss rate sign, e.g. usually it should be positive
 		return -(windA()[i] * dFdh + windB()[i] * F()[i] + windC()[i]);
 	};
+ 	
 	return lazy_integrate<HotRegion>(opt_str_.Mdot_wind, h(), dMdot_dh);
 }
 
 
+const vecd& FreddiState::Column_density_wind() const {
+    if (!opt_str_.Column_density_wind) {
+        vecd x(Nx(), 0.0);
+        // Pre-calculate the running Mdot vector once
+        const vecd& mdot_run = Mdot_wind_running(); 
+
+        for (size_t i = first(); i <= last(); i++) {
+            // Formula: Σ = Mdot / (4 * pi * R * v_wind)
+            x[i] = mdot_run[i] / (4.0 * M_PI * R()[i] * v_wind()[i]);
+        }
+        opt_str_.Column_density_wind = std::move(x);
+    }
+    return *opt_str_.Column_density_wind;
+}
+
+const vecd& FreddiState::Mdot_wind_running() const {
+    if (!opt_str_.Mdot_wind_running) {
+        vecd mdot_wind(Nx(), 0.0);
+        vecd local_source(Nx(), 0.0);
+
+        // 1. Calculate the local integrand at every point i
+        for (size_t i = first(); i <= last(); ++i) {
+            double dFdh;
+            if (i == first()) {
+                dFdh = (F()[i+1] - F()[i]) / (h()[i+1] - h()[i]);
+            } else if (i == last()) {
+                dFdh = (F()[i] - F()[i-1]) / (h()[i] - h()[i-1]);
+            } else {
+                const double d0 = h()[i] - h()[i-1];
+                const double d1 = h()[i+1] - h()[i];
+                // Three-point stencil for non-uniform grid
+                dFdh = (F()[i+1] * d0 * d0 / (d0 + d1) +
+                        F()[i] * (d1 * d0 - d0 * d1) - // Corrected coefficient logic
+                        F()[i-1] * d1 * d1 / (d0 + d1)) / (d0 * d1);
+            }
+            local_source[i] = -(windA()[i] * dFdh + windB()[i] * F()[i] + windC()[i]);
+        }
+
+        // 2. Perform cumulative integration (Trapezoidal rule)
+        // Mdot_wind(h) = integral from h_in to h of local_source dh
+        mdot_wind[first()] = 0.0; // Boundary condition at Rin
+        for (size_t i = first() + 1; i <= last(); ++i) {
+            double dh = h()[i] - h()[i-1];
+            double avg_source = 0.5 * (local_source[i] + local_source[i-1]);
+            mdot_wind[i] = mdot_wind[i-1] + avg_source * dh;
+        }
+
+        opt_str_.Mdot_wind_running = std::move(mdot_wind);
+    }
+    return *opt_str_.Mdot_wind_running;
+}
+
+
+// const vecd& FreddiState::Mdot_wind_running() const {
+// //double FreddiState::Mdot_wind_running(int ii) const {
+//     // 1. Prepare the coordinate subset (h values)
+//     std::vector<double> h_subset;
+//     for (size_t i = first(); i <= ii; ++i) {
+//         h_subset.push_back(h()[i]);
+//     }
+// 	printf("h_subset size = %zu\n", h_subset.size());
+// 	getchar();
+//     // 2. Define the integrand lambda
+//     // This takes the current index 'i' as an argument
+//     auto dMdot_dh_func = [this](size_t i) -> double {
+//         double dFdh;
+//         // Boundary checks based on the global grid limits
+//         if (i == first()) {
+//             dFdh = (F()[i+1] - F()[i]) / (h()[i+1] - h()[i]);
+//         } else if (i == last()) {
+//             dFdh = (F()[i] - F()[i-1]) / (h()[i] - h()[i-1]);
+//         } else {
+//             const double d0 = h()[i] - h()[i-1];
+//             const double d1 = h()[i+1] - h()[i];
+//             // Three-point stencil for non-uniform grid
+//             dFdh = (F()[i+1] * d0 * d0 / (d0 + d1) +
+//                     F()[i] * (d1 - d0) -
+//                     F()[i-1] * d1 * d1 / (d0 + d1)) / (d0 * d1);
+//         }
+// 		// if (windC()[i] != 0.0) {
+// 		// 	printf("windC()[%zu] = %e\n", i, windC()[i]);
+// 		// 	getchar();
+// 		// }
+// 		printf("i=%zu, d0=%e, d1=%e, dFdh=%e, F[i]=%e, windA=%e, windB=%e, windC=%e\n", i, h()[i] - h()[i-1], h()[i+1] - h()[i], dFdh, F()[i], windA()[i], windB()[i], windC()[i]);
+//         return -(windA()[i] * dFdh + windB()[i] * F()[i] + windC()[i]);
+//     };
+
+//     // 3. Integrate using your helper
+//     // Ensure lazy_integrate is designed to handle this range
+// 	printf("Integrating Mdot_wind_running up to index %d\n", ii);
+// 	printf("%e\n", lazy_integrate<HotRegion>(opt_str_.Mdot_wind_running, h_subset, dMdot_dh_func));
+// 	getchar();
+//     return lazy_integrate<HotRegion>(opt_str_.Mdot_wind_running, h_subset, dMdot_dh_func);
+// }
+
 
 FreddiState::BasicWind::BasicWind(const FreddiState &state):
-		A_(state.Nx(), 0.), B_(state.Nx(), 0.), C_(state.Nx(), 0.) {}
-
+		A_(state.Nx(), 0.), B_(state.Nx(), 0.), C_(state.Nx(), 0.), Vwind_(state.v_wind())  {}
+		// Vwind_ calls FreddiState::v_wind(), which returns structure_.v_esc
 FreddiState::BasicWind::~BasicWind() = default;
 
 FreddiState::SS73CWind::SS73CWind(const FreddiState &state):
@@ -983,6 +1117,7 @@ void  FreddiState::find_R_max_where_Qirr_works () {
     }
 }
 //current_.
+
 
 
 double FreddiState::Tirr_critical (double r, int ii) const {

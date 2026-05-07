@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+
+# generate_launch.sh
+set -euo pipefail
+
+LASTCOMMANDFILE="last_command.log"
+
+# Path to the freddi-ns executable
+BIN="$(pwd)/cmake-build-dev3/freddi-ns"
+
+# Directory that contains last_command
+CMD_DIR="/home/glipunova/galja/rabota/data/0115+63/curves2025/models2023/test_lis"
+
+CMD_FILE="${CMD_DIR}/${LASTCOMMANDFILE}"
+LAUNCH_FILE="$(pwd)/.vscode/launch.json"
+
+if [ ! -f "${CMD_FILE}" ]; then
+    echo "ERROR: ${LASTCOMMANDFILE} not found at: ${CMD_FILE}" >&2
+    exit 2
+fi
+
+# Read the first non-empty line
+LINE=$(grep -v '^#' "${CMD_FILE}" | grep -v '^$' | head -n 1)
+
+if [ -z "$LINE" ]; then
+    echo "ERROR: ${LASTCOMMANDFILE} is empty or contains only comments" >&2
+    exit 3
+fi
+
+# Get the executable name
+PROG_BASENAME=$(basename "$BIN")
+
+# Clean the line: remove the program name and any leading './'
+# This uses a regex to strip the binary name if it starts the line
+ARGS_LINE=$(echo "$LINE" | sed -E "s|^(\./)?${PROG_BASENAME}||" | sed -E "s|^${BIN}||" | sed 's/^[[:space:]]*//')
+
+# Split into an array
+read -r -a ARGS_ARR <<< "$ARGS_LINE"
+
+# Build JSON array for args
+ARGS_JSON=""
+for i in "${!ARGS_ARR[@]}"; do
+    arg="${ARGS_ARR[$i]}"
+    # Escape backslashes and double quotes for JSON
+    esc=$(printf '%s' "$arg" | sed 's/\\/\\\\/g; s/"/\\"/g')
+
+    ARGS_JSON+="\"$esc\""
+    # Add comma if not the last element
+    if [ "$i" -lt $(( ${#ARGS_ARR[@]} - 1 )) ]; then
+        ARGS_JSON+=", "
+    fi
+done
+
+# Ensure .vscode directory exists
+mkdir -p "$(dirname "$LAUNCH_FILE")"
+
+cat > "$LAUNCH_FILE" <<EOF
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug freddi-ns (generated)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${BIN}",
+            "args": [
+                ${ARGS_JSON}
+            ],
+            "stopAtEntry": false,
+            "cwd": "${CMD_DIR}",
+            "environment": [],
+            "console": "integratedTerminal",
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "Make: build",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
+EOF
+
+echo "Wrote ${LAUNCH_FILE}"
+echo "Program: ${BIN}"
+echo "Arguments identified: ${ARGS_LINE}"

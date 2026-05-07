@@ -25,7 +25,7 @@ public:
 private:
 	class BasicWind {
 	protected:
-		vecd A_, B_, C_;
+		vecd A_, B_, C_, Vwind_;
 	public:
 		explicit BasicWind(const FreddiState&);
 		virtual ~BasicWind() = 0;
@@ -34,6 +34,7 @@ private:
 		inline const vecd& A() const { return A_; }
 		inline const vecd& B() const { return B_; }
 		inline const vecd& C() const { return C_; }
+		//inline const vecd& Vwind() const { return Vwind_; }
 	};
 
 	class NoWind: public BasicWind {
@@ -232,10 +233,12 @@ private:
 		OpacityRelated oprel;
 		vecd h;
 		vecd R;
+		vecd v_esc;
 		wunc_t wunc;
 	private:
 		static vecd initialize_h(const FreddiArguments& args, size_t Nx);
 		static vecd initialize_R(const vecd& h, double GM);
+		static vecd initialize_v_esc(const vecd& R, double GM);
 	public:
 		DiskStructure(const FreddiArguments& args, const wunc_t& wunc);
 	};
@@ -266,7 +269,8 @@ private:
 		boost::optional<double> Mdisk;
 		boost::optional<double> Lx;
 		boost::optional<double> Mdot_wind;
-		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height, Shadow;
+		//boost::optional<double> Mdot_wind_running;
+		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height, Shadow,Column_density_wind,Mdot_wind_running;
 	};
 
 protected:
@@ -303,6 +307,7 @@ public:
 	inline const FreddiArguments& args() const { return str_->args; }
 	inline const vecd& h() const { return str_->h; }
 	inline const vecd& R() const { return str_->R; }
+	inline const vecd& v_esc() const { return str_->v_esc; }
 	inline const vecd& lambdas() const { return str_->args.flux->lambdas; }
 	inline Star& star() { return star_; }
 	void replaceArgs(const FreddiArguments& args);  // Danger!
@@ -345,9 +350,11 @@ public:
 	virtual vecd windA() const { return wind_->A(); }
 	virtual vecd windB() const { return wind_->B(); }
 	virtual vecd windC() const { return wind_->C(); }
+	virtual vecd v_wind() const { return str_->v_esc; }
 // disk_irr_source_
 protected:
 	static std::shared_ptr<BasicFreddiIrradiationSource> initializeFreddiIrradiationSource(const std::string& angular_dist_type);
+    vecd local_escape_velocity() const;
 public:
 	inline double angular_dist_disk(const double mu) const { return disk_irr_source_->angular_dist(mu); }
 // opt_str_
@@ -418,6 +425,8 @@ public:
 	const vecd& Kirr() const;
 	const vecd& Height() const;
 	const vecd& Shadow() const;
+	const vecd& Mdot_wind_running() const;
+	const vecd& Column_density_wind() const;
 	double Luminosity(const vecd& T, double nu1, double nu2) const;
 	inline double magnitude(const double lambda, const double F0) const {
 		return -2.5 * std::log10(I_lambda<HotRegion>(lambda) * cosiOverD2() / F0);
@@ -443,6 +452,8 @@ public:
 	inline double flux_star(const Passband& passband) const { return flux_star(passband, phase_opt()); }
 	inline double Mdisk() const { return lazy_integrate<HotRegion>(opt_str_.Mdisk, Sigma()); }
 	double Mdot_wind() const;
+	double Mdot_wind_running(const int ii) const;
+	double Column_density_wind(const int ii) const;
 	double Sigma_minus(double r) const;
 	double Sigma_plus(double r) const;
 	double Teff_plus(double r) const;

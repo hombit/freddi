@@ -1,0 +1,27 @@
+{
+"version": "2.0.0",
+"tasks": [
+{
+"label": "Make: build",
+"type": "shell",
+"command": "make",
+"args": [],
+"options": {
+"cwd": "${workspaceFolder}"
+},
+"group": {
+"kind": "build",
+"isDefault": true
+},
+"problemMatcher": []
+},
+{
+"label": "Generate launch.json",
+"type": "shell",
+"command": "${workspaceFolder}/.vscode/generate_launch.sh",
+"problemMatcher": [],
+"group": "none"
+}
+]
+}
+

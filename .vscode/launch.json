@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug freddi-ns (generated)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/glipunova/galja/rabota/freddi/master/freddi-muses02/cmake-build-dev3/freddi-ns",
+            "args": [
+                "$FREDDIDIR/cmake-build-dev3/freddi-ns", "--config=no-outflow.ini", "--tempsparsity=1", "--Mdot0=6.24516664546512e+17"
+            ],
+            "stopAtEntry": false,
+            "cwd": "/home/glipunova/galja//rabota/data/0115+63/curves2025/models2023/index1eta02eps5_DIM_scatter_TavTcr_Cirr2e-4_dev3/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "Make: build",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

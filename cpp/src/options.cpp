@@ -302,24 +302,41 @@ SelfIrradiationOptions::SelfIrradiationOptions(const po::variables_map &vm, cons
 				vm["Cirrcold"].as<double>(),
 				vm["irrindexcold"].as<double>(),
 				vm["h2rcold"].as<double>(),
-				vm["angulardistdisk"].as<std::string>()) {
-	if (Cirr <= 0. && ((dsa_args.boundcond == "Tirr") || (dsa_args.boundcond == "DIM")) ) {
-		throw po::error("Set positive --Cirr when --boundcond=Tirr or DIM");
+				vm["angulardistdisk"].as<std::string>(),
+				vm["irradiation_type"].as<std::string>(),
+				vm["scattering_opacity"].as<double>(),
+				vm["etaX"].as<double>()
+			) {
+	if ((Cirr <= 0.) && (irradiation_type == "constant_Cirr") && ((dsa_args.boundcond == "Tirr") || (dsa_args.boundcond == "DIM")) ) {
+		throw po::error("Set positive --Cirr when --boundcond=Tirr or DIM for irradiation type = constant_Cirr ");
 	}
 }
 
 po::options_description SelfIrradiationOptions::description() {
-	po::options_description od("Parameters of self-irradiation:\nQirr = (1-shadow) * Cirr * (H/r / 0.05)^irrindex * L * psi / (4 pi R^2), where psi is the angular distribution of X-ray radiation; shadow can be 0 (default) or 1. When scatter_by_corona=\"no\", if h/r1 < max (h/r, r<r1), the ring r1 is not irradiatied from the centre: shadow = 1 \n");
+	// 1. Create the main group with a short header
+    po::options_description od("Self-irradiation parameters (see further details below): \n");
 	
 	od.add_options()
-			( "Cirr", po::value<double>()->default_value(default_Cirr), "Irradiation factor for the hot disk\n" )
-			( "irrindex", po::value<double>()->default_value(default_irrindex), "Irradiation index for the hot disk\n" )
-			( "Cirrcold", po::value<double>()->default_value(default_Cirr_cold), "Irradiation factor for the cold disk\n" )
-			( "irrindexcold", po::value<double>()->default_value(default_irrindex_cold), "Irradiation index for the cold disk\n" )
+			( "Cirr", po::value<double>()->default_value(default_Cirr), "Irradiation factor for the hot disk, used if irradiation_type=constant_Cirr (Cirr in the code is equal to C_irr_tilde_paper)\n" )
+			( "irrindex", po::value<double>()->default_value(default_irrindex), "Irradiation index for the hot disk, used if irradiation_type=constant_Cirr\n" )
+			( "Cirrcold", po::value<double>()->default_value(default_Cirr_cold), "Irradiation factor for the cold disk, used if irradiation_type=constant_Cirr\n" )
+			( "irrindexcold", po::value<double>()->default_value(default_irrindex_cold), "Irradiation index for the cold disk, used if irradiation_type=constant_Cirr\n" )
 			( "h2rcold", po::value<double>()->default_value(default_height_to_radius_cold), "Semi-height to radius ratio for the cold disk\n" )
 			( "angulardistdisk", po::value<std::string>()->default_value(default_angular_dist_disk), "Angular distribution of the disk X-ray radiation. Values: isotropic (Psi=1), plane (Psi=2z/R)\n" )
+			( "irradiation_type", po::value<std::string>()->default_value(default_irradiation_type), "Tag to calculate irradiation parameter. Values: constant_Cirr, scatter_dependent, direct_analytic\n" )
+			( "scattering_opacity", po::value<double>()->default_value(default_scattering_opacity), "[cm^2/g] Scattering coefficient in the medium above the disc, used if irradiation_type=scatter_dependent \n" )
+			( "etaX", po::value<double>()->default_value(default_etaX), "thermalization coefficient for X-rays, used if irradiation_type=scatter_dependent or direct_analytic; it is 1/3 by default, but depends on the X-ray spectrum, see Suleimanov et al. 1999" )
 			;
-			
+	// 3. Create a second group for the detailed description text
+    // We put the long text as the 'caption' of this group
+    po::options_description details(
+        "   Basic definition of the self-irradiation parameter CIRR == Qirr/(L /(4 pi R^2));\n\n"
+        "   Options to calculate CIRR: \n"
+        "   --irradiation_type=constant_Cirr: Qirr = (1-shadow) * Cirr * (H/r / 0.05)^irrindex * psi * L  / (4 pi R^2),\n    where psi is the angular distribution of X-ray radiation; shadow can be 0 (default) or 1. When scatter_by_corona=\"no\", if h/r1 < max (h/r, r<r1), the ring r1 is not irradiatied from the centre: shadow = 1 \n\n    --irradiation_type=scatter_dependent: CIRR = psi * etaX * tau_corona_perp/2, where etaX is the thermalization coefficient for X-rays (1/3 by default, but depends on the X-ray spectrum), and tau is the optical scattering thickness of the corona/wind in the z direction (Ostriker et al. 1991).\n\n    Generally tau_corona_perp = Column_density_wind * scattering_opacity, where scattering_opacity is the scattering coefficient [cm2/g].\n Column_density_wind [cm^2/g] can be determined from the wind model: Column_density_wind = rho z_wind = Mdot_wind(R) / (4 pi R v_wind(R)), where Mdot_wind(R) is the wind mass rate [g/s] in the radial direction at cylindrical radius R, z_wind - vertical thickness of the wind layer,  v_wind(R) - wind velocity, currently equal to v_esc = sqrt(2GM/R).\n\n    --irradiation_type=direct_analytic: CIRR = eta_X * (dz/dr -z/r) * angular_distribution \n\n    Note that in the case of scatter_dependent, the irradiation parameter is different for different rings. In this case, the value of --Cirr is not used and can be set to zero (as well as for direct_analytic).\n\n    NB In papers, C_irr_paper = CIRR = Cirr * (H/r / 0.05)^irrindex * psi, also C_irr_tilde_paper = Cirr \n");
+
+    // 4. Add the details group to the main object
+    // Since we add it after the options, it will appear at the bottom
+    od.add(details);
 	return od;
 }
 

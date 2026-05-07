@@ -1,0 +1,13 @@
+#inspect 
+
+joe .vscode/generate_launch.sh
+
+#run 
+
+.vscode/generate_launch.sh
+
+
+# the binary freddi-ns  should be comiled with options: 
+
+make CXXFLAGS="-g -O0" -j 4
+

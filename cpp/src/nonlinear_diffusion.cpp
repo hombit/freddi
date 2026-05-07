@@ -79,12 +79,12 @@ void nonlinear_diffusion_nonuniform_wind_1_2_ (
 			alpha[i + 1] = b[i] / (c - alpha[i] * a[i]);
 			beta[i + 1] = (beta[i] * a[i] + f[i]) / (c - alpha[i] * a[i]);
 		}
-		//std::printf("right_bound_cond: %e\n", right_bounder_cond );
+		
 		y[last] = ((x[last] - x[last - 1]) * right_bounder_cond + f[last] + beta[last] * a[last]) /
 				   (c0[last] + K_1[last] - alpha[last] * a[last]);
 		for (size_t i = last - 1; i > first; --i) {
 			y[i] = alpha[i + 1] * y[i + 1] + beta[i + 1];
-			if (i == last-1) {std::printf("ys: %e %e\n", y[i], y[i+1] );}
+			//if (i == last-1) {std::printf("ys: %e %e\n", y[i], y[i+1] );}
 		}
 		if (y[last]<0) {flag_F_negative = 1; }
 		y[first] = left_bounder_cond;
@@ -93,7 +93,7 @@ void nonlinear_diffusion_nonuniform_wind_1_2_ (
 			K_1[i] = frac[i] * W[i] / y[i];
 		}
 	} while ((max_dif_rel(K_1, K_0, 1, last - 1) > eps) && (iter_sol <=maxiter));
-	 std::printf ("flag_F_negative=%d  ", flag_F_negative);
+	 //std::printf ("flag_F_negative=%d  ", flag_F_negative);
 	 if (iter_sol >= maxiter) { 
 	     throw std::invalid_argument("Disc equation failed to converge. If you set --initialcond=gaussF, try move gausssigma and gaussmu parameters");
 	     throw DiscEqFailException();
@@ -188,8 +188,7 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
         if (flag_F_negative == 1) {
             current_right_bc *= 0.99; // Decrease by 1%
             retry_count++;
-            //std::printf("Unphysical F detected. Retrying with right_bc = %e (Retry %d)\n", current_right_bc, retry_count);
-			//std::getchar();
+            std::printf("Unphysical F detected. Retrying with right_bc = %e (Retry %d)\n", current_right_bc, retry_count);
 			iter_sol = 0;
         } else {
             physics_valid = true; // Success!

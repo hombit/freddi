@@ -117,11 +117,11 @@ void FreddiEvolution::step(const double tau) {
 	FreddiState::step(tau);
 	
 	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A__ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
-	
+	//nonlinear_diffusion(tau);
 	if (Mdot_outer_boundary() == 0.0) {
-        nonlinear_diffusion(tau);
+        nonlinear_diffusion(tau); // valid for outer boundary condition Mdotin=0
     } else {
-        nonlinear_diffusion_outer_condition_depends_Mdotin(tau);
+        nonlinear_diffusion_outer_condition_depends_Mdotin(tau); //  iterations until the outer boundary condition fullfulls at the end of the step
     }
 	
     /*nonlinear_diffusion_nonuniform_wind_1_2(

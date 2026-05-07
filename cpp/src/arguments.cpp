@@ -369,7 +369,9 @@ constexpr const double SelfIrradiationArguments::default_Cirr_cold;
 constexpr const double SelfIrradiationArguments::default_irrindex_cold;
 constexpr const double SelfIrradiationArguments::default_height_to_radius_cold;
 constexpr const char SelfIrradiationArguments::default_angular_dist_disk[];
-
+constexpr const char SelfIrradiationArguments::default_irradiation_type[];
+constexpr const double SelfIrradiationArguments::default_scattering_opacity;
+constexpr const double SelfIrradiationArguments::default_etaX;
 
 constexpr const double FluxArguments::default_colourfactor;
 constexpr const double FluxArguments::default_emin;

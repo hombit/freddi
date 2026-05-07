@@ -183,7 +183,7 @@ public:
 	constexpr static const double default_Rfront_Mdotzero_factor = 1.;
 	constexpr static const double default_DIM_front_Mdot_factor = 2.3;
         //constexpr static const char default_check_state_approach[] = "before2024";
-        constexpr static const char default_check_Sigma_approach[] = "simple";
+    constexpr static const char default_check_Sigma_approach[] = "simple";
 	constexpr static const char default_Tirr_crit_approach[] = "const";
 	constexpr static const char default_DIM_front_approach[] = "maxFvis";
 	constexpr static const char default_scatter_by_corona[] = "yes";
@@ -293,6 +293,10 @@ public:
 	constexpr static const double default_irrindex_cold = 0.0;
 	constexpr static const double default_height_to_radius_cold = 0.0;
 	constexpr static const char default_angular_dist_disk[] = "plane";
+	constexpr static const char default_irradiation_type[] = "constant_Cirr";
+	constexpr static const double default_scattering_opacity = 0.34;  // as in Tavleev+2023
+	constexpr static const double default_etaX = 0.333;
+	
 public:
 	double Cirr;
 	double irrindex;
@@ -300,14 +304,17 @@ public:
 	double irrindex_cold;
 	double height_to_radius_cold;
 	std::string angular_dist_disk;
+	std::string irradiation_type;
+	double scattering_opacity;
+	double etaX;
 public:
 	SelfIrradiationArguments(
 			double Cirr, double irrindex,
 			double Cirr_cold, double irrindex_cold, double height_to_radius_cold,
-			const std::string& angular_dist_disk):
+			const std::string& angular_dist_disk, const std::string& irradiation_type, double scattering_opacity, double etaX):
 			Cirr(Cirr), irrindex(irrindex),
 			Cirr_cold(Cirr_cold), irrindex_cold(irrindex_cold), height_to_radius_cold(height_to_radius_cold),
-			angular_dist_disk(angular_dist_disk) {}
+			angular_dist_disk(angular_dist_disk), irradiation_type(irradiation_type), scattering_opacity(scattering_opacity), etaX(etaX) {} 
 };
 
 
