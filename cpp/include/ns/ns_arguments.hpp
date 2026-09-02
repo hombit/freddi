@@ -122,7 +122,8 @@ public:
 			std::optional<double> Mdisk0, std::optional<double> Mdot0,
 			std::optional<double> powerorder,
 			std::optional<double> gaussmu, std::optional<double> gausssigma,
-			const std::string& wind, const pard& windparams);
+			const std::string& wind, const pard& windparams,
+			const std::string& windT_ic_approach);
 };
 
 

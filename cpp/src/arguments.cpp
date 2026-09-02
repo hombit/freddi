@@ -46,7 +46,8 @@ DiskStructureArguments::DiskStructureArguments(
 		std::optional<double> Mdisk0, std::optional<double> Mdot0,
 		std::optional<double> powerorder,
 		std::optional<double> gaussmu, std::optional<double> gausssigma,
-		const std::string& wind, const pard& windparams
+		const std::string& wind, const pard& windparams,
+		const std::string& windT_ic_approach
 	):
 		opacity(opacity),
 		oprel(OpacityRelated(opacity, bdb_args.Mx, bdb_args.alpha, mu)),
@@ -64,7 +65,8 @@ DiskStructureArguments::DiskStructureArguments(
 													  powerorder,
 													  gaussmu, gausssigma)),
 		wind(wind),
-		windparams(windparams) {}
+		windparams(windparams),
+		windT_ic_approach(windT_ic_approach) {}
 
 std::shared_ptr<DiskStructureArguments::InitialFFunction> DiskStructureArguments::initializeInitialFFunction(
 				const OpacityRelated& oprel,

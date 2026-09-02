@@ -119,11 +119,13 @@ DiskStructureOptions::DiskStructureOptions(const po::variables_map &vm, const Ba
 				varToOpt<double>(vm, "gaussmu"),
 				varToOpt<double>(vm, "gausssigma"),
 				vm["windtype"].as<std::string>(),
-				windparamsInitializer(vm)) {}
+				windparamsInitializer(vm),
+				vm["windT_ic_approach"].as<std::string>()) {}
 
 
 pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 	const auto windtype = vm["windtype"].as<std::string>();
+	const auto windT_ic_approach = vm["windT_ic_approach"].as<std::string>();
 
 	if (windtype == "no") {
 		return {};
@@ -159,15 +161,15 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 		if (vm.count("windXi_max") == 0) {
 			throw po::error("--windXi_max is required if --windtype=Shields1986");
 		}
-		if (vm.count("windT_ic") == 0) {
-			throw po::error("--windT_ic is required if --windtype=Shields1986");
+		if (windT_ic_approach == "const" && vm.count("windT_ic") == 0) {
+			throw po::error("--windT_ic is required if --windtype=Shields1986 and --windT_ic_approach=const");
 		}
 		if (vm.count("windPow") == 0) {
 			throw po::error("--windPow is required if --windtype=Shields1986");
 		}
 		return {
 				{"Xi_max", vm["windXi_max"].as<double>()},
-				{"T_ic", vm["windT_ic"].as<double>()},
+				{"T_ic", vm.count("windT_ic") ? vm["windT_ic"].as<double>() : 0.0},
 				{"Pow", vm["windPow"].as<double>()}
 		};
 	}
@@ -175,20 +177,20 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 		if (vm.count("windC_0") == 0) {
 			throw po::error("--windC_0 is required if --windtype=Woods1996AGN");
 		}
-		if (vm.count("windT_ic") == 0) {
-			throw po::error("--windT_ic is required if --windtype=Woods1996AGN");
+		if (windT_ic_approach == "const" && vm.count("windT_ic") == 0) {
+			throw po::error("--windT_ic is required if --windtype=Woods1996AGN and --windT_ic_approach=const");
 		}
 		return {
 				{"C_0", vm["windC_0"].as<double>()},
-				{"T_ic", vm["windT_ic"].as<double>()}
+				{"T_ic", vm.count("windT_ic") ? vm["windT_ic"].as<double>() : 0.0}
 		};
 	}
 	if (windtype == "Woods1996"){
 		if (vm.count("windXi_max") == 0) {
 			throw po::error("--windXi_max is required if --windtype=Woods1996");
 		}
-		if (vm.count("windT_ic") == 0) {
-			throw po::error("--windT_ic is required if --windtype=Woods1996");
+		if (windT_ic_approach == "const" && vm.count("windT_ic") == 0) {
+			throw po::error("--windT_ic is required if --windtype=Woods1996 and --windT_ic_approach=const");
 		}
 		if (vm.count("windPow") == 0) {
 			throw po::error("--windPow is required if --windtype=Woods1996");
@@ -198,7 +200,7 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 // 		}
 		return {
 				{"Xi_max", vm["windXi_max"].as<double>()},
-				{"T_ic", vm["windT_ic"].as<double>()},
+				{"T_ic", vm.count("windT_ic") ? vm["windT_ic"].as<double>() : 0.0},
 				{"Pow", vm["windPow"].as<double>()},
 				{"IrAngDis", vm["wind_Irr_ang_distribution"].as<int>()}
 		};
@@ -286,7 +288,11 @@ po::options_description DiskStructureOptions::description() {
 			( "windA_0", po::value<double>(), "Dimensionless parameter characterizing the strength of the super-Eddington wind in the framework of the model Janiuk et al. 2015. Effective value range from 10 to 25\n")
 			( "windB_1", po::value<double>(), "The quantity is of the order of unity. Characterizes the relationship between the change in energy per particle and virial energy.\nE = B_1 * k * T\n")
 			( "windXi_max", po::value<double>(), "Ionization parameter, the ratio of the radiation and gas pressures\n" )
-			( "windT_ic", po::value<double>(), "Inverse Compton temperature, K. Characterizes the hardness of the irradiating spectrum\n")
+			( "windT_ic", po::value<double>(), "Inverse Compton temperature, K. Characterizes the hardness of the irradiating spectrum. Required when --windT_ic_approach=const; ignored otherwise\n")
+			( "windT_ic_approach", po::value<std::string>()->default_value(default_windT_ic_approach), "Type of determining the inverse Compton temperature used by the thermal wind models (Shields1986, Woods1996AGN, Woods1996)\n\n"
+					"Values:\n"
+					" const: use the fixed value given by --windT_ic\n"
+					" Done2018: compute from the disk's instantaneous Eddington ratio l = Lbol/Ledd, following Eqs. (8)-(9) of Done et al. (2018): T_IC/1e7 K = 4.2 - 4.6*log10(l/0.02) for l < 0.02, and T_IC/1e7 K = 0.36*(l/0.02)^(1/4) for l >= 0.02\n")
 			( "windPow", po::value<double>(), "Multiplicative coefficient to control wind power\n")
 			( "windC_0", po::value<double>(), "Characteristic column density of the wind mass loss rate from Woods et al. 1996 model, g/(s*cm^2). For AGN approx value is 3e-13 g/(s*cm^2)\n")
 			( "wind_Irr_ang_distribution", po::value<int>()->default_value(default_wind_Irr_ang_distribution), "Flag to take into account (1), or not (0, default), the angular distribution of central X-rays when calculating the illuminating X-ray flux which drives the thermal wind.\n" )

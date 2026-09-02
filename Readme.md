@@ -365,7 +365,24 @@ Parameters of the disk model:
                                    
   --windT_ic arg                   Inverse Compton temperature, K. 
                                    Characterizes the hardness of the 
-                                   irradiating spectrum
+                                   irradiating spectrum. Required when 
+                                   --windT_ic_approach=const; ignored 
+                                   otherwise
+                                   
+  --windT_ic_approach arg (=const) Type of determining the inverse Compton 
+                                   temperature used by the thermal wind models
+                                   (Shields1986, Woods1996AGN, Woods1996)
+                                   
+                                   Values:
+                                    const: use the fixed value given by 
+                                   --windT_ic
+                                    Done2018: compute from the disk's 
+                                   instantaneous Eddington ratio l = 
+                                   Lbol/Ledd, following Eqs. (8)-(9) of Done 
+                                   et al. (2018): T_IC/1e7 K = 4.2 - 
+                                   4.6*log10(l/0.02) for l < 0.02, and 
+                                   T_IC/1e7 K = 0.36*(l/0.02)^(1/4) for l >= 
+                                   0.02
                                    
   --windPow arg                    Multiplicative coefficient to control wind 
                                    power
@@ -712,7 +729,25 @@ Parameters of the disk model:
                                         
   --windT_ic arg                        Inverse Compton temperature, K. 
                                         Characterizes the hardness of the 
-                                        irradiating spectrum
+                                        irradiating spectrum. Required when 
+                                        --windT_ic_approach=const; ignored 
+                                        otherwise
+                                        
+  --windT_ic_approach arg (=const)      Type of determining the inverse Compton
+                                        temperature used by the thermal wind 
+                                        models (Shields1986, Woods1996AGN, 
+                                        Woods1996)
+                                        
+                                        Values:
+                                         const: use the fixed value given by 
+                                        --windT_ic
+                                         Done2018: compute from the disk's 
+                                        instantaneous Eddington ratio l = 
+                                        Lbol/Ledd, following Eqs. (8)-(9) of 
+                                        Done et al. (2018): T_IC/1e7 K = 4.2 - 
+                                        4.6*log10(l/0.02) for l < 0.02, and 
+                                        T_IC/1e7 K = 0.36*(l/0.02)^(1/4) for l 
+                                        >= 0.02
                                         
   --windPow arg                         Multiplicative coefficient to control 
                                         wind power
@@ -1307,6 +1342,12 @@ to taking thermal wind into account.
 Choosing option `--windtype=Woods1996`, it is necessary to set the value of the ionization parameter Xi
 (which is proportional to the ratio of the radiation and gas pressures) by the option `--windXi_max` and the Compoton temperature T_ic 
 (which determines the hardness of the irradiating spectrum and the size of the region where the wind operates) by the option `--windT_ic`. 
+
+By default (`--windT_ic_approach=const`), T_ic is fixed to the value given by `--windT_ic` for the whole simulation.
+Setting `--windT_ic_approach=Done2018` instead makes T_ic evolve with the disk's instantaneous Eddington ratio
+l = Lbol/Ledd, following the hard/soft-state phenomenological relation of Eqs. (8)-(9) of
+[Done et al. (2018)](https://ui.adsabs.harvard.edu/abs/2018MNRAS.476.4132D); `--windT_ic` is then not required and is ignored.
+This applies to the `Shields1986`, `Woods1996AGN` and `Woods1996` wind types.
 
 ### Companion star irradiation
 

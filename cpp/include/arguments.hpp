@@ -185,6 +185,7 @@ public:
         //constexpr static const char default_check_state_approach[] = "before2024";
     constexpr static const char default_check_Sigma_approach[] = "simple";
 	constexpr static const char default_Tirr_crit_approach[] = "const";
+	constexpr static const char default_windT_ic_approach[] = "const";
 	constexpr static const char default_DIM_front_approach[] = "maxFvis";
 	constexpr static const char default_scatter_by_corona[] = "yes";
 	constexpr static const char default_initialcond[] = "powerF";
@@ -212,6 +213,7 @@ public:
 	std::string initialcond;
 	std::string wind;
 	pard windparams;
+	std::string windT_ic_approach;
 protected:
 	std::shared_ptr<InitialFFunction> initial_F_function;
 protected:
@@ -243,8 +245,9 @@ public:
 			std::optional<double> powerorder,
 			std::optional<double> gaussmu, 
 			std::optional<double> gausssigma,
-			const std::string& wind, 
-			const pard& windparams);
+			const std::string& wind,
+			const pard& windparams,
+			const std::string& windT_ic_approach);
 	DiskStructureArguments(
 			const std::string &opacity,
 			const OpacityRelated &oprel,
@@ -261,25 +264,27 @@ public:
 			const std::string &scatter_by_corona,
 			const std::string &initialcond,
 			const std::shared_ptr<InitialFFunction> initial_F_function,
-			const std::string &wind, 
-			const pard &windparams):
-			opacity(opacity), 
+			const std::string &wind,
+			const pard &windparams,
+			const std::string &windT_ic_approach):
+			opacity(opacity),
 			oprel(oprel),
 			Mdotout(Mdotout),
-			boundcond(boundcond), 
-			Thot(Thot), 
+			boundcond(boundcond),
+			Thot(Thot),
 			Tirr2Tvishot(Tirr2Tvishot),
 			Rfront_Mdotzero_factor(Rfront_Mdotzero_factor),
 			DIM_front_Mdot_factor(DIM_front_Mdot_factor),
-			//check_state_approach(check_state_approach), 
+			//check_state_approach(check_state_approach),
 			check_Sigma_approach(check_Sigma_approach),
 			Tirr_crit_approach(Tirr_crit_approach),
 			DIM_front_approach(DIM_front_approach),
 			scatter_by_corona(scatter_by_corona),
 			initialcond(initialcond),
 			initial_F_function(initial_F_function),
-			wind(wind), 
-			windparams(windparams) {}
+			wind(wind),
+			windparams(windparams),
+			windT_ic_approach(windT_ic_approach) {}
 	inline vecd initial_F(const vecd& h) const { return (*initial_F_function)(h); }
 	inline size_t initial_first(const vecd& h) const { return initial_F_function->first(h); }
 };

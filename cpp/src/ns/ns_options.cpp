@@ -202,7 +202,8 @@ NeutronStarDiskStructureOptions::NeutronStarDiskStructureOptions(const po::varia
 				varToOpt<double>(vm, "gaussmu"),
 				varToOpt<double>(vm, "gausssigma"),
 				vm["windtype"].as<std::string>(),
-				DiskStructureOptions::windparamsInitializer(vm)) {}
+				DiskStructureOptions::windparamsInitializer(vm),
+				vm["windT_ic_approach"].as<std::string>()) {}
 
 po::options_description NeutronStarDiskStructureOptions::description() {
 	auto non_ns_od = DiskStructureOptions::description();

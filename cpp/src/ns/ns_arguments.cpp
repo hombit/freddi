@@ -127,7 +127,8 @@ NeutronStarDiskStructureArguments::NeutronStarDiskStructureArguments(
 		std::optional<double> Mdisk0, std::optional<double> Mdot0,
 		std::optional<double> powerorder,
 		std::optional<double> gaussmu, std::optional<double> gausssigma,
-		const std::string& wind, const pard& windparams
+		const std::string& wind, const pard& windparams,
+		const std::string& windT_ic_approach
 ): DiskStructureArguments(opacity, OpacityRelated(opacity, bdb_args.Mx, bdb_args.alpha, mu),
 						  Mdotout,
 						  boundcond, Thot, Tirr2Tvishot,
@@ -142,7 +143,7 @@ NeutronStarDiskStructureArguments::NeutronStarDiskStructureArguments(
 													   initialcond, F0, Mdisk0, Mdot0,
 													   powerorder,
 													   gaussmu, gausssigma),
-						  wind, windparams) {}
+						  wind, windparams, windT_ic_approach) {}
 
 
 std::shared_ptr<DiskStructureArguments::InitialFFunction> NeutronStarDiskStructureArguments::initializeInitialFFunctionNS(

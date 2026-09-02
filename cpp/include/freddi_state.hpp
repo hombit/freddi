@@ -133,7 +133,8 @@ private:
 	private:
 		// windparams
 		const double Xi_max;
-		const double T_ic;
+		const double T_ic_const;
+		double T_ic;
 		const double Pow;
 	public:
 		explicit Shields1986Wind(const FreddiState& state);
@@ -149,7 +150,8 @@ private:
 	private:
 		// windparams
 		const double C_0;
-		const double T_ic;
+		const double T_ic_const;
+		double T_ic;
 	public:
 		explicit Woods1996AGNWind(const FreddiState& state);
 		~Woods1996AGNWind() override = default;
@@ -164,7 +166,8 @@ private:
 		protected:
 			// windparams , changed from private to protectes to make them accesible in ns_evolution
 			const double Xi_max;
-			const double T_ic;
+			const double T_ic_const;
+			double T_ic;
 			const double Pow;
 			const double IrAngDis;
 		public:
@@ -340,6 +343,8 @@ public:
 	virtual double Mdot_in() const;
     virtual double Mdot_out_from_F() const;
     virtual double Lbol_disk() const;
+	virtual double L_edd_disk() const;
+	virtual double T_ic_current(double T_ic_const) const;
     virtual double Rfront_Rhot(double r, double z_r) const;
 	virtual double obtain_Mdot_outer_boundary() const;
 	virtual double Tirr_critical(double r, int ii) const ;
