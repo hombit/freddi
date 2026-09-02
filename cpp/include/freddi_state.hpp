@@ -26,7 +26,8 @@ private:
 	class BasicWind {
 	protected:
 		vecd A_, B_, C_, Vwind_;
-    	double R_IC_; 
+    	double R_IC_;
+		double T_ic_ = 0.0; // inverse Compton temperature, K; 0 for wind types without one (see BasicWind::BasicWind)
 	public:
 		explicit BasicWind(const FreddiState&);
 		virtual ~BasicWind() = 0;
@@ -35,7 +36,8 @@ private:
 		inline const vecd& A() const { return A_; }
 		inline const vecd& B() const { return B_; }
 		inline const vecd& C() const { return C_; }
-		inline double R_IC() const { return R_IC_; } 
+		inline double R_IC() const { return R_IC_; }
+		inline double T_ic() const { return T_ic_; }
 	};
 
 	class NoWind: public BasicWind {

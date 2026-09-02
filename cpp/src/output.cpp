@@ -224,6 +224,7 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Mdot_Rhot", "g/s", "Accretion rate at the cooling front radius", [freddi]() {return freddi->Mdot_out_from_F();}},
 			{"Mdot_wind", "g/s", "Wind mass loss from two sides",  [freddi]() {return freddi->Mdot_wind();}},
 			{"R_IC", "cm", "Compton radius", [freddi]() {return freddi->R_IC();}},
+			{"T_ic", "K", "Inverse Compton temperature used by the thermal wind model, see --windT_ic_approach", [freddi]() {return freddi->T_ic();}},
 			{"Sigma_wind", "g/cm^2", "Surface density in corona/wind at the outer radius of the hot disk", [freddi]() {return freddi->Column_density_wind()[freddi->last()];}},
 	};
 	const bool cold_disk = freddi->args().flux->cold_disk;

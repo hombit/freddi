@@ -736,6 +736,7 @@ FreddiState::Shields1986Wind::Shields1986Wind(const FreddiState& state):
 void FreddiState::Shields1986Wind::update(const FreddiState& state) {
     BasicWind::update(state);
     T_ic = state.T_ic_current(T_ic_const);
+    T_ic_ = T_ic;
     const auto disk = state.args().disk;
     //  1983ApJ...271...70B page 4
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
@@ -778,6 +779,7 @@ FreddiState::Woods1996AGNWind::Woods1996AGNWind(const FreddiState& state):
 void FreddiState::Woods1996AGNWind::update(const FreddiState& state) {
     BasicWind::update(state);
     T_ic = state.T_ic_current(T_ic_const);
+    T_ic_ = T_ic;
     const auto disk = state.args().disk;
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
     const double L_edd = state.L_edd_disk();
@@ -833,6 +835,7 @@ BasicWind(state),
 void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
     BasicWind::update(state);
     T_ic = state.T_ic_current(T_ic_const);
+    T_ic_ = T_ic;
     const auto disk = state.args().disk;
 
     const double L = state.Lbol_disk();

@@ -59,6 +59,7 @@ public:
 	virtual void step(double tau);
 	inline void step() { return step(args().calc->tau); }
 	double R_IC() const { return wind_->R_IC(); }
+	double T_ic() const { return wind_->T_ic(); }
 public:
 	using iterator = EvolutionIterator<FreddiEvolution>;
 	inline iterator begin() { return {this}; }
