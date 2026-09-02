@@ -1348,8 +1348,9 @@ Setting `--windT_ic_approach=Done2018` instead makes T_ic evolve with the disk's
 l = Lbol/Ledd, following the hard/soft-state phenomenological relation of Eqs. (8)-(9) of
 [Done et al. (2018)](https://ui.adsabs.harvard.edu/abs/2018MNRAS.476.4132D); `--windT_ic` is then not required and is ignored.
 This applies to the `Shields1986`, `Woods1996AGN` and `Woods1996` wind types.
-The `R_IC` output column (the Compton radius) is recomputed from T_ic at every time step as well, so it
-tracks the disk's luminosity when `--windT_ic_approach=Done2018` rather than staying fixed as it does under `const`.
+The `T_ic` output column reports the value of T_ic actually used at each time step, and the `R_IC` output
+column (the Compton radius, derived from T_ic) is recomputed alongside it — so both track the disk's
+luminosity when `--windT_ic_approach=Done2018` rather than staying fixed as they do under `const`.
 
 ### Companion star irradiation
 
