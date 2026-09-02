@@ -602,12 +602,18 @@ const vecd& FreddiState::Mdot_wind_running() const {
 // }
 
 FreddiState::BasicWind::BasicWind(const FreddiState &state) :
-    A_(state.Nx(), 0.), 
-    B_(state.Nx(), 0.), 
-    C_(state.Nx(), 0.), 
+    A_(state.Nx(), 0.),
+    B_(state.Nx(), 0.),
+    C_(state.Nx(), 0.),
     Vwind_(state.v_wind()), // state.v_wind() returns the esc velocity vector
-    R_IC_((state.GM() * state.args().disk->mu * GSL_CONST_CGSM_MASS_PROTON) / 
-          (GSL_CONST_CGSM_BOLTZMANN * state.args().disk->windparams.at("T_ic"))) 
+    // R_IC_ (Compton radius) is only meaningful for wind models with an inverse Compton
+    // temperature (Shields1986, Woods1996AGN, Woods1996ShieldsApproxWind); those recompute it
+    // themselves in update() (see T_ic_current()), tracking windT_ic_approach. Other wind types
+    // don't have "T_ic" in windparams at all, hence the guard here.
+    R_IC_(state.args().disk->windparams.count("T_ic")
+          ? (state.GM() * state.args().disk->mu * GSL_CONST_CGSM_MASS_PROTON) /
+                (GSL_CONST_CGSM_BOLTZMANN * state.args().disk->windparams.at("T_ic"))
+          : 0.0)
 {}
 
 
@@ -736,6 +742,7 @@ void FreddiState::Shields1986Wind::update(const FreddiState& state) {
     // should the angular distribution be a factor here???
     //  1983ApJ...271...70B page 3
     const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_ic);
+    R_IC_ = R_iC;
     const double L_edd = state.L_edd_disk();
     const double L_crit = (1.0 / 8.0) * std::sqrt(GSL_CONST_CGSM_MASS_ELECTRON / (disk->mu * GSL_CONST_CGSM_MASS_PROTON)) * std::sqrt((GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT ) / (GSL_CONST_CGSM_BOLTZMANN * T_ic)) * L_edd;
     const double P_iC = L / (4.0 * M_PI * m::pow<2>(R_iC) * Xi_max * GSL_CONST_CGSM_SPEED_OF_LIGHT);
@@ -775,6 +782,7 @@ void FreddiState::Woods1996AGNWind::update(const FreddiState& state) {
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
     const double L_edd = state.L_edd_disk();
     const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_ic);
+    R_IC_ = R_iC;
     const double le = L/L_edd;
     double R_tr;
     if ( le <= 0.01 ) {
@@ -829,6 +837,7 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
 
     const double L = state.Lbol_disk();
     const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_ic);
+    R_IC_ = R_iC;
     //const double VeL = std::sqrt(state.GM()/R_iC) ;
     //const double C_iC = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_ic)/( GSL_CONST_CGSM_MASS_PROTON));
     //const double m_ch0 = disk->Mdot0 / (M_PI * state.R().back()*state.R().back());
