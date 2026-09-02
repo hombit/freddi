@@ -368,6 +368,22 @@ const vecd& FreddiState::Kirr() const {
 				// getchar();
 				x[i] = args().irr->etaX * args().irr->scattering_opacity * Column_density_wind()[i] / 2;
 			}
+		} else if (args().irr->irradiation_type == "Dubus2001") {
+			// Undocumented (comparison-only): Dubus et al. 2001-style wind-scattering irradiation
+			// parameter, a single disc-wide constant instead of scatter_dependent's per-ring
+			// Column_density_wind() estimate. Their Eq. (10):
+			//   C = int_0^1 int_{Rin}^{Rout} sigma_T n_w mu dmu dr
+			//     ~= sigma_T * Mdot_wind / (8 pi R_in v_w m_I)
+			// where m_I is the mean particle mass and v_w is the wind velocity, both evaluated
+			// near the inner disc radius, and Mdot_wind is the total (two-sided) wind mass loss
+			// rate integrated over the whole hot disc.
+			const double R_in = R()[first()];
+			const double m_I = args().disk->mu * GSL_CONST_CGSM_MASS_PROTON;
+			const double C = GSL_CONST_CGSM_THOMSON_CROSS_SECTION * Mdot_wind() /
+					(8.0 * M_PI * R_in * v_wind()[first()] * m_I);
+			for (size_t i = first(); i <= Nx(); i++) {
+				x[i] = C;
+			}
 		} else if  (args().irr->irradiation_type == "direct_analytic") {
 			const vecd& H = Height();
 			x[0] = 0.0; // no irradiation at the inner boundary
