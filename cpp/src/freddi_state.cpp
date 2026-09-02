@@ -375,12 +375,17 @@ const vecd& FreddiState::Kirr() const {
 			//   C = int_0^1 int_{Rin}^{Rout} sigma_T n_w mu dmu dr ~= kappa * Mdot_wind / (8 pi Rin v_w)
 			// where kappa = sigma_T/m_I is the scattering opacity (--scattering_opacity); Rin = 0.2
 			// R_IC is the wind launching radius (their Eq. 4, "thermal wind is effective for radii
-			// R >= 0.2 R_IC" -- using Freddi's own R_IC = wind_->R_IC(), not their Eq. 4 definition
-			// which additionally corrects for radiation pressure via (1 - sqrt(2) L/Ledd); TODO decide
-			// whether to also use that correction here); v_w ~ escape velocity at Rin; and Mdot_wind
-			// is the total (two-sided) wind mass loss rate, i.e. their Mdot_w(Rin) integrated out to
-			// Rout, matching Freddi's existing Mdot_wind().
-			const double R_in = 0.2 * wind_->R_IC();
+			// R >= 0.2 R_IC"); v_w ~ escape velocity at Rin; and Mdot_wind is the total (two-sided)
+			// wind mass loss rate, i.e. their Mdot_w(Rin) integrated out to Rout, matching Freddi's
+			// existing Mdot_wind().
+			// R_IC here is their Eq. (4), i.e. Freddi's own wind_->R_IC() = GM*mu*mp/(kB*T_ic) with
+			// an added rough radiation-pressure correction (1 - sqrt(2) L/Ledd) -- scoped to this
+			// branch only, the shared wind_->R_IC()/T_ic used by the actual wind mass-loss physics
+			// (Shields1986Wind, Woods1996AGNWind, Woods1996ShieldsApproxWind) is untouched. Per the
+			// source paper this correction is explicitly "rough" and can go unphysical (negative)
+			// as L approaches Ledd/sqrt(2) -- not guarded against here.
+			const double R_IC_corrected = wind_->R_IC() * (1.0 - std::sqrt(2.0) * Lbol_disk() / L_edd_disk());
+			const double R_in = 0.2 * R_IC_corrected;
 			const double v_w = std::sqrt(2.0 * GM() / R_in);
 			const double C = args().irr->scattering_opacity * Mdot_wind() / (8.0 * M_PI * R_in * v_w);
 			for (size_t i = first(); i <= Nx(); i++) {
