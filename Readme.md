@@ -364,14 +364,18 @@ Parameters of the disk model:
                                    radiation and gas pressures
                                    
   --windT_ic arg                   Inverse Compton temperature, K. 
-                                   Characterizes the hardness of the 
-                                   irradiating spectrum. Required when 
-                                   --windT_ic_approach=const; ignored 
-                                   otherwise
+                                   Characterizes the hardness of the irradiating 
+                                   spectrum. Required when 
+                                   --windT_ic_approach=const; ignored otherwise. 
+                                   The T_ic value actually used at each time 
+                                   step, and the Compton radius R_IC derived 
+                                   from it, are reported in the T_ic and R_IC 
+                                   output columns
                                    
   --windT_ic_approach arg (=const) Type of determining the inverse Compton 
-                                   temperature used by the thermal wind models
-                                   (Shields1986, Woods1996AGN, Woods1996)
+                                   temperature used by the thermal wind models 
+                                   (Shields1986, Woods1996AGN, Woods1996). See 
+                                   also the T_ic and R_IC output columns
                                    
                                    Values:
                                     const: use the fixed value given by 
@@ -731,12 +735,17 @@ Parameters of the disk model:
                                         Characterizes the hardness of the 
                                         irradiating spectrum. Required when 
                                         --windT_ic_approach=const; ignored 
-                                        otherwise
+                                        otherwise. The T_ic value actually used 
+                                        at each time step, and the Compton 
+                                        radius R_IC derived from it, are 
+                                        reported in the T_ic and R_IC output 
+                                        columns
                                         
   --windT_ic_approach arg (=const)      Type of determining the inverse Compton
                                         temperature used by the thermal wind 
                                         models (Shields1986, Woods1996AGN, 
-                                        Woods1996)
+                                        Woods1996). See also the T_ic and R_IC 
+                                        output columns
                                         
                                         Values:
                                          const: use the fixed value given by 

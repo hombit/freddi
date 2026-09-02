@@ -288,8 +288,8 @@ po::options_description DiskStructureOptions::description() {
 			( "windA_0", po::value<double>(), "Dimensionless parameter characterizing the strength of the super-Eddington wind in the framework of the model Janiuk et al. 2015. Effective value range from 10 to 25\n")
 			( "windB_1", po::value<double>(), "The quantity is of the order of unity. Characterizes the relationship between the change in energy per particle and virial energy.\nE = B_1 * k * T\n")
 			( "windXi_max", po::value<double>(), "Ionization parameter, the ratio of the radiation and gas pressures\n" )
-			( "windT_ic", po::value<double>(), "Inverse Compton temperature, K. Characterizes the hardness of the irradiating spectrum. Required when --windT_ic_approach=const; ignored otherwise\n")
-			( "windT_ic_approach", po::value<std::string>()->default_value(default_windT_ic_approach), "Type of determining the inverse Compton temperature used by the thermal wind models (Shields1986, Woods1996AGN, Woods1996)\n\n"
+			( "windT_ic", po::value<double>(), "Inverse Compton temperature, K. Characterizes the hardness of the irradiating spectrum. Required when --windT_ic_approach=const; ignored otherwise. The T_ic value actually used at each time step, and the Compton radius R_IC derived from it, are reported in the T_ic and R_IC output columns\n")
+			( "windT_ic_approach", po::value<std::string>()->default_value(default_windT_ic_approach), "Type of determining the inverse Compton temperature used by the thermal wind models (Shields1986, Woods1996AGN, Woods1996). See also the T_ic and R_IC output columns\n\n"
 					"Values:\n"
 					" const: use the fixed value given by --windT_ic\n"
 					" Done2018: compute from the disk's instantaneous Eddington ratio l = Lbol/Ledd, following Eqs. (8)-(9) of Done et al. (2018): T_IC/1e7 K = 4.2 - 4.6*log10(l/0.02) for l < 0.02, and T_IC/1e7 K = 0.36*(l/0.02)^(1/4) for l >= 0.02\n")
