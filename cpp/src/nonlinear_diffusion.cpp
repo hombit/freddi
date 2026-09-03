@@ -192,13 +192,17 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
         if (flag_F_negative == 1 || !converged) {
             current_right_bc *= 0.99; // Decrease by 1%
             retry_count++;
-            std::printf(
-                "%s detected. Retrying with right_bc = %e (Retry %d)\n",
-                converged ? "Unphysical F" : "Non-convergence",
-                current_right_bc, retry_count);
         } else {
             physics_valid = true; // Success!
         }
+    }
+
+    // One summary line per step instead of one line per retry -- this loop can take
+    // dozens of retries, and printing each of them floods stdout.
+    if (retry_count > 0) {
+        std::printf(
+            "Disc equation: needed %d retries of right_bc (down to %e) to reach a %s solution\n",
+            retry_count, current_right_bc, physics_valid ? "physical" : "failed");
     }
 
     if (!physics_valid) {
