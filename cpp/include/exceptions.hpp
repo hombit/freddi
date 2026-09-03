@@ -13,7 +13,7 @@ public:
 class DiscEqFailException: public std::exception {
 public:
 	virtual const char* what() const noexcept override {
-		return "Iterations >=2000";
+		return "Disc equation failed to converge to a physical solution";
 	}
 };
 

@@ -184,22 +184,24 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
         } while ((max_dif_rel(K_1, K_0, 1, last - 1) > eps) && (iter_sol <= maxiter));
         // --- Original Logic Ends ---
 
-        // Check if we need to restart due to unphysical results
-        if (flag_F_negative == 1) {
+        const bool converged = (iter_sol <= maxiter);
+
+        // Retry with a smaller right boundary condition if this attempt produced
+        // unphysical (negative) F, or the relaxation loop failed to converge at all --
+        // both are treated as a failed guess for current_right_bc, not a fatal error.
+        if (flag_F_negative == 1 || !converged) {
             current_right_bc *= 0.99; // Decrease by 1%
             retry_count++;
-            std::printf("Unphysical F detected. Retrying with right_bc = %e (Retry %d)\n", current_right_bc, retry_count);
-			iter_sol = 0;
+            std::printf(
+                "%s detected. Retrying with right_bc = %e (Retry %d)\n",
+                converged ? "Unphysical F" : "Non-convergence",
+                current_right_bc, retry_count);
         } else {
             physics_valid = true; // Success!
         }
-
-        if (iter_sol >= maxiter) {
-            throw std::invalid_argument("Disc equation failed to converge within maxiter.");
-        }
     }
 
-    if (retry_count >= max_retries) {
-        throw std::runtime_error("Exceeded max retries attempting to fix negative F.");
+    if (!physics_valid) {
+        throw DiscEqFailException();
     }
 }

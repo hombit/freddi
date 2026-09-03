@@ -46,6 +46,17 @@ bool run_application(int ac, char *av[]) {
 				<< "reason: " << e.what()
 				<< std::endl;
 			return true;
+		} catch (const DiscEqFailException &e) {
+			std::cerr
+				<< "Freddi terminated prematurely"
+				<< ", "
+				<< "i_t = " << i_t
+				<< ", "
+				<< "t = " << sToDay(freddi->t()) << " (days)"
+				<< ", "
+				<< "reason: " << e.what()
+				<< std::endl;
+			return true;
 		}
 	}
 	
