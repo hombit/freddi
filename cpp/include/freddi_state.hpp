@@ -431,6 +431,8 @@ public:
 	const vecd& Tph_X() const;
 	const vecd& Tirr() const;
 	const vecd& Kirr() const;
+	double Cirr_scatter_dependent(size_t i) const;
+	double Cirr_Dubus2019() const;
 	const vecd& Height() const;
 	const vecd& Shadow() const;
 	const vecd& Mdot_wind_running() const;

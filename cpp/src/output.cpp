@@ -226,6 +226,8 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"R_IC", "cm", "Compton radius", [freddi]() {return freddi->R_IC();}},
 			{"T_ic", "K", "Inverse Compton temperature used by the thermal wind model, see --windT_ic_approach", [freddi]() {return freddi->T_ic();}},
 			{"Sigma_wind", "g/cm^2", "Surface density in corona/wind at the outer radius of the hot disk", [freddi]() {return freddi->Column_density_wind()[freddi->last()];}},
+			{"Cirr_scatter_out", "float", "Diagnostic only, not applied to the evolution: Cirr at the outer radius of the hot disk per the scatter_dependent formula (etaX * scattering_opacity * Sigma_wind / 2), regardless of the active --irradiation_type", [freddi]() {return freddi->Cirr_scatter_dependent(freddi->last());}},
+			{"Cirr_Dubus2019", "float", "Diagnostic only, not applied to the evolution: disc-wide Cirr per Dubus et al. (2019) Eq. (10) (kappa * Mdot_wind / (8 pi Rin v_w)), regardless of the active --irradiation_type", [freddi]() {return freddi->Cirr_Dubus2019();}},
 	};
 	const bool cold_disk = freddi->args().flux->cold_disk;
 	const bool star = freddi->args().flux->star;

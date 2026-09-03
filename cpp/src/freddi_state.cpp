@@ -352,43 +352,51 @@ const vecd& FreddiState::Qx() const {
 }
 
 
+double FreddiState::Cirr_scatter_dependent(size_t i) const {
+	// uniform formula for the whole disc
+	// Cirr = etaX * wind_Column_density *kappa_Thomson * angular_distribution / 2, see Qx()
+	// here we calculate Kirr = etaX * wind_Column_density *kappa_Thomson / 2
+	// scattering_opacity usually is kappa_Thomson
+	//  $X=0.735$ $Y=0.248$ and $Z=0.017$, with $Z/X$ = 0.023 (GREVESSE and A.J. SAUVAL 1988)
+	return args().irr->etaX * args().irr->scattering_opacity * Column_density_wind()[i] / 2;
+}
+
+
+double FreddiState::Cirr_Dubus2019() const {
+	// Undocumented (comparison-only): Dubus (2019)-style wind-scattering irradiation
+	// parameter, a single disc-wide constant instead of scatter_dependent's per-ring
+	// Column_density_wind() estimate. Their Eq. (10):
+	//   C = int_0^1 int_{Rin}^{Rout} sigma_T n_w mu dmu dr ~= kappa * Mdot_wind / (8 pi Rin v_w)
+	// where kappa = sigma_T/m_I is the scattering opacity (--scattering_opacity); Rin = 0.2
+	// R_IC is the wind launching radius (their Eq. 4, "thermal wind is effective for radii
+	// R >= 0.2 R_IC"); v_w ~ escape velocity at Rin; and Mdot_wind is the total (two-sided)
+	// wind mass loss rate, i.e. their Mdot_w(Rin) integrated out to Rout, matching Freddi's
+	// existing Mdot_wind().
+	// R_IC here is their Eq. (4), i.e. Freddi's own wind_->R_IC() = GM*mu*mp/(kB*T_ic) with
+	// an added rough radiation-pressure correction (1 - sqrt(2) L/Ledd) -- scoped to this
+	// branch only, the shared wind_->R_IC()/T_ic used by the actual wind mass-loss physics
+	// (Shields1986Wind, Woods1996AGNWind, Woods1996ShieldsApproxWind) is untouched. Per the
+	// source paper this correction is explicitly "rough" and can go unphysical (negative)
+	// as L approaches Ledd/sqrt(2) -- not guarded against here.
+	const double R_IC_corrected = wind_->R_IC() * (1.0 - std::sqrt(2.0) * Lbol_disk() / L_edd_disk());
+	const double R_in = 0.2 * R_IC_corrected;
+	const double v_w = std::sqrt(2.0 * GM() / R_in);
+	return args().irr->scattering_opacity * Mdot_wind() / (8.0 * M_PI * R_in * v_w);
+}
+
+
 const vecd& FreddiState::Kirr() const {
-	
+
 	if(!opt_str_.Kirr) {
 		vecd x(Nx());
 		const vecd& Shad = Shadow();
 		if (args().irr->irradiation_type == "scatter_dependent") {
-			for (size_t i = first(); i <= Nx(); i++) {
-				// uniform formula for the whole disc
-				// Cirr = etaX * wind_Column_density *kappa_Thomson * angular_distribution / 2, see Qx()
-				// here we calculate Kirr = etaX * wind_Column_density *kappa_Thomson / 2
-				// scattering_opacity usually is kappa_Thomson 
-				//  $X=0.735$ $Y=0.248$ and $Z=0.017$, with $Z/X$ = 0.023 (GREVESSE and A.J. SAUVAL 1988)
-				// printf("Column_density_wind()[i] = %e\n", Column_density_wind()[i]);
-				// getchar();
-				x[i] = args().irr->etaX * args().irr->scattering_opacity * Column_density_wind()[i] / 2;
+			for (size_t i = first(); i < Nx(); i++) {
+				x[i] = Cirr_scatter_dependent(i);
 			}
 		} else if (args().irr->irradiation_type == "Dubus2019") {
-			// Undocumented (comparison-only): Dubus (2019)-style wind-scattering irradiation
-			// parameter, a single disc-wide constant instead of scatter_dependent's per-ring
-			// Column_density_wind() estimate. Their Eq. (10):
-			//   C = int_0^1 int_{Rin}^{Rout} sigma_T n_w mu dmu dr ~= kappa * Mdot_wind / (8 pi Rin v_w)
-			// where kappa = sigma_T/m_I is the scattering opacity (--scattering_opacity); Rin = 0.2
-			// R_IC is the wind launching radius (their Eq. 4, "thermal wind is effective for radii
-			// R >= 0.2 R_IC"); v_w ~ escape velocity at Rin; and Mdot_wind is the total (two-sided)
-			// wind mass loss rate, i.e. their Mdot_w(Rin) integrated out to Rout, matching Freddi's
-			// existing Mdot_wind().
-			// R_IC here is their Eq. (4), i.e. Freddi's own wind_->R_IC() = GM*mu*mp/(kB*T_ic) with
-			// an added rough radiation-pressure correction (1 - sqrt(2) L/Ledd) -- scoped to this
-			// branch only, the shared wind_->R_IC()/T_ic used by the actual wind mass-loss physics
-			// (Shields1986Wind, Woods1996AGNWind, Woods1996ShieldsApproxWind) is untouched. Per the
-			// source paper this correction is explicitly "rough" and can go unphysical (negative)
-			// as L approaches Ledd/sqrt(2) -- not guarded against here.
-			const double R_IC_corrected = wind_->R_IC() * (1.0 - std::sqrt(2.0) * Lbol_disk() / L_edd_disk());
-			const double R_in = 0.2 * R_IC_corrected;
-			const double v_w = std::sqrt(2.0 * GM() / R_in);
-			const double C = args().irr->scattering_opacity * Mdot_wind() / (8.0 * M_PI * R_in * v_w);
-			for (size_t i = first(); i <= Nx(); i++) {
+			const double C = Cirr_Dubus2019();
+			for (size_t i = first(); i < Nx(); i++) {
 				x[i] = C;
 			}
 		} else if  (args().irr->irradiation_type == "direct_analytic") {
