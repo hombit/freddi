@@ -463,6 +463,7 @@ public:
 	inline double flux_star(const Passband& passband) const { return flux_star(passband, phase_opt()); }
 	inline double Mdisk() const { return lazy_integrate<HotRegion>(opt_str_.Mdisk, Sigma()); }
 	double Mdot_wind() const;
+	double Mdot_wind_Dubus2019() const;
 	double Mdot_wind_running(const int ii) const;
 	double Column_density_wind(const int ii) const;
 	double Sigma_minus(double r) const;

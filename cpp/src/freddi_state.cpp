@@ -579,6 +579,52 @@ double FreddiState::Mdot_wind() const {
 }
 
 
+double FreddiState::Mdot_wind_Dubus2019() const {
+	// Undocumented (comparison-only): total wind mass-loss rate under the Woods1996ShieldsApproxWind
+	// formula (--windtype=Woods1996), with R_iC replaced by the Dubus (2019) radiation-pressure-
+	// corrected Compton radius (their Eq. 4, same expression as in Cirr_Dubus2019()) instead of
+	// Freddi's own R_iC = GM*mu*mp/(kB*T_ic). Purely diagnostic: does not feed back into the
+	// evolution, and Woods1996ShieldsApproxWind::update() still uses the uncorrected R_iC for the
+	// actually simulated wind. Only meaningful for --windtype=Woods1996 (reads its windparams).
+	const auto disk = args().disk;
+	const double Xi_max = disk->windparams.at("Xi_max");
+	const double Pow = disk->windparams.at("Pow");
+	const bool IrAngDis = disk->windparams.at("IrAngDis") != 0.0;
+	const double T_ic = wind_->T_ic();
+	const double L = Lbol_disk();
+	const double L_edd = L_edd_disk();
+	const double R_iC = wind_->R_IC() * (1.0 - std::sqrt(2.0) * L / L_edd); // Dubus (2019) Eq. (4)
+	const double L_crit = (1.0 / 8.0) * std::sqrt(GSL_CONST_CGSM_MASS_ELECTRON / (disk->mu * GSL_CONST_CGSM_MASS_PROTON)) * std::sqrt((GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT* GSL_CONST_CGSM_SPEED_OF_LIGHT ) / (GSL_CONST_CGSM_BOLTZMANN * T_ic)) * L_edd;
+	double el = L / L_crit;
+
+	vecd C(Nx(), 0.0);
+	for (size_t i = first(); i <= last(); ++i) {
+		if (R()[i] > 0.1 * R_iC) {
+			if (IrAngDis) {
+				el *= angular_dist_disk(Height()[i] / R()[i]);
+			}
+			const double xi = R()[i] / R_iC;
+			const double xi1 = R_iC / R()[i];
+			const double T_ch = T_ic * std::pow(el, 2.0 / 3.0) * std::pow(xi, -2.0 / 3.0);
+			const double C_ch = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_ch) / (disk->mu * GSL_CONST_CGSM_MASS_PROTON));
+			const double C0 = (4.0 * M_PI * m::pow<3>(h()[i])) / (m::pow<2>(GM()));
+			const double Fr = L / (4.0 * M_PI * m::pow<2>(R()[i]) * Xi_max * C_ch * GSL_CONST_CGSM_SPEED_OF_LIGHT);
+			const double Fc = ((std::pow((1 + m::pow<2>(((0.125 * el + 0.00382) * xi1))), (1.0 / 6.0))) /
+							   std::pow((1 + m::pow<-2>((m::pow<4>(el)* (1.0 + 262.0 * m::pow<2>(xi))))),
+										(1.0 / 6.0)));
+			const double Expo = std::exp(-(((1.0 - (1 / std::sqrt(1.0 + 0.25 * m::pow<2>(xi1)))) *
+											(1.0 - (1 / std::sqrt(1.0 + 0.25 * m::pow<2>(xi1))))) / (2.0 * xi)));
+			C[i] = -2.0 * Pow * C0 * Fr * Fc * Expo;
+		}
+	}
+
+	auto dMdot_dh = [&C](const size_t i) -> double {
+		return -C[i];
+	};
+	return integrate<HotRegion>(h(), dMdot_dh);
+}
+
+
 const vecd& FreddiState::Column_density_wind() const {
     if (!opt_str_.Column_density_wind) {
         vecd x(Nx(), 0.0);
