@@ -1361,6 +1361,35 @@ The `T_ic` output column reports the value of T_ic actually used at each time st
 column (the Compton radius, derived from T_ic) is recomputed alongside it — so both track the disk's
 luminosity when `--windT_ic_approach=Done2018` rather than staying fixed as they do under `const`.
 
+#### Temporary: Dubus et al. (2019) comparison tools
+
+**This subsection documents comparison-only tooling that is deliberately not shown by `--help`,
+and is expected to be removed (or promoted into the regular docs) once the comparison against
+Dubus et al. (2019) is done.**
+
+`--irradiation_type=Dubus2019` is an additional, `--help`-hidden value for the `--irradiation_type`
+option. It computes a single disc-wide irradiation constant from the wind's own scattering, following
+Dubus et al. (2019) Eq. (10):
+```
+C ~= kappa * Mdot_wind / (8 pi Rin v_w)
+```
+where `kappa` is `--scattering_opacity` (their `sigma_T/m_I`), `Rin = 0.2 R_IC` is the wind launching
+radius, `v_w` is the escape velocity at `Rin`, and `Mdot_wind` is the total wind mass-loss rate. Unlike
+`scatter_dependent`'s per-ring `Sigma_wind`-based estimate, this is a single value applied uniformly
+across the disc. `R_IC` here additionally carries the radiation-pressure correction of their Eq. (4),
+`R_IC = R_IC,Freddi * (1 - sqrt(2) L/Ledd)` — scoped only to this calculation; the shared `R_IC`/`T_ic`
+used by the actual wind mass-loss physics (`Shields1986`, `Woods1996AGN`, `Woods1996`) is unaffected.
+
+Four diagnostic output columns are always present in `freddi.dat`, regardless of the active
+`--irradiation_type` — they report what each scheme *would* give, without affecting the simulation:
+- `Cirr_scatter_out`: Cirr at the outer hot-disk radius under `scatter_dependent`.
+- `C_irr_direct`: Cirr at the outer hot-disk radius under `direct_analytic`.
+- `Cirr_Dubus2019`: the disc-wide Cirr under `Dubus2019` (Eq. 10 above).
+- `Mdot_wind_Dubus2019`: the total wind mass-loss rate the `Woods1996` formula would give if its own
+  `R_iC` were replaced by the Dubus et al. (2019) Eq. (4) radiation-pressure-corrected value, instead
+  of Freddi's own (uncorrected) `R_iC`. The actually simulated `Mdot_wind` always uses the uncorrected
+  `R_iC`, independent of `--irradiation_type`.
+
 ### Companion star irradiation
 
 We use a simple model of irradiated star to simulate periodic variability and
