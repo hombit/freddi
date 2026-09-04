@@ -385,6 +385,16 @@ double FreddiState::Cirr_Dubus2019() const {
 }
 
 
+double FreddiState::Cirr_direct_analytic(size_t i) const {
+	// CIRR = eta_X * (dz/dr - z/r) * angular_distribution
+	if (i == first()) {
+		return 0.0; // no irradiation at the inner boundary
+	}
+	return (1.0 - Shadow()[i]) * args().irr->etaX *
+			((Height()[i] - Height()[i - 1]) / (R()[i] - R()[i - 1]) - Height()[i] / R()[i]);
+}
+
+
 const vecd& FreddiState::Kirr() const {
 
 	if(!opt_str_.Kirr) {
@@ -400,14 +410,8 @@ const vecd& FreddiState::Kirr() const {
 				x[i] = C;
 			}
 		} else if  (args().irr->irradiation_type == "direct_analytic") {
-			const vecd& H = Height();
-			x[0] = 0.0; // no irradiation at the inner boundary
-			for (size_t i = first()+1; i <= last(); i++) {
-				// CIRR = eta_X * (dz/dr -z/r) * angular_distribution 
-				x[i] = (1.0 - Shad[i]) * args().irr->etaX * ((H[i]-H[i-1]) / (R()[i] - R()[i-1]) - H[i] / R()[i] );
-			}
-			for (size_t i = last() + 1; i < Nx(); i++) {
-				x[i] = (1.0 - Shad[i]) * args().irr->etaX * ((H[i]-H[i-1]) / (R()[i] - R()[i-1]) - H[i] / R()[i] );
+			for (size_t i = first(); i < Nx(); i++) {
+				x[i] = Cirr_direct_analytic(i);
 			}
 		} else if  (args().irr->irradiation_type == "constant_Cirr") {
 			const vecd& H = Height();

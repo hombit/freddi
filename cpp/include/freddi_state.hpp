@@ -433,6 +433,7 @@ public:
 	const vecd& Kirr() const;
 	double Cirr_scatter_dependent(size_t i) const;
 	double Cirr_Dubus2019() const;
+	double Cirr_direct_analytic(size_t i) const;
 	const vecd& Height() const;
 	const vecd& Shadow() const;
 	const vecd& Mdot_wind_running() const;
