@@ -1355,7 +1355,7 @@ Choosing option `--windtype=Woods1996`, it is necessary to set the value of the 
 By default (`--windT_ic_approach=const`), T_ic is fixed to the value given by `--windT_ic` for the whole simulation.
 Setting `--windT_ic_approach=Done2018` instead makes T_ic evolve with the disk's instantaneous Eddington ratio
 l = Lbol/Ledd, following the hard/soft-state phenomenological relation of Eqs. (8)-(9) of
-[Done et al. (2018)](https://ui.adsabs.harvard.edu/abs/2018MNRAS.476.4132D); `--windT_ic` is then not required and is ignored.
+[Done, Tomaru & Takahashi (2018)](https://ui.adsabs.harvard.edu/abs/2018MNRAS.473..838D); `--windT_ic` is then not required and is ignored.
 This applies to the `Shields1986`, `Woods1996AGN` and `Woods1996` wind types.
 
 By default (`--wind_Irr_ang_distribution=0`), the `Shields1986` and `Woods1996` wind models assume

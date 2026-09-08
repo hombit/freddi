@@ -255,7 +255,7 @@ double FreddiState::T_ic_current(double T_ic_const) const {
 		return T_ic_const;
 	}
 	if (args().disk->windT_ic_approach == "Done2018") {
-		//  Done, Davis, Jin, Blaes, Done 2018 (MNRAS 476, 4132), Eqs. (8)-(9), smoothly blended
+		//  Done, Tomaru & Takahashi 2018 (MNRAS 473, 838), Eqs. (8)-(9), smoothly blended
 		//  around l = L/Ledd = 0.02 following Dubus et al. (2019), Eq. after their Eq. (9):
 		//  T_IC = T_HS/(1+x) + T_SS*x/(1+x), x = (l/0.02)^6
 		const double l = Lbol_disk() / L_edd_disk();
