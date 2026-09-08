@@ -268,6 +268,19 @@ double FreddiState::T_ic_current(double T_ic_const) const {
 }
 
 
+double FreddiState::R_iC_from_T_ic(double T_ic) const {
+	double R_iC = GM() * args().disk->mu * GSL_CONST_CGSM_MASS_PROTON / (GSL_CONST_CGSM_BOLTZMANN * T_ic);
+	if (args().disk->windT_ic_approach == "Done2018") {
+		// Dubus et al. (2019) Eq. (4): radiation-pressure correction to R_IC, gated on
+		// windT_ic_approach=Done2018 since that's the T_ic(l) relation this correction was derived
+		// alongside; applied here (not just in the Cirr_Dubus2019()/Mdot_wind_Dubus2019()
+		// diagnostics) so the actually simulated wind uses the same R_IC Dubus et al. (2019) do.
+		R_iC *= (1.0 - std::sqrt(2.0) * Lbol_disk() / L_edd_disk());
+	}
+	return R_iC;
+}
+
+
 double FreddiState::R_wind_inner_launch_radius(double R_iC) const {
 	// Inner radius beyond which the thermal wind is launched, as a multiple of the passed-in
 	// Compton radius R_iC. Begelman et al. (1983)/Shields et al. (1986)/Woods et al. (1996), and
@@ -384,13 +397,16 @@ double FreddiState::Cirr_Dubus2019() const {
 	// R >= 0.2 R_IC"); v_w ~ escape velocity at Rin; and Mdot_wind is the total (two-sided)
 	// wind mass loss rate, i.e. their Mdot_w(Rin) integrated out to Rout, matching Freddi's
 	// existing Mdot_wind().
-	// R_IC here is their Eq. (4), i.e. Freddi's own wind_->R_IC() = GM*mu*mp/(kB*T_ic) with
-	// an added rough radiation-pressure correction (1 - sqrt(2) L/Ledd) -- scoped to this
-	// branch only, the shared wind_->R_IC()/T_ic used by the actual wind mass-loss physics
-	// (Shields1986Wind, Woods1996AGNWind, Woods1996ShieldsApproxWind) is untouched. Per the
-	// source paper this correction is explicitly "rough" and can go unphysical (negative)
-	// as L approaches Ledd/sqrt(2) -- not guarded against here.
-	const double R_IC_corrected = wind_->R_IC() * (1.0 - std::sqrt(2.0) * Lbol_disk() / L_edd_disk());
+	// R_IC here is their Eq. (4): GM*mu*mp/(kB*T_ic) with an added rough radiation-pressure
+	// correction (1 - sqrt(2) L/Ledd), applied here unconditionally so this diagnostic always
+	// reflects the Dubus2019 R_IC regardless of --windT_ic_approach. (When
+	// --windT_ic_approach=Done2018, R_iC_from_T_ic() already applies this same correction to the
+	// actually simulated wind's own R_IC -- computed independently here via wind_->T_ic() rather
+	// than wind_->R_IC() to avoid double-applying it in that case.) Per the source paper this
+	// correction is explicitly "rough" and can go unphysical (negative) as L approaches
+	// Ledd/sqrt(2) -- not guarded against here.
+	const double R_IC_base = GM() * args().disk->mu * GSL_CONST_CGSM_MASS_PROTON / (GSL_CONST_CGSM_BOLTZMANN * wind_->T_ic());
+	const double R_IC_corrected = R_IC_base * (1.0 - std::sqrt(2.0) * Lbol_disk() / L_edd_disk());
 	const double R_in = 0.2 * R_IC_corrected;
 	const double v_w = std::sqrt(2.0 * GM() / R_in);
 	return args().irr->scattering_opacity * Mdot_wind() / (8.0 * M_PI * R_in * v_w);
@@ -596,9 +612,12 @@ double FreddiState::Mdot_wind_Dubus2019() const {
 	// formula (--windtype=Woods1996), with R_iC replaced by the Dubus (2019) radiation-pressure-
 	// corrected Compton radius (their Eq. 4, same expression as in Cirr_Dubus2019()) instead of
 	// Freddi's own R_iC = GM*mu*mp/(kB*T_ic). Purely diagnostic: does not feed back into the
-	// evolution, and Woods1996ShieldsApproxWind::update() still uses the uncorrected R_iC for the
-	// actually simulated wind. Only meaningful for --windtype=Woods1996 (reads its windparams);
-	// reports 0 (with a one-time warning) for any other --windtype instead of crashing.
+	// evolution. The correction is applied unconditionally here (independent of
+	// --windT_ic_approach) via wind_->T_ic() rather than wind_->R_IC(), since the latter may
+	// already carry this same correction when --windT_ic_approach=Done2018 (see
+	// R_iC_from_T_ic()) -- using it here too would double-apply it. Only meaningful for
+	// --windtype=Woods1996 (reads its windparams); reports 0 (with a one-time warning) for any
+	// other --windtype instead of crashing.
 	const auto disk = args().disk;
 	if (!disk->windparams.count("Xi_max") || !disk->windparams.count("Pow") ||
 			!disk->windparams.count("IrAngDis") || !disk->windparams.count("R_launch_factor")) {
@@ -616,7 +635,8 @@ double FreddiState::Mdot_wind_Dubus2019() const {
 	const double T_ic = wind_->T_ic();
 	const double L = Lbol_disk();
 	const double L_edd = L_edd_disk();
-	const double R_iC = wind_->R_IC() * (1.0 - std::sqrt(2.0) * L / L_edd); // Dubus (2019) Eq. (4)
+	const double R_iC_base = GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON / (GSL_CONST_CGSM_BOLTZMANN * T_ic);
+	const double R_iC = R_iC_base * (1.0 - std::sqrt(2.0) * L / L_edd); // Dubus (2019) Eq. (4)
 	const double L_crit = (1.0 / 8.0) * std::sqrt(GSL_CONST_CGSM_MASS_ELECTRON / (disk->mu * GSL_CONST_CGSM_MASS_PROTON)) * std::sqrt((GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT* GSL_CONST_CGSM_SPEED_OF_LIGHT ) / (GSL_CONST_CGSM_BOLTZMANN * T_ic)) * L_edd;
 	double el = L / L_crit;
 
@@ -846,7 +866,7 @@ void FreddiState::Shields1986Wind::update(const FreddiState& state) {
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
     // should the angular distribution be a factor here???
     //  1983ApJ...271...70B page 3
-    const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_ic);
+    const double R_iC = state.R_iC_from_T_ic(T_ic);
     R_IC_ = R_iC;
     const double L_edd = state.L_edd_disk();
     const double L_crit = (1.0 / 8.0) * std::sqrt(GSL_CONST_CGSM_MASS_ELECTRON / (disk->mu * GSL_CONST_CGSM_MASS_PROTON)) * std::sqrt((GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT * GSL_CONST_CGSM_SPEED_OF_LIGHT ) / (GSL_CONST_CGSM_BOLTZMANN * T_ic)) * L_edd;
@@ -887,7 +907,7 @@ void FreddiState::Woods1996AGNWind::update(const FreddiState& state) {
     const auto disk = state.args().disk;
     const double L = state.Mdot_in() * m::pow<2>(GSL_CONST_CGSM_SPEED_OF_LIGHT) * state.eta();
     const double L_edd = state.L_edd_disk();
-    const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_ic);
+    const double R_iC = state.R_iC_from_T_ic(T_ic);
     R_IC_ = R_iC;
     const double le = L/L_edd;
     double R_tr;
@@ -943,7 +963,7 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
     const auto disk = state.args().disk;
 
     const double L = state.Lbol_disk();
-    const double R_iC = (state.GM() * disk->mu * GSL_CONST_CGSM_MASS_PROTON)/(GSL_CONST_CGSM_BOLTZMANN * T_ic);
+    const double R_iC = state.R_iC_from_T_ic(T_ic);
     R_IC_ = R_iC;
     //const double VeL = std::sqrt(state.GM()/R_iC) ;
     //const double C_iC = std::sqrt((GSL_CONST_CGSM_BOLTZMANN * T_ic)/( GSL_CONST_CGSM_MASS_PROTON));

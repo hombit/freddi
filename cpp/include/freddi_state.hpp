@@ -347,6 +347,7 @@ public:
     virtual double Lbol_disk() const;
 	virtual double L_edd_disk() const;
 	virtual double T_ic_current(double T_ic_const) const;
+	virtual double R_iC_from_T_ic(double T_ic) const;
     virtual double Rfront_Rhot(double r, double z_r) const;
 	virtual double obtain_Mdot_outer_boundary() const;
 	virtual double Tirr_critical(double r, int ii) const ;
