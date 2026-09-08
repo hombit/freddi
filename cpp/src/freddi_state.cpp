@@ -584,26 +584,47 @@ double FreddiState::flux_star(const Passband& passband, const double phase) cons
 }
 
 
+double FreddiState::dMdot_wind_dh(size_t i) const {
+	double dFdh;
+	if (i == first()) {
+		dFdh = (F()[i+1] - F()[i]) / (h()[i+1] - h()[i]);
+	} else if (i == Nx() - 1) {
+		dFdh = (F()[i] - F()[i-1]) / (h()[i] - h()[i-1]);
+	} else {
+		const double delta_0 = h()[i] - h()[i-1];
+		const double delta_1 = h()[i+1] - h()[i];
+		dFdh = (F()[i+1] * delta_0 * delta_0 / (delta_0 + delta_1) +
+				F()[i] * (delta_1 - delta_0) -
+				F()[i-1] * delta_1 * delta_1 / (delta_0 + delta_1)) /
+				(delta_0 * delta_1);
+	}
+	// Wind loss rate sign is opposite disk loss rate sign, e.g. usually it should be positive
+	return -(windA()[i] * dFdh + windB()[i] * F()[i] + windC()[i]);
+}
+
+
 double FreddiState::Mdot_wind() const {
-	auto dMdot_dh = [this](const size_t i) -> double {
-		double dFdh;
-		if (i == first()) {
-			dFdh = (F()[i+1] - F()[i]) / (h()[i+1] - h()[i]);
-		} else if (i == last()) {
-			dFdh = (F()[i] - F()[i-1]) / (h()[i] - h()[i-1]);
-		} else {
-			const double delta_0 = h()[i] - h()[i-1];
-			const double delta_1 = h()[i+1] - h()[i];
-			dFdh = (F()[i+1] * delta_0 * delta_0 / (delta_0 + delta_1) +
-					F()[i] * (delta_1 - delta_0) -
-					F()[i-1] * delta_1 * delta_1 / (delta_0 + delta_1)) /
-					(delta_0 * delta_1);
-		}
-		// Wind loss rate sign is opposite disk loss rate sign, e.g. usually it should be positive
-		return -(windA()[i] * dFdh + windB()[i] * F()[i] + windC()[i]);
-	};
- 	
-	return lazy_integrate<HotRegion>(opt_str_.Mdot_wind, h(), dMdot_dh);
+	// Integrated over the whole disc (hot + cold), not just the hot region: Compton-wind mass loss
+	// is driven by X-ray irradiation and R/R_IC, not by whether the local annulus is currently on
+	// the hot or cold branch of the thermal instability, so a cold, quiescent outer disc can still
+	// carry a wind if R >= windR_launch_factor*R_IC (Shields1986Wind, Woods1996AGNWind and
+	// Woods1996ShieldsApproxWind all now fill windC() out to the outer edge accordingly). See also
+	// Mdot_wind_cold() for the cold-zone-only contribution.
+	if (!opt_str_.Mdot_wind) {
+		opt_str_.Mdot_wind = trapz(h(), [this](size_t i) { return dMdot_wind_dh(i); }, first(), Nx() - 1);
+	}
+	return *opt_str_.Mdot_wind;
+}
+
+
+double FreddiState::Mdot_wind_cold() const {
+	// The cold-zone-only (R > Rhot) contribution to Mdot_wind() above, exposed separately as a
+	// diagnostic of how much of the total wind mass loss originates beyond the hot disc.
+	if (!opt_str_.Mdot_wind_cold) {
+		// trapz() returns 0 when first >= last, i.e. when there is no cold zone at all
+		opt_str_.Mdot_wind_cold = trapz(h(), [this](size_t i) { return dMdot_wind_dh(i); }, last() + 1, Nx() - 1);
+	}
+	return *opt_str_.Mdot_wind_cold;
 }
 
 
@@ -641,7 +662,8 @@ double FreddiState::Mdot_wind_Dubus2019() const {
 	double el = L / L_crit;
 
 	vecd C(Nx(), 0.0);
-	for (size_t i = first(); i <= last(); ++i) {
+	// Whole disc, matching Mdot_wind()/Woods1996ShieldsApproxWind::update() -- see there for why.
+	for (size_t i = first(); i < Nx(); ++i) {
 		if (R()[i] > R_wind_inner_launch_radius(R_iC)) {
 			if (IrAngDis) {
 				el *= angular_dist_disk(Height()[i] / R()[i]);
@@ -664,7 +686,7 @@ double FreddiState::Mdot_wind_Dubus2019() const {
 	auto dMdot_dh = [&C](const size_t i) -> double {
 		return -C[i];
 	};
-	return integrate<HotRegion>(h(), dMdot_dh);
+	return trapz(h(), dMdot_dh, first(), Nx() - 1);
 }
 
 
@@ -672,9 +694,11 @@ const vecd& FreddiState::Column_density_wind() const {
     if (!opt_str_.Column_density_wind) {
         vecd x(Nx(), 0.0);
         // Pre-calculate the running Mdot vector once
-        const vecd& mdot_run = Mdot_wind_running(); 
+        const vecd& mdot_run = Mdot_wind_running();
 
-        for (size_t i = first(); i <= last(); i++) {
+        // Whole disc (not just the hot region), so the cold outer disc's own Cirr
+        // (scatter_dependent) reflects any wind mass loss originating out there too.
+        for (size_t i = first(); i < Nx(); i++) {
             // Formula: Σ = Mdot / (4 * pi * R * v_wind)
             x[i] = mdot_run[i] / (4.0 * M_PI * R()[i] * v_wind()[i]);
         }
@@ -686,32 +710,13 @@ const vecd& FreddiState::Column_density_wind() const {
 const vecd& FreddiState::Mdot_wind_running() const {
     if (!opt_str_.Mdot_wind_running) {
         vecd mdot_wind(Nx(), 0.0);
-        vecd local_source(Nx(), 0.0);
 
-        // 1. Calculate the local integrand at every point i
-        for (size_t i = first(); i <= last(); ++i) {
-            double dFdh;
-            if (i == first()) {
-                dFdh = (F()[i+1] - F()[i]) / (h()[i+1] - h()[i]);
-            } else if (i == last()) {
-                dFdh = (F()[i] - F()[i-1]) / (h()[i] - h()[i-1]);
-            } else {
-                const double d0 = h()[i] - h()[i-1];
-                const double d1 = h()[i+1] - h()[i];
-                // Three-point stencil for non-uniform grid
-                dFdh = (F()[i+1] * d0 * d0 / (d0 + d1) +
-                        F()[i] * (d1 * d0 - d0 * d1) - // Corrected coefficient logic
-                        F()[i-1] * d1 * d1 / (d0 + d1)) / (d0 * d1);
-            }
-            local_source[i] = -(windA()[i] * dFdh + windB()[i] * F()[i] + windC()[i]);
-        }
-
-        // 2. Perform cumulative integration (Trapezoidal rule)
-        // Mdot_wind(h) = integral from h_in to h of local_source dh
+        // Cumulative integration (trapezoidal rule) of dMdot_wind_dh() over the whole disc (not
+        // just the hot region, see Mdot_wind()): Mdot_wind_running(h) = integral from h_in to h.
         mdot_wind[first()] = 0.0; // Boundary condition at Rin
-        for (size_t i = first() + 1; i <= last(); ++i) {
-            double dh = h()[i] - h()[i-1];
-            double avg_source = 0.5 * (local_source[i] + local_source[i-1]);
+        for (size_t i = first() + 1; i < Nx(); ++i) {
+            const double dh = h()[i] - h()[i-1];
+            const double avg_source = 0.5 * (dMdot_wind_dh(i) + dMdot_wind_dh(i-1));
             mdot_wind[i] = mdot_wind[i-1] + avg_source * dh;
         }
 
@@ -874,7 +879,9 @@ void FreddiState::Shields1986Wind::update(const FreddiState& state) {
     const double el = L/L_crit;
     
 
-    for (size_t i = state.first(); i <= state.last(); ++i) {
+    // Integrated over the whole disc (not just the hot region): a cold, quiescent outer disc can
+    // still carry a Compton wind if irradiated (see Mdot_wind()).
+    for (size_t i = state.first(); i < state.Nx(); ++i) {
         //  1986ApJ...306...90S page 2
         if (state.R()[i] > 0.1*R_iC) {
             const double xi = state.R()[i] / R_iC;
@@ -928,7 +935,9 @@ void FreddiState::Woods1996AGNWind::update(const FreddiState& state) {
     }
 
 
-    for (size_t i = state.first(); i <= state.last(); ++i) {
+    // Integrated over the whole disc (not just the hot region): a cold, quiescent outer disc can
+    // still carry a Compton wind if irradiated (see Mdot_wind()).
+    for (size_t i = state.first(); i < state.Nx(); ++i) {
         //
         double g_R;
         if ( state.R()[i] <= R_tr ) {
@@ -972,7 +981,9 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
     const double L_crit = (1.0 / 8.0) * std::sqrt(GSL_CONST_CGSM_MASS_ELECTRON / (disk->mu * GSL_CONST_CGSM_MASS_PROTON)) * std::sqrt((GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT* GSL_CONST_CGSM_SPEED_OF_LIGHT ) / (GSL_CONST_CGSM_BOLTZMANN * T_ic)) * L_edd;
     double el = L/L_crit;
     
-    for (size_t i = state.first(); i <= state.last(); ++i) {
+    // Integrated over the whole disc (not just the hot region): a cold, quiescent outer disc can
+    // still carry a Compton wind if irradiated (see Mdot_wind()).
+    for (size_t i = state.first(); i < state.Nx(); ++i) {
         if (state.R()[i] > state.R_wind_inner_launch_radius(R_iC)) {
 	    if (IrAngDis) {
 			// Take account of the central flux angular distribution:

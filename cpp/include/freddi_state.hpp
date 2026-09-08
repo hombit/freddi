@@ -275,6 +275,7 @@ private:
 		boost::optional<double> Mdisk;
 		boost::optional<double> Lx;
 		boost::optional<double> Mdot_wind;
+		boost::optional<double> Mdot_wind_cold;
 		//boost::optional<double> Mdot_wind_running;
 		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height, Shadow,Column_density_wind,Mdot_wind_running;
 	};
@@ -463,7 +464,11 @@ public:
 	inline double flux_star(double lambda) const { return flux_star(lambda, phase_opt()); }
 	inline double flux_star(const Passband& passband) const { return flux_star(passband, phase_opt()); }
 	inline double Mdisk() const { return lazy_integrate<HotRegion>(opt_str_.Mdisk, Sigma()); }
+protected:
+	double dMdot_wind_dh(size_t i) const;
+public:
 	double Mdot_wind() const;
+	double Mdot_wind_cold() const;
 	double Mdot_wind_Dubus2019() const;
 	double R_wind_inner_launch_radius(double R_iC) const;
 	double Mdot_wind_running(const int ii) const;
