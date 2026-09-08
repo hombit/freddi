@@ -597,8 +597,19 @@ double FreddiState::Mdot_wind_Dubus2019() const {
 	// corrected Compton radius (their Eq. 4, same expression as in Cirr_Dubus2019()) instead of
 	// Freddi's own R_iC = GM*mu*mp/(kB*T_ic). Purely diagnostic: does not feed back into the
 	// evolution, and Woods1996ShieldsApproxWind::update() still uses the uncorrected R_iC for the
-	// actually simulated wind. Only meaningful for --windtype=Woods1996 (reads its windparams).
+	// actually simulated wind. Only meaningful for --windtype=Woods1996 (reads its windparams);
+	// reports 0 (with a one-time warning) for any other --windtype instead of crashing.
 	const auto disk = args().disk;
+	if (!disk->windparams.count("Xi_max") || !disk->windparams.count("Pow") ||
+			!disk->windparams.count("IrAngDis") || !disk->windparams.count("R_launch_factor")) {
+		static bool warned = false;
+		if (!warned) {
+			std::cerr << "Warning: Mdot_wind_Dubus2019 diagnostic output column is only meaningful "
+					"for --windtype=Woods1996; reporting 0 since --windtype=" << disk->wind << std::endl;
+			warned = true;
+		}
+		return 0.0;
+	}
 	const double Xi_max = disk->windparams.at("Xi_max");
 	const double Pow = disk->windparams.at("Pow");
 	const bool IrAngDis = disk->windparams.at("IrAngDis") != 0.0;
