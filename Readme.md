@@ -1357,6 +1357,21 @@ Setting `--windT_ic_approach=Done2018` instead makes T_ic evolve with the disk's
 l = Lbol/Ledd, following the hard/soft-state phenomenological relation of Eqs. (8)-(9) of
 [Done et al. (2018)](https://ui.adsabs.harvard.edu/abs/2018MNRAS.476.4132D); `--windT_ic` is then not required and is ignored.
 This applies to the `Shields1986`, `Woods1996AGN` and `Woods1996` wind types.
+
+By default (`--wind_Irr_ang_distribution=0`), the `Shields1986` and `Woods1996` wind models assume
+the disk is illuminated isotropically, exactly reproducing the published Begelman et al. (1983) /
+Shields et al. (1986) / Woods et al. (1996) formulas. Setting `--wind_Irr_ang_distribution=1` instead
+rescales the local illuminating luminosity at each radius by `angular_dist_disk(H/R)`, i.e. by the same
+angular distribution function that is set via `--angulardistdisk` and used elsewhere in `Freddi` to
+compute the disk's self-irradiation. This accounts for the fact that a flared disk surface is
+illuminated at a grazing angle rather than seeing the central source isotropically.
+
+Note that this flag only reproduces the literal Woods/Shields wind equation when combined with
+`--angulardistdisk=isotropic` (which returns a factor of 1 at every radius). With the default
+`--angulardistdisk=plane`, the rescaling factor is `2*(H/R)` rather than 1, so for a geometrically thin
+disk (`H/R` typically well below 0.5) `--wind_Irr_ang_distribution=1` makes the wind weaker than the
+base formula, not identical to it.
+
 The `T_ic` output column reports the value of T_ic actually used at each time step, and the `R_IC` output
 column (the Compton radius, derived from T_ic) is recomputed alongside it — so both track the disk's
 luminosity when `--windT_ic_approach=Done2018` rather than staying fixed as they do under `const`.
