@@ -191,6 +191,7 @@ public:
 	constexpr static const char default_initialcond[] = "powerF";
 	constexpr static const char default_wind[] = "no";
 	constexpr static const int default_wind_Irr_ang_distribution = 0;
+	constexpr static const double default_windR_launch_factor = 0.1;
 public:
 	constexpr static const double mu = 0.62;
 public:

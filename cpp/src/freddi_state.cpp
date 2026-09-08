@@ -255,15 +255,27 @@ double FreddiState::T_ic_current(double T_ic_const) const {
 		return T_ic_const;
 	}
 	if (args().disk->windT_ic_approach == "Done2018") {
-		//  Done, Davis, Jin, Blaes, Done 2018 (MNRAS 476, 4132), Eqs. (8)-(9):
-		//  switch in Compton temperature between hard and soft state, fixed at l = L/Ledd = 0.02
+		//  Done, Davis, Jin, Blaes, Done 2018 (MNRAS 476, 4132), Eqs. (8)-(9), smoothly blended
+		//  around l = L/Ledd = 0.02 following Dubus et al. (2019), Eq. after their Eq. (9):
+		//  T_IC = T_HS/(1+x) + T_SS*x/(1+x), x = (l/0.02)^6
 		const double l = Lbol_disk() / L_edd_disk();
-		if (l < 0.02) {
-			return (4.2 - 4.6 * std::log10(l / 0.02)) * 1e7;
-		}
-		return 0.36 * std::pow(l / 0.02, 0.25) * 1e7;
+		const double T_hs = (4.2 - 4.6 * std::log10(l / 0.02)) * 1e7;
+		const double T_ss = 0.36 * std::pow(l / 0.02, 0.25) * 1e7;
+		const double x = std::pow(l / 0.02, 6.0);
+		return T_hs / (1.0 + x) + T_ss * (x / (1.0 + x));
 	}
 	throw std::invalid_argument("Wrong windT_ic_approach");
+}
+
+
+double FreddiState::R_wind_inner_launch_radius(double R_iC) const {
+	// Inner radius beyond which the thermal wind is launched, as a multiple of the passed-in
+	// Compton radius R_iC. Begelman et al. (1983)/Shields et al. (1986)/Woods et al. (1996), and
+	// Freddi's long-standing default, take this to be 0.1 R_IC; Dubus et al. (2019) instead assume
+	// the wind is effective for R >= 0.2 R_IC. Controlled by --windR_launch_factor (windparams
+	// "R_launch_factor"), default 0.1 -- set to 0.2 to compare against Dubus et al. (2019). Only
+	// meaningful for --windtype=Woods1996 (reads its windparams).
+	return args().disk->windparams.at("R_launch_factor") * R_iC;
 }
 
 
@@ -599,7 +611,7 @@ double FreddiState::Mdot_wind_Dubus2019() const {
 
 	vecd C(Nx(), 0.0);
 	for (size_t i = first(); i <= last(); ++i) {
-		if (R()[i] > 0.1 * R_iC) {
+		if (R()[i] > R_wind_inner_launch_radius(R_iC)) {
 			if (IrAngDis) {
 				el *= angular_dist_disk(Height()[i] / R()[i]);
 			}
@@ -930,7 +942,7 @@ void FreddiState::Woods1996ShieldsApproxWind::update(const FreddiState& state) {
     double el = L/L_crit;
     
     for (size_t i = state.first(); i <= state.last(); ++i) {
-        if (state.R()[i] > 0.1*R_iC) {
+        if (state.R()[i] > state.R_wind_inner_launch_radius(R_iC)) {
 	    if (IrAngDis) {
 			// Take account of the central flux angular distribution:
 			el *= state.angular_dist_disk(state.Height()[i] / state.R()[i]) ; 

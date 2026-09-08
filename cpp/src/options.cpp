@@ -202,7 +202,8 @@ pard DiskStructureOptions::windparamsInitializer(const po::variables_map& vm) {
 				{"Xi_max", vm["windXi_max"].as<double>()},
 				{"T_ic", vm.count("windT_ic") ? vm["windT_ic"].as<double>() : 0.0},
 				{"Pow", vm["windPow"].as<double>()},
-				{"IrAngDis", vm["wind_Irr_ang_distribution"].as<int>()}
+				{"IrAngDis", vm["wind_Irr_ang_distribution"].as<int>()},
+				{"R_launch_factor", vm["windR_launch_factor"].as<double>()}
 		};
 	}
 	if (windtype == "toy"){
@@ -296,6 +297,7 @@ po::options_description DiskStructureOptions::description() {
 			( "windPow", po::value<double>(), "Multiplicative coefficient to control wind power\n")
 			( "windC_0", po::value<double>(), "Characteristic column density of the wind mass loss rate from Woods et al. 1996 model, g/(s*cm^2). For AGN approx value is 3e-13 g/(s*cm^2)\n")
 			( "wind_Irr_ang_distribution", po::value<int>()->default_value(default_wind_Irr_ang_distribution), "Flag to take into account (1), or not (0, default), the angular distribution of central X-rays when calculating the illuminating X-ray flux which drives the thermal wind.\n" )
+			( "windR_launch_factor", po::value<double>()->default_value(default_windR_launch_factor), "Only for --windtype=Woods1996: the wind is launched for R > windR_launch_factor * R_IC. Begelman et al. (1983)/Shields et al. (1986)/Woods et al. (1996) use 0.1 (the default); Dubus et al. (2019) instead assume the wind is effective for R >= 0.2 R_IC -- set this to 0.2 to compare against their prescription.\n" )
 			;
 			
 	return od;

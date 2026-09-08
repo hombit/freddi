@@ -464,6 +464,7 @@ public:
 	inline double Mdisk() const { return lazy_integrate<HotRegion>(opt_str_.Mdisk, Sigma()); }
 	double Mdot_wind() const;
 	double Mdot_wind_Dubus2019() const;
+	double R_wind_inner_launch_radius(double R_iC) const;
 	double Mdot_wind_running(const int ii) const;
 	double Column_density_wind(const int ii) const;
 	double Sigma_minus(double r) const;

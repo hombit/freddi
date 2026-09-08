@@ -29,6 +29,7 @@ constexpr const char DiskStructureArguments::default_DIM_front_approach[];
 constexpr const double DiskStructureArguments::mu;
 constexpr const char DiskStructureArguments::default_wind[];
 constexpr const int DiskStructureArguments::default_wind_Irr_ang_distribution;
+constexpr const double DiskStructureArguments::default_windR_launch_factor;
 
 DiskStructureArguments::DiskStructureArguments(
 		const BasicDiskBinaryArguments &bdb_args,
