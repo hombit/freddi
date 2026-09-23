@@ -1,4 +1,4 @@
-# `Freddi` — compute FRED-like light curves of LMXB
+# `Freddi` — compute FRED-like light curves and the radial structure of discs in LMXB during outbursts  
 
 ## Table of contents
 
