@@ -394,9 +394,17 @@ double FreddiState::Cirr_Dubus2019() const {
 	//   C = int_0^1 int_{Rin}^{Rout} sigma_T n_w mu dmu dr ~= kappa * Mdot_wind / (8 pi Rin v_w)
 	// where kappa = sigma_T/m_I is the scattering opacity (--scattering_opacity); Rin = 0.2
 	// R_IC is the wind launching radius (their Eq. 4, "thermal wind is effective for radii
-	// R >= 0.2 R_IC"); v_w ~ escape velocity at Rin; and Mdot_wind is the total (two-sided)
-	// wind mass loss rate, i.e. their Mdot_w(Rin) integrated out to Rout, matching Freddi's
-	// existing Mdot_wind().
+	// R >= 0.2 R_IC"); Mdot_wind is the total (two-sided) wind mass loss rate, i.e. their
+	// Mdot_w(Rin) integrated out to Rout, matching Freddi's existing Mdot_wind(); and v_w is
+	// their "mass-weighted wind outflow rate" (text below their Eq. 10) -- the local escape
+	// velocity v_esc(r) = sqrt(2GM/r) averaged (weighted by dMdot_wind/dr, not dMdot_wind_dh()'s
+	// native per-dh density -- converted via dh/dr = GM/(2h), h = sqrt(GM r)) over the actual
+	// radial wind mass-loss profile, not v_esc evaluated at the single radius Rin. The two can differ a lot:
+	// the simulated wind's radial extent is set by --windR_launch_factor (only used by
+	// --windtype=Woods1996, via R_wind_inner_launch_radius() -- not by this Rin), which need not
+	// match their fixed 0.2 R_IC. E.g. for wind_Dubus_fig3.ini's windR_launch_factor=1e-3, Rin=0.2
+	// R_IC there even exceeds Rout, so nearly all of Mdot_wind() actually originates well inside
+	// Rin, and a v_w evaluated only at Rin would not represent where the wind mass is.
 	// R_IC here is their Eq. (4): GM*mu*mp/(kB*T_ic) with an added rough radiation-pressure
 	// correction (1 - sqrt(2) L/Ledd), applied here unconditionally so this diagnostic always
 	// reflects the Dubus2019 R_IC regardless of --windT_ic_approach. (When
@@ -408,8 +416,19 @@ double FreddiState::Cirr_Dubus2019() const {
 	const double R_IC_base = GM() * args().disk->mu * GSL_CONST_CGSM_MASS_PROTON / (GSL_CONST_CGSM_BOLTZMANN * wind_->T_ic());
 	const double R_IC_corrected = R_IC_base * (1.0 - std::sqrt(2.0) * Lbol_disk() / L_edd_disk());
 	const double R_in = 0.2 * R_IC_corrected;
-	const double v_w = std::sqrt(2.0 * GM() / R_in);
-	return args().irr->scattering_opacity * Mdot_wind() / (8.0 * M_PI * R_in * v_w);
+	const double Mdot_w = Mdot_wind();
+	if (Mdot_w <= 0.0) {
+		return 0.0;
+	}
+	const vecd& Vesc = v_esc();
+	const vecd& H = h();
+	const double GM_ = GM();
+	// dMdot_wind_dh() is a density per unit h; convert to a density per unit r via
+	// dh/dr = GM/(2h) (from h = sqrt(GM r)) so the average below is mass-weighted in r.
+	auto dMdot_wind_dr = [this, &H, GM_](size_t i) { return dMdot_wind_dh(i) * GM_ / (2.0 * H[i]); };
+	const double Mdot_w_dr = trapz(R(), dMdot_wind_dr, first(), Nx() - 1);
+	const double v_w = trapz(R(), [&Vesc, &dMdot_wind_dr](size_t i) { return Vesc[i] * dMdot_wind_dr(i); }, first(), Nx() - 1) / Mdot_w_dr;
+	return args().irr->scattering_opacity * Mdot_w / (8.0 * M_PI * R_in * v_w);
 }
 
 
