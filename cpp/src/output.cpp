@@ -322,6 +322,7 @@ std::vector<FileOutputLongField> FreddiFileOutput::initializeDiskStructureFields
 			{"Tvis", "K", "Viscous temperature (Qvis / sigma_SB)^1/4", [freddi](size_t i) {return freddi->Tph_vis()[i];}},
 			{"Tirr", "K", "Irradiation temperature (Qirr / sigma_SB)^1/4", [freddi](size_t i) {return freddi->Tirr()[i];}},
 			{"Height", "cm", "Semiheight", [freddi](size_t i) {return freddi->Height()[i];}},
+			{"tau_perp_wind", "dimensionless", "Optical (scattering) depth perpendicular to the disc plane through the wind: scattering_opacity * Column_density_wind", [freddi](size_t i) {return freddi->tau_perp_wind()[i];}},
 	};
 }
 

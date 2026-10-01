@@ -277,7 +277,7 @@ private:
 		boost::optional<double> Mdot_wind;
 		boost::optional<double> Mdot_wind_cold;
 		//boost::optional<double> Mdot_wind_running;
-		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height, Shadow,Column_density_wind,Mdot_wind_running;
+		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height, Shadow,Column_density_wind,Mdot_wind_running,tau_perp_wind;
 	};
 
 protected:
@@ -440,6 +440,7 @@ public:
 	const vecd& Shadow() const;
 	const vecd& Mdot_wind_running() const;
 	const vecd& Column_density_wind() const;
+	const vecd& tau_perp_wind() const;
 	double Luminosity(const vecd& T, double nu1, double nu2) const;
 	inline double magnitude(const double lambda, const double F0) const {
 		return -2.5 * std::log10(I_lambda<HotRegion>(lambda) * cosiOverD2() / F0);

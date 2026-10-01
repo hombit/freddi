@@ -726,6 +726,20 @@ const vecd& FreddiState::Column_density_wind() const {
     return *opt_str_.Column_density_wind;
 }
 
+const vecd& FreddiState::tau_perp_wind() const {
+    if (!opt_str_.tau_perp_wind) {
+        vecd x(Nx(), 0.0);
+        // tau_corona_perp = Column_density_wind * scattering_opacity, see the
+        // --irradiation_type=scatter_dependent help text (options.cpp) for the derivation.
+        const vecd& Sigma_wind = Column_density_wind();
+        for (size_t i = first(); i < Nx(); i++) {
+            x[i] = args().irr->scattering_opacity * Sigma_wind[i];
+        }
+        opt_str_.tau_perp_wind = std::move(x);
+    }
+    return *opt_str_.tau_perp_wind;
+}
+
 const vecd& FreddiState::Mdot_wind_running() const {
     if (!opt_str_.Mdot_wind_running) {
         vecd mdot_wind(Nx(), 0.0);
