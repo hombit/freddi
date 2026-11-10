@@ -158,7 +158,8 @@ void BasicFreddiFileOutput::diskStructureDump() {
 			<< "\n### Mdot = " << freddi->Mdot_in() << " g/s"
 			<< std::endl;
 
-	const size_t last = freddi->args().flux->cold_disk ? freddi->Nx() - 1 : freddi->last();
+	// Radial dump covers the whole grid (up to Rtid), not just the hot zone up to Rhot
+	const size_t last = freddi->Nx() - 1;
 
 	for ( int i = freddi->first(); i <= last; ++i ){
 		full_output << disk_structure_fields.at(0).func(i);
@@ -226,6 +227,10 @@ std::vector<FileOutputShortField> FreddiFileOutput::initializeShortFields(const 
 			{"Mdot_wind_cold", "g/s", "Wind mass loss from two sides, from the cold zone (R > Rhot) only -- already included in Mdot_wind", [freddi]() {return freddi->Mdot_wind_cold();}},
 			{"R_IC", "cm", "Compton radius", [freddi]() {return freddi->R_IC();}},
 			{"T_ic", "K", "Inverse Compton temperature used by the thermal wind model, see --windT_ic_approach", [freddi]() {return freddi->T_ic();}},
+			{"tau_r_corona_Rhot", "dimensionless", "tau_r_corona (Ostriker, McKee & Klein 1991, Appendix G, G.2) at the outer radius of the hot disk Rhot: grid value of the tau_r_corona radial column, so it is zero if Rhot < R_hc (Eq. 20) or the disc is in its own shadow there; other outflows (super-Eddington, magnetic winds) are ignored", [freddi]() {return freddi->tau_r_corona()[freddi->last()];}},
+			{"R_Fmax", "Rsun", "Radius where the viscous torque Fvis has its maximum (Mdot = 0), over the hot zone (inner edge to Rhot)", [freddi]() {return cmToSun(freddi->R()[freddi->i_Fmax()]);}},
+			{"tau_r_corona_Fmax", "dimensionless", "tau_r_corona (Ostriker, McKee & Klein 1991, Appendix G, G.2) at R_Fmax, the radius where Fvis has its maximum: grid value of the tau_r_corona radial column, so it is zero if R_Fmax < R_hc (Eq. 20) or the disc is in its own shadow there; other outflows (super-Eddington, magnetic winds) are ignored", [freddi]() {return freddi->tau_r_corona()[freddi->i_Fmax()];}},
+			{"tau_r_corona_RIC", "dimensionless", "tau_r_corona (Ostriker, McKee & Klein 1991, Appendix G, G.2) evaluated directly at the genuine Compton radius GM mu m_p/(k_B T_ic) (no Dubus correction), which is often beyond the radial grid: (L/Ledd)/Xi_tilde*(R_IC/z_disk)^2, z_disk = disc semi-height if R_IC<=Rhot, else 0.01 R_IC; zero if R_IC<R_hc (Eq. 20); shadow is not taken into account; other outflows (super-Eddington, magnetic winds) are ignored", [freddi]() {return freddi->tau_r_corona_at_R_IC();}},
 			{"Sigma_wind", "g/cm^2", "Surface density in corona/wind at the outer radius of the hot disk", [freddi]() {return freddi->Column_density_wind()[freddi->last()];}},
 			{"Cirr_scatter_out", "float", "Diagnostic only, not applied to the evolution: Cirr at the outer radius of the hot disk per the scatter_dependent formula (etaX * scattering_opacity * Sigma_wind / 2), regardless of the active --irradiation_type", [freddi]() {return freddi->Cirr_scatter_dependent(freddi->last());}},
 			{"Cirr_scatter_Rtid", "float", "Diagnostic only, not applied to the evolution: same as Cirr_scatter_out but evaluated at the disc's outer (tidal) radius Rtid instead of the (time-dependent) hot disk radius Rhot", [freddi]() {return freddi->Cirr_scatter_dependent(freddi->Nx() - 1);}},
@@ -323,6 +328,9 @@ std::vector<FileOutputLongField> FreddiFileOutput::initializeDiskStructureFields
 			{"Tirr", "K", "Irradiation temperature (Qirr / sigma_SB)^1/4", [freddi](size_t i) {return freddi->Tirr()[i];}},
 			{"Height", "cm", "Semiheight", [freddi](size_t i) {return freddi->Height()[i];}},
 			{"tau_perp_wind", "dimensionless", "Optical (scattering) depth perpendicular to the disc plane through the wind: scattering_opacity * Column_density_wind", [freddi](size_t i) {return freddi->tau_perp_wind()[i];}},
+			{"tau_perp_corona", "dimensionless", "Optical (scattering) depth perpendicular to the disc plane through a dynamically stable Compton-heated corona, Ostriker, McKee & Klein (1991) Eqs. (47) and (55); zero inside R_hc (Eq. 20) and where the disc is in its own shadow (Shadow())", [freddi](size_t i) {return freddi->tau_perp_corona()[i];}},
+			{"tau_r_wind", "dimensionless", "Optical (scattering) depth along z=const (radially) through the thermal wind from the wind launch radius; other outflows (super-Eddington, magnetic winds) are ignored", [freddi](size_t i) {return freddi->tau_r_wind()[i];}},
+			{"tau_r_corona", "dimensionless", "Optical (scattering) depth along z=const (radially) through the Compton-heated corona, (L/Ledd)/Xi_tilde*(R/z_disk)^2 with f=1, z_disk = disc semi-height up to Rhot and 0.01 R beyond (Ostriker, McKee & Klein 1991, Eqs. 39, 44; Appendix G, G.2); zero inside R_hc (Eq. 20) and where the disc is in its own shadow (Shadow()); other outflows (super-Eddington, magnetic winds) are ignored", [freddi](size_t i) {return freddi->tau_r_corona()[i];}},
 	};
 }
 

@@ -275,7 +275,11 @@ double FreddiState::R_iC_from_T_ic(double T_ic) const {
 		// windT_ic_approach=Done2018 since that's the T_ic(l) relation this correction was derived
 		// alongside; applied here (not just in the Cirr_Dubus2019()/Mdot_wind_Dubus2019()
 		// diagnostics) so the actually simulated wind uses the same R_IC Dubus et al. (2019) do.
-		R_iC *= (1.0 - std::sqrt(2.0) * Lbol_disk() / L_edd_disk());
+		// For L/Ledd >= 1/sqrt(2) the factor is <= 0 (radiation pressure unbinds the gas at all
+		// radii, i.e. the wind is launched everywhere): clamp to a small positive floor
+		// (1e-6 of the uncorrected value) so that xi = R/R_IC stays finite and positive.
+		const double correction = 1.0 - std::sqrt(2.0) * Lbol_disk() / L_edd_disk();
+		R_iC *= std::max(correction, 1e-6);
 	}
 	return R_iC;
 }
@@ -738,6 +742,207 @@ const vecd& FreddiState::tau_perp_wind() const {
         opt_str_.tau_perp_wind = std::move(x);
     }
     return *opt_str_.tau_perp_wind;
+}
+
+// Relative disc semi-height z_disk/R assumed for the corona's tau_par (G.2) in the cold zone
+// beyond Rhot (Height() itself, which is irradiation-related, is not changed)
+static constexpr double z_disk_to_R_cold_corona = 0.01;
+
+double FreddiState::R_IC_corona() const {
+    // Genuine Compton radius R_IC = GM mu m_p / (k_B T_ic) used for the Ostriker et al. (1991)
+    // corona (xi = R/R_IC), WITHOUT the Dubus et al. (2019) Eq. (4) radiation-pressure
+    // correction (1 - sqrt(2) L/Ledd), which R_iC_from_T_ic() / wind_->R_IC() apply to the wind
+    // under --windT_ic_approach=Done2018. 0 for wind types without an inverse Compton temperature.
+    const double T_ic = wind_ ? wind_->T_ic() : 0.0;
+    if (T_ic <= 0.0) {
+        return 0.0;
+    }
+    return GM() * args().disk->mu * GSL_CONST_CGSM_MASS_PROTON / (GSL_CONST_CGSM_BOLTZMANN * T_ic);
+}
+
+double FreddiState::R_hc() const {
+    // Ostriker, McKee & Klein (1991, ApJ 377, 593) Eq. (20): the minimum radius R_hc where a hot
+    // Compton-heated corona can exist, i.e. where the direct central flux L/(4 pi R^2) exceeds
+    // twice the locally generated viscous flux 2 Qvis, with Qvis = 3 Fvis omega_K / (8 pi R^2)
+    // (omega_K = sqrt(GM/R^3)). Qvis is evaluated from F() over the whole grid (not from Tph_vis,
+    // which is only filled up to the hot-zone edge), so R_hc does not depend on Rhot. Both L and
+    // Qvis scale with Mdot, so R_hc is nearly independent of Mdot (it depends on Mx, eta).
+    // Qvis drops faster than R^-2 in the outer disc, so the direct flux wins outside R_hc: the
+    // outermost crossing is searched for (log-linear interpolation between grid nodes).
+    // Returns R()[first()] if the direct flux dominates everywhere, and +inf if nowhere.
+    const double L = Lbol_disk();
+    const size_t out = Nx() - 1;
+    auto g = [&](size_t i) {
+        const double omega_K = std::sqrt(GM() / m::pow<3>(R()[i]));
+        const double Qvis = 3.0 * F()[i] * omega_K / (8.0 * M_PI * m::pow<2>(R()[i]));
+        return L / (4.0 * M_PI * m::pow<2>(R()[i])) - 2.0 * Qvis;
+    };
+    if (g(out) <= 0.0) {
+        return std::numeric_limits<double>::infinity();
+    }
+    for (size_t i = out; i > first(); --i) {
+        if (g(i - 1) <= 0.0) {
+            const double g_in = g(i - 1), g_out = g(i);
+            const double w = -g_in / (g_out - g_in);
+            return std::exp((1.0 - w) * std::log(R()[i - 1]) + w * std::log(R()[i]));
+        }
+    }
+    return R()[first()];
+}
+
+const vecd& FreddiState::tau_r_wind() const {
+    // Optical (Thomson/scattering) depth along z = const, i.e. radially in the disc plane, through
+    // the thermal wind from the wind launch radius to R:
+    //   tau_r_wind(R) = scattering_opacity * int_{R_launch}^{R} rho_wind dR',
+    //   rho_wind = Mdot_wind_running / (4 pi R^2 v_wind)  (so that int rho dR ~ Column_density_wind).
+    // R_launch = R_wind_inner_launch_radius(R_IC) (windR_launch_factor * R_IC); for wind types
+    // without it, integrated from the inner disc edge. Trapezoidal rule, starting from the first
+    // grid node with R >= R_launch. Zero if R_IC <= 0.
+    // NOTE: only the thermal (Compton-heated) wind is included. Other outflows
+    // (super-Eddington winds, magnetic winds) are ignored.
+    if (!opt_str_.tau_r_wind) {
+        vecd x(Nx(), 0.0);
+        const double R_IC = wind_ ? wind_->R_IC() : 0.0;
+        if (R_IC > 0.0) {
+            const double R_launch = args().disk->windparams.count("R_launch_factor")
+                    ? R_wind_inner_launch_radius(R_IC) : 0.0;
+            const vecd& mdot_run = Mdot_wind_running();
+            const double kappa = args().irr->scattering_opacity;
+            auto rho = [&](size_t i) {
+                return mdot_run[i] / (4.0 * M_PI * m::pow<2>(R()[i]) * v_wind()[i]);
+            };
+            bool started = false;
+            for (size_t i = first(); i < Nx(); i++) {
+                if (R()[i] < R_launch) {
+                    continue;
+                }
+                if (started) {
+                    x[i] = x[i-1] + kappa * 0.5 * (rho(i) + rho(i-1)) * (R()[i] - R()[i-1]);
+                }
+                started = true;
+            }
+        }
+        opt_str_.tau_r_wind = std::move(x);
+    }
+    return *opt_str_.tau_r_wind;
+}
+
+double FreddiState::z_disk_corona(size_t i) const {
+    // Disc semi-height used in the corona's tau_par (G.2): Height() in the hot zone (up to Rhot),
+    // and z_disk_to_R_cold_corona * R in the cold zone beyond Rhot.
+    return i <= last() ? Height()[i] : z_disk_to_R_cold_corona * R()[i];
+}
+
+const vecd& FreddiState::tau_r_corona() const {
+    // Optical depth along z = const (radially) through the dynamically stable Compton-heated
+    // corona, Ostriker, McKee & Klein (1991, ApJ 377, 593) Eqs. (39), (44), in the form of
+    //   tau_par(xi) ~ (L/Ledd) / Xi_tilde * (xi / z_disk(xi))^2                    (G.2)
+    // (Appendix G): corona hot (T_mb = T_ic) and optically thin, f = exp(-tau) + f_sc = 1 (scattered
+    // radiation ignored), and h_x ~ 0 (source in the disc plane; may change for super-Eddington
+    // regime), so xi_min depends mainly on the relative disc thickness. xi/z_disk = R / z_disk(R)
+    // (both in units of R_IC), z_disk = Height() the disc semi-height in the hot zone (up to
+    // Rhot) and 0.01 R in the cold zone beyond Rhot (z_disk_to_R_cold_corona). Xi_tilde = 0.65
+    // (T_ic/1e8 K)^-3/2 (Eq. 29b). R_IC is the genuine GM mu m_p/(k_B T_ic) (R_IC_corona(), no
+    // Dubus correction). Zero inside R_hc (OMK Eq. 20, see R_hc(): no hot corona there), at the
+    // nodes shadowed by the disc itself (Shadow(), evaluated independently of Rhot: the cold disc
+    // is typically in the shadow), and for wind types without a T_ic.
+    // NOTE: only the Compton-heated corona is included. Other outflows
+    // (super-Eddington winds, magnetic winds) are ignored.
+    if (!opt_str_.tau_r_corona) {
+        vecd x(Nx(), 0.0);
+        const double T_ic = wind_ ? wind_->T_ic() : 0.0;
+        if (T_ic > 0.0 && R_IC_corona() > 0.0) {
+            const double R_hc_ = R_hc();
+            const double l = Lbol_disk() / L_edd_disk();
+            const double Xi_tilde = 0.65 * std::pow(T_ic / 1e8, -1.5);
+            const vecd& shadow = Shadow();
+            for (size_t i = first(); i < Nx(); i++) {
+                if (R()[i] < R_hc_ || shadow[i] > 0.0) {
+                    continue;
+                }
+                x[i] = l / Xi_tilde * m::pow<2>(R()[i] / z_disk_corona(i));
+            }
+        }
+        opt_str_.tau_r_corona = std::move(x);
+    }
+    return *opt_str_.tau_r_corona;
+}
+
+double FreddiState::tau_r_corona_at_R_IC() const {
+    // tau_r_corona (G.2, see tau_r_corona()) evaluated directly at the genuine Compton radius R_IC
+    // (R_IC_corona()), which is often outside the radial grid: tau_par = (L/Ledd)/Xi_tilde *
+    // (R_IC / z_disk(R_IC))^2, with z_disk = Height() (linearly interpolated) if R_IC <= Rhot
+    // and z_disk_to_R_cold_corona * R_IC beyond Rhot. Zero if R_IC < R_hc or without a T_ic.
+    // Shadow() is NOT taken into account here (it is a formula evaluation, not a grid value).
+    const double T_ic = wind_ ? wind_->T_ic() : 0.0;
+    const double R_IC = R_IC_corona();
+    if (T_ic <= 0.0 || R_IC <= 0.0 || R_IC < R_hc()) {
+        return 0.0;
+    }
+    double z_disk = z_disk_to_R_cold_corona * R_IC;
+    if (R_IC <= R()[last()]) {
+        const auto it = std::lower_bound(R().begin() + first(), R().begin() + last() + 1, R_IC);
+        const size_t j = std::max<size_t>(it - R().begin(), first() + 1);
+        const double w = (R_IC - R()[j-1]) / (R()[j] - R()[j-1]);
+        z_disk = (1.0 - w) * Height()[j-1] + w * Height()[j];
+    }
+    if (z_disk <= 0.0) {
+        return 0.0;
+    }
+    const double l = Lbol_disk() / L_edd_disk();
+    const double Xi_tilde = 0.65 * std::pow(T_ic / 1e8, -1.5);
+    return l / Xi_tilde * m::pow<2>(R_IC / z_disk);
+}
+
+size_t FreddiState::i_Fmax() const {
+    // Grid index of the maximum of the viscous torque F (Fvis) over the hot zone, first()..last()
+    // (up to Rhot), i.e. where Mdot = dF/dh = 0 (the boundary between the inner accreting and the
+    // outer spreading disc). If F grows monotonically outward over the hot zone, this is Rhot.
+    return std::max_element(F().begin() + first(), F().begin() + last() + 1) - F().begin();
+}
+
+double FreddiState::tau_parallel_corona(size_t i) const {
+    return tau_r_corona()[i];
+}
+
+double FreddiState::tau_parallel_wind(size_t i) const {
+    return tau_r_wind()[i];
+}
+
+const vecd& FreddiState::tau_perp_corona() const {
+    // Ostriker, McKee & Klein (1991, ApJ 377, 593), isothermal Compton-heated corona:
+    //   tau_perp(xi) ~ f (L/Ledd) / (Xi_tilde xi^{1/2}) (T_mb/T_ic)^{1/2}      (O47, O55)
+    //   Xi_tilde ~ 0.65 T_ic8^{-3/2}, T_ic8 = T_ic / 1e8 K                      (O29b)
+    // xi = R / R_IC; T_mb/T_ic depends weakly on tau_parallel and is taken to be 1.
+    // f is the local attenuation factor, Eqs. (17)-(18): f = f_dir + f_sc + f_d. As a first
+    // approximation only f_dir = exp(-tau_parallel) is kept, with
+    // tau_parallel = tau_r_corona + tau_r_wind (computed with f = 1 to avoid circularity).
+    // R_IC is the genuine GM mu m_p/(k_B T_ic) (R_IC_corona()), not the Dubus-corrected
+    // wind_->R_IC(). Zero inside R_hc (OMK Eq. 20, see R_hc()), at the nodes shadowed by the disc
+    // itself (Shadow(), see tau_r_corona()) and for wind types without an inverse Compton
+    // temperature. Other outflows (super-Eddington winds, magnetic winds) are not
+    // included in tau_parallel.
+    if (!opt_str_.tau_perp_corona) {
+        vecd x(Nx(), 0.0);
+        const double T_ic = wind_ ? wind_->T_ic() : 0.0;
+        if (T_ic > 0.0 && R_IC_corona() > 0.0) {
+            const double R_IC = R_IC_corona();
+            const double R_hc_ = R_hc();
+            const double l = Lbol_disk() / L_edd_disk();
+            const double Xi_tilde = 0.65 * std::pow(T_ic / 1e8, -1.5);
+            const vecd& shadow = Shadow();
+            for (size_t i = first(); i < Nx(); i++) {
+                if (R()[i] < R_hc_ || shadow[i] > 0.0 || z_disk_corona(i) <= 0.0) {
+                    continue;
+                }
+                const double f = std::exp(-(tau_parallel_corona(i) + tau_parallel_wind(i)));
+                const double xi = R()[i] / R_IC;
+                x[i] = f * l / (Xi_tilde * std::sqrt(xi));
+            }
+        }
+        opt_str_.tau_perp_corona = std::move(x);
+    }
+    return *opt_str_.tau_perp_corona;
 }
 
 const vecd& FreddiState::Mdot_wind_running() const {

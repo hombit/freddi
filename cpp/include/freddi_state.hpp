@@ -277,7 +277,7 @@ private:
 		boost::optional<double> Mdot_wind;
 		boost::optional<double> Mdot_wind_cold;
 		//boost::optional<double> Mdot_wind_running;
-		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height, Shadow,Column_density_wind,Mdot_wind_running,tau_perp_wind;
+		boost::optional<vecd> W, Tph, Qx, Tph_vis, Tph_X, Tirr, Kirr, Sigma, Height, Shadow,Column_density_wind,Mdot_wind_running,tau_perp_wind,tau_perp_corona,tau_r_wind,tau_r_corona;
 	};
 
 protected:
@@ -441,6 +441,16 @@ public:
 	const vecd& Mdot_wind_running() const;
 	const vecd& Column_density_wind() const;
 	const vecd& tau_perp_wind() const;
+	const vecd& tau_perp_corona() const;
+	const vecd& tau_r_wind() const;
+	const vecd& tau_r_corona() const;
+	double R_hc() const;
+	double R_IC_corona() const;
+	double z_disk_corona(size_t i) const;
+	double tau_r_corona_at_R_IC() const;
+	size_t i_Fmax() const;
+	double tau_parallel_corona(size_t i) const;
+	double tau_parallel_wind(size_t i) const;
 	double Luminosity(const vecd& T, double nu1, double nu2) const;
 	inline double magnitude(const double lambda, const double F0) const {
 		return -2.5 * std::log10(I_lambda<HotRegion>(lambda) * cosiOverD2() / F0);
