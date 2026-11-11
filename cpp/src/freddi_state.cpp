@@ -960,6 +960,16 @@ const vecd& FreddiState::tau_perp_corona() const {
     // itself (Shadow(), see tau_r_corona()) and for wind types without an inverse Compton
     // temperature. Other outflows (super-Eddington winds, magnetic winds) are not
     // included in tau_parallel.
+    // WARNING / thin-corona cut: also zero where xi <= (z_disk/R)^2, i.e. where the corona scale
+    // height h_c = xi^{3/2} R_IC (isothermal at T_ic, h_c/R = xi^{1/2}) is not above the disc
+    // semi-height z_disk (z_disk_corona()). OMK's tau_perp (Eqs. 46-47) is derived for a corona
+    // thicker than the disc (h_c > h_d); below that the isochoric model has no coronal layer and
+    // Eq. (47) does not apply. This is the same condition, xi_min = (z_disk/R)^2 >= xi, that makes
+    // tau_r_corona zero (exact h_x = 0 solution of Eq. 40, see tau_r_corona()). Without this cut
+    // tau_perp_corona would be unattenuated (f = 1, since tau_r_corona = 0 there) and spuriously
+    // large in the inner disc (e.g. ~0.4 at 3e7 cm in a test run where the cut is at ~3e9 cm).
+    // NOTE: the corona there is not necessarily absent, only not described by this model (a
+    // corona thinner than the disc, or the vertically stratified tail of Eq. 34).
     if (!opt_str_.tau_perp_corona) {
         vecd x(Nx(), 0.0);
         const double T_ic = wind_ ? wind_->T_ic() : 0.0;
@@ -970,11 +980,16 @@ const vecd& FreddiState::tau_perp_corona() const {
             const double Xi_tilde = 0.65 * std::pow(T_ic / 1e8, -1.5);
             const vecd& shadow = Shadow();
             for (size_t i = first(); i < Nx(); i++) {
-                if (R()[i] < R_hc_ || shadow[i] > 0.0 || z_disk_corona(i) <= 0.0) {
+                const double z_disk = z_disk_corona(i);
+                if (R()[i] < R_hc_ || shadow[i] > 0.0 || z_disk <= 0.0) {
+                    continue;
+                }
+                const double xi = R()[i] / R_IC;
+                // Thin-corona cut (see WARNING above): corona scale height <= disc semi-height
+                if (xi <= m::pow<2>(z_disk / R()[i])) {
                     continue;
                 }
                 const double f = std::exp(-(tau_parallel_corona(i) + tau_parallel_wind(i)));
-                const double xi = R()[i] / R_IC;
                 x[i] = f * l / (Xi_tilde * std::sqrt(xi));
             }
         }
