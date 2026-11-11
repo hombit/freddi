@@ -744,7 +744,8 @@ const vecd& FreddiState::tau_perp_wind() const {
     return *opt_str_.tau_perp_wind;
 }
 
-// Relative disc semi-height z_disk/R assumed for the corona's tau_par (G.2) in the cold zone
+// Relative disc semi-height z_disk/R = h_d/xi assumed for the corona's source-to-disc optical
+// depth tau(xi) (Ostriker, McKee & Klein 1991, Eqs. 39-40; see tau_r_corona()) in the cold zone
 // beyond Rhot (Height() itself, which is irradiation-related, is not changed)
 static constexpr double z_disk_to_R_cold_corona = 0.01;
 
@@ -828,39 +829,70 @@ const vecd& FreddiState::tau_r_wind() const {
 }
 
 double FreddiState::z_disk_corona(size_t i) const {
-    // Disc semi-height used in the corona's tau_par (G.2): Height() in the hot zone (up to Rhot),
-    // and z_disk_to_R_cold_corona * R in the cold zone beyond Rhot.
+    // Disc semi-height H_d = h_d R_IC used in the corona's source-to-disc optical depth tau(xi)
+    // (OMK91 Eqs. 39-40, see tau_r_corona()): Height() in the hot zone (up to Rhot), and
+    // z_disk_to_R_cold_corona * R in the cold zone beyond Rhot.
     return i <= last() ? Height()[i] : z_disk_to_R_cold_corona * R()[i];
 }
 
 const vecd& FreddiState::tau_r_corona() const {
-    // Optical depth along z = const (radially) through the dynamically stable Compton-heated
-    // corona, Ostriker, McKee & Klein (1991, ApJ 377, 593) Eqs. (39), (44), in the form of
-    //   tau_par(xi) ~ (L/Ledd) / Xi_tilde * (xi / z_disk(xi))^2                    (G.2)
-    // (Appendix G): corona hot (T_mb = T_ic) and optically thin, f = exp(-tau) + f_sc = 1 (scattered
-    // radiation ignored), and h_x ~ 0 (source in the disc plane; may change for super-Eddington
-    // regime), so xi_min depends mainly on the relative disc thickness. xi/z_disk = R / z_disk(R)
-    // (both in units of R_IC), z_disk = Height() the disc semi-height in the hot zone (up to
-    // Rhot) and 0.01 R in the cold zone beyond Rhot (z_disk_to_R_cold_corona). Xi_tilde = 0.65
-    // (T_ic/1e8 K)^-3/2 (Eq. 29b). R_IC is the genuine GM mu m_p/(k_B T_ic) (R_IC_corona(), no
-    // Dubus correction). Zero inside R_hc (OMK Eq. 20, see R_hc(): no hot corona there), at the
+    // Optical depth tau(xi) through the dynamically stable Compton-heated corona along the ray
+    // from the central source to the disc surface at (xi, h_d(xi)), Ostriker, McKee & Klein
+    // (1991, ApJ 377, 593; OMK91) Eqs. (32), (35). The ray is nearly parallel to the disc plane,
+    // hence the column name "tau_r". This is NOT OMK91's tau_parallel (their Eqs. 48-49, the
+    // depth from xi outward to the disc edge). It is an integral, not a local value:
+    //   tau(xi) ~ int_{xi_min}^{xi} R_IC sigma_T n_e,b(xi') dxi',
+    //   R_IC sigma_T n_e,b = (L/Ledd) / (Xi_tilde xi'^2)                          (Eqs. 29a, 37)
+    //   => tau(xi) = (L/Ledd)/Xi_tilde * [1/xi_min - 1/xi]                        (Eq. 39)
+    // where xi_min is where the straight ray enters the corona, i.e. crosses one coronal scale
+    // height h_c(xi') = xi'^{3/2} (isothermal at T_ic, h_c/R = xi^{1/2}) above the base:
+    //   (h_x - xi_min^{3/2}) / xi_min = (h_x - h_d(xi)) / xi                     (Eq. 40)
+    // Here h_x = 0 (source in the disc plane; may change for the super-Eddington regime), for
+    // which Eq. (40) is solved exactly: xi_min^{1/2} = h_d/xi = z_disk/R, so xi_min = (z_disk/R)^2
+    // and Eq. (39) gives
+    //   tau(xi) = (L/Ledd)/Xi_tilde * max(0, (R/z_disk)^2 - R_IC/R)              (exact, h_x = 0)
+    // It is zero where xi <= (z_disk/R)^2, i.e. where the corona scale height is below the disc
+    // semi-height (h_c < h_d): OMK's thick-corona assumption h_c >> h_d fails there and the ray
+    // stays below the coronal base layer (isochoric model: no coronal density there).
+    // Previously OMK's approximate solution of Eq. (40), Eq. (44), was used, i.e. Eq. (45):
+    //   tau(xi) ~ (L/Ledd)/Xi_tilde / (h_x^{2/3} + (h_d/xi)^2)                   (Eq. 45)
+    // which for h_x = 0 drops the -R_IC/R term; it overestimates tau by 1/(1 - xi_min/xi), and
+    // spuriously gave tau ~ 1-3 in the inner disc where xi < xi_min.
+    // WARNING: earlier versions of this comment and of the output help texts called the h_x = 0
+    // form of Eq. (45) "(G.2)" and cited "Appendix G" of OMK91. OMK91 has only Appendices A and
+    // B; the origin of the "G.2" label is unknown (not verified against any source), so it is
+    // kept here only as a pointer to the old notes:
+    //   tau(xi) ~ (L/Ledd) / Xi_tilde * (xi / h_d(xi))^2                         ("G.2")
+    // Because n_e,b ~ xi'^-2 the integral is dominated by its lower limit, so tau decreases with
+    // R where the disc flares (H/R grows -> the ray enters the corona farther out, where it is
+    // less dense). z_disk = Height() the disc semi-height in the hot zone (up to Rhot) and
+    // 0.01 R in the cold zone beyond Rhot (z_disk_to_R_cold_corona). Xi_tilde = 0.65
+    // (T_ic/1e8 K)^-3/2 (Eq. 29b). Assumptions: isochoric corona (density n_e,b(xi) up to one
+    // scale height, no vertical stratification of Eq. 34), corona hot (T_mb = T_ic), optically
+    // thin, f = exp(-tau) + f_sc = 1 (attenuation and scattered radiation ignored); values
+    // tau >~ 1 are outside the range of validity (the e^{-tau} factor in Eq. 38 would then
+    // limit tau). R_IC is the genuine GM mu m_p/(k_B T_ic) (R_IC_corona(), no Dubus correction). Zero inside R_hc (OMK Eq. 20, see R_hc(): no hot corona there), at the
     // nodes shadowed by the disc itself (Shadow(), evaluated independently of Rhot: the cold disc
-    // is typically in the shadow), and for wind types without a T_ic.
+    // is typically in the shadow; the ray then does not reach the disc surface), and for wind
+    // types without a T_ic.
     // NOTE: only the Compton-heated corona is included. Other outflows
     // (super-Eddington winds, magnetic winds) are ignored.
     if (!opt_str_.tau_r_corona) {
         vecd x(Nx(), 0.0);
         const double T_ic = wind_ ? wind_->T_ic() : 0.0;
-        if (T_ic > 0.0 && R_IC_corona() > 0.0) {
+        const double R_IC = R_IC_corona();
+        if (T_ic > 0.0 && R_IC > 0.0) {
             const double R_hc_ = R_hc();
             const double l = Lbol_disk() / L_edd_disk();
             const double Xi_tilde = 0.65 * std::pow(T_ic / 1e8, -1.5);
             const vecd& shadow = Shadow();
             for (size_t i = first(); i < Nx(); i++) {
-                if (R()[i] < R_hc_ || shadow[i] > 0.0) {
+                const double z_disk = z_disk_corona(i);
+                if (R()[i] < R_hc_ || shadow[i] > 0.0 || z_disk <= 0.0) {
                     continue;
                 }
-                x[i] = l / Xi_tilde * m::pow<2>(R()[i] / z_disk_corona(i));
+                // OMK91 Eq. (39) with the exact h_x = 0 solution of Eq. (40), xi_min = (z_disk/R)^2:
+                x[i] = l / Xi_tilde * std::max(0.0, m::pow<2>(R()[i] / z_disk) - R_IC / R()[i]);
             }
         }
         opt_str_.tau_r_corona = std::move(x);
@@ -869,9 +901,10 @@ const vecd& FreddiState::tau_r_corona() const {
 }
 
 double FreddiState::tau_r_corona_at_R_IC() const {
-    // tau_r_corona (G.2, see tau_r_corona()) evaluated directly at the genuine Compton radius R_IC
-    // (R_IC_corona()), which is often outside the radial grid: tau_par = (L/Ledd)/Xi_tilde *
-    // (R_IC / z_disk(R_IC))^2, with z_disk = Height() (linearly interpolated) if R_IC <= Rhot
+    // tau_r_corona (OMK91 Eqs. 39-40, exact for h_x = 0, see tau_r_corona()) evaluated directly
+    // at the genuine Compton radius R_IC (R_IC_corona()), i.e. xi = 1, which is often outside
+    // the radial grid: tau = (L/Ledd)/Xi_tilde * max(0, (R_IC / z_disk(R_IC))^2 - 1),
+    // with z_disk = Height() (linearly interpolated) if R_IC <= Rhot
     // and z_disk_to_R_cold_corona * R_IC beyond Rhot. Zero if R_IC < R_hc or without a T_ic.
     // Shadow() is NOT taken into account here (it is a formula evaluation, not a grid value).
     const double T_ic = wind_ ? wind_->T_ic() : 0.0;
@@ -891,7 +924,7 @@ double FreddiState::tau_r_corona_at_R_IC() const {
     }
     const double l = Lbol_disk() / L_edd_disk();
     const double Xi_tilde = 0.65 * std::pow(T_ic / 1e8, -1.5);
-    return l / Xi_tilde * m::pow<2>(R_IC / z_disk);
+    return l / Xi_tilde * std::max(0.0, m::pow<2>(R_IC / z_disk) - 1.0);
 }
 
 size_t FreddiState::i_Fmax() const {
@@ -901,6 +934,9 @@ size_t FreddiState::i_Fmax() const {
     return std::max_element(F().begin() + first(), F().begin() + last() + 1) - F().begin();
 }
 
+// Optical depths from the central source to the disc surface at R()[i], used for the direct-flux
+// attenuation f_dir = exp(-tau) in tau_perp_corona(). The name "tau_parallel" refers to the
+// ray being nearly parallel to the disc plane; it is not OMK91's tau_parallel (Eqs. 48-49).
 double FreddiState::tau_parallel_corona(size_t i) const {
     return tau_r_corona()[i];
 }
@@ -915,8 +951,10 @@ const vecd& FreddiState::tau_perp_corona() const {
     //   Xi_tilde ~ 0.65 T_ic8^{-3/2}, T_ic8 = T_ic / 1e8 K                      (O29b)
     // xi = R / R_IC; T_mb/T_ic depends weakly on tau_parallel and is taken to be 1.
     // f is the local attenuation factor, Eqs. (17)-(18): f = f_dir + f_sc + f_d. As a first
-    // approximation only f_dir = exp(-tau_parallel) is kept, with
-    // tau_parallel = tau_r_corona + tau_r_wind (computed with f = 1 to avoid circularity).
+    // approximation only f_dir = exp(-tau) is kept (OMK91, text after Eq. 45), with tau the
+    // optical depth from the source to the disc surface at R: tau = tau_r_corona + tau_r_wind
+    // (computed with f = 1 to avoid circularity; called tau_parallel below for the ray being
+    // nearly parallel to the disc, not OMK91's tau_parallel of Eqs. 48-49).
     // R_IC is the genuine GM mu m_p/(k_B T_ic) (R_IC_corona()), not the Dubus-corrected
     // wind_->R_IC(). Zero inside R_hc (OMK Eq. 20, see R_hc()), at the nodes shadowed by the disc
     // itself (Shadow(), see tau_r_corona()) and for wind types without an inverse Compton
