@@ -27,7 +27,9 @@ void nonlinear_diffusion_nonuniform_wind_1_2 (
 		const std::function<vecd (const vecd &, const vecd &, size_t, size_t)>& wunc, // first argument is array of x_i, second — array of y(x_i,t); return value — array of w(x_i,y_i)
 		const vecd &x, // array with (non)uniform grid
 		vecd &y, // array with initial condition and for results
-		size_t first, size_t last // indexes of front and back elements
+		size_t first, size_t last, // indexes of front and back elements
+		int* bc_clamped = nullptr, // if given: max(*bc_clamped, number of Picard iterations in which right_bounder_cond had to be clamped toward zero to keep y >= 0)
+		double* bc_factor = nullptr // if given: min(*bc_factor, effective / requested right_bounder_cond); 1 means the requested condition was used
 );
 
 

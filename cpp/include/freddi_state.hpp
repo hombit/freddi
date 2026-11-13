@@ -254,6 +254,8 @@ private:
 		double Mdot_out;
 		double Mdot_in_prev = -INFINITY;
 		double Mdot_outer_boundary;
+		int bc_clamped = 0; // diagnostic: Picard iterations in which the outer boundary condition was clamped (max over the step's solves)
+		double bc_factor = 1.0; // diagnostic: effective / requested outer boundary condition (min over the step's solves)
 		double t;
 		size_t i_t;
 		size_t first;
@@ -322,6 +324,8 @@ public:
 public:
 	inline double Mdot_out() const { return current_.Mdot_out; }
 	inline double Mdot_outer_boundary() const { return current_.Mdot_outer_boundary; }
+	inline int bc_clamped() const { return current_.bc_clamped; }
+	inline double bc_factor() const { return current_.bc_factor; }
 	inline double F_in() const { return current_.F_in; }
 	inline const vecd& F() const { return current_.F; }
 	inline double t() const { return current_.t; }

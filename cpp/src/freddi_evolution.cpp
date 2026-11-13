@@ -24,8 +24,9 @@ void FreddiEvolution::nonlinear_diffusion(const double tau) {
 			windA(), windB(), windC(),
 			wunc(),
 			h(), current_.F,
-			first(), last());
-        
+			first(), last(),
+			&current_.bc_clamped, &current_.bc_factor);
+
 }
 
 void FreddiEvolution::nonlinear_diffusion_outer_condition_depends_Mdotin(const double tau) {
@@ -62,7 +63,8 @@ void FreddiEvolution::nonlinear_diffusion_outer_condition_depends_Mdotin(const d
 			windA(), windB(), windC(),
 			wunc(),
 			h(), current_.F,
-			first(), last()
+			first(), last(),
+			&current_.bc_clamped, &current_.bc_factor // worst values over the solves Brent makes in this step
 		);
 
 
@@ -122,6 +124,8 @@ void FreddiEvolution::step(const double tau) {
 	
 	if (args().calc->verb_level > VERB_LEVEL_MESSAGES) {std::cout << "c_A__ t="<< sToDay(current_.t)  <<"\n" << std::endl;}
 	//nonlinear_diffusion(tau);
+	current_.bc_clamped = 0;   // diagnostic columns bc_clamped (max) and bc_factor (min)
+	current_.bc_factor = 1.0;  // over this step's solves
 	if (Mdot_outer_boundary() == 0.0) {
         nonlinear_diffusion(tau); // valid for outer boundary condition Mdotin=0
     } else {
